@@ -4,15 +4,15 @@ import React from 'react'
 import Link from 'next/link'
 import {cn} from '@/lib/utils'
 import {usePathname} from 'next/navigation'
-import { MagnifyingGlassIcon, BellAlertIcon, HomeIcon, 
+import { MagnifyingGlassIcon, BellAlertIcon,
          ChatBubbleOvalLeftIcon, TrophyIcon, 
-         ChartBarIcon } from '@heroicons/react/24/outline'
+         ChartBarIcon, Squares2X2Icon } from '@heroicons/react/24/outline'
 
 export default function Navbar() {
   const pathname = usePathname();
 
   const navItems = [
-    {href: "/", label: "Dashboard", icon: HomeIcon},
+    {href: "/", label: "Dashboard", icon: Squares2X2Icon},
     {href: "/chat", label: "Chat", icon: ChatBubbleOvalLeftIcon},
     {href: "/game", label: "Game", icon: TrophyIcon},
     {href: "/leaderboard", label: "Leaderboard", icon: ChartBarIcon},
