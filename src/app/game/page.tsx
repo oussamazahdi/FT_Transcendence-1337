@@ -1,8 +1,12 @@
 "use client"
 import React from 'react'
 import { useState } from 'react';
+import GameSetup from '@/components/gameSetupComp/gameSetup';
 
 export default function Game() {
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
   const [activeComponent, setActiveComponent] = useState("local");
 
   const localGameItems = [
@@ -35,7 +39,7 @@ export default function Game() {
       alt: "1vs1 cover",
       description: "Play a single game against a friend.",
       rightButton: "Invite friend",
-      leftButton: "Make Match"
+      leftButton: "Matchmaking"
     },
     {
       titel: "Tournament",
@@ -51,7 +55,7 @@ export default function Game() {
       alt: "XO game cover",
       description: "Play a single game against a friend.",
       rightButton: "Invite friend",
-      leftButton: "Make Match"
+      leftButton: "Matchmaking"
     }
   ];
 
@@ -88,7 +92,8 @@ export default function Game() {
                 <h1 className='font-bold text-2xl pt-3 pb-1'>{item.titel}</h1>
                 <p className='pb-3 text-[#D5D5D5]'>{item.description}</p> 
                 <button className=' bg-[#181818]/65 hover:bg-[#1B1B1B]/65 mb-3 py-2 w-full rounded-lg \
-                cursor-pointer shadow-md font-medium'>
+                cursor-pointer shadow-md font-medium'
+                onClick={() => setIsModalVisible(true)}>
                   {item.button}
                 </button>
               </div>
@@ -96,6 +101,7 @@ export default function Game() {
         </div>
     )
   }
+
   return (
       <div className='absolute top-5 text-white flex flex-col inset-x-0 mx-5 items-center space-y-15'>
         <div className='space-x-2 p-2 bg-white/20 rounded-xl'>
@@ -111,6 +117,8 @@ export default function Game() {
           >Online</button>
         </div>
         {activeComponent === "local" ? <LocalGame /> : <RemoteGame />}
+        <GameSetup isVisible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}/>
         </div>
   );
 }

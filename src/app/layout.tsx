@@ -43,7 +43,7 @@ export default function RootLayout({
       >
         <Background>
           <Navbar />
-          <div className="absolute top-35 text-white flex inset-x-0 justify-center mx-5">
+          <div className="absolute top-35 text-white flex inset-x-0 justify-center mx-5 scroll-smooth">
             {children}
           </div>
         </Background>
