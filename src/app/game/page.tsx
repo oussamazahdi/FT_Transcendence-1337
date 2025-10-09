@@ -1,7 +1,9 @@
 "use client"
+
 import React from 'react'
 import { useState } from 'react';
-import GameSetup from '@/components/gameSetupComp/gameSetup';
+import GameSetup from "@/components/gameSetupComp/gameSetup";
+
 
 export default function Game() {
 
@@ -136,8 +138,8 @@ export default function Game() {
           >Online</button>
         </div>
         {activeComponent === "local" ? <LocalGame /> : <RemoteGame />}
-        <GameSetup isVisible={isModalVisible}
-        onClose={() => setIsModalVisible(false)}/>
+        <GameSetup isVisible={isModalVisible} onClose={() => setIsModalVisible(false)} />
+
         </div>
   );
 }
