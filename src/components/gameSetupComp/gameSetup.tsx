@@ -310,7 +310,6 @@ const GameSetup: React.FC<{ isVisible: boolean; onClose: () => void }> = ({ isVi
 
   useEffect(() => {
     localStorage.setItem("GameData", JSON.stringify(gameData));
-    console.log("all data updated:", gameData);
   }, [gameData]);
 
   const avatars = [
