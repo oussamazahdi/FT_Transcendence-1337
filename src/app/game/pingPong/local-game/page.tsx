@@ -336,10 +336,8 @@
 
 
 
-
 "use client"
 
-import { stat } from "fs"
 import React, { useRef, useState, useEffect } from "react"
 
 export default function PingPongGame() {
@@ -349,6 +347,9 @@ export default function PingPongGame() {
   const [isPause, setIsPause] = useState(false)
   const [gameOver, setGameOver] = useState(false)
   const [winner, setWinner] = useState("")
+
+  // 🧠 Keep an up-to-date pause flag for the game loop
+  const isPauseRef = useRef(false)
 
   const [players, setPlayers] = useState({
     player1: {
@@ -366,7 +367,7 @@ export default function PingPongGame() {
   })
 
   const gameStateRef = useRef({
-    board: { width: 1024, height: 700, color: "#262626"  },
+    board: { width: 1024, height: 700, color: "#262626" },
     ball: { x: 512, y: 350, velocityX: 5, velocityY: 5, speed: 5, radius: 10 },
     player1: { x: 30, y: 300, width: 20, height: 100 },
     player2: { x: 974, y: 300, width: 20, height: 100 },
@@ -375,27 +376,25 @@ export default function PingPongGame() {
   })
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const animationRef = useRef<number | null>(null)
 
   // 🧠 Load saved GameData
   useEffect(() => {
     const dataLine = localStorage.getItem("GameData")
     if (!dataLine) return
     const data = JSON.parse(dataLine)
-
-    const paddleHeight = 90 + (15 * data.paddleSize)
+    const paddleHeight = 90 + 15 * data.paddleSize
     const width = 1024
     const height = 700
 
-    // Update ref (game logic)
     gameStateRef.current = {
-      board: { width, height,
-               color: "#262626" },
+      board: { width, height, color: "#262626" },
       ball: {
         x: width / 2,
         y: height / 2,
         velocityX: data.ballSpeed * 2,
         velocityY: data.ballSpeed * 1.5,
-        speed: data.ballSpeed > 2 ? data.ballSpeed - 0.5 : data.ballSpeed - 1.5, // i have probleme here i need 
+        speed: data.ballSpeed > 2 ? 0.25 * data.ballSpeed : 0.3 * data.ballSpeed,
         radius: 10,
       },
       player1: { x: 40, y: height / 2 - paddleHeight / 2, width: 15, height: paddleHeight },
@@ -404,7 +403,6 @@ export default function PingPongGame() {
       scoreLimit: data.scoreLimit,
     }
 
-    // Update state (UI)
     setPlayers({
       player1: {
         nickName: data.player1NickName,
@@ -423,12 +421,12 @@ export default function PingPongGame() {
     setScore1(data.player1Score || 0)
     setScore2(data.player2Score || 0)
   }, [])
-  // 
-  useEffect(()=>{
+
+  // 🎮 Main game loop
+  useEffect(() => {
     const state = gameStateRef.current
     const canvas = canvasRef.current
     if (!canvas) return
-
     const context = canvas.getContext("2d")
     if (!context) return
 
@@ -437,7 +435,7 @@ export default function PingPongGame() {
       if (e.key === "s") state.keys.s = true
       if (e.key === "ArrowUp") state.keys.ArrowUp = true
       if (e.key === "ArrowDown") state.keys.ArrowDown = true
-      if (e.key === " ") setIsPause((p) => !p)
+      if (e.key === " ") togglePause() // spacebar toggles pause too
     }
 
     const keyUpHandler = (e: KeyboardEvent) => {
@@ -449,64 +447,53 @@ export default function PingPongGame() {
 
     window.addEventListener("keydown", keyDownHandler)
     window.addEventListener("keyup", keyUpHandler)
-    
-    
+
     const gameLoop = () => {
-      if (isPause || gameOver) return ;
-      
-      if (state.keys.w && state.player1.y > 0 ) state.player1.y -= paddleSpeed
-      if (state.keys.s && (state.player1.y + state.player1.height) < state.board.height ) state.player1.y += paddleSpeed
-      if (state.keys.ArrowUp && state.player2.y > 0 ) state.player2.y -= paddleSpeed
-      if (state.keys.ArrowDown && (state.player2.y + state.player2.height) < state.board.height ) state.player2.y += paddleSpeed
-
-      context.clearRect(0, 0, state.board.width, state.board.height)
-      
-      if (state.ball.y <= 0 || state.ball.y >= state.board.height) state.ball.velocityY *= -1;
-
-      if (state.ball.x > state.player2.x && state.ball.y > state.player2.y && state.ball.y < state.player2.y + state.player2.height)
-          state.ball.velocityX *= -1;
-      if (state.ball.x < state.player1.x + state.player1.width && state.ball.y > state.player1.y && state.ball.y < state.player1.y + state.player1.height)
-          state.ball.velocityX *= -1;
-
-
-
-
-
-
-
-
-
-
-      // if(state.ball.y >= state.player1.y && state.ball.y <= (state.player1.y + state.player1.height) )
-      //   if(state.ball.y - state.ball.radius < 0 || state.ball.y + state.ball.radius > canvas.height )
-      // {
-      //   state.ball.velocityX *= -1;
-
-      // }
-
-      // if (state.ball.y - state.ball.radius < 0 || state.ball.y + state.ball.radius > canvas.height) {
-      //   state.ball.dy *= -1
-      // }
-      // if(state.ball.x >= state.player1.x && state.ball.x <= state.player1.x + state.player1.height)
-      // {
-      //   state.ball.velocityX *= -1;
-
-      // }
-      if (state.ball.x <= 0 || state.ball.x >= state.board.width) {
-        // state.ball.velocityX *= -1;
-        if (state.ball.x >= state.board.width)
-          setScore1((s)=> s + 1)
-        if (state.ball.x <= 0)
-          setScore2((s)=> s + 1)
-        state.ball.x = state.board.width / 2;
-        state.ball.y = state.board.height / 2;
+      if (isPauseRef.current || gameOver) {
+        animationRef.current = requestAnimationFrame(gameLoop)
+        return
       }
+
+      // Movement
+      if (state.keys.w && state.player1.y > 0) state.player1.y -= paddleSpeed
+      if (state.keys.s && state.player1.y + state.player1.height < state.board.height)
+        state.player1.y += paddleSpeed
+      if (state.keys.ArrowUp && state.player2.y > 0) state.player2.y -= paddleSpeed
+      if (state.keys.ArrowDown && state.player2.y + state.player2.height < state.board.height)
+        state.player2.y += paddleSpeed
+
+      // Clear board
+      context.clearRect(0, 0, state.board.width, state.board.height)
+
+      // Ball collisions
+      if (state.ball.y <= 0 || state.ball.y >= state.board.height) state.ball.velocityY *= -1
+
+      if (
+        state.ball.x > state.player2.x &&
+        state.ball.y > state.player2.y &&
+        state.ball.y < state.player2.y + state.player2.height
+      )
+        state.ball.velocityX *= -1
+      if (
+        state.ball.x < state.player1.x + state.player1.width &&
+        state.ball.y > state.player1.y &&
+        state.ball.y < state.player1.y + state.player1.height
+      )
+        state.ball.velocityX *= -1
+
+      // Scoring
+      if (state.ball.x <= 0 || state.ball.x >= state.board.width) {
+        if (state.ball.x >= state.board.width) setScore1((s) => s + 1)
+        if (state.ball.x <= 0) setScore2((s) => s + 1)
+        state.ball.x = state.board.width / 2
+        state.ball.y = state.board.height / 2
+      }
+
+      // Ball movement
       state.ball.x += state.ball.velocityX * state.ball.speed
       state.ball.y += state.ball.velocityY * state.ball.speed
 
-
-
-
+      // Draw
       context.beginPath()
       context.setLineDash([15, 8])
       context.moveTo(state.board.width / 2, 0)
@@ -514,100 +501,80 @@ export default function PingPongGame() {
       context.strokeStyle = "#FFFFFF"
       context.stroke()
 
-      context.beginPath();
-      context.rect(state.player1.x, state.player1.y, state.player1.width, state.player1.height);
-      context.fillStyle = "#D9D9D9";
-      context.fill()
-      
-      context.beginPath();
-      context.rect(state.player2.x, state.player2.y, state.player2.width, state.player2.height);
-      context.fillStyle = "#D9D9D9";
-      context.fill()
-      
+      context.fillStyle = "#D9D9D9"
+      context.fillRect(state.player1.x, state.player1.y, state.player1.width, state.player1.height)
+      context.fillRect(state.player2.x, state.player2.y, state.player2.width, state.player2.height)
+
       context.beginPath()
       context.arc(state.ball.x, state.ball.y, state.ball.radius, 0, Math.PI * 2)
-      context.fillStyle = "#D9D9D9";
+      context.fillStyle = "#D9D9D9"
       context.fill()
 
-      requestAnimationFrame(gameLoop)
+      animationRef.current = requestAnimationFrame(gameLoop)
     }
-    gameLoop();
-  }, [gameStateRef.current, isPause, gameOver])
 
+    animationRef.current = requestAnimationFrame(gameLoop)
+
+    return () => {
+      window.removeEventListener("keydown", keyDownHandler)
+      window.removeEventListener("keyup", keyUpHandler)
+      if (animationRef.current) cancelAnimationFrame(animationRef.current)
+    }
+  }, [gameOver])
+
+  // 🧩 Toggle pause (for both UI and loop)
+  const togglePause = () => {
+    setIsPause((prev) => {
+      const newValue = !prev
+      isPauseRef.current = newValue
+      return newValue
+    })
+  }
+
+  // 🖼️ UI
   return (
     <div className="absolute top-28 inset-x-0 flex flex-col items-center text-white space-y-6">
-       {/* 🧑‍🤝‍🧑 Players + Score */}
-       <div className="flex flex-row items-center justify-between w-full lg:max-w-5xl px-5">
-         {/* Player 1 */}
-         <div className="flex gap-1 flex-col  items-center">
-           <img
-            src={players.player1.avatar}
-            alt="player 1 avatar"
-            className="w-20 h-20 rounded-lg object-cover"
-          />
-          {/* <div className="flex flex-col gap-1"> */}
-            <h3 className="text-2xl font-semibold">{players.player1.nickName}</h3>
-            <p className="text-xs text-[#858585]">w (up) / s (down)</p>
-          {/* </div> */}
+      <div className="flex flex-row items-center justify-between w-full lg:max-w-5xl px-5">
+        <div className="flex gap-1 flex-col items-center">
+          <img src={players.player1.avatar} alt="player 1 avatar" className="w-20 h-20 rounded-lg object-cover" />
+          <h3 className="text-2xl font-semibold">{players.player1.nickName}</h3>
+          <p className="text-xs text-[#858585]">w (up) / s (down)</p>
         </div>
 
-        {/* Score */}
         <div className="flex flex-col items-center">
-          <p className="text-5xl font-bold">
-            {`${score1} - ${score2}`}
-          </p>
+          <p className="text-5xl font-bold">{`${score1} - ${score2}`}</p>
         </div>
 
-        {/* Player 2 */}
-        <div className="flex gap-1 flex-col  items-center">
-          {/* <div className="flex flex-col text-right gap-1"> */}
-          {/* </div> */}
-          <img
-            src={players.player2.avatar}
-            alt="player 2 avatar"
-            className="w-20 h-20 rounded-lg object-cover"
-          />
-            <h3 className="text-2xl font-semibold">{players.player2.nickName}</h3>
-            <p className="text-xs text-[#858585]">↑ (up) / ↓ (down)</p>
+        <div className="flex gap-1 flex-col items-center">
+          <img src={players.player2.avatar} alt="player 2 avatar" className="w-20 h-20 rounded-lg object-cover" />
+          <h3 className="text-2xl font-semibold">{players.player2.nickName}</h3>
+          <p className="text-xs text-[#858585]">↑ (up) / ↓ (down)</p>
         </div>
       </div>
 
-      {/* 🎮 Game section */}
       <div className="mx-4">
-        <canvas ref={canvasRef} width={gameStateRef.current.board.width} height={gameStateRef.current.board.height}
-                className={`bg-[#262626] w-full max-w-240  rounded-2xl border border-white/20`}
+        <canvas
+          ref={canvasRef}
+          width={gameStateRef.current.board.width}
+          height={gameStateRef.current.board.height}
+          className="bg-[#262626] w-full max-w-240 rounded-2xl border border-white/20"
         />
       </div>
 
-      {/* ⏸️ Buttons */}
       <div className="flex flex-row gap-6 mb-4">
-        <button className="px-6 py-2 bg-[#8D8D8D]/25 rounded-lg hover:bg-white/25 transition">
-          Pause
+        <button
+          className="px-6 py-2 bg-[#8D8D8D]/25 rounded-lg hover:bg-white/25 transition"
+          onClick={togglePause}
+        >
+          {isPause ? "Resume" : "Pause"}
         </button>
         <button className="px-6 py-2 bg-[#8D8D8D]/25 rounded-lg hover:bg-white/25 transition">
           Restart
         </button>
       </div>
     </div>
-
   )
 }
-
-// export default Page;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
