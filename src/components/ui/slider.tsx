@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "@/lib/utils"
 
 export interface SliderProps {
   className?: string
@@ -21,7 +20,7 @@ export interface SliderProps {
 const Slider = React.forwardRef<HTMLDivElement, SliderProps>(
   (
     {
-      className,
+      className = "",
       label,
       defaultValue = 0,
       value: controlledValue,
@@ -40,14 +39,8 @@ const Slider = React.forwardRef<HTMLDivElement, SliderProps>(
     const sliderRef = React.useRef<HTMLDivElement>(null)
     const [isDragging, setIsDragging] = React.useState(false)
 
-    // ✅ Ensure we always have a valid value
-    const value =
-      controlledValue !== undefined ? controlledValue : internalValue
-
-    // ✅ Clamp value to valid range (prevents out-of-track position)
+    const value = controlledValue !== undefined ? controlledValue : internalValue
     const clampedValue = Math.min(Math.max(value, minValue), maxValue)
-
-    // ✅ Calculate percentage safely
     const percentage =
       ((clampedValue - minValue) / (maxValue - minValue)) * 100 || 0
 
@@ -109,13 +102,10 @@ const Slider = React.forwardRef<HTMLDivElement, SliderProps>(
       }
     }, [isDragging, updateValue])
 
-    // ✅ Keep thumb position correct when resizing the window
     React.useEffect(() => {
       const handleResize = () => {
         if (sliderRef.current && controlledValue === undefined) {
-          setInternalValue((v) =>
-            Math.min(Math.max(v, minValue), maxValue)
-          )
+          setInternalValue((v) => Math.min(Math.max(v, minValue), maxValue))
         }
       }
       window.addEventListener("resize", handleResize)
@@ -123,12 +113,10 @@ const Slider = React.forwardRef<HTMLDivElement, SliderProps>(
     }, [minValue, maxValue, controlledValue])
 
     return (
-      <div ref={ref} className={cn("w-full select-none", className)}>
+      <div ref={ref} className={`w-full select-none ${className}`}>
         {/* Header */}
         <div className="flex items-center justify-between mb-2">
-          {label && (
-            <span className="text-base font-normal text-white">{label}</span>
-          )}
+          {label && <span className="text-base font-normal text-white">{label}</span>}
           <span className="text-base font-normal text-white">
             {clampedValue.toFixed(1)}
           </span>
@@ -137,26 +125,19 @@ const Slider = React.forwardRef<HTMLDivElement, SliderProps>(
         {/* Track */}
         <div
           ref={sliderRef}
-          className={cn(
-            "relative w-full cursor-pointer",
-            disabled && "opacity-60"
-          )}
+          className={`relative w-full cursor-pointer ${disabled ? "opacity-60" : ""}`}
           onMouseDown={handleMouseDown}
         >
-          <div
-            className={cn(
-              "relative w-full rounded-full bg-gray-600",
-              sizeConfig[size].track
-            )}
-          >
+          <div className={`relative w-full rounded-full bg-gray-600 ${sizeConfig[size].track}`}>
             {/* Filled track */}
             <div
-              className={cn(
-                "absolute left-0 top-0 h-full rounded-full transition-all duration-150 ease-out",
-                color === "foreground" && "bg-[#D9D9D9]",
-                color === "primary" && "bg-blue-500",
-                color === "secondary" && "bg-green-500"
-              )}
+              className={`absolute left-0 top-0 h-full rounded-full transition-all duration-150 ease-out ${
+                color === "foreground"
+                  ? "bg-[#D9D9D9]"
+                  : color === "primary"
+                  ? "bg-blue-500"
+                  : "bg-green-500"
+              }`}
               style={{ width: `${percentage}%` }}
             />
 
@@ -165,31 +146,29 @@ const Slider = React.forwardRef<HTMLDivElement, SliderProps>(
               steps.map((s, i) => (
                 <div
                   key={i}
-                  className={cn(
-                    "absolute top-1/2 -translate-y-1/2 -translate-x-1/2 rounded-full",
-                    sizeConfig[size].step,
-                    s.percentage <= percentage
-                      ? "bg-white"
-                      : "bg-gray-400"
-                  )}
+                  className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 rounded-full ${
+                    sizeConfig[size].step
+                  } ${s.percentage <= percentage ? "bg-white" : "bg-gray-400"}`}
                   style={{ left: `${s.percentage}%` }}
                 />
               ))}
           </div>
 
-          {/* ✅ Thumb */}
+          {/* Thumb */}
           <div
-            className={cn(
-              "absolute top-1/2 -translate-y-1/2 -translate-x-1/2 rounded-full border-2 border-white shadow-md transition-transform duration-100 ease-in-out",
-              isDragging ? "scale-110" : "scale-100",
+            className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 rounded-full border-2 border-white shadow-md transition-transform duration-100 ease-in-out ${
+              isDragging ? "scale-110" : "scale-100"
+            } ${
               disabled
                 ? "cursor-not-allowed"
-                : "cursor-grab active:cursor-grabbing",
-              color === "foreground" && "bg-slate-800",
-              color === "primary" && "bg-blue-500",
-              color === "secondary" && "bg-green-500",
-              sizeConfig[size].thumb
-            )}
+                : "cursor-grab active:cursor-grabbing"
+            } ${
+              color === "foreground"
+                ? "bg-slate-800"
+                : color === "primary"
+                ? "bg-blue-500"
+                : "bg-green-500"
+            } ${sizeConfig[size].thumb}`}
             style={{ left: `${percentage}%` }}
           />
         </div>

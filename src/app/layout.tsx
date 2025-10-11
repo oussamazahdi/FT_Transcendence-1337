@@ -3,12 +3,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Poppins } from "next/font/google";
-import Background from '@/components/Background'
-import Navbar from '@/components/Navbar'
+import Background from '../components/Background' // Adjusted path
+import Navbar from '../components/Navbar' // Adjusted path
 import { usePathname } from "next/navigation";
 
-
-// import { Bitcount_Prop_Single } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -26,13 +24,6 @@ const poppins = Poppins({
   weight: ["400", "500", "700"], // optional: choose the weights you need
 });
 
-// export const metadata: Metadata = {
-//   title: "Ft_transcendence",
-//   description: "42 ft_transcendence is a full-stack web application project from 42 School that challenges students to \
-//   build a real-time multiplayer Pong game with authentication, chat, and responsive UI. It combines modern web \
-//   technologies, backend architecture, and advanced features like WebSockets, OAuth, and two-factor authentication, \
-//   showcasing skills in fullstack development, security, and scalability.",
-// };
 
 export default function RootLayout({
   children,
@@ -40,17 +31,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathName = usePathname();
-  const hideNavBar = pathName === "/game/pingo"
+  const hideNavBar = pathName === "/game/pingPong/local-game"
   return (
     <html lang="en">
       <body
         className={`${poppins.className} ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Background>
-          {!hideNavBar && <Navbar />}
-          {/* <Navbar /> */}
-          <div className=
-          {hideNavBar === true ? "text-white" :"absolute top-35 text-white flex inset-x-0 justify-center mx-5 scroll-smooth"}>
+          <Navbar />
+          <div
+          className={hideNavBar === true ? "text-white" :"absolute top-35 text-white flex inset-x-0 justify-center mx-5 scroll-smooth"}>
             {children}
           </div>
         </Background>
@@ -58,66 +48,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-
-
-
-// // "use client"
-
-// import type { Metadata } from "next";
-// import { Geist, Geist_Mono } from "next/font/google";
-// import { Poppins } from "next/font/google";
-// import Background from '@/components/Background'
-// import Navbar from '@/components/Navbar'
-// import { usePathname } from "next/navigation";
-
-
-// // import { Bitcount_Prop_Single } from "next/font/google";
-// import "./globals.css";
-
-// const geistSans = Geist({
-//   variable: "--font-geist-sans",
-//   subsets: ["latin"],
-// });
-
-// const geistMono = Geist_Mono({
-//   variable: "--font-geist-mono",
-//   subsets: ["latin"],
-// });
-
-// const poppins = Poppins({
-//   subsets: ["latin"],   // required
-//   weight: ["400", "500", "700"], // optional: choose the weights you need
-// });
-
-// export const metadata: Metadata = {
-//   title: "Ft_transcendence",
-//   description: "42 ft_transcendence is a full-stack web application project from 42 School that challenges students to \
-//   build a real-time multiplayer Pong game with authentication, chat, and responsive UI. It combines modern web \
-//   technologies, backend architecture, and advanced features like WebSockets, OAuth, and two-factor authentication, \
-//   showcasing skills in fullstack development, security, and scalability.",
-// };
-
-// export default function RootLayout({
-//   children,
-// }: Readonly<{
-//   children: React.ReactNode;
-// }>) {
-//   // const pathName = usePathname();
-//   // const hideNavBar = pathName === "/game/pingo"
-//   return (
-//     <html lang="en">
-//       <body
-//         className={`${poppins.className} ${geistSans.variable} ${geistMono.variable} antialiased`}
-//       >
-//         <Background>
-//           {/* {!hideNavBar && <Navbar />} */}
-//           <Navbar />
-//           <div className="absolute top-35 text-white flex inset-x-0 justify-center mx-5 scroll-smooth">
-//             {children}
-//           </div>
-//         </Background>
-//       </body>
-//     </html>
-//   );
-// }
