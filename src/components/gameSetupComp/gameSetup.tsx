@@ -20,9 +20,9 @@ const GameSetup: React.FC<{ isVisible: boolean; onClose: () => void }> = ({ isVi
     player1Avatar: "/gameAvatars/Empty.jpeg",
     player2NickName: "player 2",
     player2Avatar: "/gameAvatars/Empty.jpeg",
-    paddleColor: "bg-gray-300",
-    ballColor: "bg-blue-900",
-    boardColor: "bg-[#262626]",
+    paddleColor: "#D9D9D9",
+    ballColor: "#D9D9D9",
+    boardColor: "#262626",
     scoreLimit: 5,
     ballSpeed: 1,
     paddleSize: 1,
@@ -32,7 +32,6 @@ const GameSetup: React.FC<{ isVisible: boolean; onClose: () => void }> = ({ isVi
 
   useEffect(() => {
     localStorage.setItem("GameData", JSON.stringify(gameData));
-    console.log("all data updated:", gameData);
   }, [gameData]);
 
   const avatars = [
@@ -187,8 +186,8 @@ const GameSetup: React.FC<{ isVisible: boolean; onClose: () => void }> = ({ isVi
                 {colorList.map((c) => (
                   <button
                     key={c.name}
-                    className={`w-10 h-10 ${c.class} rounded-md border ${gameData.paddleColor === c.class ? "border-white scale-110" : "border-gray-400/0"} hover:scale-110 transition-transform`}
-                    onClick={() => setGameData(prev => ({ ...prev, paddleColor: c.class }))}/>
+                    className={`w-10 h-10 ${c.class} rounded-md border ${gameData.paddleColor === c.hashCode ? "border-white scale-110" : "border-gray-400/0"} hover:scale-110 transition-transform`}
+                    onClick={() => setGameData(prev => ({ ...prev, paddleColor: c.hashCode }))}/>
                 ))}
               </div>
               <h4 className='text-sm text-gray-400/65'>Choose your paddle color </h4>
@@ -200,8 +199,8 @@ const GameSetup: React.FC<{ isVisible: boolean; onClose: () => void }> = ({ isVi
                 {colorList.map((c) => (
                   <button
                     key={c.name}
-                    className={`w-10 h-10 ${c.class} rounded-md border  ${gameData.ballColor === c.class ? "border-white scale-110" : "border-gray-400/0"} hover:scale-110 transition-transform`}
-                    onClick={() => setGameData(prev => ({ ...prev, ballColor: c.class }))}/>
+                    className={`w-10 h-10 ${c.class} rounded-md border  ${gameData.ballColor === c.hashCode ? "border-white scale-110" : "border-gray-400/0"} hover:scale-110 transition-transform`}
+                    onClick={() => setGameData(prev => ({ ...prev, ballColor: c.hashCode }))}/>
                 ))}
               </div>
               <h4 className='text-sm text-gray-400/65'>Choose your ball color </h4>
@@ -213,8 +212,8 @@ const GameSetup: React.FC<{ isVisible: boolean; onClose: () => void }> = ({ isVi
                 {colorList.map((c) => (
                   <button
                     key={c.name}
-                    className={`w-10 h-10 ${c.class} rounded-md border ${gameData.boardColor === c.class ? "border-white scale-110" : "border-gray-400/0"} hover:scale-110 transition-transform`}
-                    onClick={() => setGameData(prev => ({ ...prev, boardColor: c.class }))}/>
+                    className={`w-10 h-10 ${c.class} rounded-md border ${gameData.boardColor === c.hashCode ? "border-white scale-110" : "border-gray-400/0"} hover:scale-110 transition-transform`}
+                    onClick={() => setGameData(prev => ({ ...prev, boardColor: c.hashCode }))}/>
                 ))}
               </div>
               <h4 className='text-sm text-gray-400/65'>Choose your Board color </h4>

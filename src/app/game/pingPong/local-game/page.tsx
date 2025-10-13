@@ -1,341 +1,3 @@
-// "use client"
-
-// import React, { useState, useEffect } from 'react';
-
-// const Page = () => {
-//   const [gameData, setGameData] = useState({
-//     player1NickName: "player 1",
-//     player1Avatar: "/gameAvatars/Empty.jpeg",
-//     player2NickName: "player 2",
-//     player2Avatar: "/gameAvatars/Empty.jpeg",
-//     paddleColor: "bg-gray-300",
-//     ballColor: "bg-white",
-//     boardColor: "bg-[#262626]",
-//     scoreLimit: 5,
-//     ballSpeed: 2,
-//     paddleSize: 2,
-//     player1Score: 0,
-//     player2Score: 0,
-//   });
-
-//   useEffect(() => {
-//     const dataline = localStorage.getItem("GameData");
-//     if (dataline) {
-//       setGameData(JSON.parse(dataline));
-//     }
-//   }, []);
-
-//   return (
-//     <div className="absolute top-28 inset-x-0 flex flex-col items-center text-white space-y-6">
-//       {/* players + Score */}
-//       <div className="flex flex-row items-center justify-between w-full lg:max-w-5xl px-5">
-        
-//         {/* Player 1 */}
-//         <div className="flex gap-4 flex-col md:flex-row items-center">
-//           <img
-//             src={gameData.player1Avatar}
-//             alt="player 1 avatar"
-//             className="w-20 h-20 rounded-lg object-cover"
-//           />
-//           <div className="flex flex-col gap-1">
-//             <h3 className="text-2xl font-semibold">{gameData.player1NickName}</h3>
-//             <p className="text-xs text-[#858585]">w (up) / s (down)</p>
-//           </div>
-//         </div>
-
-//         {/* Score */}
-//         <div className="flex flex-col items-center">
-//           <p className="text-3xl font-bold">{`${gameData.player1Score ?? 0} - ${gameData.player2Score ?? 0}`}</p>
-//         </div>
-
-//         {/* Player 2 */}
-//         <div className="flex gap-4 flex-col md:flex-row items-center">
-//           <div className="flex flex-col text-right gap-1">
-//             <h3 className="text-2xl font-semibold">{gameData.player2NickName}</h3>
-//             <p className="text-xs text-[#858585]">↑ (up) / ↓ (down)</p>
-//           </div>
-//           <img
-//             src={gameData.player2Avatar}
-//             alt="player 2 avatar"
-//             className="w-20 h-20 rounded-lg object-cover"
-//           />
-//         </div>
-//       </div>
-//       {/* Game section */}
-//       <div className='px-110 py-70 border bg-[#262626] rounded-xl '>
-//         <h1>Game section</h1>
-//       </div>
-//       {/* buttons section */}
-//       <div className="flex flex-row gap-6 mb-4">
-//         <button className="px-6 py-2 bg-[#8D8D8D]/25 rounded-lg hover:bg-white/25 transition">Pause</button>
-//         <button className="px-6 py-2 bg-[#8D8D8D]/25 rounded-lg hover:bg-white/25 transition">Restart</button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Page;
-// "use client"
-
-// import React, { useRef, useState, useEffect } from 'react';
-
-// const Page = () => {
-//   const [gameData, setGameData] = useState({
-//     player1NickName: "player 1",
-//     player1Avatar: "/gameAvatars/Empty.jpeg",
-//     player2NickName: "player 2",
-//     player2Avatar: "/gameAvatars/Empty.jpeg",
-//     paddleColor: "bg-gray-300",
-//     ballColor: "bg-white",
-//     boardColor: "bg-[#262626]",
-//     scoreLimit: 5,
-//     ballSpeed: 2,
-//     paddleSize: 1,
-//     player1Score: 0,
-//     player2Score: 0,
-//   });
-//   console.log(gameData)
-//   const width = 1010;
-//   const height = 600;
-//   useEffect(() => {
-//     const dataline = localStorage.getItem("GameData");
-//     if (dataline) {
-//       setGameData(JSON.parse(dataline));
-//     }
-
-//   }, []);
-
-//   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  
-  
-  
-//   const boardData = {
-//     boardWidth : 1010,
-//     boardHeight : 600,
-
-//   }
-
-//   const [firstPlayer, setFirstPlayer] = useState({
-//     playerHeight : 80 * gameData.paddleSize,
-//     playerWidth : -12,
-//     playerX : 40,
-//     playerY : (boardData.boardHeight / 2) - ((70 * gameData.paddleSize) / 2),
-//   })
-//   // const firstPlayer = {
-//   //   playerHeight : 20 * gameData.,
-//   //   playerWidth : 10
-//   // }
-
-
-
-//   useEffect(()=>{
-//     const context = canvasRef.current?.getContext("2d");
-//     if (!context) {
-//       // console.log("failed to get context");
-//       return;
-//     };
-
-//     context.fillStyle = "#D1D3D4";
-//     context.fillRect(firstPlayer.playerX, firstPlayer.playerY, firstPlayer.playerWidth, firstPlayer.playerHeight);
-
-
-//     console.log("player H : ", firstPlayer.playerHeight, gameData.paddleSize)
-//     console.log("player W : ", firstPlayer.playerWidth)
-//     console.log("player X : ", firstPlayer.playerX)
-//     console.log("player Y : ", firstPlayer.playerY)
-//     // context.clearRect(0, 0, width, height);
-//     // context.strokeStyle = "red";
-//     // context.lineWidth = 2;
-//     // const bigX = 10, bigY = 10, bigW = width - 20, bigH = height - 20;
-//     // context.strokeRect(bigX, bigY, bigW, bigH);
-//   }, [width, height, firstPlayer.playerHeight])
-
-
-
-
-
-
-//   return (
-//     <div className="absolute top-28 inset-x-0 flex flex-col items-center text-white space-y-6">
-//       {/* players + Score */}
-//       <div className="flex flex-row items-center justify-between w-full lg:max-w-5xl px-5">
-        
-//         {/* Player 1 */}
-//         <div className="flex gap-4 flex-col md:flex-row items-center">
-//           <img
-//             src={gameData.player1Avatar}
-//             alt="player 1 avatar"
-//             className="w-20 h-20 rounded-lg object-cover"
-//           />
-//           <div className="flex flex-col gap-1">
-//             <h3 className="text-2xl font-semibold">{gameData.player1NickName}</h3>
-//             <p className="text-xs text-[#858585]">w (up) / s (down)</p>
-//           </div>
-//         </div>
-
-//         {/* Score */}
-//         <div className="flex flex-col items-center">
-//           <p className="text-3xl font-bold">{`${gameData.player1Score ?? 0} - ${gameData.player2Score ?? 0}`}</p>
-//         </div>
-
-//         {/* Player 2 */}
-//         <div className="flex gap-4 flex-col md:flex-row items-center">
-//           <div className="flex flex-col text-right gap-1">
-//             <h3 className="text-2xl font-semibold">{gameData.player2NickName}</h3>
-//             <p className="text-xs text-[#858585]">↑ (up) / ↓ (down)</p>
-//           </div>
-//           <img
-//             src={gameData.player2Avatar}
-//             alt="player 2 avatar"
-//             className="w-20 h-20 rounded-lg object-cover"
-//           />
-//         </div>
-//       </div>
-//       {/* Game section */}
-//       <div className='mx-4'>
-//         <canvas ref={canvasRef} width={width} height={height} className={`${gameData.boardColor} w-full max-w-5xl  rounded-2xl border border-1 border-white/20`}/>
-//       </div>
-//       {/* buttons section */}
-//       <div className="flex flex-row gap-6 mb-4">
-//         <button className="px-6 py-2 bg-[#8D8D8D]/25 rounded-lg hover:bg-white/25 transition">Pause</button>
-//         <button className="px-6 py-2 bg-[#8D8D8D]/25 rounded-lg hover:bg-white/25 transition">Restart</button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Page;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// "use client";
-
-// import React, { useRef, useState, useEffect, useCallback } from "react";
-
-// const Page = () => {
-//   const [gameData, setGameData] = useState({
-//     player1NickName: "player 1",
-//     player1Avatar: "/gameAvatars/Empty.jpeg",
-//     player2NickName: "player 2",
-//     player2Avatar: "/gameAvatars/Empty.jpeg",
-//     paddleColor: "bg-gray-300",
-//     ballColor: "bg-white",
-//     boardColor: "bg-[#262626]",
-//     scoreLimit: 5,
-//     ballSpeed: 2,
-//     paddleSize: 1,
-//     player1Score: 0,
-//     player2Score: 0,
-//   });
-
-//   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-//   const width = 1010;
-//   const height = 600;
-
-//   // 🧠 Load saved data once
-//   useEffect(() => {
-//     const dataLine = localStorage.getItem("GameData");
-//     if (dataLine) setGameData(JSON.parse(dataLine));
-//   }, []);
-
-//   // 🎮 Player state
-//   const [firstPlayer, setFirstPlayer] = useState({
-//     playerHeight: 80 + 10 * gameData.paddleSize,
-//     playerWidth: 12,
-//     playerX: 40,
-//     playerY: height / 2 - (80 + 10 * gameData.paddleSize) / 2,
-//     velocityY: 0,
-//   });
-
-//   const [secondPlayer, setSecondPlayer] = useState({
-//     playerHeight: 80 + 10 * gameData.paddleSize,
-//     playerWidth: 12,
-//     playerX: width - 52,
-//     playerY: height / 2 - (80 + 10 * gameData.paddleSize) / 2,
-//     velocityY: 0,
-//   });
-
-//   // 🕹 Handle key events safely (only one listener)
-//   const handleKeyDown = useCallback((event: KeyboardEvent) => {
-//     if (event.key === "w") {
-//       setFirstPlayer((prev) => ({...prev,playerY: Math.max(0, prev.playerY - 40)}));
-//     } else if (event.key === "s") {
-//       setFirstPlayer((prev) => ({...prev,playerY: Math.min(height - prev.playerHeight, prev.playerY + 40)}));
-//     }
-//     else if (event.key === "ArrowUp") {
-//       setSecondPlayer((prev) => ({...prev,playerY: Math.max(0, prev.playerY - 40)}));
-//     }
-//     else if (event.key === "ArrowDown") {
-//       setSecondPlayer((prev) => ({...prev,playerY: Math.min(height - prev.playerHeight, prev.playerY + 40)}));
-//     }
-
-//   }, [height]);
-
-//   // 🧹 Attach and clean up event listener
-//   useEffect(() => {
-//     window.addEventListener("keydown", handleKeyDown);
-//     return () => window.removeEventListener("keydown", handleKeyDown);
-//   }, [handleKeyDown]);
-
-//   // 🎨 Game rendering loop
-//   useEffect(() => {
-//     const canvas = canvasRef.current;
-//     if (!canvas) return;
-//     const ctx = canvas.getContext("2d");
-//     if (!ctx) return;
-
-//     const draw = () => {
-//       ctx.clearRect(0, 0, width, height);
-
-//       // Board background
-//       ctx.fillStyle = "#262626";
-//       ctx.fillRect(0, 0, width, height);
-
-//       // Player 1
-//       ctx.fillStyle = "#D1D3D4";
-//       ctx.fillRect(
-//         firstPlayer.playerX,
-//         firstPlayer.playerY,
-//         firstPlayer.playerWidth,
-//         firstPlayer.playerHeight
-//       );
-
-//       // Player 2
-//       ctx.fillRect(
-//         secondPlayer.playerX,
-//         secondPlayer.playerY,
-//         secondPlayer.playerWidth,
-//         secondPlayer.playerHeight
-//       );
-
-//       requestAnimationFrame(draw);
-//     };
-
-//     draw();
-//   }, [firstPlayer, secondPlayer]);
-
-//   return (
-//     
-//   );
-// };
-
-// export default Page;
-
-
-
-
-
 "use client"
 
 import React, { useRef, useState, useEffect } from "react"
@@ -360,10 +22,10 @@ export default function PingPongGame() {
     player2: {
       nickName: "Player 2",
       avatar: "/gameAvatars/Empty.jpeg",
-      color: "bg-gray-300",
+      color: "#D9D9D9",
     },
-    boardColor: "bg-black/65",
-    ballColor: "bg-white",
+    boardColor: "#262626",
+    ballColor: "#D9D9D9",
   })
 
   const gameStateRef = useRef({
@@ -386,15 +48,22 @@ export default function PingPongGame() {
     const paddleHeight = 90 + 15 * data.paddleSize
     const width = 1024
     const height = 700
+    // const angle = (Math.random() * Math.PI) / 2 - Math.PI / 4
+    // const direction = Math.random() > 0.5 ? 1 : -1
+    // state.ball.dx = Math.cos(angle) * settings.ballSpeed * direction
+    // state.ball.dy = Math.sin(angle) * settings.ballSpeed
+
+    const angle = (Math.random() * Math.PI) / 2 - Math.PI / 4
+    const direction = Math.random() > 0.5 ? 1 : -1
 
     gameStateRef.current = {
-      board: { width, height, color: "#262626" },
+      board: { width, height, color: data.boardColor },
       ball: {
         x: width / 2,
         y: height / 2,
-        velocityX: data.ballSpeed * 2,
-        velocityY: data.ballSpeed * 1.5,
-        speed: data.ballSpeed > 2 ? 0.25 * data.ballSpeed : 0.3 * data.ballSpeed,
+        velocityX: Math.cos(angle) * data.ballSpeed * direction,
+        velocityY: Math.sin(angle) * data.ballSpeed,
+        speed: data.ballSpeed > 2 ? 0.6 * data.ballSpeed : 0.5 * data.ballSpeed,
         radius: 10,
       },
       player1: { x: 40, y: height / 2 - paddleHeight / 2, width: 15, height: paddleHeight },
@@ -402,7 +71,7 @@ export default function PingPongGame() {
       keys: { w: false, s: false, ArrowUp: false, ArrowDown: false },
       scoreLimit: data.scoreLimit,
     }
-
+    // console.log("game data=>", data);
     setPlayers({
       player1: {
         nickName: data.player1NickName,
@@ -466,20 +135,28 @@ export default function PingPongGame() {
       context.clearRect(0, 0, state.board.width, state.board.height)
 
       // Ball collisions
-      if (state.ball.y <= 0 || state.ball.y >= state.board.height) state.ball.velocityY *= -1
+      if (state.ball.y - state.ball.radius <= 0 || state.ball.y + state.ball.radius >= state.board.height) state.ball.velocityY *= -1
 
       if (
-        state.ball.x > state.player2.x &&
+        state.ball.x + state.ball.radius > state.player2.x &&
         state.ball.y > state.player2.y &&
         state.ball.y < state.player2.y + state.player2.height
       )
+      {
         state.ball.velocityX *= -1
+        state.ball.velocityY = ((state.ball.y - state.player2.y) / state.player2.height - 0.5)
+        console.log("ball x: ", state.ball.x, " ball y: ", state.ball.y, " player 2 x : ", state.player2.x ," player 2 y : ", state.player2.y)
+        
+      }
       if (
-        state.ball.x < state.player1.x + state.player1.width &&
-        state.ball.y > state.player1.y &&
-        state.ball.y < state.player1.y + state.player1.height
+        state.ball.x - state.ball.radius < state.player1.x + state.player1.width &&
+        state.ball.y - state.ball.radius > state.player1.y &&
+        state.ball.y + state.ball.radius < state.player1.y + state.player1.height
       )
+      {
         state.ball.velocityX *= -1
+        state.ball.velocityY = ((state.ball.y - state.player1.y) / state.player1.height - 0.5) * state.ball.speed * 2
+      }
 
       // Scoring
       if (state.ball.x <= 0 || state.ball.x >= state.board.width) {
@@ -501,14 +178,15 @@ export default function PingPongGame() {
       context.strokeStyle = "#FFFFFF"
       context.stroke()
 
-      context.fillStyle = "#D9D9D9"
+      context.fillStyle = players.player1.color
       context.fillRect(state.player1.x, state.player1.y, state.player1.width, state.player1.height)
       context.fillRect(state.player2.x, state.player2.y, state.player2.width, state.player2.height)
 
       context.beginPath()
       context.arc(state.ball.x, state.ball.y, state.ball.radius, 0, Math.PI * 2)
-      context.fillStyle = "#D9D9D9"
+      context.fillStyle = players.ballColor
       context.fill()
+      // console.log("ball color : ", players.ballColor, " paddle color : ", players.player1.color)
 
       animationRef.current = requestAnimationFrame(gameLoop)
     }
@@ -520,7 +198,7 @@ export default function PingPongGame() {
       window.removeEventListener("keyup", keyUpHandler)
       if (animationRef.current) cancelAnimationFrame(animationRef.current)
     }
-  }, [gameOver])
+  }, [gameOver, players])
 
   // 🧩 Toggle pause (for both UI and loop)
   const togglePause = () => {
@@ -557,7 +235,7 @@ export default function PingPongGame() {
           ref={canvasRef}
           width={gameStateRef.current.board.width}
           height={gameStateRef.current.board.height}
-          className="bg-[#262626] w-full max-w-240 rounded-2xl border border-white/20"
+          className={`bg-[${players.boardColor}] w-full max-w-240 rounded-2xl border border-white/20`}
         />
       </div>
 
@@ -575,24 +253,3 @@ export default function PingPongGame() {
     </div>
   )
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
