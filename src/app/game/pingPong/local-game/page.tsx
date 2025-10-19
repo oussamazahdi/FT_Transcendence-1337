@@ -10,7 +10,6 @@ export default function PingPongGame() {
   const [gameOver, setGameOver] = useState(false)
   const [winner, setWinner] = useState("")
 
-  // 🧠 Keep an up-to-date pause flag for the game loop
   const isPauseRef = useRef(false)
 
   const [players, setPlayers] = useState({
@@ -40,7 +39,6 @@ export default function PingPongGame() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const animationRef = useRef<number | null>(null)
 
-  // 🧠 Load saved GameData
   useEffect(() => {
     const dataLine = localStorage.getItem("GameData")
     if (!dataLine) return
@@ -91,7 +89,7 @@ export default function PingPongGame() {
     setScore2(data.player2Score || 0)
   }, [])
 
-  // 🎮 Main game loop
+
   useEffect(() => {
     const state = gameStateRef.current
     const canvas = canvasRef.current
@@ -145,7 +143,7 @@ export default function PingPongGame() {
       {
         state.ball.velocityX *= -1
         state.ball.velocityY = ((state.ball.y - state.player2.y) / state.player2.height - 0.5)
-        console.log("ball x: ", state.ball.x, " ball y: ", state.ball.y, " player 2 x : ", state.player2.x ," player 2 y : ", state.player2.y)
+        // console.log("ball x: ", state.ball.x, " ball y: ", state.ball.y, " player 2 x : ", state.player2.x ," player 2 y : ", state.player2.y)
         
       }
       if (
@@ -200,7 +198,7 @@ export default function PingPongGame() {
     }
   }, [gameOver, players])
 
-  // 🧩 Toggle pause (for both UI and loop)
+
   const togglePause = () => {
     setIsPause((prev) => {
       const newValue = !prev
@@ -209,7 +207,7 @@ export default function PingPongGame() {
     })
   }
 
-  // 🖼️ UI
+
   return (
     <div className="absolute top-28 inset-x-0 flex flex-col items-center text-white space-y-6">
       <div className="flex flex-row items-center justify-between w-full lg:max-w-5xl px-5">
