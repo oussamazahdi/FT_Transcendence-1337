@@ -44,7 +44,7 @@ export default function chat() {
     )
   })
   return (
-    <div className='w-300 size-155 bg-[#8D8D8D]/25 flex flex-row rounded-xl mb-1' >
+    <div className='w-full mx-3 lg:w-3/5 min-h-[85dvh] bg-[#8D8D8D]/25 flex flex-row rounded-xl' >
       <div className='p-3 w-100 flex flex-col bg-[#1A1A1A]/75 rounded-l-xl'>
         <div>
           <h1 className='font-bold text-xl'>Recent Messages</h1>

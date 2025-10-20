@@ -38,11 +38,15 @@ export default function RootLayout({
         className={`${poppins.className} ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Background>
-          <Navbar />
-          <div
-          className={hideNavBar === true ? "text-white" :"absolute top-35 text-white flex inset-x-0 justify-center mx-5 scroll-smooth"}>
-            {children}
-          </div>
+          
+          {/* <div className="bg-red-700/40 size-full"> */}
+            <Navbar />
+            <div
+            className={hideNavBar === true ? "text-white" :" absolute top-35 text-white flex inset-x-0 justify-center "}>
+              {children}
+            </div>
+          {/* </div> */}
+        
         </Background>
       </body>
     </html>

@@ -31,7 +31,7 @@ export default function Game() {
   const LocalGame = ()=>
   {
     return (
-      <div className='flex items-center  grid grid-cols-1 gap-6 md:grid-cols-2 w-full max-w-6xl'>
+      <div className='flex items-center  grid grid-cols-1 gap-6 md:grid-cols-2 w-full max-w-7xl'>
 
 				<div className='rounded-3xl bg-gray-400/30 px-3 pt-3 text-center lg:ml-30'>
 					<img src={localGameItems[0].cover} alt={localGameItems[0].alt} className='w-full h-90 object-cover rounded-xl'/>
