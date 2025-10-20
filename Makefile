@@ -1,10 +1,10 @@
 CWD             := .
-BACKEND			:= $(CWD)/backend
+BACKEND		:= $(CWD)/backend
 FRONTEND		:= $(CWD)/frontend
 DOTENV_PATH     := $(CWD)/.env
 
 DOCKER_COMPOSE	:= docker compose -f $(CWD)/docker-compose.yml
-RMDIR           := sudo rm -fr
+RMDIR           := rm -fr
 MKDIR           := mkdir -p
 
 setup:
@@ -14,7 +14,7 @@ setup:
 	fi
 
 up: setup
-	@$(DOCKER_COMPOSE) up --build -d
+	@$(DOCKER_COMPOSE) up --build 
 
 down:
 	@$(DOCKER_COMPOSE) down
