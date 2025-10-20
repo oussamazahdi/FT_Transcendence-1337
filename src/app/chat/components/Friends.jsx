@@ -2,7 +2,7 @@ import React from 'react'
 
 const Friends = (props) => {
   return (
-    <div className="flex items-center rounded-sm rounded-lg hover:bg-[#8D8D8D]/25 cursor-pointer">
+    <div className="flex items-center rounded-sm rounded-lg hover:bg-[#8D8D8D]/25 cursor-pointer" onClick={props.onClick}>
       <img src={props.pdp.src} alt="" className='p-2 size-15 rounded-xl'/>
       <div className="flex-1 flex items-start justify-between min-w-0">
         <div className="flex-1 min-w-0 pr-4">
