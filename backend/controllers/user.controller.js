@@ -33,7 +33,7 @@ export const getUser = async (request, reply) => {
         const db = request.server.db;
 
         const user = db.prepare(
-          'SELECT id, username, email, profileImage FROM users WHERE id = ?'
+          'SELECT id, firstname, lastname, username, email, avatar FROM users WHERE id = ?'
         ).get(decoded.userId);
 
         if (!user) {
@@ -49,9 +49,11 @@ export const getUser = async (request, reply) => {
           success: true,
           user: {
             id: user.id,
+            firstname: user.firstname,
+            lastname: user.lastname,
             username: user.username,
             email: user.email,
-            profileImage: user.profileImage,
+            avatar: user.avatar
           }});
 
       } catch (error) {

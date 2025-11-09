@@ -19,8 +19,8 @@ const fastify = Fastify({
     }
  });
 
-fastify.register(cookiePlugin);
 fastify.register(corsPlugin);
+fastify.register(cookiePlugin);
 fastify.register(databasePlugin)
 fastify.register(authRoutes);
 fastify.register(userRoutes);
