@@ -61,11 +61,12 @@ export default function Game() {
   }
 
   return (
-      <div className='absolute top-5 text-white flex flex-col inset-x-0 mx-5 items-center space-y-15'>
-	   <LocalGame />
-        {/* {activeComponent === "local" ? <LocalGame /> : <RemoteGame />} */}
-        {/* <GameSetup isVisible={isModalVisible} onClose={() => setIsModalVisible(false)} /> */}
+    //   <div className='absolute top-5 text-white flex flex-col inset-x-0 mx-5 items-center space-y-15'>
+	  //  <LocalGame />
+    //     {/* {activeComponent === "local" ? <LocalGame /> : <RemoteGame />} */}
+    //     {/* <GameSetup isVisible={isModalVisible} onClose={() => setIsModalVisible(false)} /> */}
 
-        </div>
+    //     </div>
+    <div>test</div>
   );
 }

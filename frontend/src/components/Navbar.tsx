@@ -13,7 +13,7 @@ interface User{
   id: number;
   username: string;
   email: string;
-  profileImage: string;
+  avatar: string;
 }
 
 export default function Navbar() {
@@ -84,9 +84,9 @@ export default function Navbar() {
             <BellAlertIcon className="h-11 w-11 p-2.5 text-white bg-[#D9D9D9]/40 rounded-full" />
           {loading ? (
             <div className='h-13 w-13 rounded-full bg-gray-400 animate-pulse' />
-          ) : user?.profileImage ? (
+          ) : user?.avatar ? (
             <Image
-              src={user.profileImage}
+              src={user.avatar}
               alt={user.username}
               width={52}
               height={52}

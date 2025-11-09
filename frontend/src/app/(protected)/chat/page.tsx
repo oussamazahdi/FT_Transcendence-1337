@@ -11,11 +11,11 @@ export default function chat() {
   const [selectedFriend, setSelectedFriend] = useState(null);
 
   return (
-    <div  className='flex w-full min-w-100 mx-3 lg:w-3/5 min-h-[80vh] bg-[#8D8D8D]/25 rounded-xl overflow-hidden min-h-100'>
-      <div className='w-1/3 min-w-[250px] max-w-[350px] bg-[#1A1A1A]/75 p-3'>
+    <div  className='flex w-full min-w-100 mx-3 lg:w-4/5 min-h-[80vh] rounded-lg overflow-hidden'>
+      <div className='min-w-[250px] max-w-[350px] mr-2'>
         <SideBar onSelectFriend={setSelectedFriend}/>
       </div>
-      <div className='flex-1 bg-[#8D8D8D]/25 p-4 h-full'>
+      <div className='flex-1 bg-[#8D8D8D]/25 h-full rounded-lg'>
         <ChatPage friend={selectedFriend}/>
       </div>
     </div>

@@ -5,46 +5,19 @@ import Image from 'next/image'
 import { useState } from 'react'
 import { useRouter } from "next/navigation";
 import Link from 'next/link'
-
-
+import Input from './components/Input'
 
 export default function SignUp(){
-
+	const [firstname, setFirstname] = useState("");
+	const [lastname, setLastname] = useState("");
 	const [username, setUsername] = useState("");
 	const [email, setemail] = useState("");
 	const [password, setpassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [error, setError] = useState("");
 	const [loading, setLoading] = useState(false);
-  	const [profileImage, setProfileImage] = useState<string | null>(null);
-	const [imagePreview, setImagePreview] = useState<string | null>(null);
 	const router = useRouter();
 
-	const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0];
-
-		if (file){
-			if (!file.type.startsWith("image/")) {
-        setError("Please select an image file");
-        return;
-			}
-			if(file.size > 5 * 1024 * 1024 ){
-				setError("Image size must be less than 5MB");
-        return;
-			}
-
-			
-			const reader = new FileReader();
-      reader.onloadend = () => {
-				const base64String = reader.result as string
-
-				setProfileImage(base64String);
-
-        setImagePreview(base64String);
-      };
-      reader.readAsDataURL(file);
-    	}
-	}
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setError("");
@@ -66,10 +39,11 @@ export default function SignUp(){
         },
 				credentials: "include",
 				body: JSON.stringify({
+					firstname,
+					lastname,
+          username,
 					email,
           password,
-          username,
-					profileImage: profileImage || null,
         })
 			});
 			
@@ -92,114 +66,52 @@ export default function SignUp(){
 
   return (
 	<div className='min-h-screen flex justify-center items-center'>
-		<div className='flex flex-row  justify-between bg-[#1A1A1A]/75 w-[800px] h-[480px] rounded-xl'>
-			<div className='flex flex-col items-center justify-center text-white w-[400px] m-2'>
-					<h1 className='text-3xl font-bold'>Sign up</h1>
-					<form onSubmit={handleSubmit} className="space-y-4 my-3">
-
-						<div className="flex flex-col items-center">
-            		<label className="block text-white text-center">Profile Picture</label>
-							<div className="flex flex-row justify-center">
-							{imagePreview ? (
-								<div className=" overflow-hidden w-10 h-10 rounded-full bg-gray-700 border-4 border-gray-600 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-600 transition">
-									<Image
-                    src={imagePreview}
-										alt="Upload icon"
-                    width={48}
-                    height={48}
-                    className="object-cover rounded-full"
-                  />
-                </div>
-								) : (
-                <div className="w-10 h-10 rounded-full bg-gray-700 border-4 border-gray-600 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-600 transition">
-                  <Image
-                    src={assets.arrow}
-                    alt="Upload icon"
-                    width={48}
-                    height={48}
-                    className="invert"
-                  />
-                </div>
-								)}
-
-								<div className='m-2'>
-									<label className="w-32 h-8 px-4 py-2 text-center rounded bg-gray-700 text-white text-xs placeholder-gray-400 focus:outline-none">
-										Choose Image
-										<input
-											type="file"
-											onChange={handleImageChange}
-											accept="image/*"
-											className="hidden"
-											/>
-									</label>
-									</div>
-          	</div>
-							<p className="text-xs text-gray-400">Max size: 5MB</p>
-						</div>
-
-
-						<div>
-							<input
-								type="text"
-								value={username}
-								onChange={(e) => setUsername(e.target.value)}
-								placeholder="your username"
-								required
-								className=" w-60 h-8 px-4 py-2 rounded bg-gray-700 text-white text-xs placeholder-gray-400 focus:outline-none"
+		<div className='flex flex-row  justify-between bg-[#1A1A1A]/75 w-[800px] h-[480px] rounded-4xl'>
+				<form onSubmit={handleSubmit} className="space-y-1 flex flex-col items-center justify-center text-white w-[400px] mx-2">
+					<h1 className='text-2xl font-bold text-center '>Create an account</h1>
+					<p className='text-xs text-center mb-8'>Enter your personal data to create your account</p>
+					<div>
+						<input
+							type="text"
+							value={firstname}
+							onChange={(e) => setFirstname(e.target.value)}
+							placeholder="Firstname"
+							required
+							className="mr-1 w-40 h-8 px-4 py-2 rounded bg-white/10 text-white text-xs placeholder-gray-400 focus:outline-none"
 							/>
-          	</div>
-
-						<div>
-							<input
-								type="text"//to change it later to email type
-								value={email}
-								onChange={(e) => setemail(e.target.value)}
-								placeholder="you@email.com"
-								required
-								className=" w-60 h-8 text-xs px-4 py-2 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none"
+						<input
+							type="text"
+							value={lastname}
+							onChange={(e) => setLastname(e.target.value)}
+							placeholder="Lastname"
+							required
+							className="w-40 h-8 px-4 py-2 rounded bg-white/10 text-white text-xs placeholder-gray-400 focus:outline-none"
 							/>
-          	</div>
+					</div>
+					<Input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Nickname"/>
+					<Input type="email" value={email} onChange={(e) => setemail(e.target.value)} placeholder="Email address"/>
+					<Input type="password" value={password} onChange={(e) => setpassword(e.target.value)} placeholder="Password"/>
+					<Input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm password" />
 
-						<div>
-							<input
-								type="password"
-								value={password}
-								onChange={(e) => setpassword(e.target.value)}
-								placeholder="••••••••"
-								required
-								className=" h-8 text-xs w-60 px-4 py-2 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none"
-							/>
-          	</div>
+					{error && <p className="text-red-500 text-xs text-center">{error}</p>}
+					<button
+						type="submit"
+						disabled={loading}
+						className=" w-81 mt-3 px-4 py-2 bg-teal-950 text-white text-xs rounded hover:bg-green-700 disabled:bg-gray-500 transition"
+						>
+						{loading ? "Creating account..." : "Continue"}
+					</button>
 
-						<div>
-							<input
-								type="password"
-								value={confirmPassword}
-								onChange={(e) => setConfirmPassword(e.target.value)}
-								placeholder="confirm your password"
-								required
-								className=" h-8 text-xs w-60 px-4 py-2 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none"
-							/>
-          	</div>
+					<p className="text-gray-400 text-xs text-center mt-4">
+					Already have an account?{" "}
+					<Link href="/sign-in" className="text-green-400 hover:text-green-300">
+						Sign In
+					</Link>
+					</p>
+					
+				</form>
 
-						{error && <p className="text-red-500 text-xs text-center">{error}</p>}
-				    <button
-							type="submit"
-							disabled={loading}
-							className=" w-full px-4 py-2 bg-teal-950 text-white rounded hover:bg-green-700 disabled:bg-gray-500 transition"
-							>
-							{loading ? "Creating account..." : "Sign Up"}
-          	</button>
-
-					</form>
-					<p className="text-gray-400 text-center mt-4">
-						Already have an account?{" "}
-						<Link href="/sign-in" className="text-green-400 hover:text-green-300">
-							Sign In
-						</Link>
-        </p>
-			</div>
-			<div className= 'relative overflow-hidden m-2 bg-white rounded-xl w-[400px]'>
+			<div className= 'relative overflow-hidden m-2 bg-white rounded-3xl w-[400px]'>
 				<Image
 					src={assets.loginImg}
 					alt="logo"
@@ -207,6 +119,7 @@ export default function SignUp(){
 					className='object-cover'
 					/>
 			</div>
+
 		</div>
 	</div>
   )

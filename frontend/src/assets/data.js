@@ -1,6 +1,6 @@
 import soufiixPdp from './soufiix.jpeg'
 import mohcinePdp from './mohcine.jpeg'
-import arrow from './arrow.png'
+import upload from './upload.png'
 import kamalPdp from './kamal.jpeg'
 import loginImg from './login_img.png'
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
@@ -11,7 +11,7 @@ export const assets = {
     mohcinePdp,
     kamalPdp,
     communication,
-    arrow,
+    upload,
     loginImg,
     MagnifyingGlassIcon,
 }

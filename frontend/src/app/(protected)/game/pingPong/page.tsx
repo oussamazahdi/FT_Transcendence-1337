@@ -32,7 +32,7 @@ const LocalGame = ()=>{
 	  return (
 	    <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 w-full max-w-6xl'>
 		   
-		   <div key={localGameItems[0].titel} className='rounded-3xl bg-gray-400/30 px-3 pt-3 text-center'>
+		  <div key={localGameItems[0].titel} className='rounded-3xl bg-gray-400/30 px-3 pt-3 text-center'>
 			<img src={localGameItems[0].cover} alt={localGameItems[0].alt} className='w-full h-90 object-cover rounded-xl'/>
 			<h1 className='font-bold text-2xl pt-3 pb-1'>{localGameItems[0].titel}</h1>
 			<p className='pb-3 text-[#D5D5D5]'>{localGameItems[0].description}</p> 

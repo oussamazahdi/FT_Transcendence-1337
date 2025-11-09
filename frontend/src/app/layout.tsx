@@ -1,6 +1,6 @@
 "use client"
 
-import type { Metadata } from "next";
+// import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Poppins } from "next/font/google";
 import Background from '../components/Background' // Adjusted path
@@ -34,6 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
+        suppressHydrationWarning
         className={`${poppins.className} ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Background>
