@@ -55,7 +55,7 @@ export default function SignUp(){
 	  	const data = await reply.json();
       console.log("Signup successful:", data);
 
-	  	router.push("/Dashboard");
+	  	router.replace("/sign-up/selecteImage");
 		}catch(err:any){
 			setError(err.message || "An error occurred");
 			console.error("Signup error", err)
@@ -66,10 +66,10 @@ export default function SignUp(){
 
   return (
 	<div className='min-h-screen flex justify-center items-center'>
-		<div className='flex flex-row  justify-between bg-[#1A1A1A]/75 w-[800px] h-[480px] rounded-4xl'>
+		<div className='flex flex-row  justify-between bg-[#0F0F0F]/75 w-[800px] h-[480px] rounded-4xl'>
 				<form onSubmit={handleSubmit} className="space-y-1 flex flex-col items-center justify-center text-white w-[400px] mx-2">
 					<h1 className='text-2xl font-bold text-center '>Create an account</h1>
-					<p className='text-xs text-center mb-8'>Enter your personal data to create your account</p>
+					<p className='text-xs text-[#A6A6A6] text-center mb-8'>Enter your personal data to create your account</p>
 					<div>
 						<input
 							type="text"

@@ -73,13 +73,14 @@ const SelecteImage = () => {
       setError("Upload succeeded but server did not return imageUrl");
       return;
     }
-    
+
     setSelectedAvatar(uploadedImageUrl);
 
     if (imagePreview) {
       URL.revokeObjectURL(imagePreview);
       setImagePreview(null);
     }
+
 
     }catch(err){
       console.error("Upload error:", err);
