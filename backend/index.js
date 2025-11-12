@@ -5,6 +5,9 @@ import corsPlugin from "./plugin/cors.js";
 import userRoutes from "./routes/user.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import databasePlugin from "./plugin/database.js"
+import multipart from '@fastify/multipart'
+import staticFiles from './plugin/staticFiles.js'
+import uploadRoutes from './routes/upload.routes.js'
 
 const fastify = Fastify({ 
     logger:{
@@ -24,6 +27,10 @@ fastify.register(cookiePlugin);
 fastify.register(databasePlugin)
 fastify.register(authRoutes);
 fastify.register(userRoutes);
+
+fastify.register(multipart)
+fastify.register(staticFiles)
+fastify.register(uploadRoutes)
 
 fastify.get('/', (request, reply) => {
     reply.send({hello:"world"});
