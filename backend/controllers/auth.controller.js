@@ -29,6 +29,7 @@ export const signUp = async (request, reply) => {
 		}
 	
 		const salt = await bcrypt.genSalt();
+		console.log(salt);
 		const hashedPassword = await bcrypt.hash(password, salt);
 
 		const insert = db.prepare(`

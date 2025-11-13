@@ -2,6 +2,7 @@
 import React, { ReactEventHandler, useState } from 'react'
 import Image from 'next/image'
 import { assets } from '@/assets/data'
+import { useRouter } from 'next/navigation'
 
 const SelecteImage = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -9,6 +10,7 @@ const SelecteImage = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const avatarStyle = "w-11 h-11 rounded-lg object-cover cursor-pointer transition-all hover:scale-110";
 
@@ -43,44 +45,52 @@ const SelecteImage = () => {
     setImagePreview(preview);
   }
 
+  //function 
   const handleSubmit = async () => {
-    if (!profileImage) {
-    setError("No image selected");
-    return;
+    if (!profileImage && !selectedAvatar) {
+      setError("No image selected");
+      return;
     }
 
     setError(null);
     setLoading(true);
-
-    const formData = new FormData();
-    formData.append("image/", profileImage);
+    let success = false
 
     try{
-      const reply = await fetch("http://localhost:5000/upload", {
-        method: "POST",
-        body: formData,
-      })
+      if (profileImage){
+        const formData = new FormData();
+        formData.append("image/", profileImage);
+        const reply = await fetch("http://localhost:5000/upload", {
+          method: "POST",
+          body: formData,
+        })
 
-    const data = await reply.json()
+        const data = await reply.json();
+        if (!reply.ok) {
+          throw new Error(data.error || `Upload failed (${reply.status})`);
+        }
 
-    if (!reply.ok) {
-      setError(data.error  || `Upload failed (${reply.status})`);
-      return;
-    }
+        success = true;
 
-    const uploadedImageUrl = data.imageUrl;
-    if (!uploadedImageUrl) {
-      setError("Upload succeeded but server did not return imageUrl");
-      return;
-    }
+      }else{
+        const reply = await fetch("http://localhost:5000/selecte-avatar", {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ avatarUrl: selectedAvatar }), 
+        })
 
-    setSelectedAvatar(uploadedImageUrl);
+        const data = await reply.json();
+        if (!reply.ok) {
+          throw new Error(data.error || `Avatar selection failed (${reply.status})`);
+        }
 
-    if (imagePreview) {
-      URL.revokeObjectURL(imagePreview);
-      setImagePreview(null);
-    }
+        success = true;
 
+      }
+
+    router.replace("/Dashboard")
 
     }catch(err){
       console.error("Upload error:", err);
@@ -97,9 +107,9 @@ const SelecteImage = () => {
       <div className='flex flex-col justify-center items-center w-[400px] mx-2 space-y-2'>
         <h1 className='text-white text-lg font-bold'>Selecte Profile Avatar</h1>
 
-        <h2 className='text-white text-sm px-6 text-center'>import a avatar or choise one of the available avatars</h2>
+        <h2 className='text-[#A6A6A6] text-sm px-6 text-center'>import a avatar or choise one of the available avatars</h2>
 
-        <div className='relative border rounded-lg w-81 h-30 text-white border-dashed p-2 text-xs text-center'>
+        <div className='relative border rounded-lg w-81 h-30 text-white border-[#A6A6A6] border-dashed p-2 text-xs text-center'>
             <div className="flex justify-center items-center">
               <input
                 type="file"
@@ -130,11 +140,11 @@ const SelecteImage = () => {
                 </label>
               )}
             </div>
-          <h4 className='mt-2'>drage and drop your profile picture here</h4>
+          <h4 className='mt-2 text-[#A6A6A6]'>drage and drop your profile picture here</h4>
         </div>
 
 
-        <h2 className='text-white text-sm'>or choise avatar from here</h2>
+        <h2 className='text-[#A6A6A6] text-sm '>or choise avatar from here</h2>
 
         <div className='flex flex-row space-x-2'>
           {avatars.map((a) => (

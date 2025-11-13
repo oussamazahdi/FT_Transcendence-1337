@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { assets } from '@/assets/data';
+import Input from '../sign-up/components/Input';
+import ConnectWith from '@/components/ConnectWith';
 
 const SignIn = () => {
   const [username, setUsername] = useState("");
@@ -57,32 +59,27 @@ const SignIn = () => {
 		<div className='flex flex-row  justify-between bg-[#1A1A1A]/75 w-[800px] h-[480px] rounded-xl'>
 			<div className='flex flex-col items-center justify-center text-white w-[400px] m-2'>
 					<h1 className='text-3xl font-bold'>Welcome back</h1>
-          <p className='text-center'>Sign in to access to your profile, games,
-              and chat with your friends </p>
+          <p className='text-center text-[#A6A6A6] text-xs '>Sign in to access to your profile, games,<br/>and chat with your friends </p>
 
-					<form onSubmit={handleSubmit} className="space-y-4 my-3">
+					<form onSubmit={handleSubmit} className="space-y-1 mt-6">
 
 						<div>
-							<input
-								type="text"
+							<Input
 								value={username}
 								onChange={(e) => setUsername(e.target.value)}
 								placeholder="your username"
-								required
-								className=" w-60 h-8 px-4 py-2 rounded bg-gray-700 text-white text-xs placeholder-gray-400 focus:outline-none"
 							/>
           	</div>
 
 						<div>
-							<input
+							<Input
 								type="password"
 								value={password}
 								onChange={(e) => setpassword(e.target.value)}
 								placeholder="your password"
-								required
-								className=" h-8 text-xs w-60 px-4 py-2 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none"
 							/>
           	</div>
+
 
 						{error && <p className="text-red-500 text-xs text-center">{error}</p>}
 				    <button
@@ -94,16 +91,17 @@ const SignIn = () => {
           	</button>
 
 					</form>
-					<p className="text-gray-400 text-center mt-4">
+					<p className="text-gray-400 text-center text-xs mt-1">
 						Don't have an account?{" "}
 						<Link href="/sign-up" className="text-green-400 hover:text-green-300">
 							Sign up
 						</Link>
         </p>
+				<ConnectWith/>
 			</div>
 			<div className= 'relative overflow-hidden m-2 bg-white rounded-xl w-[400px]'>
 				<Image
-					src={assets.loginImg}
+					src={assets.signIn_image}
 					alt="logo"
 					fill={true}
 					className='object-cover'

@@ -10,9 +10,9 @@ export default function Home() {
       name: "Kamal [kael-ala]",
       imageUrl: assets.kamalPdp,
       links: {
-        school42: "...",
+        school42: "https://profile.intra.42.fr/users/kael-ala",
         linkedin: "...",
-        github: "..."
+        github: "https://github.com/KamalElAlami"
       },
       key:'1'
     },
@@ -20,9 +20,9 @@ export default function Home() {
       name: "Oussama [ozahdi]",
       imageUrl: assets.mohcinePdp,
       links: {
-        school42: "...",
+        school42: "https://profile.intra.42.fr/users/ozahdi",
         linkedin: "...",
-        github: "..."
+        github: "https://github.com/oussamazahdi"
       },
       key:'2'
     },
@@ -30,9 +30,9 @@ export default function Home() {
       name: "soufiane [sarif]",
       imageUrl: assets.soufiixPdp,
       links: {
-        school42: "...",
-        linkedin: "...",
-        github: "..."
+        school42: "https://profile.intra.42.fr/users/sarif",
+        linkedin: "https://www.linkedin.com/in/soufiane-arif-16a97b136/",
+        github: "https://github.com/soufiixarif"
       },
       key:'3'
     }
