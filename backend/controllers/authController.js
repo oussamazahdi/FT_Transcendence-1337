@@ -22,49 +22,26 @@ function generateToken(userId, Username)
         userId: userId,
         username: Username
     };
-    return jwt.sign(payload, process.env.JWT_SECRET);
+    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
 }
 
 async function checkLogin(request, reply)
 {
     const { email, password } = request.body;
     const db = request.server.db;
-    return new Promise((resolve, reject) => {
-        db.get(`SELECT * FROM users WHERE email = ?`, [email], (error, user) => {
-            if (error)
-            {
-                reply.code(400).send(error.message);
-                return resolve();
-            }
-            if (!user)
-            {
-                reply.code(401).send({error: "User Not Found, Please Try to signup"});
-                return resolve();
-            }
-            console.log(generateToken(user.id, user.username));
-            bcrypt.compare(password, user.password, (error, result) => {
-                if (error)
-                    reply.code(400).send(error.message);
-                if (result)
-                {
-                    reply.code(200).send({success: true, user: {
-                        id: user.id,
-                        firstname: user.firstname,
-                        lastname: user.lastname,
-                        username: user.username,
-                        email: user.email,
-                    }})
-                    resolve();
-                }
-                else
-                {
-                    reply.code(401).send({error: "wrong password"})
-                    return reject();
-                }
-            })
-        });
-
-    })
+    try {
+        const user = db.prepare(`SELECT * FROM users WHERE email = ?`).get(email);
+        if (!user)
+            return reply.code(404).send({error: "USER_NOT_FOUND"});
+        const match = await bcrypt.compare(password, user.password);
+        if (!match)
+            return reply.code(403).send({error: "INVALID_PASSWORD"});
+        const accessToken = generateToken(user.id, user.username);
+        return reply.code(200).send({message: "AUTHORIZED", accessToken: accessToken}); // update later enhance later and create refresh and access token
+    }
+    catch (error) {
+            return reply.code(500).send({error: "INTERNAL_SERVER_ERROR"});
+    }
 }
 
 
@@ -73,14 +50,19 @@ async function registerNewUser(request, reply)
     const { firstname, lastname, username, email, password } = request.body;
     const db = request.server.db;
     let cryptedPass = await bcrypt.hash(password, 12);
-    return new Promise((resolve, reject) => {
-        db.run(`INSERT INTO users (firstname, lastname, username, email, password) VALUES (?, ?, ?, ?, ?)`, [firstname, lastname, username, email, cryptedPass], (error) => {
-            if (error)
-                return reply.code(400).send(error.message);
-            else
-                return reply.code(201).send("success: " + this.lastID);
-        })
-    });
+    try {
+        db.prepare(`INSERT INTO users (firstname, lastname, username, email, password) VALUES (?, ?, ?, ?, ?)`).run(firstname, lastname, username, email, cryptedPass);
+        return reply.code(201).send({message: "USER_CREATED_SUCCESSFULLY"});
+    }
+    catch (error)
+    {
+        if (error.message.includes('UNIQUE constraint failed'))
+            return reply.code(409).send({error: "USER_IS_ALREADY_EXIST"});
+        else if (error.message.includes('NOT NULL constraint failed'))
+            return reply.code(400).send({error: "MISSING_FIELD"});
+        else
+            return reply.code(500).send({error: "INTERNAL_SERVER_ERROR"});
+    }
 }
 
 export { checkLogin, registerNewUser };
