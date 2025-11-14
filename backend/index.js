@@ -2,6 +2,9 @@ import Fastify from "fastify"
 import Sqlite3 from "sqlite3"
 import { initRoutes } from "./routes/routes.js";
 import { initDatabase } from "./database/databaseUtils.js";
+import corsPlugin from "./plugins/cors.js";
+import dotenv from 'dotenv';
+dotenv.config({ path: '../.env' });
 
 
 const db = new Sqlite3.Database("./database/transcendence.db", Sqlite3.OPEN_READWRITE, (error) => {
@@ -22,6 +25,7 @@ const fastify = Fastify({
     }
 });
 
+fastify.register(corsPlugin);
 fastify.decorate('db', db);
 initDatabase(fastify.db);
 initRoutes(fastify);

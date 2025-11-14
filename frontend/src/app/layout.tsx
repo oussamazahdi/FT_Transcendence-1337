@@ -1,10 +1,9 @@
 "use client"
 
-import type { Metadata } from "next";
+// import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Poppins } from "next/font/google";
 import Background from '../components/Background' // Adjusted path
-import Navbar from '../components/Navbar' // Adjusted path
 import { usePathname } from "next/navigation";
 
 import "./globals.css";
@@ -31,18 +30,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathName = usePathname();
-  const hideNavBar = pathName === "/game/pingPong/local-game"
+  // const hideNavBar = pathName === "/game/pingPong/local-game"
   return (
     <html lang="en">
       <body
+        suppressHydrationWarning
         className={`${poppins.className} ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Background>
-          <Navbar />
-          <div
-          className={hideNavBar === true ? "text-white" :"absolute top-35 text-white flex inset-x-0 justify-center mx-5 scroll-smooth"}>
-            {children}
-          </div>
+          {children}
         </Background>
       </body>
     </html>
