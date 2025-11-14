@@ -31,7 +31,7 @@ function authRoutes(fastify)
                     },
                     password: {
                         type: 'string',
-                        minLength: 1,
+                        minLength: 8,
                     },
                 }
             }

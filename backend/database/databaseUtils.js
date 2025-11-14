@@ -1,19 +1,22 @@
 function initDatabase(db)
 {
-    db.run(`CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        firstname TEXT,
-        lastname TEXT,
-        username TEXT UNIQUE,
-        email TEXT UNIQUE,
-        password TEXT,
-        profilePicture TEXT DEFAULT,
-        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )`, (error) => {
-            if (error)
-                console.error(error.message);
-        });
+    try {
+        db.exec(`CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            firstname TEXT,
+            lastname TEXT,
+            username TEXT UNIQUE,
+            email TEXT UNIQUE,
+            password TEXT,
+            profilepicture TEXT,
+            createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )`);
+        console.log("Database initialized successfully!")
+    }
+    catch (error) {
+        console.error("Database cannot be inited due to : " + error.message);
+        process.exit(1);
+    }
 }
-
 
 export { initDatabase };
