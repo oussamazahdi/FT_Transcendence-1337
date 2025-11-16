@@ -8,7 +8,7 @@ function initDatabase(db)
             username TEXT UNIQUE,
             email TEXT UNIQUE,
             password TEXT,
-            profilepicture TEXT,
+            profilepicture TEXT DEFAULT "/frontend/uploads/kamal.jpeg",
             createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )`);
         console.log("Database initialized successfully!")

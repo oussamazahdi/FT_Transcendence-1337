@@ -21,8 +21,6 @@ const SignIn = () => {
     setLoading(true);
 
     try{
-
-      console.log(email," -----" ,password);
       const reply = await fetch("http://localhost:3001/api/auth/login", {
         method:"POST",
         headers: {
@@ -33,6 +31,8 @@ const SignIn = () => {
           password,
         })
       });
+	  const parsedData = await reply.json();
+	  localStorage.setItem('token', parsedData.token);
 
       if(!reply.ok){
         const errorData = await reply.json();

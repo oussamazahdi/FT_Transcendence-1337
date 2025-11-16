@@ -23,7 +23,7 @@ function getOneUser(request, reply)
         return reply.code(200).send({message: "SUCCESS", data: user});
     }
     catch (error) {
-        return reply.code(500).send({error: "INTERNAL_SERVER_ERROR"});
+        return reply.code(500).send({error: "INTERNAL_SERVER_ERROR: error in getting one user"});
     }
 }
 

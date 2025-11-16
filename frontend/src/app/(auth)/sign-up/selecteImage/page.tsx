@@ -60,7 +60,7 @@ const SelecteImage = () => {
       if (profileImage){
         const formData = new FormData();
         formData.append("image/", profileImage);
-        const reply = await fetch("http://localhost:5000/upload", {
+        const reply = await fetch("http://localhost:3001/api/auth/uploadImage", {
           method: "POST",
           body: formData,
         })
