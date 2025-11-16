@@ -5,6 +5,7 @@ import { initDatabase } from "./database/databaseUtils.js";
 import corsPlugin from "./plugins/cors.js";
 import dotenv from 'dotenv';
 dotenv.config({ path: '../.env' });
+import multipart from '@fastify/multipart';
 
 
 const db = new Sqlite3('./database/transcendence.db', { 
@@ -24,6 +25,7 @@ const fastify = Fastify({
     }
 });
 
+fastify.register(multipart);
 fastify.register(corsPlugin);
 fastify.decorate('db', db);
 initDatabase(fastify.db);

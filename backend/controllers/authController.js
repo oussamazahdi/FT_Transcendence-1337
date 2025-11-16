@@ -1,5 +1,10 @@
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
+import fs from "fs"
+import path from "path";
+import { pipeline } from 'stream/promises';
+
+
 /*
     request object :
         request.body → POST/PUT data
@@ -37,7 +42,7 @@ async function checkLogin(request, reply)
         if (!match)
             return reply.code(403).send({error: "INVALID_PASSWORD"});
         const accessToken = generateToken(user.id, user.username);
-        return reply.code(200).send({message: "AUTHORIZED", accessToken: accessToken}); // update later enhance later and create refresh and access token
+        return reply.code(200).send({message: "AUTHORIZED", token: accessToken}); // update later enhance later and create refresh and access token
     }
     catch (error) {
             return reply.code(500).send({error: "INTERNAL_SERVER_ERROR"});
@@ -50,9 +55,10 @@ async function registerNewUser(request, reply)
     const { firstname, lastname, username, email, password } = request.body;
     const db = request.server.db;
     let cryptedPass = await bcrypt.hash(password, 12);
+    const accessToken = generateToken(user.id, user.username);
     try {
         db.prepare(`INSERT INTO users (firstname, lastname, username, email, password) VALUES (?, ?, ?, ?, ?)`).run(firstname, lastname, username, email, cryptedPass);
-        return reply.code(201).send({message: "USER_CREATED_SUCCESSFULLY"});
+        return reply.code(201).send({message: "USER_CREATED_SUCCESSFULLY", token: accessToken});
     }
     catch (error)
     {
@@ -65,4 +71,15 @@ async function registerNewUser(request, reply)
     }
 }
 
-export { checkLogin, registerNewUser };
+async function processImage(request, reply)
+{
+    const uploadDir = process.cwd() + '/uploads/';
+    const image = await request.file();
+    const filePath = uploadDir + image.filename;
+    console.log(filePath);
+    await pipeline(image.file, fs.createWriteStream(filePath));
+
+    reply.code(200).send({message: "SUCCESS", data: {path: filePath}});
+}
+
+export { checkLogin, registerNewUser, processImage };

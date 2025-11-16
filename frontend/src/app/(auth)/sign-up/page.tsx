@@ -34,35 +34,38 @@ export default function SignUp(){
 		setLoading(true);
 
 		try{
-
 			const reply = await fetch("http://localhost:3001/api/auth/register" ,{
 				method:"POST",
 				headers: {
 					"Content-Type": "application/json",
-        },
+				},
 				credentials: "include",
 				body: JSON.stringify({
 					firstname,
 					lastname,
-          username,
+          			username,
 					email,
-          password,
-        })
+          			password,
+				})
 			});
+
+			const parsedData = await reply.json();
+			localStorage.setItem('token', parsedData.token);
 			
-			 if (!reply.ok) {
-        const errorData = await reply.json();
-        throw new Error(errorData.message || "Signup failed");
-      }
-
-	  	const data = await reply.json();
-      console.log("Signup successful:", data);
-
-	  	router.replace("/sign-up/selecteImage");
-		}catch(err:any){
+			if (!reply.ok) {
+				const errorData = await reply.json();
+				throw new Error(errorData.message || "Signup failed");
+			}
+			
+			const data = await reply.json();
+			console.log("Signup successful:", data);
+			router.replace("/sign-up/selecteImage");
+		}
+		catch(err:any){
 			setError(err.message || "An error occurred");
 			console.error("Signup error", err)
-		}finally{
+		}
+		finally{
 			setLoading(false);
 		}
 }
