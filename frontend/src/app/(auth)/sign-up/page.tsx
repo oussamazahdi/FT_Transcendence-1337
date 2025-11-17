@@ -48,9 +48,6 @@ export default function SignUp(){
           			password,
 				})
 			});
-
-			const parsedData = await reply.json();
-			localStorage.setItem('token', parsedData.token);
 			
 			if (!reply.ok) {
 				const errorData = await reply.json();

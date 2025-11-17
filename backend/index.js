@@ -4,9 +4,9 @@ import { initRoutes } from "./routes/routes.js";
 import { initDatabase } from "./database/databaseUtils.js";
 import corsPlugin from "./plugins/cors.js";
 import dotenv from 'dotenv';
-dotenv.config({ path: '../.env' });
 import multipart from '@fastify/multipart';
 
+dotenv.config({ path: '../.env' });
 
 const db = new Sqlite3('./database/transcendence.db', { 
     verbose: console.log  // Optional: log queries
