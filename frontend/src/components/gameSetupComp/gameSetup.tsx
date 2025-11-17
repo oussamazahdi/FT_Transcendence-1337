@@ -59,7 +59,7 @@ const GameSetup: React.FC<{ isVisible: boolean; onClose: () => void }> = ({ isVi
 
   const firstWizardStep = () => {
     return (
-      <div className="relative bg-[#3C3C3C]/80 backdrop-blur-md p-6 rounded-3xl shadow-lg w-full max-w-4xl m-3">
+      <div className="relative bg-[#0F0F0F]/75 backdrop-blur-md p-6 rounded-3xl shadow-lg w-full max-w-4xl m-3">
         
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
@@ -103,7 +103,7 @@ const GameSetup: React.FC<{ isVisible: boolean; onClose: () => void }> = ({ isVi
               id="nickname1"
               type="text"
               placeholder="Enter your @nickname"
-              className="p-2 rounded-md bg-[#848484]/40 text-white placeholder-gray-400 text-sm w-full"
+              className="p-2 rounded-lg bg-[#848484]/30 text-white placeholder-gray-400 text-sm w-full"
               value={nickname1}
               onChange={(e) => {
                 setNickname1(e.target.value);
@@ -143,7 +143,7 @@ const GameSetup: React.FC<{ isVisible: boolean; onClose: () => void }> = ({ isVi
               id="nickname2"
               type="text"
               placeholder="Enter your @nickname"
-              className="p-2 rounded-md bg-[#848484]/40 text-white placeholder-gray-400 text-sm w-full"
+              className="p-2 rounded-lg bg-[#848484]/30 text-white placeholder-gray-400 text-sm w-full"
               value={nickname2}
               onChange={(e) => {
                 setNickname2(e.target.value);
@@ -262,7 +262,7 @@ const GameSetup: React.FC<{ isVisible: boolean; onClose: () => void }> = ({ isVi
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm">
       {wizardForm === 1 ? firstWizardStep() : secondWizardStep()}
     </div>
   );
