@@ -1,9 +1,11 @@
 "use client"
 
 import React, { useState } from 'react'
-import GameSetup from "@/components/gameSetupComp/gameSetup";
+import GameSetup from "@/components/gameSetupComp/gameSetup"
+import { useRouter } from 'next/navigation'
 
-const LocalGame = ()=>{
+const LocalGame = () => {
+	const router = useRouter() 
 
 	const [isModalVisible, setIsModalVisible] = useState(false);
 	const localGameItems = [
@@ -47,9 +49,9 @@ const LocalGame = ()=>{
 				<img src={localGameItems[1].cover} alt={localGameItems[1].alt} className='w-full h-110 object-cover rounded-xl'/>
 				<h1 className='font-bold text-2xl pt-3 pb-1'>{localGameItems[1].titel}</h1>
 				<p className='pb-3 text-[#D5D5D5]'>{localGameItems[1].description}</p> 
-				<button className=' bg-[#333333]/60 hover:bg-[#333333]/40 mb-3 py-2 w-full rounded-lg \
-				cursor-pointer shadow-md font-medium'
-				onClick={() => setIsModalVisible(true)}>
+				<button
+				className=' bg-[#333333]/60 hover:bg-[#333333]/40 mb-3 py-2 w-full rounded-lg cursor-pointer shadow-md font-medium'
+				onClick={() => router.push("/game/pingPong/tournament")}>
 				{localGameItems[1].button}
 				</button>
 			</div>
@@ -60,7 +62,7 @@ const LocalGame = ()=>{
 				<p className='pb-3 text-[#D5D5D5]'>{localGameItems[2].description}</p> 
 				<button className=' bg-[#333333]/60 hover:bg-[#333333]/40 mb-3 py-2 w-full rounded-lg \
 				cursor-pointer shadow-md font-medium'
-				onClick={() => setIsModalVisible(true)}>
+				onClick={() => router.push("/game/pingPong/matchmaking")}>
 				{localGameItems[2].button}
 				</button>
 			</div>
