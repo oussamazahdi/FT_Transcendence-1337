@@ -63,7 +63,7 @@ export default function Navbar() {
   ]
   const [search, setSearch] = useState('');
   return (
-      <div className="relative mt-5 mx-12 flex justify-between">
+      <div className="relative mt-8 mx-20 lg:mx-35 flex justify-between">
       <div>
         <Link href="/dashboard">
           <img

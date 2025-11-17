@@ -4,7 +4,7 @@ function getAllUsers(request, reply)
 {
     try {
         const db = request.server.db;
-        const users = db.prepare('SELECT id, firstname, lastname, username, email, profilepicture FROM users').all();
+        const users = db.prepare('SELECT id, firstname, lastname, username, email, avatar FROM users').all();
         return reply.code(200).send({message: "SUCCESS", data: users});
     }
     catch (error) {
@@ -17,7 +17,7 @@ function getOneUser(request, reply)
 {
     try {
         const db = request.server.db;
-        const user = db.prepare('SELECT id, firstname, lastname, username, email, profilepicture From users WHERE id = ?').get(request.params.id);
+        const user = db.prepare('SELECT id, firstname, lastname, username, email, avatar From users WHERE id = ?').get(request.params.id);
         if (!user)
             return reply.code(404).send({error: "USER_NOT_FOUND"});
         return reply.code(200).send({message: "SUCCESS", data: user});
@@ -31,7 +31,7 @@ async function updateUser(request, reply)
 {
     try {
         const db = request.server.db;
-        const user = db.prepare('SELECT id, firstname, lastname, username, email, password, profilePicture From users WHERE id = ?').get(request.params.id);
+        const user = db.prepare('SELECT id, firstname, lastname, username, email, password, avatar From users WHERE id = ?').get(request.params.id);
         if (!user)
             return reply.code(404).send({error: "USER_NOT_FOUND"});
         const firstname = request.body.firstname || user.firstname;
@@ -39,10 +39,10 @@ async function updateUser(request, reply)
         const username = request.body.username || user.username;
         const email = request.body.email || user.email;
         const password = (request.body.password) ? await bcrypt.hash(request.body.password, 12) : user.password;
-        const profilePicture = request.body.profilePicture || user.profilePicture;
+        const avatar = request.body.avatar || user.avatar;
         
-        const updated = db.prepare('UPDATE users SET firstname = ?, lastname = ?, username = ?, email = ?, password = ?, profilePicture = ? WHERE id = ?')
-        .run(firstname, lastname, username, email, password, profilePicture, request.params.id);
+        const updated = db.prepare('UPDATE users SET firstname = ?, lastname = ?, username = ?, email = ?, password = ?, avatar = ? WHERE id = ?')
+        .run(firstname, lastname, username, email, password, avatar, request.params.id);
         
         return reply.code(204).send({message: "SUCCESS"});
     }
