@@ -5,6 +5,8 @@ import React, { useState, useEffect } from 'react';
 import { Slider } from "@/components/ui/slider"
 import Link from 'next/link'
 
+
+
 const GameSetup: React.FC<{ isVisible: boolean; onClose: () => void }> = ({ isVisible, onClose }) => {
   if (!isVisible) return null;
 
@@ -34,6 +36,7 @@ const GameSetup: React.FC<{ isVisible: boolean; onClose: () => void }> = ({ isVi
     localStorage.setItem("GameData", JSON.stringify(gameData));
   }, [gameData]);
 
+
   const avatars = [
     { color: "/gameAvatars/profile1.jpeg", black: "/gameAvatars/blackAvatar/avatar1.png", alt: "avatar 1" },
     { color: "/gameAvatars/profile2.jpeg", black: "/gameAvatars/blackAvatar/avatar2.png", alt: "avatar 2" },
@@ -59,7 +62,7 @@ const GameSetup: React.FC<{ isVisible: boolean; onClose: () => void }> = ({ isVi
 
   const firstWizardStep = () => {
     return (
-      <div className="relative bg-[#0F0F0F]/75 backdrop-blur-md p-6 rounded-3xl shadow-lg w-full max-w-4xl m-3">
+      <div className="relative bg-[#1A1A1A]/75 backdrop-blur-md p-6 rounded-3xl shadow-lg w-full max-w-4xl m-3">
         
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
@@ -155,7 +158,7 @@ const GameSetup: React.FC<{ isVisible: boolean; onClose: () => void }> = ({ isVi
 
         {/* Footer buttons */}
         <div className="flex justify-between mt-6">
-          <button className="text-gray-400 hover:text-white transition">Prev</button>
+          <button className="text-gray-400">Prev</button>
           <button 
             className="text-gray-400 hover:text-white hover:bg-[#848484]/30 rounded-full px-4 py-1 transition"
             onClick={() => {setWizardForm(2)}}
@@ -169,7 +172,7 @@ const GameSetup: React.FC<{ isVisible: boolean; onClose: () => void }> = ({ isVi
 
   const secondWizardStep = () => {
     return (
-      <div className="relative bg-[#3C3C3C]/80 backdrop-blur-md p-6 rounded-3xl shadow-lg w-full max-w-4xl m-3">
+      <div className="relative bg-[#1A1A1A]/75 backdrop-blur-md p-6 rounded-3xl shadow-lg w-full max-w-4xl m-3">
 
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-white text-2xl font-semibold">Game Settings</h1>
@@ -178,7 +181,7 @@ const GameSetup: React.FC<{ isVisible: boolean; onClose: () => void }> = ({ isVi
 
         <div className="grid md:grid-cols-2 gap-6">          
           
-          <div className="self-start items-center border border-dashed border-gray-500/60 rounded-xl p-6">
+          <div className="self-start border border-dashed border-gray-500/60 rounded-xl p-6">
             <h2 className="text-lg font-semibold text-white mb-4">Visual Customization</h2>
             <div className='mb-1' >
               <h3>Paddle Color</h3>
@@ -221,7 +224,7 @@ const GameSetup: React.FC<{ isVisible: boolean; onClose: () => void }> = ({ isVi
 
           </div>
         
-          <div className="self-start items-center border border-dashed border-gray-500/60 rounded-xl p-6">
+          <div className="self-start border border-dashed border-gray-500/60 rounded-xl p-6">
             <h2 className="text-lg font-semibold text-white mb-4">Game Configuration</h2>
             
             <div className='mb-8' >
@@ -249,7 +252,7 @@ const GameSetup: React.FC<{ isVisible: boolean; onClose: () => void }> = ({ isVi
         </div>
 
         <div className="flex justify-between mt-6">
-          <button className="text-gray-400 hover:text-white transition" onClick={() => setWizardForm(1)}>Prev</button>
+          <button className="text-gray-400 hover:text-white hover:bg-[#848484]/30 rounded-full px-4 py-1 transition" onClick={() => setWizardForm(1)}>Prev</button>
           <Link href="/game/pingPong/local-game">
             <button 
               className="text-gray-400 hover:text-white hover:bg-[#848484]/30 rounded-full px-4 py-1 transition">

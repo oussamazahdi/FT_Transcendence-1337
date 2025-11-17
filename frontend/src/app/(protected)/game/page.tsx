@@ -45,7 +45,7 @@ export default function Game() {
 					<img src={localGameItems[1].cover} alt={localGameItems[1].alt} className='w-full h-110 object-cover rounded-xl'/>
 					<h1 className='font-bold text-2xl pt-3 pb-1'>{localGameItems[1].titel}</h1>
 					<p className='pb-3 text-[#D5D5D5]/60'>{localGameItems[1].description}</p>
-		  		<Link href="/game/pingPong">
+		  		<Link href="/game">
             <button className=' bg-[#333333]/60 hover:bg-[#333333]/40 mb-3 py-2 w-full rounded-lg cursor-pointer shadow-md font-medium'>
               {localGameItems[1].button}
             </button>
