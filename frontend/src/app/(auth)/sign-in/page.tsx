@@ -8,7 +8,7 @@ import Input from '../sign-up/components/Input';
 import ConnectWith from '@/components/ConnectWith';
 
 const SignIn = () => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setpassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -21,15 +21,13 @@ const SignIn = () => {
     setLoading(true);
 
     try{
-
-      console.log(username," -----" ,password);
-      const reply = await fetch("http://localhost:5000/sign-in", {
+      const reply = await fetch("http://localhost:3001/api/auth/login", {
         method:"POST",
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          username,
+          email,
           password,
         })
       });
@@ -65,9 +63,10 @@ const SignIn = () => {
 
 						<div>
 							<Input
-								value={username}
-								onChange={(e) => setUsername(e.target.value)}
-								placeholder="your username"
+								type="email"
+								value={email}
+								onChange={(e) => setEmail(e.target.value)}
+								placeholder="E-mail"
 							/>
           	</div>
 
