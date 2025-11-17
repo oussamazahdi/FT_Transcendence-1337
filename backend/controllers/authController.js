@@ -45,6 +45,7 @@ async function checkLogin(request, reply)
         return reply.code(200).send({message: "AUTHORIZED", token: accessToken}); // update later enhance later and create refresh and access token
     }
     catch (error) {
+            console.log(error.message);
             return reply.code(500).send({error: "INTERNAL_SERVER_ERROR"});
     }
 }
@@ -55,10 +56,9 @@ async function registerNewUser(request, reply)
     const { firstname, lastname, username, email, password } = request.body;
     const db = request.server.db;
     let cryptedPass = await bcrypt.hash(password, 12);
-    const accessToken = generateToken(user.id, user.username);
     try {
         db.prepare(`INSERT INTO users (firstname, lastname, username, email, password) VALUES (?, ?, ?, ?, ?)`).run(firstname, lastname, username, email, cryptedPass);
-        return reply.code(201).send({message: "USER_CREATED_SUCCESSFULLY", token: accessToken});
+        return reply.code(201).send({message: "USER_CREATED_SUCCESSFULLY"});
     }
     catch (error)
     {
@@ -67,7 +67,10 @@ async function registerNewUser(request, reply)
         else if (error.message.includes('NOT NULL constraint failed'))
             return reply.code(400).send({error: "MISSING_FIELD"});
         else
+        {
+            console.log(error.message);
             return reply.code(500).send({error: "INTERNAL_SERVER_ERROR"});
+        }
     }
 }
 

@@ -1,13 +1,30 @@
-networks:
-  trans_global_network:
-    driver: bridge
-volumes:
-  trans_database:
 services:
+  backend:
+    build: ./backend
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    env_file:
+      - .env
+    networks:
+      - transcendence
+
   frontend:
-    container_name: frontend
     build: ./frontend
     ports:
       - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    env_file:
+      - .env
+    depends_on:
+      - backend
     networks:
-      - trans_global_network
+      - transcendence
+
+networks:
+  transcendence:
+    driver: bridge
