@@ -45,7 +45,7 @@ const SelecteImage = () => {
     setImagePreview(preview);
   }
 
-  //function 
+  //Lfunction Lmli7a
   const handleSubmit = async () => {
     if (!profileImage && !selectedAvatar) {
       setError("No image selected");
@@ -60,7 +60,7 @@ const SelecteImage = () => {
       if (profileImage){
         const formData = new FormData();
         formData.append("image/", profileImage);
-        const reply = await fetch("http://localhost:5000/upload", {
+        const reply = await fetch("http://localhost:3001/api/auth/uploadImage", {
           method: "POST",
           body: formData,
         })
@@ -73,7 +73,7 @@ const SelecteImage = () => {
         success = true;
 
       }else{
-        const reply = await fetch("http://localhost:5000/selecte-avatar", {
+        const reply = await fetch("http://localhost:5000/select-avatar", {
           method: "POST",
           headers: {
             'Content-Type': 'application/json',
