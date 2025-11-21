@@ -8,6 +8,8 @@ interface CountdownTimerProps {
   startColor: string
   endColor: string
   size?: 'sm' | 'md' | 'lg'
+
+  onFinish?: () => void
 }
 
 export function CountdownTimer({
@@ -16,6 +18,7 @@ export function CountdownTimer({
   startColor,
   endColor,
   size = 'md',
+  onFinish,
 }: CountdownTimerProps) {
   const [remainingTime, setRemainingTime] = useState(totalMinutes * 60 + totalSeconds)
   const [isRunning, setIsRunning] = useState(true)
@@ -48,14 +51,46 @@ export function CountdownTimer({
   }
 
   useEffect(() => {
-    if (!isRunning || remainingTime <= 0) return
+    // Start/stop the ticking interval based only on `isRunning`.
+    // Do NOT depend on `remainingTime` here — that caused the interval
+    // to be recreated every tick. The "finish" callback is handled
+    // in a separate effect so it's called exactly once when time hits 0.
+    if (!isRunning) return
 
     const interval = setInterval(() => {
-      setRemainingTime((prev) => Math.max(0, prev - 0.1))
+      // Keep one or two decimals to avoid floating-point drift in display
+      setRemainingTime((prev) => Math.max(0, +((prev - 0.1).toFixed(2))))
     }, 100)
 
     return () => clearInterval(interval)
-  }, [isRunning, remainingTime])
+  }, [isRunning])
+
+
+  // 1. Handle countdown ticking
+  // useEffect(() => {
+  //   if (!isRunning || remainingTime <= 0) return;
+
+  //   const interval = setInterval(() => {
+  //     setRemainingTime((prev) => Math.max(0, prev - 0.1));
+  //   }, 100);
+
+  //   return () => clearInterval(interval);
+  // }, [isRunning, remainingTime]);
+
+
+  useEffect(() => {
+    if (remainingTime <= 0 && isRunning) {
+      setIsRunning(false);
+      onFinish?.();
+    }
+  }, [remainingTime, isRunning]);
+
+
+  // Reset remaining time if the input props change
+  useEffect(() => {
+    setRemainingTime(totalMinutes * 60 + totalSeconds)
+  }, [totalMinutes, totalSeconds])
+
 
   const displayMinutes = Math.floor(remainingTime / 60)
   const displaySeconds = Math.floor(remainingTime % 60)
