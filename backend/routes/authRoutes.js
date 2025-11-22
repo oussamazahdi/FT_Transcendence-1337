@@ -1,8 +1,25 @@
-import { checkLogin, registerNewUser } from "../controllers/authController.js";
+import { checkLogin, registerNewUser, processImage } from "../controllers/authController.js";
 
 function authRoutes(fastify)
 {
-    fastify.post("/login", checkLogin);
+    fastify.post("/login", {
+        schema: {
+            body: {
+                type: 'object',
+                required: ['email', 'password'],
+                properties: {
+                    email: {
+                        type: 'string',
+                        format: 'email',
+                    },
+                    password: {
+                        type: 'string',
+                        minLength: 8,
+                    },
+                }
+            }
+        }
+    }, checkLogin);
 
     fastify.post("/register", {
         schema: {
@@ -37,6 +54,8 @@ function authRoutes(fastify)
             }
         }
     }, registerNewUser);
+
+    fastify.post("/uploadImage", processImage);
 }
 
 export { authRoutes };
