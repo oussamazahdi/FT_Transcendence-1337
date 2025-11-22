@@ -7,8 +7,6 @@ import Link from 'next/link'
 export default function Matchmaking(){
 	const [timer, setTimer] = useState(true)
 	return (
-		// <div className="min-h-screen flex items-center justify-center">
-
 			<div className='flex flex-col items-center bg-[#0F0F0F]/65 p-10 rounded-3xl'>
 				<h3 className='text-3xl font-extrabold mb-6' >Find Match</h3>
 				
@@ -32,26 +30,13 @@ export default function Matchmaking(){
 						<h3 className='text-md font-medium text-[#6E6E6E]'>[player2]</h3>
 					</div>
 				</div>
-				{/* <CountdownTimer
-					totalMinutes={0}
-					totalSeconds={90}
-					startColor="#D9D9D9"
-					endColor="#D9D9D9"
+				{timer == true ?<CountdownTimer totalMinutes={0} totalSeconds={5}
+					startColor="#D9D9D9" endColor="#D9D9D9"
 					size="md"
-					onFinish={() => console.log("Timer done!")}
-					/> */}
-					{timer == true ?<CountdownTimer
-					totalMinutes={0}
-					totalSeconds={5}
-					startColor="#D9D9D9"
-					endColor="#D9D9D9"
-					size="lg"
-					onFinish={() => {
-						setTimer(false)
-					}}
+					onFinish={() => setTimer(false)}
 					/> :
 					<div className='flex gap-3 mt-5'>
-					<Link href={"/dashboard"}>
+					<Link href={"/game/pingPong"}>
 						<button className='bg-[#0F0F0F]/65 text-white/40 hover:text-white px-3 py-2 rounded-md font-medium transition duration-300 cursor-pointer'>
 							Exit
 						</button>

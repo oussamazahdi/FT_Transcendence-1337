@@ -8,7 +8,6 @@ interface CountdownTimerProps {
   startColor: string
   endColor: string
   size?: 'sm' | 'md' | 'lg'
-
   onFinish?: () => void
 }
 
@@ -27,7 +26,6 @@ export function CountdownTimer({
   const progress = (remainingTime / totalTime) * 100
 
   const interpolateColor = (color1: string, color2: string, factor: number) => {
-    // Parse hex colors to RGB
     const parseHex = (hex: string) => {
       const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
       return result
@@ -42,7 +40,6 @@ export function CountdownTimer({
     const c1 = parseHex(color1)
     const c2 = parseHex(color2)
 
-    // Interpolate RGB values
     const r = Math.round(c1.r + (c2.r - c1.r) * factor)
     const g = Math.round(c1.g + (c2.g - c1.g) * factor)
     const b = Math.round(c1.b + (c2.b - c1.b) * factor)
@@ -51,32 +48,14 @@ export function CountdownTimer({
   }
 
   useEffect(() => {
-    // Start/stop the ticking interval based only on `isRunning`.
-    // Do NOT depend on `remainingTime` here — that caused the interval
-    // to be recreated every tick. The "finish" callback is handled
-    // in a separate effect so it's called exactly once when time hits 0.
     if (!isRunning) return
 
     const interval = setInterval(() => {
-      // Keep one or two decimals to avoid floating-point drift in display
       setRemainingTime((prev) => Math.max(0, +((prev - 0.1).toFixed(2))))
     }, 100)
 
     return () => clearInterval(interval)
   }, [isRunning])
-
-
-  // 1. Handle countdown ticking
-  // useEffect(() => {
-  //   if (!isRunning || remainingTime <= 0) return;
-
-  //   const interval = setInterval(() => {
-  //     setRemainingTime((prev) => Math.max(0, prev - 0.1));
-  //   }, 100);
-
-  //   return () => clearInterval(interval);
-  // }, [isRunning, remainingTime]);
-
 
   useEffect(() => {
     if (remainingTime <= 0 && isRunning) {
@@ -85,8 +64,6 @@ export function CountdownTimer({
     }
   }, [remainingTime, isRunning]);
 
-
-  // Reset remaining time if the input props change
   useEffect(() => {
     setRemainingTime(totalMinutes * 60 + totalSeconds)
   }, [totalMinutes, totalSeconds])
@@ -115,7 +92,6 @@ export function CountdownTimer({
       </div>
 
       <div className="relative w-full bg-gray-800 rounded-full overflow-hidden">
-        {/* Progress fill with dynamic color */}
         <div
           className={`${sizeStyles[size].height} rounded-full transition-all duration-100 ease-linear`}
           style={{
@@ -125,24 +101,6 @@ export function CountdownTimer({
           }}
         />
       </div>
-
-      {/* <div className="flex gap-2 justify-center">
-        <button
-          onClick={() => setIsRunning(!isRunning)}
-          className="px-3 py-1 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
-        >
-          {isRunning ? 'Pause' : 'Resume'}
-        </button>
-        <button
-          onClick={() => {
-            setRemainingTime(totalTime)
-            setIsRunning(false)
-          }}
-          className="px-3 py-1 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
-        >
-          Reset
-        </button>
-      </div> */}
     </div>
   )
 }
