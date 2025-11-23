@@ -209,7 +209,7 @@ export default function PingPongGame() {
 
 
   return (
-    <div className="absolute top-28 inset-x-0 flex flex-col items-center text-white space-y-6">
+    <div className="trelative inset-x-0 flex flex-col items-center text-white space-y-6">
       <div className="flex flex-row items-center justify-between w-full lg:max-w-5xl px-5">
         <div className="flex gap-1 flex-col items-center">
           <img src={players.player1.avatar} alt="player 1 avatar" className="w-20 h-20 rounded-lg object-cover" />

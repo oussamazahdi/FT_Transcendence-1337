@@ -45,7 +45,7 @@ const SignIn = () => {
 			const payload = JSON.parse(atob(data.token.split('.')[1]));
     	localStorage.setItem('userId', payload.userId);
 
-      router.push("/Dashboard")
+      router.push("/dashboard")
 
     }catch(err:any){
       setError(err.message || "An error occurred");
