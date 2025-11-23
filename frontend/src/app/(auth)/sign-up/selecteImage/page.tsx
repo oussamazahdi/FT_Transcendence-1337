@@ -49,6 +49,7 @@ const SelecteImage = () => {
   }
 
   const handleSubmit = async () => {
+
     if (!profileImage && !selectedAvatar) {
       setError("Please select an image or choose an avatar");
       return;
@@ -79,9 +80,7 @@ const SelecteImage = () => {
         // Select predefined avatar
         const reply = await fetch("http://localhost:5000/select-avatar", {
           method: "POST",
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          credentials: 'include',
           body: JSON.stringify({ avatarUrl: selectedAvatar }), 
         });
 

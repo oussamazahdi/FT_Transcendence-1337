@@ -26,6 +26,7 @@ const SignIn = () => {
         headers: {
           'Content-Type': 'application/json'
         },
+		credentials: 'include', // Very important a sat this line howa lee responsible of resend the token cookie
         body: JSON.stringify({
           email,
           password,

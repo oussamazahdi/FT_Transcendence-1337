@@ -5,8 +5,8 @@ import Link from 'next/link'
 import {cn} from '@/lib/utils'
 import {usePathname} from 'next/navigation'
 import { MagnifyingGlassIcon, BellAlertIcon, HomeIcon, 
-         ChatBubbleOvalLeftIcon, TrophyIcon, 
-         ChartBarIcon } from '@heroicons/react/24/outline'
+        	ChatBubbleOvalLeftIcon, TrophyIcon, 
+        	ChartBarIcon } from '@heroicons/react/24/outline'
 
 interface User{
   id: number;

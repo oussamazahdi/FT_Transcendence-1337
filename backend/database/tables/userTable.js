@@ -1,4 +1,4 @@
-function initDatabase(db)
+function createUserTable(db)
 {
     try {
         db.exec(`CREATE TABLE IF NOT EXISTS users (
@@ -8,7 +8,7 @@ function initDatabase(db)
             username TEXT UNIQUE,
             email TEXT UNIQUE,
             password TEXT,
-            profilepicture TEXT DEFAULT "/frontend/uploads/kamal.jpeg",
+            profilepicture TEXT,
             createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )`);
         // console.log("Database initialized successfully!")
@@ -19,4 +19,4 @@ function initDatabase(db)
     }
 }
 
-export { initDatabase };
+export { createUserTable };
