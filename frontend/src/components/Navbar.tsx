@@ -57,50 +57,72 @@ export default function Navbar() {
   };
 
   const navItems = [
-    {href: "/Dashboard", label: "Dashboard", icon: HomeIcon},
+    {href: "/dashboard", label: "dashboard", icon: HomeIcon},
     {href: "/chat", label: "Chat", icon: ChatBubbleOvalLeftIcon},
     {href: "/game", label: "Game", icon: TrophyIcon},
     {href: "/leaderboard", label: "Leaderboard", icon: ChartBarIcon},
   ]
-
+  const [search, setSearch] = useState('');
   return (
-      <div className='absolute top-5 inset-x-0 flex items-center justify-center'>
-        <div className='hidden md:flex items-center gap-10 md:gap-10 lg:gap-35 bg-[#8D8D8D]/25 px-3 py-3 rounded-full '>
-          <Link href="/">
-            <img src="/logo.png" alt="logo" className='h-13 h-13 object-cover rounded-full' />
+      <div className="relative mt-8 mx-20 lg:mx-35 flex justify-between">
+      <div>
+        <Link href="/dashboard">
+          <img
+            src="/logo.png"
+            alt="logo"
+            className="h-13 w-13 object-cover rounded-[10px]"
+          />
+        </Link>
+      </div>
+
+      <div className="flex items-center">
+        {navItems.map((item) => (
+          <Link key={item.href} href={item.href}>
+            <button
+              className={`${
+                pathname === item.href || pathname.startsWith(item.href)
+                  ? " text-white font-medium bg-[#000000]/60 py-2 px-4 mx-2 rounded-full shadow-md transition delay-20 duration-200 "
+                  : "mx-2 text-[#BEBEBE] border border-[#9D9D9D]/40 hover:text-white hover:bg-[#000000]/40 rounded-full cursor-pointer py-2 px-4"
+              }`}
+            >
+              {item.label}
+            </button>
           </Link>
-         <div className='flex items-center'>
-          {navItems.map((item)=>(
-            <Link key={item.href} href={item.href} >
-              <button className={cn("flex items-center text-[#BEBEBE] hover:text-white cursor-pointer py-2 px-3",
-              pathname === item.href &&  "flex items-center text-white font-medium bg-[#959595]/40 py-2 px-3 rounded-full shadow-md")}>
-                <item.icon className='h-4 w-4 mr-1' />
-                {item.label}
-              </button>
-            </Link>
-          ))}
-          </div>
+        ))}
+      </div>
+
+      <div className="flex items-center my-2 border border-[#9D9D9D]/65 py-2 pl-4 text-white/60 rounded-full">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search"
+          className="flex-1 border-none bg-transparent focus:outline-none text-white/80 placeholder-white/40"
+        />
+        <MagnifyingGlassIcon className="w-6 h-6 ml-3 mr-3 text-white/60" />
+      </div>
           <div className='flex items-center gap-3' >
-            <MagnifyingGlassIcon className="h-11 w-11 p-2.5 text-white bg-[#D9D9D9]/40 rounded-full" />
-            <BellAlertIcon className="h-11 w-11 p-2.5 text-white bg-[#D9D9D9]/40 rounded-full" />
+            <button className="border border-[#9D9D9D]/40 rounded-[10px] p-3 hover:bg-[#000000]/40 cursor-pointer">
+              <BellAlertIcon className="w-5 h-5 text-white/60" />
+            </button>
           {loading ? (
-            <div className='h-13 w-13 rounded-full bg-gray-400 animate-pulse' />
-          ) : user?.profilepicture ? (
-            <img
-              src={user.profilepicture}
+            <div className='h-13 w-13 rounded-[10px] bg-gray-400 animate-pulse' />
+          ) : user?.avatar ? (
+            <Image
+              src={user.avatar}
               alt={user.username}
               width={52}
               height={52}
-              className='h-13 w-13 rounded-full object-cover border-2 border-white/20 cursor-pointer hover:border-white/50 transition'
+              className="h-13 w-13 object-cover rounded-[10px] ml-4"
             />
           ) : (
-            <div className='h-13 w-13 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-lg cursor-pointer hover:shadow-lg transition'>
+            <div className='h-13 w-13 rounded-[10px] bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-lg cursor-pointer hover:shadow-lg transition'>
               {user?.username?.[0]?.toUpperCase() || '?'}
             </div>
           )}
         </div>
       </div>
-    </div>
+    // </div>
   );
 }
 

@@ -6,7 +6,7 @@ export default function RootLayout({
   return (
     <>
       <Navbar />
-      <div className="absolute top-35 text-white flex inset-x-0 justify-center mx-5">
+      <div className="relative mt-5 text-white flex inset-x-0 justify-center">
         {children}
       </div>
     </>
