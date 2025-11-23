@@ -1,10 +1,14 @@
 import Fastify from "fastify"
 import Sqlite3 from "better-sqlite3"
-import { initRoutes } from "./routes/routes.js";
-import { initDatabase } from "./database/databaseUtils.js";
-import corsPlugin from "./plugins/cors.js";
 import dotenv from 'dotenv';
 import multipart from '@fastify/multipart';
+import cookie from '@fastify/cookie';
+import { fileURLToPath } from 'url';
+import path from 'path';
+import fastifyStatic from "@fastify/static";
+import { initAllTables } from "./database/tables/initDatabase.js";
+import { initRoutes } from "./routes/routes.js";
+import corsPlugin from "./plugins/cors.js";
 
 dotenv.config({ path: '../.env' });
 
@@ -25,10 +29,19 @@ const fastify = Fastify({
     }
 });
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Register static files middleware
+fastify.register(fastifyStatic, {
+  root: path.join(__dirname, 'uploads'),
+  prefix: '/uploads/' // Access images at http://localhost:3000/uploads/kamal.jpeg
+});
+
 fastify.register(multipart);
 fastify.register(corsPlugin);
+fastify.register(cookie);
 fastify.decorate('db', db);
-initDatabase(fastify.db);
+initAllTables(fastify.db);
 initRoutes(fastify);
 
 fastify.setNotFoundHandler((request, reply) => {
