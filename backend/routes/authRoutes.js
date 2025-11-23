@@ -1,4 +1,5 @@
-import { checkLogin, registerNewUser, processImage } from "../controllers/authController.js";
+import { checkLogin, registerNewUser, processImage, generateNewToken } from "../controllers/authController.js";
+import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 function authRoutes(fastify)
 {
@@ -20,6 +21,7 @@ function authRoutes(fastify)
             }
         }
     }, checkLogin);
+
 
     fastify.post("/register", {
         schema: {
@@ -55,7 +57,9 @@ function authRoutes(fastify)
         }
     }, registerNewUser);
 
-    fastify.post("/uploadImage", processImage);
+    fastify.post("/uploadImage", {preHandler: authMiddleware}, processImage);
+    // fastify.post("/logout", logoutUser)
+    fastify.get("/refresh", generateNewToken);
 }
 
 export { authRoutes };

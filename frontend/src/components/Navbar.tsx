@@ -6,8 +6,8 @@ import Link from 'next/link'
 import {cn} from '@/lib/utils'
 import {usePathname} from 'next/navigation'
 import { MagnifyingGlassIcon, BellAlertIcon, HomeIcon, 
-         ChatBubbleOvalLeftIcon, TrophyIcon, 
-         ChartBarIcon } from '@heroicons/react/24/outline'
+        	ChatBubbleOvalLeftIcon, TrophyIcon, 
+        	ChartBarIcon } from '@heroicons/react/24/outline'
 
 interface User{
   id: number;
@@ -29,15 +29,13 @@ export default function Navbar() {
   const fetchUserProfile = async () => {
     try {
       setLoading(true);
-      
-      // ✅ Fetch with credentials (includes cookies)
-      const response = await fetch('http://localhost:5000/user/profile', {
+
+      const response = await fetch('http://localhost:3001/user/profile', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include',  // ✅ This sends cookies automatically
-        // ❌ No Authorization header needed!
+        credentials: 'include',
       });
 
       if (!response.ok) {

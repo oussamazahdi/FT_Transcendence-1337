@@ -47,6 +47,7 @@ const SelecteImage = () => {
 
   //Lfunction Lmli7a
   const handleSubmit = async () => {
+
     if (!profileImage && !selectedAvatar) {
       setError("No image selected");
       return;
@@ -63,9 +64,12 @@ const SelecteImage = () => {
         const reply = await fetch("http://localhost:3001/api/auth/uploadImage", {
           method: "POST",
           body: formData,
+          credentials: 'include'
         })
 
         const data = await reply.json();
+        
+        console.log(reply);
         if (!reply.ok) {
           throw new Error(data.error || `Upload failed (${reply.status})`);
         }
@@ -73,11 +77,9 @@ const SelecteImage = () => {
         success = true;
 
       }else{
-        const reply = await fetch("http://localhost:5000/select-avatar", {
+        const reply = await fetch("http://localhost:3001/select-avatar", {
           method: "POST",
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          credentials: 'include',
           body: JSON.stringify({ avatarUrl: selectedAvatar }), 
         })
 

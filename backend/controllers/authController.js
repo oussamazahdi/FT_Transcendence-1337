@@ -3,6 +3,10 @@ import jwt from "jsonwebtoken"
 import fs from "fs"
 import path from "path";
 import { pipeline } from 'stream/promises';
+import { loginUser, addNewUser, generateToken } from "../models/authModel.js";
+import { generateFileNameByUser } from "../utils/authUtils.js";
+import { verify } from "crypto";
+import { error } from "console";
 
 
 /*
@@ -21,32 +25,32 @@ import { pipeline } from 'stream/promises';
         reply.type('application/json') → content-type
 */
 
-function generateToken(userId, Username)
-{
-    const payload = {
-        userId: userId,
-        username: Username
-    };
-    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
-}
-
 async function checkLogin(request, reply)
 {
     const { email, password } = request.body;
     const db = request.server.db;
     try {
-        const user = db.prepare(`SELECT * FROM users WHERE email = ?`).get(email);
-        if (!user)
+        const tokens = await loginUser(db, email, password);
+        if (tokens.message && tokens.message.includes("USER_NOT_FOUND"))
             return reply.code(404).send({error: "USER_NOT_FOUND"});
-        const match = await bcrypt.compare(password, user.password);
-        if (!match)
+        if (tokens.message && tokens.message.includes("INVALID_PASSWORD"))
             return reply.code(403).send({error: "INVALID_PASSWORD"});
-        const accessToken = generateToken(user.id, user.username);
-        return reply.code(200).send({message: "AUTHORIZED", token: accessToken}); // update later enhance later and create refresh and access token
+        reply.setCookie('refreshToken', tokens.refreshToken, {
+            httpOnly: true,
+            sameSite: 'strict',
+            path: '/',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+        reply.setCookie('accessToken', tokens.accessToken, {
+            httpOnly: true,
+            sameSite: 'strict',
+            path: '/',
+            maxAge: 15 * 60 * 1000
+        });
+        return reply.code(200).send({message: "AUTHORIZED"});
     }
     catch (error) {
-            console.log(error.message);
-            return reply.code(500).send({error: "INTERNAL_SERVER_ERROR"});
+            return reply.code(500).send({error: error.message});
     }
 }
 
@@ -55,9 +59,20 @@ async function registerNewUser(request, reply)
 {
     const { firstname, lastname, username, email, password } = request.body;
     const db = request.server.db;
-    let cryptedPass = await bcrypt.hash(password, 12);
     try {
-        db.prepare(`INSERT INTO users (firstname, lastname, username, email, password) VALUES (?, ?, ?, ?, ?)`).run(firstname, lastname, username, email, cryptedPass);
+        const tokens = await addNewUser(db, firstname, lastname, username, email, password);
+        reply.setCookie('refreshToken', tokens.refreshToken, {
+            httpOnly: true,
+            sameSite: 'strict',
+            path: '/',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+        reply.setCookie('accessToken', tokens.accessToken, {
+            httpOnly: true,
+            sameSite: 'strict',
+            path: '/',
+            maxAge: 15 * 60 * 1000
+        });
         return reply.code(201).send({message: "USER_CREATED_SUCCESSFULLY"});
     }
     catch (error)
@@ -67,22 +82,50 @@ async function registerNewUser(request, reply)
         else if (error.message.includes('NOT NULL constraint failed'))
             return reply.code(400).send({error: "MISSING_FIELD"});
         else
-        {
-            console.log(error.message);
-            return reply.code(500).send({error: "INTERNAL_SERVER_ERROR"});
-        }
+            return reply.code(500).send({error: error.message});
     }
 }
 
 async function processImage(request, reply)
 {
-    const uploadDir = process.cwd() + '/uploads/';
+    /**
+     * needs protection and separation model from the controller
+     */
+    const db = request.server.db;
+    const uploadDir = path.join(process.cwd(), 'uploads');
     const image = await request.file();
-    const filePath = uploadDir + image.filename;
-    console.log(filePath);
+    const filename = generateFileNameByUser(request.user.username, image.filename);
+    const filePath = path.join(uploadDir, filename);
     await pipeline(image.file, fs.createWriteStream(filePath));
-
+    let result = db.prepare('UPDATE users SET profilepicture = ? WHERE id = ?').run(filePath, request.user.userId);
     reply.code(200).send({message: "SUCCESS", data: {path: filePath}});
 }
 
-export { checkLogin, registerNewUser, processImage };
+function generateNewToken(request, reply)
+{
+    const db = request.server.db;
+    const refreshToken = request.cookies.refreshToken;
+    const accessToken = request.cookies.accessToken;
+
+    try {
+        if (!refreshToken || !accessToken)
+            throw new Error("UNAUTHORIZED_NO_TOKEN");
+        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+        const tokenDbResults = db.prepare('SELECT refresh_token FROM tokens WHERE refresh_token = ?').get(refreshToken); // check if token exists
+        if (!tokenDbResults)
+            throw new Error("INVALID_TOKEN")
+        const newAccessToken = generateToken(decoded.userId, decoded.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION);
+        reply.setCookie('accessToken', newAccessToken, {
+            httpOnly: true,
+            sameSite: 'strict',
+            path: '/',
+            maxAge: 15 * 60 * 1000
+        });
+        return reply.code(201).send({message: "TOKEN_REFRESHED_SUCCESSFULLY"});
+    }
+    catch (error) {
+        return reply.code(401).send({error: error.message});
+    }
+}
+
+export { checkLogin, registerNewUser, processImage, generateNewToken };
