@@ -1,4 +1,4 @@
-import { getAllUsers, getOneUser, updateUser, deleteUser } from "../controllers/userController.js";
+import { getAllUsers, getOneUser, updateUser, deleteUser, searchUsers } from "../controllers/userController.js";
 
 function userRoutes(fastify)
 {
@@ -6,6 +6,9 @@ function userRoutes(fastify)
     fastify.get("/:id", getOneUser);
     fastify.put("/:id", updateUser);
     fastify.delete("/:id", deleteUser);
+    
+    //added by soufiix
+    fastify.get("/search", searchUsers);
 }
 
 export { userRoutes };

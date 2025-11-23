@@ -5,6 +5,9 @@ import { initDatabase } from "./database/databaseUtils.js";
 import corsPlugin from "./plugins/cors.js";
 import dotenv from 'dotenv';
 import multipart from '@fastify/multipart';
+import fastifyStatic from '@fastify/static';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config({ path: '../.env' });
 
@@ -30,6 +33,14 @@ fastify.register(corsPlugin);
 fastify.decorate('db', db);
 initDatabase(fastify.db);
 initRoutes(fastify);
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Register static files middleware
+fastify.register(fastifyStatic, {
+  root: path.join(__dirname, 'uploads'),
+  prefix: '/uploads/' // Access images at http://localhost:3000/uploads/kamal.jpeg
+});
 
 fastify.setNotFoundHandler((request, reply) => {
     reply.code(404).send({msg : "Waloooo nech a 3chiri makayn walo gha gheyrha"});
