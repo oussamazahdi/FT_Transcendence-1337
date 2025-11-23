@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useState, useEffect } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import {cn} from '@/lib/utils'
 import {usePathname} from 'next/navigation'
@@ -11,9 +10,11 @@ import { MagnifyingGlassIcon, BellAlertIcon, HomeIcon,
 
 interface User{
   id: number;
+  firstname:string;
+  lastname:string;
   username: string;
   email: string;
-  avatar: string;
+  profilepicture: string;
 }
 
 export default function Navbar() {
@@ -30,14 +31,14 @@ export default function Navbar() {
     try {
       setLoading(true);
       
-      // ✅ Fetch with credentials (includes cookies)
-      const response = await fetch('http://localhost:5000/user/profile', {
+      const userId = localStorage.getItem('userId');
+      console.log("===========>" ,userId);
+      const response = await fetch(`http://localhost:3001/api/users/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include',  // ✅ This sends cookies automatically
-        // ❌ No Authorization header needed!
+        credentials: 'include', 
       });
 
       if (!response.ok) {
@@ -46,12 +47,12 @@ export default function Navbar() {
 
       const data = await response.json();
       console.log('✅ User profile fetched:', data);
-      setUser(data.user);
+      setUser(data.data);
 
     } catch (err: any) {
       console.error('❌ Error fetching profile:', err);
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   };
 
@@ -84,9 +85,9 @@ export default function Navbar() {
             <BellAlertIcon className="h-11 w-11 p-2.5 text-white bg-[#D9D9D9]/40 rounded-full" />
           {loading ? (
             <div className='h-13 w-13 rounded-full bg-gray-400 animate-pulse' />
-          ) : user?.avatar ? (
-            <Image
-              src={user.avatar}
+          ) : user?.profilepicture ? (
+            <img
+              src={user.profilepicture}
               alt={user.username}
               width={52}
               height={52}

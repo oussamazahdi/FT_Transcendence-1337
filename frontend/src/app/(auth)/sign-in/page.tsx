@@ -39,7 +39,11 @@ const SignIn = () => {
       }
 
       const data = await reply.json();
+			localStorage.setItem('accessToken', data.token);
       console.log("sign in succeful:", data);
+
+			const payload = JSON.parse(atob(data.token.split('.')[1]));
+    	localStorage.setItem('userId', payload.userId);
 
       router.push("/Dashboard")
 
