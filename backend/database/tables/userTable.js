@@ -8,7 +8,7 @@ function createUserTable(db)
             username TEXT UNIQUE,
             email TEXT UNIQUE,
             password TEXT,
-            profilepicture TEXT,
+            avatar TEXT,
             createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )`);
         // console.log("Database initialized successfully!")
