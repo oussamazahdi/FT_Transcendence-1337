@@ -97,8 +97,10 @@ async function processImage(request, reply)
     const filename = generateFileNameByUser(request.user.username, image.filename);
     const filePath = path.join(uploadDir, filename);
     await pipeline(image.file, fs.createWriteStream(filePath));
-    let result = db.prepare('UPDATE users SET profilepicture = ? WHERE id = ?').run(filePath, request.user.userId);
-    reply.code(200).send({message: "SUCCESS", data: {path: filePath}});
+    const fileLink = `${request.host}/uploads/${filename}`;
+    let result = db.prepare('UPDATE users SET avatar = ? WHERE id = ?').run(fileLink, request.user.userId);
+    const user = db.prepare('SELECT firstname, lastname, username, email, avatar FROM users WHERE id = ?').get(request.user.userId);
+    reply.code(200).send({message: "SUCCESS", userData: user});
 }
 
 function generateNewToken(request, reply)

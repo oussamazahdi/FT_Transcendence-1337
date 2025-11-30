@@ -8,6 +8,13 @@ function createTokenTable(db)
             creationdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
             )`);
+        db.exec(`CREATE TABLE IF NOT EXISTS blacklisted_tokens (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            refresh_token TEXT NOT NULL UNIQUE,
+            creationdate TIMESTAMP,
+            expirationdate TIMESTAMP,
+            blacklistedat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )`);
     }
     catch (error) {
         console.error("Database cannot be inited due to : " + error.message);

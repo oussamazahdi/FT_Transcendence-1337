@@ -11,6 +11,7 @@ import { initRoutes } from "./routes/routes.js";
 import corsPlugin from "./plugins/cors.js";
 
 dotenv.config({ path: '../.env' });
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const db = new Sqlite3('./database/transcendence.db', { 
     verbose: console.log  // Optional: log queries
@@ -32,6 +33,10 @@ const fastify = Fastify({
 fastify.register(multipart);
 fastify.register(corsPlugin);
 fastify.register(cookie);
+fastify.register(fastifyStatic, {
+  root: path.join(__dirname, 'uploads'),
+  prefix: '/uploads/'
+});
 fastify.decorate('db', db);
 initAllTables(fastify.db);
 initRoutes(fastify);

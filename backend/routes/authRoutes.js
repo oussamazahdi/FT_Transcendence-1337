@@ -58,7 +58,8 @@ function authRoutes(fastify)
     }, registerNewUser);
 
     fastify.post("/uploadImage", {preHandler: authMiddleware}, processImage);
-    // fastify.post("/logout", logoutUser)
+    // fastify.get("/identifier", {preHandler: authMiddleware} ,getUserData);
+    // fastify.post("/logout", logoutUser);
     fastify.get("/refresh", generateNewToken);
 }
 
