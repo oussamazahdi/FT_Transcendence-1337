@@ -3,9 +3,6 @@ import Sqlite3 from "better-sqlite3"
 import dotenv from 'dotenv';
 import multipart from '@fastify/multipart';
 import cookie from '@fastify/cookie';
-import { fileURLToPath } from 'url';
-import path from 'path';
-import fastifyStatic from "@fastify/static";
 import { initAllTables } from "./database/tables/initDatabase.js";
 import { initRoutes } from "./routes/routes.js";
 import corsPlugin from "./plugins/cors.js";
