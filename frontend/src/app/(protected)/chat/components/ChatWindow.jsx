@@ -1,9 +1,7 @@
-import React from "react";
+import { useContext } from "react";
+import { SelectedFriendContext } from "@/contexts/userContexts";
 
-export default function ChatWindow({friend}){
-    return (
-        <div>
-            {friend.playerName}
-        </div>
-    )
+export default function ChatWindow() {
+  const { selectedFriend } = useContext(SelectedFriendContext);
+  return <div>{selectedFriend.name}</div>;
 }
