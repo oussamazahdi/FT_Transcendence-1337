@@ -15,12 +15,12 @@ const SelecteImage = () => {
   const avatarStyle = "w-11 h-11 rounded-lg object-cover cursor-pointer transition-all hover:scale-110";
 
   const avatars = [
-    { color: "/gameAvatars/profile1.jpeg", black: "/gameAvatars/blackAvatar/avatar1.png", alt: "avatar 1" },
-    { color: "/gameAvatars/profile2.jpeg", black: "/gameAvatars/blackAvatar/avatar2.png", alt: "avatar 2" },
-    { color: "/gameAvatars/profile3.jpeg", black: "/gameAvatars/blackAvatar/avatar3.png", alt: "avatar 3" },
-    { color: "/gameAvatars/profile4.jpeg", black: "/gameAvatars/blackAvatar/avatar4.png", alt: "avatar 4" },
-    { color: "/gameAvatars/profile5.jpeg", black: "/gameAvatars/blackAvatar/avatar5.png", alt: "avatar 5" },
-    { color: "/gameAvatars/profile6.jpeg", black: "/gameAvatars/blackAvatar/avatar6.png", alt: "avatar 6" },
+    { color: "/gameAvatars/profile1.jpeg", black: "/gameAvatars/blackAvatar/avatar1.png", alt: "profile1" },
+    { color: "/gameAvatars/profile2.jpeg", black: "/gameAvatars/blackAvatar/avatar2.png", alt: "profile2" },
+    { color: "/gameAvatars/profile3.jpeg", black: "/gameAvatars/blackAvatar/avatar3.png", alt: "profile3" },
+    { color: "/gameAvatars/profile4.jpeg", black: "/gameAvatars/blackAvatar/avatar4.png", alt: "profile4" },
+    { color: "/gameAvatars/profile5.jpeg", black: "/gameAvatars/blackAvatar/avatar5.png", alt: "profile5" },
+    { color: "/gameAvatars/profile6.jpeg", black: "/gameAvatars/blackAvatar/avatar6.png", alt: "profile6" },
   ];
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,10 +78,10 @@ const SelecteImage = () => {
         
       } else if (selectedAvatar) {
         // Select predefined avatar
-        const reply = await fetch("http://localhost:5000/select-avatar", {
+        const reply = await fetch("http://localhost:3001/api/auth/uploadImage", {
           method: "POST",
           credentials: 'include',
-          body: JSON.stringify({ avatarUrl: selectedAvatar }), 
+          body: JSON.stringify({ avatar: selectedAvatar }), 
         });
 
         const data = await reply.json();
@@ -159,7 +159,7 @@ const SelecteImage = () => {
                 alt={a.alt}
                 className={avatarStyle}
                 onClick={() => {
-                  setSelectedAvatar(a.color);
+                  setSelectedAvatar(a.alt);
                   setImagePreview(a.color);
                   setProfileImage(null); // Clear custom image if avatar is chosen
                 }}

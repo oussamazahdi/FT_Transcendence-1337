@@ -2,15 +2,17 @@ import jwt from "jsonwebtoken"
 
 async function authMiddleware(request, reply)
 {
+    const db = request.server.db;
     const accessToken = request.cookies.accessToken;
-    if (!accessToken)
-        return reply.code(401).send({message: "UNAUTHORIZED_NO_ACCESS_TOKEN"});
+    const refreshToken = request.cookies.refreshToken;
     try {
+        if (!accessToken)
+            throw new Error("UNAUTHORIZED_NO_ACCESS_TOKEN");
+        const blacklisted = db.prepare('SELECT * FROM revoked_tokens WHERE refresh_token = ?').get(refreshToken);
+        if (blacklisted)
+            throw new Error("TOKEN_REVOKED");
         const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
         request.user = decoded;
-        // console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-        // console.log("decoded =>>> ", decoded);
-        // console.log("request =>>> ", request.user);
     }
     catch (error) {
         if (error.name === "TokenExpiredError")

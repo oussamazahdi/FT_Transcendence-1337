@@ -1,4 +1,4 @@
-import { checkLogin, registerNewUser, processImage, generateNewToken } from "../controllers/authController.js";
+import { checkLogin, registerNewUser, processImage, generateNewToken, getUserData, logoutUser } from "../controllers/authController.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 function authRoutes(fastify)
@@ -58,9 +58,10 @@ function authRoutes(fastify)
     }, registerNewUser);
 
     fastify.post("/uploadImage", {preHandler: authMiddleware}, processImage);
-    // fastify.get("/identifier", {preHandler: authMiddleware} ,getUserData);
-    // fastify.post("/logout", logoutUser);
+    fastify.get("/me", {preHandler: authMiddleware} ,getUserData);
+    fastify.post("/logout", {preHandler: authMiddleware}, logoutUser);
     fastify.get("/refresh", generateNewToken);
+    // todo : 2FA, OAUTH
 }
 
 export { authRoutes };

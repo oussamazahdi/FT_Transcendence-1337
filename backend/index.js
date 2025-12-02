@@ -9,6 +9,7 @@ import fastifyStatic from "@fastify/static";
 import { initAllTables } from "./database/tables/initDatabase.js";
 import { initRoutes } from "./routes/routes.js";
 import corsPlugin from "./plugins/cors.js";
+import { setupTokenCleanup } from './jobs/revokedTokensCleanup.js';
 
 dotenv.config({ path: '../.env' });
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -38,6 +39,8 @@ fastify.register(fastifyStatic, {
   prefix: '/uploads/'
 });
 fastify.decorate('db', db);
+
+setupTokenCleanup(fastify.db);
 initAllTables(fastify.db);
 initRoutes(fastify);
 
