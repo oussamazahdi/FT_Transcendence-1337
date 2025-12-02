@@ -5,25 +5,6 @@ import path from "path";
 import { pipeline } from 'stream/promises';
 import { loginUser, addNewUser, generateToken } from "../models/authModel.js";
 import { generateFileNameByUser } from "../utils/authUtils.js";
-import { verify } from "crypto";
-import { error } from "console";
-
-
-/*
-    request object :
-        request.body → POST/PUT data
-        request.params → URL parameters (/user/:id)
-        request.query → Query strings (?name=kamal)
-        request.headers → HTTP headers
-        request.method → GET, POST, etc.
-        request.url → l'URL path
-    Reply object :
-        reply.send(data) → bach t-sender response
-        reply.code(200) → bach t-setter status code
-        reply.header('key', 'value') → bach tzid headers
-        reply.status(404).send() → alternative syntax
-        reply.type('application/json') → content-type
-*/
 
 async function checkLogin(request, reply)
 {
@@ -47,7 +28,8 @@ async function checkLogin(request, reply)
             path: '/',
             maxAge: 15 * 60 * 1000
         });
-        return reply.code(200).send({message: "AUTHORIZED"});
+        const user = db.prepare('SELECT firstname, lastname, username, email, avatar FROM users WHERE email = ?').get(email);
+        return reply.code(200).send({message: "AUTHORIZED", userData: user});
     }
     catch (error) {
             return reply.code(500).send({error: error.message});
@@ -88,19 +70,39 @@ async function registerNewUser(request, reply)
 
 async function processImage(request, reply)
 {
-    /**
+    /*
      * needs protection and separation model from the controller
      */
-    const db = request.server.db;
-    const uploadDir = path.join(process.cwd(), 'uploads');
-    const image = await request.file();
-    const filename = generateFileNameByUser(request.user.username, image.filename);
-    const filePath = path.join(uploadDir, filename);
-    await pipeline(image.file, fs.createWriteStream(filePath));
-    const fileLink = `${request.host}/uploads/${filename}`;
-    let result = db.prepare('UPDATE users SET avatar = ? WHERE id = ?').run(fileLink, request.user.userId);
-    const user = db.prepare('SELECT firstname, lastname, username, email, avatar FROM users WHERE id = ?').get(request.user.userId);
-    reply.code(200).send({message: "SUCCESS", userData: user});
+    try {
+        const db = request.server.db;
+        const isMultipart = request.headers['content-type']?.startsWith('multipart/form-data');
+        let fileLink = null;
+        if (isMultipart)
+        {
+            const uploadDir = path.join(process.cwd(), 'uploads');
+                const image = await request.file();
+                const filename = generateFileNameByUser(request.user.username, image.filename);
+                const filePath = path.join(uploadDir, filename);
+                await pipeline(image.file, fs.createWriteStream(filePath));
+                fileLink = `${request.host}/uploads/${filename}`;
+        }
+        else 
+        {
+            const { avatar } = JSON.parse(request.body);
+            console.log(avatar);
+            const availableAvatars = ["profile1", "profile2", "profile3", "profile4", "profile5", "profile6"];
+            if (!availableAvatars.includes(avatar))
+                return reply.code(400).send("INVALID_AVATAR");
+            fileLink = `${request.host}/uploads/default/${avatar}.jpeg`;
+        }
+        db.prepare('UPDATE users SET avatar = ? WHERE id = ?').run(fileLink, request.user.userId);
+        const user = db.prepare('SELECT firstname, lastname, username, email, avatar FROM users WHERE id = ?').get(request.user.userId);
+        reply.code(200).send({message: "SUCCESS", userData: user});
+    }
+    catch (error)
+    {
+        return reply.code(400).send({error: error.message});
+    }
 }
 
 function generateNewToken(request, reply)
@@ -112,6 +114,9 @@ function generateNewToken(request, reply)
     try {
         if (!refreshToken || !accessToken)
             throw new Error("UNAUTHORIZED_NO_TOKEN");
+        const blacklisted = db.prepare('SELECT * FROM revoked_tokens WHERE refresh_token = ?').get(refreshToken);
+        if (blacklisted)
+            throw new Error("TOKEN_REVOKED");
         const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
         const tokenDbResults = db.prepare('SELECT refresh_token FROM tokens WHERE refresh_token = ?').get(refreshToken); // check if token exists
         if (!tokenDbResults)
@@ -130,4 +135,45 @@ function generateNewToken(request, reply)
     }
 }
 
-export { checkLogin, registerNewUser, processImage, generateNewToken };
+async function getUserData(request, reply) 
+{
+    const db = request.server.db;
+	try {
+        const user = db.prepare('SELECT firstname, lastname, username, email, avatar FROM users WHERE id = ?').get(request.user.userId);
+        return reply.code(200).send({message: "SUCCESS", userData: user});
+    }
+    catch (error) {
+        return reply.code(401).send({error: error.message});
+    }
+}
+
+async function logoutUser(request, reply)
+{
+    const db = request.server.db
+    try {
+        const refreshToken = request.cookies.refreshToken;
+        if (!refreshToken)
+            return reply.code(401).send("NO_TOKEN_PROVIDED");
+        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+        const expiration = new Date(decoded.exp * 1000).toISOString();
+        db.prepare('DELETE FROM tokens WHERE refresh_token = ?').run(refreshToken);
+        db.prepare('INSERT INTO revoked_tokens (refresh_token, expirationdate) VALUES (?, ?)').run(refreshToken, expiration);
+        reply.clearCookie('accessToken', {
+            httpOnly: true,
+            sameSite: 'strict',
+            path: '/',
+        });
+        reply.clearCookie('refreshToken', {
+            httpOnly: true,
+            sameSite: 'strict',
+            path: '/',
+        });
+        return reply.code(200).send({message: "LOGGED_OUT"});
+
+    }
+    catch (error) {
+        return reply.code(400).send({error: error.message});
+    }
+}
+
+export { checkLogin, registerNewUser, processImage, generateNewToken, getUserData, logoutUser };
