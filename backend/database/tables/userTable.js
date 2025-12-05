@@ -9,7 +9,10 @@ function createUserTable(db)
             email TEXT UNIQUE,
             password TEXT,
             avatar TEXT,
-            createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            isverified BOOLEAN DEFAULT false,
+            otp TEXT,
+            otpexpiration TIMESTAMP,
+            createdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )`);
         // console.log("Database initialized successfully!")
     }

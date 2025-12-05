@@ -6,6 +6,10 @@ import cookie from '@fastify/cookie';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fastifyStatic from "@fastify/static";
+import nodemailer from 'nodemailer'
+// import fastifyTotp from 'fastify-totp'
+
+// locals
 import { initAllTables } from "./database/tables/initDatabase.js";
 import { initRoutes } from "./routes/routes.js";
 import corsPlugin from "./plugins/cors.js";
@@ -31,6 +35,18 @@ const fastify = Fastify({
     }
 });
 
+const transporter = nodemailer.createTransport( {
+    host: process.env.SMTP_SERVER,
+    port: parseInt(process.env.SMTP_PORT),
+    secure: false,
+    auth: {
+        user: process.env.SMTP_EMAIL,
+        pass:process.env.SMTP_PASSWORD
+    }
+});
+
+fastify.decorate('nodemailer', transporter);
+// await fastify.register(fastifyTotp);
 fastify.register(multipart);
 fastify.register(corsPlugin);
 fastify.register(cookie);
@@ -43,10 +59,6 @@ fastify.decorate('db', db);
 setupTokenCleanup(fastify.db);
 initAllTables(fastify.db);
 initRoutes(fastify);
-
-fastify.setNotFoundHandler((request, reply) => {
-    reply.code(404).send({msg : "Waloooo nech a 3chiri makayn walo gha gheyrha"});
-});
 
 await fastify.listen({port: 3001}, (error) => {
     if (error)

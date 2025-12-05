@@ -1,4 +1,4 @@
-import { checkLogin, registerNewUser, processImage, generateNewToken, getUserData, logoutUser } from "../controllers/authController.js";
+import { authController } from "../controllers/authController.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 function authRoutes(fastify)
@@ -20,7 +20,7 @@ function authRoutes(fastify)
                 }
             }
         }
-    }, checkLogin);
+    }, authController.checkLogin);
 
 
     fastify.post("/register", {
@@ -55,13 +55,16 @@ function authRoutes(fastify)
                 }
             }
         }
-    }, registerNewUser);
+    }, authController.registerNewUser);
 
-    fastify.post("/uploadImage", {preHandler: authMiddleware}, processImage);
-    fastify.get("/me", {preHandler: authMiddleware} ,getUserData);
-    fastify.post("/logout", {preHandler: authMiddleware}, logoutUser);
-    fastify.get("/refresh", generateNewToken);
+    fastify.post("/uploadImage", {preHandler: authMiddleware}, authController.uploadImage);
+    fastify.get("/me", {preHandler: authMiddleware}, authController.getMe);
+    fastify.post("/logout", {preHandler: authMiddleware}, authController.logout);
+    fastify.post("/refresh", authController.generateNewToken);
+    fastify.post("/resendCode", {preHandler: authMiddleware}, authController.resendCode);
+    fastify.post("/emailVerification", {preHandler: authMiddleware}, authController.verifyEmail);
     // todo : 2FA, OAUTH
+    // fastify.post("/enable2fa", {preHandler: authMiddleware}, authController.enable2fa);
 }
 
 export { authRoutes };
