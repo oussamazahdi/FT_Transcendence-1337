@@ -3,69 +3,47 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { assets } from "@/assets/data";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/authContext";
+import { AUTH_ERRORS } from "@/lib/utils";
 
 const SelecteImage = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
-  const [error, setError] = useState(null);
   const [selectedAvatar, setSelectedAvatar] = useState(null);
+  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const {user, isLoading} = useAuth();
+
+  // const {user, isLoading} = useAuth();
   const router = useRouter();
 
 
   //to change after merging qith kamal
-  useEffect(() => {
-    if (isLoading)
-      return;
-    if (!user){//usless after merge 
-      router.push("/sign-in");
-    }else{
-      router.push("/dashboard");
-    }
-
-  }, user, isLoading)
+  // useEffect(() => {
+  //   if (isLoading)
+  //     return;
+  //   if (!user){//usless after merge 
+  //     router.push("/sign-in");
+  //     return;
+  //   }
+  //   if (user.avatar){
+  //     router.push("/dashboard");
+  //   }
+  
+  // }, user, isLoading, router)
   const avatarStyle =
     "w-11 h-11 rounded-lg object-cover cursor-pointer transition-all hover:scale-110";
 
   const avatars = [
-    {
-      color: "/gameAvatars/profile1.jpeg",
-      black: "/gameAvatars/blackAvatar/avatar1.png",
-      alt: "avatar1",
-    },
-    {
-      color: "/gameAvatars/profile2.jpeg",
-      black: "/gameAvatars/blackAvatar/avatar2.png",
-      alt: "avatar2",
-    },
-    {
-      color: "/gameAvatars/profile3.jpeg",
-      black: "/gameAvatars/blackAvatar/avatar3.png",
-      alt: "avatar3",
-    },
-    {
-      color: "/gameAvatars/profile4.jpeg",
-      black: "/gameAvatars/blackAvatar/avatar4.png",
-      alt: "avatar4",
-    },
-    {
-      color: "/gameAvatars/profile5.jpeg",
-      black: "/gameAvatars/blackAvatar/avatar5.png",
-      alt: "avatar5",
-    },
-    {
-      color: "/gameAvatars/profile6.jpeg",
-      black: "/gameAvatars/blackAvatar/avatar6.png",
-      alt: "avatar6",
-    },
+    { color: "/gameAvatars/profile1.jpeg", black: "/gameAvatars/blackAvatar/avatar1.png", alt: "profile1",},
+    { color: "/gameAvatars/profile2.jpeg", black: "/gameAvatars/blackAvatar/avatar2.png", alt: "profile2", },
+    { color: "/gameAvatars/profile3.jpeg", black: "/gameAvatars/blackAvatar/avatar3.png", alt: "profile3", },
+    { color: "/gameAvatars/profile4.jpeg", black: "/gameAvatars/blackAvatar/avatar4.png", alt: "profile4", },
+    { color: "/gameAvatars/profile5.jpeg", black: "/gameAvatars/blackAvatar/avatar5.png", alt: "profile5", },
+    { color: "/gameAvatars/profile6.jpeg", black: "/gameAvatars/blackAvatar/avatar6.png", alt: "profile6", },
   ];
 
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) {
-      alert("Choose a file first");
       return;
     }
 
@@ -105,6 +83,10 @@ const SelecteImage = () => {
           `${process.env.NEXT_PUBLIC_API_URL}/api/auth/uploadImage`,
           {
             method: "POST",
+            headers:{
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
             body: formData,
           },
         );
@@ -112,15 +94,18 @@ const SelecteImage = () => {
         const data = await reply.json();
 
         if (!reply.ok) {
-          throw new Error(data.error || `Upload failed (${reply.status})`);
+          const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
+          throw new Error (errorMessage);
         }
 
         console.log("Upload successful:", data);
       } else if (selectedAvatar) {
         // Select predefined avatar
-        console.log(selectedAvatar);
-        const reply = await fetch("http://localhost:5000/select-avatar", {
+        const reply = await fetch("http://localhost:5000/uploadImage", {
           method: "POST",
+          headers:{
+            "Content-Type": "application/json",
+          },
           credentials: "include",
           body: JSON.stringify({ avatarUrl: selectedAvatar }),
         });
@@ -128,9 +113,8 @@ const SelecteImage = () => {
         const data = await reply.json();
 
         if (!reply.ok) {
-          throw new Error(
-            data.error || `Avatar selection failed (${reply.status})`,
-          );
+          const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
+          throw new Error (errorMessage);
         }
 
         console.log("Avatar selection successful:", data);
@@ -139,14 +123,14 @@ const SelecteImage = () => {
       // Navigate to dashboard on success
       router.replace("/dashboard");
     } catch (err) {
-      console.error("Error:", err);
-      setError(
-        err instanceof Error ? err.message : "Failed to save profile image",
-      );
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
+
+  // if (isLoading) return <div className="text-white text-center mt-20">Loading...</div>;
+
 
   return (
     <div className="min-h-screen flex justify-center items-center">
@@ -208,7 +192,7 @@ const SelecteImage = () => {
             {avatars.map((a) => (
               <img
                 key={a.color}
-                src={selectedAvatar === a.color ? a.color : a.black}
+                src={selectedAvatar === a.alt ? a.color : a.black}
                 alt={a.alt}
                 className={avatarStyle}
                 onClick={() => {

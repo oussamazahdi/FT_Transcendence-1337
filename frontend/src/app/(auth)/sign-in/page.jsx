@@ -7,6 +7,7 @@ import { assets } from "@/assets/data";
 import Input from "../sign-up/components/Input";
 import ConnectWith from "@/components/ConnectWith";
 import { useAuth } from "@/contexts/authContext";
+import { AUTH_ERRORS } from "@/lib/utils";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -14,7 +15,7 @@ const SignIn = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { login, user } = useAuth();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,7 +28,7 @@ const SignIn = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", // Very important a sat this line howa lee responsible of resend the token cookie
+        credentials: "include",
         body: JSON.stringify({
           email,
           password,
@@ -36,16 +37,13 @@ const SignIn = () => {
 
       if (!reply.ok) {
         const errorData = await reply.json();
-        console.log(errorData);
-        throw new Error(errorData.message || "login failed");
+        const errorMessage = AUTH_ERRORS[errorData.error] || AUTH_ERRORS["default"]
+        throw new Error(errorMessage);
       }
 
       const data = await reply.json();
-
-      console.log("Data ---> ", data);
       login(data)
 
-    console.log("User ---->", user)
       router.push("/dashboard");
     } catch (err) {
       if (err instanceof Error)
