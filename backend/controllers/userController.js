@@ -80,17 +80,17 @@ function searchUsers(request, reply){
 
 		console.log(query);
 		if (!query || typeof query !== 'string'){
-			return reply.code(400).json({ error: 'Query parameter required' });
+			return reply.code(400).json({ error: 'QUERY_PARAMETER_REQUERED' });
 		}
 
 		const trimmedQuery = query.trim();
 
 		if (trimmedQuery.length < 2) {
-			return reply.code(400).json({ error: 'Query must be at least 2 characters' });
+			return reply.code(400).json({ error: 'QUERY_TOO_SHORT' });
 		}
 
 		if (trimmedQuery.length > 20) {
-      return reply.code(400).json({ error: 'Query cannot exceed 20 characters' });
+      return reply.code(400).json({ error: 'QUERY_TOO_LONG' });
     }
 
 		const searchPattern = `%${trimmedQuery}%`;

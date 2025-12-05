@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Input from "./components/Input";
 import ConnectWith from "@/components/ConnectWith";
+import { AUTH_ERRORS } from "@/lib/utils";
 
 export default function SignUp() {
   const [firstname, setFirstname] = useState("");
@@ -49,15 +50,15 @@ export default function SignUp() {
 
       if (!reply.ok) {
         const errorData = await reply.json();
-        throw new Error(errorData.message || "Signup failed");
+        const errorMessage = AUTH_ERRORS[errorData.error] || AUTH_ERRORS["default"];
+        throw new Error(errorMessage);
       }
 
       const data = await reply.json();
       console.log("Signup successful:", data);
-      router.replace("/sign-up/selecteImage");
+      router.replace("/sign-up/email-verification");
     } catch (err) {
-      setError(err.message || "An error occurred");
-      console.error("Signup error", err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
