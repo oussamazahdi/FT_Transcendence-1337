@@ -87,16 +87,15 @@ export class AuthController {
                     const filename = generateFileNameByUser(request.user.username, image.filename);
                     const filePath = path.join(uploadDir, filename);
                     await pipeline(image.file, fs.createWriteStream(filePath));
-                    fileLink = `${request.host}/uploads/${filename}`;
+                    fileLink = `http://${request.host}/uploads/${filename}`;
             }
             else 
             {
-                const { avatar } = JSON.parse(request.body);
-                console.log(avatar);
+                const { avatar } = request.body;
                 const availableAvatars = ["profile1", "profile2", "profile3", "profile4", "profile5", "profile6"];
                 if (!availableAvatars.includes(avatar))
                     return reply.code(400).send("INVALID_AVATAR");
-                fileLink = `${request.host}/uploads/default/${avatar}.jpeg`;
+                fileLink = `http://${request.host}/uploads/default/${avatar}.jpeg`;
             }
             db.prepare('UPDATE users SET avatar = ? WHERE id = ?').run(fileLink, request.user.userId);
             const user = db.prepare('SELECT firstname, lastname, username, email, avatar FROM users WHERE id = ?').get(request.user.userId);

@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+
 import { usePathname } from "next/navigation";
 import {
   MagnifyingGlassIcon,
@@ -12,56 +13,11 @@ import {
   TrophyIcon,
   ChartBarIcon,
 } from "@heroicons/react/24/outline";
-import { resolve } from "styled-jsx/css";
-
-
+import { useAuth } from "@/contexts/authContext";
 
 export default function Navbar() {
   const pathname = usePathname();
-
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchUserProfile();
-  }, []);
-
-  const fetchUserProfile = async () => {
-    try {
-      setLoading(true);
-
-      // const userId = localStorage.getItem("userId");
-      // console.log("===========>", userId);
-      // const response = await fetch(
-      //   `${process.env.NEXT_PUBLIC_API_URL}/api/users/${userId}`,
-      //   {
-      //     method: "GET",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     credentials: "include",
-      //   },
-      // );
-
-      // if (!response.ok) {
-      //   throw new Error("Failed to fetch user profile");
-      // }
-
-      await new Promise((resolve) => setTimeout(resolve,900))
-
-      // const data = await response.json();
-      // console.log("✅ User profile fetched:", data);
-      const data = {
-        profilepicture : "/Users/mac/Desktop/ft_transcendence/backend/uploads/kamal.jpeg",
-        username:"kamal"
-      }
-      setUser(data.data);
-    } catch (err) {
-      console.error("❌ Error fetching profile:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {user, isLoading} = useAuth();
 
   const navItems = [
     { href: "/dashboard", label: "dashboard", icon: HomeIcon },
@@ -113,15 +69,15 @@ export default function Navbar() {
         <button className="border border-[#9D9D9D]/40 rounded-[10px] p-3 hover:bg-[#000000]/40 cursor-pointer">
           <BellAlertIcon className="w-5 h-5 text-white/60" />
         </button>
-        {loading ? (
+        {isLoading ? (
           <div className="h-13 w-13 rounded-[10px] bg-gray-400 animate-pulse" />
-        ) : user?.profilepicture ? (
-          <Image
-            src={user.profilepicture}
+        ) : user?.avatar ? (
+          <img
+            src={user.avatar}
             alt={user.username}
             width={52}
             height={52}
-            className="h-13 w-13 object-cover rounded-[10px] ml-4"
+            className="h-13 w-13 object-cover rounded-[10px]"
           />
         ) : (
           <div className="h-13 w-13 rounded-[10px] bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-lg cursor-pointer hover:shadow-lg transition">

@@ -1,28 +1,33 @@
 "use client"
 import { useState, useEffect, useContext, createContext } from "react"
+import { useRouter } from "next/navigation";
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }){
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  
+  const router = useRouter();
+
   useEffect(() => {
     const checkUser = async () => {
       try{
-        const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
+        console.log("fetching User data");
+        const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
           method: "GET",
           credentials: "include",
         })
 
+        const data = await response.json();
+        console.log(data);
         if (!response.ok){
           throw new Error("Failed to fetch user session")
         }
 
-        const data = await response.json();
-        setUser(data);
+        setUser(data.userData);
       }catch (err){
-        console.log(err);
+        router.push('/sign-in');
+        console.log("failed to fetch", err);
         setUser(null);
       }finally{
         setIsLoading(false);

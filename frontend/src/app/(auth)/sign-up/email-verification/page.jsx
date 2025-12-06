@@ -83,7 +83,7 @@ const EmailVerification = () => {
             // const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
             throw new Error(data.error);
           }
-      router.replace("/dashboard")
+      router.replace("/sign-up/email-verification/selecte-image")
     }catch(err){
       setError(err.message);
       console.log("chnahowa l ERROR? hahowa : ", err.message);

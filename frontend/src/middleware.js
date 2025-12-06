@@ -1,26 +1,26 @@
 import { NextResponse } from 'next/server'
 
 export function middleware (request){
-  // here i get the token
-  // const token = request.cookies.get("accessToken");
 
-  // const { pathname } = request.nextUrl;
+  const token = request.cookies.get("accessToken");
 
-  // const publicRoutes = ['/sign-in', '/sign-up', '/'];
-  // const authRoutes = ['/sign-in', '/sign-up']; 
+  const { pathname } = request.nextUrl;
 
-  // const isPublicRoute = publicRoutes.includes(pathname);
-  // const isAuthRoute = authRoutes.includes(pathname);
+  const publicRoutes = ['/sign-in', '/sign-up', '/'];
+  const authRoutes = ['/sign-in', '/sign-up']; 
 
-  // if (!isPublicRoute && !token) {
-  //   return NextResponse.redirect(new URL('/sign-in', request.url))
-  // }
+  const isPublicRoute = publicRoutes.includes(pathname);
+  const isAuthRoute = authRoutes.includes(pathname);
 
-  // if (isAuthRoute && token && pathname !== '/') {
-  //    return NextResponse.redirect(new URL('/dashboard', request.url))
-  // }
+  if (!isPublicRoute && !token) {
+    return NextResponse.redirect(new URL('/sign-in', request.url))
+  }
 
-  // return NextResponse.next();
+  if (isAuthRoute && token && pathname !== '/') {
+     return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {
