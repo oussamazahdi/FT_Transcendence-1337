@@ -28,7 +28,7 @@ async function addNewUser(db, firstname, lastname, username, email, password)
 {
     let cryptedPass = await bcrypt.hash(password, 12);
     db.prepare(`INSERT INTO users (firstname, lastname, username, email, password) VALUES (?, ?, ?, ?, ?)`).run(firstname, lastname, username, email, cryptedPass);
-    const user = db.prepare(`SELECT * FROM users WHERE email = ?`).get(email);
+    const user = db.prepare(`SELECT id, firstname, lastname, username, email, avatar FROM users WHERE email = ?`).get(email);
     const accessToken = generateToken(user.id, user.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION);
     const refreshToken = generateToken(user.id, user.username, process.env.JWT_REFRESH_SECRET, process.env.JWT_REFRESH_EXPIRATION);
     db.prepare(`INSERT INTO tokens (user_id, refresh_token) VALUES (?, ?)`).run(user.id, refreshToken);

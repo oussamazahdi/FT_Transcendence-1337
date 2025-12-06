@@ -8,8 +8,11 @@ function createUserTable(db)
             username TEXT UNIQUE,
             email TEXT UNIQUE,
             password TEXT,
-            profilepicture TEXT,
-            createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            avatar TEXT,
+            isverified BOOLEAN DEFAULT false,
+            otp TEXT,
+            otpexpiration TIMESTAMP,
+            createdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )`);
         // console.log("Database initialized successfully!")
     }
