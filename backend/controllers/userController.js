@@ -5,12 +5,11 @@ function getAllUsers(request, reply)
 {
 	try {
 		const db = request.server.db;
-		const users = db.prepare('SELECT id, firstname, lastname, username, email, profilepicture FROM users').all();
+		const users = db.prepare('SELECT id, firstname, lastname, username, email, avatar FROM users').all();
 		return reply.code(200).send({message: "SUCCESS", data: users});
 	}
 	catch (error) {
-		console.error(error.message);
-		return reply.code(500).send({error: "INTERNAL_SERVER_ERROR"});
+		return reply.code(500).send({error: error.message});
 	}
 }
 
@@ -18,13 +17,13 @@ function getOneUser(request, reply)
 {
 	try {
 		const db = request.server.db;
-		const user = db.prepare('SELECT id, firstname, lastname, username, email, profilepicture From users WHERE id = ?').get(request.params.id);
+		const user = db.prepare('SELECT id, firstname, lastname, username, email, avatar From users WHERE id = ?').get(request.params.id);
 		if (!user)
 			return reply.code(404).send({error: "USER_NOT_FOUND"});
 		return reply.code(200).send({message: "SUCCESS", data: user});
 	}
 	catch (error) {
-		return reply.code(500).send({error: "INTERNAL_SERVER_ERROR: error in getting one user"});
+		return reply.code(500).send({error: error.message});
 	}
 }
 
@@ -32,7 +31,9 @@ async function updateUser(request, reply)
 {
 	try {
 		const db = request.server.db;
-		const user = db.prepare('SELECT id, firstname, lastname, username, email, password, profilePicture From users WHERE id = ?').get(request.params.id);
+		if (request.user.userId !== parseInt(request.params.id))
+            return reply.code(403).send({error: "FORBIDDEN"});
+		const user = db.prepare('SELECT id, firstname, lastname, username, email, password, avatar From users WHERE id = ?').get(request.params.id);
 		if (!user)
 			return reply.code(404).send({error: "USER_NOT_FOUND"});
 		const firstname = request.body.firstname || user.firstname;
@@ -40,16 +41,16 @@ async function updateUser(request, reply)
 		const username = request.body.username || user.username;
 		const email = request.body.email || user.email;
 		const password = (request.body.password) ? await bcrypt.hash(request.body.password, 12) : user.password;
-		const profilePicture = request.body.profilePicture || user.profilePicture;
+		const avatar = request.body.avatar || user.avatar;
 		
-		const updated = db.prepare('UPDATE users SET firstname = ?, lastname = ?, username = ?, email = ?, password = ?, profilePicture = ? WHERE id = ?')
-		.run(firstname, lastname, username, email, password, profilePicture, request.params.id);
+		const updated = db.prepare('UPDATE users SET firstname = ?, lastname = ?, username = ?, email = ?, password = ?, avatar = ? WHERE id = ?')
+		.run(firstname, lastname, username, email, password, avatar, request.params.id);
 		
 		return reply.code(204).send({message: "SUCCESS"});
 	}
 	catch (error)
 	{
-		return reply.code(500).send({error: "INTERNAL_SERVER_ERROR"});
+		return reply.code(500).send({error: error.message});
 	}
 }
 
@@ -57,6 +58,8 @@ function deleteUser(request, reply)
 {
 	try {
 		const db = request.server.db;
+		if (request.user.userId !== parseInt(request.params.id))
+            return reply.code(403).send({error: "FORBIDDEN"});
 		const user = db.prepare('SELECT * From users WHERE id = ?').get(request.params.id);
 		if (!user)
 			return reply.code(404).send({error: "USER_NOT_FOUND"});
@@ -66,12 +69,10 @@ function deleteUser(request, reply)
 	}
 	catch (error)
 	{
-		return reply.code(500).send({error: "INTERNAL_SERVER_ERROR"});
+		return reply.code(500).send({error: error.message});
 	}
 	
 }
-
-//addes by soufiix
 
 function searchUsers(request, reply){
 	try{
@@ -83,7 +84,7 @@ function searchUsers(request, reply){
 			return reply.code(400).json({ error: 'QUERY_PARAMETER_REQUERED' });
 		}
 
-		const trimmedQuery = query.trim();
+		const searchUser = query.trim();
 
 		if (trimmedQuery.length < 2) {
 			return reply.code(400).json({ error: 'QUERY_TOO_SHORT' });
@@ -93,53 +94,52 @@ function searchUsers(request, reply){
       return reply.code(400).json({ error: 'QUERY_TOO_LONG' });
     }
 
-		const searchPattern = `%${trimmedQuery}%`;
-		const startsWithPattern = `${trimmedQuery}%`;
+		const searchPattern = `%${searchUser}%`;
+		const startsWithPattern = `${searchUser}%`;
 
 		// add AND id != the userId later 
-    const statement = db.prepare(`
-      SELECT id, firstname, lastname, username, email, profilepicture
-      FROM users
-      WHERE (
-        firstname LIKE ? OR
-        lastname LIKE ? OR
-        username LIKE ?
-      )
-      ORDER BY
-        CASE
-          WHEN firstname LIKE ? THEN 1
-          WHEN lastname LIKE ? THEN 2
-          WHEN username LIKE ? THEN 3
-          ELSE 4
-        END,
-        firstname ASC
-      LIMIT ?
-    `);
+    	const statement = db.prepare(`
 
-    const results = statement.all(
-      searchPattern,
-      searchPattern,
-      searchPattern,
-      startsWithPattern,
-      startsWithPattern,
-      startsWithPattern,
-      5
-    );
+			SELECT id, firstname, lastname, username, email, avatar
+			FROM users
+			WHERE (
+				firstname LIKE ? OR
+				lastname LIKE ? OR
+				username LIKE ?
+			)
+			ORDER BY
+				CASE
+				WHEN firstname LIKE ? THEN 1
+				WHEN lastname LIKE ? THEN 2
+				WHEN username LIKE ? THEN 3
+				ELSE 4
+				END,
+				firstname ASC
+			LIMIT ?
+    	`);
 
-    const formattedResults = results.map(user => ({
-      id: user.id,
-      firstname: user.firstname,
-      lastname: user.lastname,
-      username: user.username,
-      profilepicture: user.profilepicture,
-      fullName: `${user.firstname} ${user.lastname}`
-    }));
+		const results = statement.all(
+		searchPattern,
+		searchPattern,
+		searchPattern,
+		startsWithPattern,
+		startsWithPattern,
+		startsWithPattern,
+		5
+		);
+		const formattedResults = results.map(user => ({
+		id: user.id,
+		firstname: user.firstname,
+		lastname: user.lastname,
+		username: user.username,
+		avatar: user.avatar,
+		fullName: `${user.firstname} ${user.lastname}`
+		}));
 
-    return reply.code(200).send(formattedResults);
-		// reply.send("m3alem");
-	}catch(error){
-		console.error('searchUsers error:', error);
-		return reply.code(500).send({ error:"INTERNAL_SERVER_ERROR" })
+    	return reply.code(200).send(formattedResults);
+	}
+	catch(error) {
+		return reply.code(500).send({ error: error.message })
 	}
 
 }

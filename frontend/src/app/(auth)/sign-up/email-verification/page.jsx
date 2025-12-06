@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { assets } from "@/assets/data";
 import { useRouter } from "next/navigation";
@@ -15,7 +15,29 @@ const EmailVerification = () => {
   const [timer, setTimer] = useState(30); 
   const [canResend, setCanResend] = useState(false);
 
+  const hasFetchedRef = useRef(false);
+
   const router = useRouter();
+
+  const sendVerificationCode = useCallback( async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/resendCode`,{
+        method:"POST",
+        credentials:"include",
+      })
+
+      const data = await response.json();
+      console.log("==>", data);
+    
+    if (!response.ok) {
+        // const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
+        const errorMessage = data.error;
+        throw new Error (errorMessage);
+      }
+    }catch(err){
+      setError(err.message);
+    }
+  }, [])
 
   useEffect(() => {
     if (timer > 0) {
@@ -23,34 +45,18 @@ const EmailVerification = () => {
         setTimer((prev) => prev - 1);
       }, 1000);
       return () => clearTimeout(timeoutId);
-
     } else {
       setCanResend(true);
     }
-  }, [timer], canResend)
+  }, [timer])
 
-  useEffect (() => {
-    const sendVerificationCode = async () => {
-      try {
-        // const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/sendVerificationCode`,{
-        //   method:"POST",
-        //   credentials:"include",
-        // })
+  useEffect(() => {
+    if (hasFetchedRef.current) return;
+    
+    hasFetchedRef.current = true;
 
-        // const data = await reply.json();
-
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // if (!response.ok) {
-      //     const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
-      //     throw new Error (errorMessage);
-      //   }
-      }catch(err){
-        setError(err.message);
-      }
-    }
     sendVerificationCode();
-  }, [])
+  }, [sendVerificationCode]);
   
   const handleSubmite = async (e) => {
 
@@ -62,25 +68,25 @@ const EmailVerification = () => {
     setError("");
     setIsVerifying(true);
     try{
-      // const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/verifyVerificationCode`,{
-      //     method:"POST",
-      //     headers:{
-      //       "Content-Type": "application/json",
-      //     },
-      //     credentials:"include",
-      //     body: verificationCode,
-      //   })
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/emailVerification`,{
+          method:"POST",
+          headers:{
+            "Content-Type": "application/json",
+          },
+          credentials:"include",
+          body: JSON.stringify({code: verificationCode}),
+        })
         
-        // const data = await response.json();
+        const data = await response.json();
         
-      //   if(!response.ok){
-      //       const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
-      //       throw new Error(errorMessage);
-      //     }
-      await new Promise(resolve => setTimeout(resolve, 500));
+        if(!response.ok){
+            // const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
+            throw new Error(data.error);
+          }
       router.replace("/dashboard")
     }catch(err){
       setError(err.message);
+      console.log("chnahowa l ERROR? hahowa : ", err.message);
     }finally{
       setIsVerifying(false);
     }
@@ -93,15 +99,14 @@ const EmailVerification = () => {
     setError("");
 
     try {
-      // sendVerificationCode()
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await sendVerificationCode()
 
       setTimer(30);
+      setCanResend(false);
     } catch (err) { 
       setError("Failed to resend code.");
     } finally {
       setIsResending(false);
-      setCanResend(false);
     }
   };
 
@@ -132,6 +137,8 @@ const EmailVerification = () => {
 
     const splitCode = data.split("");
     setOtp(splitCode);
+
+    inputRefs.current[5]?.focus();
   }
 
 
