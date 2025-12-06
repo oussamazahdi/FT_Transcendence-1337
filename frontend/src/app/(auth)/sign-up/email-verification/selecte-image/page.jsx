@@ -8,7 +8,7 @@ import { AUTH_ERRORS } from "@/lib/utils";
 const SelecteImage = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
-  const [selectedAvatar, setSelectedAvatar] = useState(null);
+  const [selectedAvatar, setSelectedAvatar] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -76,15 +76,13 @@ const SelecteImage = () => {
 
     try {
       if (profileImage) {
+        console.log("request from image")
         // Upload custom image
         const formData = new FormData();
         formData.append("image/", profileImage);
-        const reply = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/auth/uploadImage`,
-          {
+        const reply = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/uploadImage`,{
             method: "POST",
             headers:{
-              "Content-Type": "application/json",
             },
             credentials: "include",
             body: formData,
@@ -94,26 +92,29 @@ const SelecteImage = () => {
         const data = await reply.json();
 
         if (!reply.ok) {
-          const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
+          // const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
+          const errorMessage = data.error;
           throw new Error (errorMessage);
         }
 
         console.log("Upload successful:", data);
       } else if (selectedAvatar) {
+        console.log("request from avatar")
         // Select predefined avatar
-        const reply = await fetch("http://localhost:5000/uploadImage", {
+        const reply = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/uploadImage`, {
           method: "POST",
           headers:{
             "Content-Type": "application/json",
           },
           credentials: "include",
-          body: JSON.stringify({ avatarUrl: selectedAvatar }),
+          body: JSON.stringify({ avatar: selectedAvatar }),
         });
 
         const data = await reply.json();
 
         if (!reply.ok) {
-          const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
+          // const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
+          const errorMessage = data.error;
           throw new Error (errorMessage);
         }
 
