@@ -16,6 +16,16 @@
       "static/chunks/main-app.js",
       "static/chunks/app/(protected)/dashboard/page.js"
     ],
+    "/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/page.js"
+    ],
+    "/(auth)/sign-in/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(auth)/sign-in/page.js"
+    ],
     "/(protected)/game/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -30,6 +40,11 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(protected)/game/pingPong/(remote-game)/matchmaking/page.js"
+    ],
+    "/(protected)/game/pingPong/local-game/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(protected)/game/pingPong/local-game/page.js"
     ]
   }
 }
