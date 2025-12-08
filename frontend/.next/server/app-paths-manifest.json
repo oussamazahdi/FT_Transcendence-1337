@@ -1,0 +1,6 @@
+{
+  "/(protected)/game/page": "app/(protected)/game/page.js",
+  "/(protected)/game/pingPong/page": "app/(protected)/game/pingPong/page.js",
+  "/(protected)/game/pingPong/(remote-game)/matchmaking/page": "app/(protected)/game/pingPong/(remote-game)/matchmaking/page.js",
+  "/(protected)/dashboard/page": "app/(protected)/dashboard/page.js"
+}

@@ -73,7 +73,7 @@ const SelecteImage = () => {
           throw new Error(data.error || `Upload failed (${reply.status})`);
         }
 
-        console.log("Upload successful:", data);
+        // console.log("Upload successful:", data);
         
       } else if (selectedAvatar) {
         // Select predefined avatar
@@ -91,7 +91,7 @@ const SelecteImage = () => {
           throw new Error(data.error || `Avatar selection failed (${reply.status})`);
         }
 
-        console.log("Avatar selection successful:", data);
+        // console.log("Avatar selection successful:", data);
       }
 
       // Navigate to dashboard on success

@@ -34,12 +34,12 @@ const SignIn = () => {
 
       if(!reply.ok){
         const errorData = await reply.json();
-        console.log(errorData);
+        // console.log(errorData);
         throw new Error(errorData.message || "login failed");
       }
 
       const data = await reply.json();
-      console.log("sign in succeful:", data);
+      // console.log("sign in succeful:", data);
 
       router.push("/dashboard")
 

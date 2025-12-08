@@ -31,7 +31,7 @@ export default function Navbar() {
       setLoading(true);
       
       // ✅ Fetch with credentials (includes cookies)
-      const response = await fetch('http://localhost:5000/user/profile', {
+      const response = await fetch('http://localhost:3001/user/profile', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -40,12 +40,12 @@ export default function Navbar() {
         // ❌ No Authorization header needed!
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch user profile');
-      }
+      // if (!response.ok) {
+      //   throw Error('Failed to fetch user profile');
+      // }
 
       const data = await response.json();
-      console.log('✅ User profile fetched:', data);
+      // console.log('✅ User profile fetched:', data);
       setUser(data.user);
 
     } catch (err: any) {

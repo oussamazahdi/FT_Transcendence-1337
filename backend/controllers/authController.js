@@ -45,7 +45,7 @@ async function checkLogin(request, reply)
         return reply.code(200).send({message: "AUTHORIZED", token: accessToken}); // update later enhance later and create refresh and access token
     }
     catch (error) {
-            console.log(error.message);
+            // console.log(error.message);
             return reply.code(500).send({error: "INTERNAL_SERVER_ERROR"});
     }
 }
@@ -68,7 +68,7 @@ async function registerNewUser(request, reply)
             return reply.code(400).send({error: "MISSING_FIELD"});
         else
         {
-            console.log(error.message);
+            // console.log(error.message);
             return reply.code(500).send({error: "INTERNAL_SERVER_ERROR"});
         }
     }
@@ -79,7 +79,7 @@ async function processImage(request, reply)
     const uploadDir = process.cwd() + '/uploads/';
     const image = await request.file();
     const filePath = uploadDir + image.filename;
-    console.log(filePath);
+    // console.log(filePath);
     await pipeline(image.file, fs.createWriteStream(filePath));
 
     reply.code(200).send({message: "SUCCESS", data: {path: filePath}});

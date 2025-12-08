@@ -5,24 +5,12 @@ import { initDatabase } from "./database/databaseUtils.js";
 import corsPlugin from "./plugins/cors.js";
 import dotenv from 'dotenv';
 import multipart from '@fastify/multipart';
+import { Server } from "socket.io";
 
 dotenv.config({ path: '../.env' });
-
-const db = new Sqlite3('./database/transcendence.db', { 
-    verbose: console.log  // Optional: log queries
-});
-
+const db = new Sqlite3('./database/transcendence.db');
 const fastify = Fastify({
-    logger: {
-        transport: {
-            target: 'pino-pretty',
-            options: {
-                colorize: true,
-                translateTime: 'yyyy-mm-dd HH:MM:ss',
-                ignore: 'pid,hostname',
-            }
-        }
-    }
+    logger: false
 });
 
 fastify.register(multipart);
@@ -35,6 +23,85 @@ fastify.setNotFoundHandler((request, reply) => {
     reply.code(404).send({msg : "Waloooo nech a 3chiri makayn walo gha gheyrha"});
 });
 
+/*-------------- setup socket.io server with fastify5 server --------------*/
+class GameSession {
+	constructor(){
+		this.complete = false;
+		this.gameRoom = "";
+		this.player1 = {
+			socketId: "",
+      login: "",
+      firstName: "",
+      lastName: "",
+      avatar: ""
+		};
+		this.player2 = {
+			socketId: "",
+      login: "",
+      firstName: "",
+      lastName: "",
+      avatar: ""
+		};
+	}
+}
+
+fastify.ready((err)=>{
+	if(err) throw err;
+	const io = new Server(fastify.server, {
+		cors:{
+			origin:"http://localhost:3000",
+			methods:["GET", "POST"]
+		},
+		transports: ["websocket", "polling"]
+	})
+	
+	let session = new GameSession
+	let games = [];
+	
+	io.on("connection", (socket) => {
+		console.log("✅ New user connected:", socket.id);
+    socket.on("join-game", (playerData) => {
+			
+			if (socket.id === session.player1.socketId || socket.id === session.player2.socketId) {
+				return;
+			}
+			
+			if (!session.complete && session.player1.socketId === "") {
+				
+				Object.assign(session.player1, {
+					firstName: playerData.firstName,
+					lastName: playerData.lastName,
+					login: playerData.login,
+					avatar: playerData.avatar,
+					socketId: socket.id,
+				});
+				
+				return;
+			}
+
+			if (!session.complete && session.player2.socketId === "") {
+
+				Object.assign(session.player2, {
+					firstName: playerData.firstName,
+					lastName: playerData.lastName,
+					login: playerData.login,
+					avatar: playerData.avatar,
+					socketId: socket.id,
+				});
+			
+				session.complete = true;
+			
+				io.to(session.player1.socketId).emit("match-found", session.player2);
+				io.to(session.player2.socketId).emit("match-found", session.player1);
+				games.push(session);
+				session = new GameSession();
+				return;
+			}
+    });
+  });
+})
+
+/*--------------------------------------------------------***--------------*/
 await fastify.listen({port: 3001}, (error) => {
     if (error)
     {

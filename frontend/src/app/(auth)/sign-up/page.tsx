@@ -55,7 +55,7 @@ export default function SignUp(){
 			}
 			
 			const data = await reply.json();
-			console.log("Signup successful:", data);
+			// console.log("Signup successful:", data);
 			router.replace("/sign-up/selecteImage");
 		}
 		catch(err:any){
