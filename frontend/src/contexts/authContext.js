@@ -26,7 +26,7 @@ export function AuthProvider({ children }){
 
         setUser(data.userData);
       }catch (err){
-        router.push('/sign-in');
+        // router.push('/sign-in');
         console.log("failed to fetch", err);
         setUser(null);
       }finally{
