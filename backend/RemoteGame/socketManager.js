@@ -34,9 +34,9 @@ export function initSocketManager(io) {
 				socket.id === session.player2.socketId) {
 				return;
 			}
-	
+
 			if (!session.complete && session.player1.socketId === "") {
-	
+
 				Object.assign(session.player1, {
 					firstName: playerData.firstName,
 					lastName: playerData.lastName,
@@ -44,12 +44,12 @@ export function initSocketManager(io) {
 					avatar: playerData.avatar,
 					socketId: socket.id,
 				});
-	
+
 				return;
 			}
-	
+
 			if (!session.complete && session.player2.socketId === "") {
-	
+
 				Object.assign(session.player2, {
 					firstName: playerData.firstName,
 					lastName: playerData.lastName,
@@ -89,9 +89,6 @@ export function initSocketManager(io) {
 			// Optionally remove this session from `games` if you already pushed it
 			games = games.filter(g => g.player1.socketId !== socket.id && g.player2.socketId !== socket.id);
 		});
-
-
-
 	});
-	}
+}
 	

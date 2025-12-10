@@ -33,7 +33,7 @@ fastify.ready((err) => {
 
 	io = new Server(fastify.server, {
 		cors: {
-			origin: "http://localhost:3000",
+			origin: "*",
 			methods: ["GET", "POST"]
 		},
 		transports: ["websocket", "polling"]
@@ -42,7 +42,7 @@ fastify.ready((err) => {
 });
 
 /* ---------------- server start ---------------- */
-await fastify.listen({ port: 3001 }, (error) => {
+await fastify.listen({ port: 3001, host: '0.0.0.0' }, (error) => {
 	if (error) {
 		console.error(error.message);
 		process.exit(1);
