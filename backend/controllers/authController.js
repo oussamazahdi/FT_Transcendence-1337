@@ -3,9 +3,17 @@ import jwt from "jsonwebtoken"
 import fs from "fs"
 import path from "path";
 import { pipeline } from 'stream/promises';
-import { loginUser, addNewUser, generateToken } from "../models/authModel.js";
+import { authModels } from "../models/authModel.js";
 import { generateFileNameByUser } from "../utils/authUtils.js";
 
+function generateToken(userId, Username, secret, expiration)
+{
+    const payload = {
+        userId: userId,
+        username: Username
+    };
+    return jwt.sign(payload, secret, { expiresIn: expiration });
+}
 
 export class AuthController {
 
@@ -14,24 +22,27 @@ export class AuthController {
         const { email, password } = request.body;
         const db = request.server.db;
         try {
-            const tokens = await loginUser(db, email, password);
-            if (tokens.message && tokens.message.includes("USER_NOT_FOUND"))
+            const result = await authModels.loginUser(db, email, password);
+            if (result.message && result.message.includes("USER_NOT_FOUND"))
                 return reply.code(404).send({error: "USER_NOT_FOUND"});
-            if (tokens.message && tokens.message.includes("INVALID_PASSWORD"))
+            if (result.message && result.message.includes("INVALID_PASSWORD"))
                 return reply.code(403).send({error: "INVALID_PASSWORD"});
-            reply.setCookie('refreshToken', tokens.refreshToken, {
+            const accessToken = generateToken(result.id, result.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION);
+            const refreshToken = generateToken(result.id, result.username, process.env.JWT_REFRESH_SECRET, process.env.JWT_REFRESH_EXPIRATION);
+            authModels.addNewToken(db, result.id, refreshToken);
+            reply.setCookie('refreshToken', refreshToken, {
                 httpOnly: true,
                 sameSite: 'strict',
                 path: '/',
                 maxAge: 7 * 24 * 60 * 60 * 1000
             });
-            reply.setCookie('accessToken', tokens.accessToken, {
+            reply.setCookie('accessToken', accessToken, {
                 httpOnly: true,
                 sameSite: 'strict',
                 path: '/',
                 maxAge: 15 * 60 * 1000
             });
-            const user = db.prepare('SELECT firstname, lastname, username, email, avatar FROM users WHERE email = ?').get(email);
+            const user = authModels.findUserByEmail(db, email);
             return reply.code(200).send({message: "AUTHORIZED", userData: user});
         }
         catch (error) {
@@ -45,14 +56,17 @@ export class AuthController {
         const { firstname, lastname, username, email, password } = request.body;
         const db = request.server.db;
         try {
-            const tokens = await addNewUser(db, firstname, lastname, username, email, password);
-            reply.setCookie('refreshToken', tokens.refreshToken, {
+            const user = await authModels.addNewUser(db, firstname, lastname, username, email, password);
+            const accessToken = generateToken(user.id, user.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION);
+            const refreshToken = generateToken(user.id, user.username, process.env.JWT_REFRESH_SECRET, process.env.JWT_REFRESH_EXPIRATION);
+            authModels.addNewToken(db, user.id, refreshToken);
+            reply.setCookie('refreshToken', refreshToken, {
                 httpOnly: true,
                 sameSite: 'strict',
                 path: '/',
                 maxAge: 7 * 24 * 60 * 60 * 1000
             });
-            reply.setCookie('accessToken', tokens.accessToken, {
+            reply.setCookie('accessToken', accessToken, {
                 httpOnly: true,
                 sameSite: 'strict',
                 path: '/',
@@ -99,7 +113,7 @@ export class AuthController {
                 fileLink = `${request.host}/uploads/default/${avatar}.jpeg`;
             }
             db.prepare('UPDATE users SET avatar = ? WHERE id = ?').run(fileLink, request.user.userId);
-            const user = db.prepare('SELECT firstname, lastname, username, email, avatar FROM users WHERE id = ?').get(request.user.userId);
+            const user = authModels.findUserById(db, request.user.userId);
             reply.code(200).send({message: "SUCCESS", userData: user});
         }
         catch (error)
@@ -142,7 +156,7 @@ export class AuthController {
     {
         const db = request.server.db;
         try {
-            const user = db.prepare('SELECT firstname, lastname, username, email, avatar, isverified FROM users WHERE id = ?').get(request.user.userId);
+            const user = authModels.findUserById(db, request.user.userId, ['firstname', 'lastname', 'username', 'email', 'avatar', 'isverified']);
             return reply.code(200).send({message: "SUCCESS", userData: user});
         }
         catch (error) {
@@ -244,15 +258,15 @@ export class AuthController {
                         </table>
                     </body>
                     </html>`.replace("{{OTP_CODE}}", code);
-            const user = db.prepare('SELECT email FROM users WHERE id = ?').get(request.user.userId);
-            db.prepare('UPDATE users SET otp = ?, otpexpiration = ? WHERE id = ?').run(code, expiration, request.user.userId);
-            // console.log(email.email);
+            const email = authModels.getUserEmail(db, request.user.userId);
+            authModels.updateUserOTP(db, request.user.userId, code, expiration);
             await request.server.nodemailer.sendMail({
                 from: "ft_transcendence <badj5510@gmail.com>",
-                to: user.email,
+                to: email,
                 subject: '🏓 Verification Code - ft_transcendence',
                 html: letter
             })
+            return reply.code(200).send({message: "CODE_SENT_SUCCESSFULLY"})
         }
         catch (error)
         {
@@ -267,7 +281,7 @@ export class AuthController {
             const db = request.server.db;
             const { code } = request.body;
             
-            const user = db.prepare('SELECT isverified, otp, otpexpiration FROM users WHERE id = ?').get(request.user.userId);
+            const user = authModels.getUserVerificationData(db, request.user.userId);
             if (user.isverified)
                 throw new Error("EMAIL_IS_ALREADY_VERIFIED");
             if (today > user.otpexpiration)
@@ -283,20 +297,26 @@ export class AuthController {
         }
     }
 
-    // async   enable2fa(request, reply)
-    // {
-    //     const db = request.server.db;
+    async   enable2fa(request, reply)
+    {
+        const db = request.server.db;
 
-    //     try {
-    //         const secret = fastify.totp.generateSecret()
-    
-    //         const qrcode = await fastify.totp.generateQRCode({ 
-    //             secret: secret.ascii,
-    //             issuer: 'ft_transcendence', // ✅ Your app name
-    //         })
+        try {
+            const secret = fastify.totp.generateSecret()
+            const email = authModels.getUserEmail(db, request.user.userId);
 
-    //     }
-    // }
+            const qrcode = await fastify.totp.generateQRCode({ 
+                secret: secret.ascii,
+                issuer: 'ft_transcendence',
+                label: email
+            })
+
+        }
+        catch (error)
+        {
+            return reply.code(400).send(error.message);
+        }
+    }
 }
 
 
