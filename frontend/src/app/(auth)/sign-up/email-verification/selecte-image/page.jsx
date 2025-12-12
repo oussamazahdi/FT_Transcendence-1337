@@ -76,11 +76,11 @@ const SelecteImage = () => {
 
     try {
       if (profileImage) {
-        console.log("request from image")
+        // console.log("request from image")
         // Upload custom image
         const formData = new FormData();
         formData.append("image/", profileImage);
-        const reply = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/uploadImage`,{
+        const reply = await fetch(`http://localhost:3001/api/auth/uploadImage`,{
             method: "POST",
             headers:{
             },
@@ -97,11 +97,11 @@ const SelecteImage = () => {
           throw new Error (errorMessage);
         }
 
-        console.log("Upload successful:", data);
+        // console.log("Upload successful:", data);
       } else if (selectedAvatar) {
-        console.log("request from avatar")
+        // console.log("request from avatar")
         // Select predefined avatar
-        const reply = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/uploadImage`, {
+        const reply = await fetch(`http://localhost:3001/api/auth/uploadImage`, {
           method: "POST",
           headers:{
             "Content-Type": "application/json",
@@ -118,7 +118,7 @@ const SelecteImage = () => {
           throw new Error (errorMessage);
         }
 
-        console.log("Avatar selection successful:", data);
+        // console.log("Avatar selection successful:", data);
       }
 
       // Navigate to dashboard on success

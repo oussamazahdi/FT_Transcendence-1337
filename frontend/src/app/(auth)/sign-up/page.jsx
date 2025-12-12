@@ -33,7 +33,7 @@ export default function SignUp() {
     setLoading(true);
 
     try {
-      const reply = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
+      const reply = await fetch(`http://localhost:3001/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,7 +55,7 @@ export default function SignUp() {
       }
 
       const data = await reply.json();
-      console.log("Signup successful:", data);
+      // console.log("Signup successful:", data);
       router.replace("/sign-up/email-verification");
     } catch (err) {
       setError(err.message);

@@ -5,22 +5,16 @@ import Link from "next/link";
 import Image from "next/image";
 
 import { usePathname } from "next/navigation";
-import {
-  MagnifyingGlassIcon,
-  BellAlertIcon,
-  HomeIcon,
-  ChatBubbleOvalLeftIcon,
-  TrophyIcon,
-  ChartBarIcon,
-} from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon, BellAlertIcon, HomeIcon,
+	ChatBubbleOvalLeftIcon, TrophyIcon, ChartBarIcon} from "@heroicons/react/24/outline";
 import { useAuth } from "@/contexts/authContext";
 
 export default function Navbar() {
   const pathname = usePathname();
   const {user, isLoading} = useAuth();
-
+	
   const navItems = [
-    { href: "/dashboard", label: "dashboard", icon: HomeIcon },
+		{ href: "/dashboard", label: "dashboard", icon: HomeIcon },
     { href: "/chat", label: "Chat", icon: ChatBubbleOvalLeftIcon },
     { href: "/game", label: "Game", icon: TrophyIcon },
     { href: "/leaderboard", label: "Leaderboard", icon: ChartBarIcon },
@@ -88,3 +82,5 @@ export default function Navbar() {
     </div>
   );
 }
+
+

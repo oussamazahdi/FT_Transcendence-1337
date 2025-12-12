@@ -3,8 +3,9 @@ import { jwtVerify } from 'jose';
 
 export async function middleware (request){
 
-  // const accessToken = request.cookies.get("accessToken")?.value;
-  // const refreshToken = request.cookies.get("refreshToken")?.value;
+  const accessToken = request.cookies.get("accessToken")?.value;
+  const refreshToken = request.cookies.get("refreshToken")?.value;
+	// console.log()
 
   // const { pathname } = request.nextUrl;
 

@@ -12,14 +12,13 @@ export function AuthProvider({ children }){
   useEffect(() => {
     const checkUser = async () => {
       try{
-        console.log("fetching User data");
-        const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
+        const response = await fetch ("http://localhost:3001/api/auth/me", {
           method: "GET",
           credentials: "include",
         })
 
         const data = await response.json();
-        console.log(data);
+        // console.log(data);
         if (!response.ok){
           throw new Error("Failed to fetch user session")
         }
@@ -27,7 +26,7 @@ export function AuthProvider({ children }){
         setUser(data.userData);
       }catch (err){
         // router.push('/sign-in');
-        console.log("failed to fetch", err);
+        // console.log("failed to fetch", err);
         setUser(null);
       }finally{
         setIsLoading(false);

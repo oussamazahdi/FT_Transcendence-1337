@@ -21,13 +21,13 @@ const EmailVerification = () => {
 
   const sendVerificationCode = useCallback( async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/resendCode`,{
+      const response = await fetch(`http://localhost:3001/api/auth/resendCode`,{
         method:"POST",
         credentials:"include",
       })
 
       const data = await response.json();
-      console.log("==>", data);
+      // console.log("==>", data);
     
     if (!response.ok) {
         // const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
@@ -68,7 +68,7 @@ const EmailVerification = () => {
     setError("");
     setIsVerifying(true);
     try{
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/emailVerification`,{
+      const response = await fetch(`http://localhost:3001/api/auth/emailVerification`,{
           method:"POST",
           headers:{
             "Content-Type": "application/json",
@@ -86,7 +86,7 @@ const EmailVerification = () => {
       router.replace("/sign-up/email-verification/selecte-image")
     }catch(err){
       setError(err.message);
-      console.log("chnahowa l ERROR? hahowa : ", err.message);
+      // console.log("chnahowa l ERROR? hahowa : ", err.message);
     }finally{
       setIsVerifying(false);
     }

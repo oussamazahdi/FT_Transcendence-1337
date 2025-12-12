@@ -183,7 +183,7 @@ export default function SideBar() {
   
         setDisplayData(formatedData);
       }catch(err){
-        console.log("Failed to fetch conversations", err);
+        // console.log("Failed to fetch conversations", err);
         setDisplayData([{
           playerPdp: assets.noChatFound,
           firstname: "No char Found",
@@ -208,10 +208,10 @@ export default function SideBar() {
     }
     
     const delayDebounceFn = setTimeout( async () => {
-      console.log(searchQuery);
+      // console.log(searchQuery);
       setLoading(true);
       try{
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/search?query=${searchQuery}`,{
+        const response = await fetch(`http://localhost:3001/api/users/search?query=${searchQuery}`,{
           method: 'GET',
           credentials: "include",
         })
