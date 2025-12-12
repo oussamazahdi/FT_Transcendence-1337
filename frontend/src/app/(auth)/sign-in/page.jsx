@@ -42,7 +42,7 @@ const SignIn = () => {
       }
 
       const data = await reply.json();
-      login(data)
+      login(data.userData)
 
       router.push("/dashboard");
     } catch (err) {
