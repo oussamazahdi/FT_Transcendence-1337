@@ -25,12 +25,6 @@ export class AuthController {
                 path: '/',
                 maxAge: 7 * 24 * 60 * 60 * 1000
             });
-            reply.setCookie('accessToken', tokens.accessToken, {
-                httpOnly: true,
-                sameSite: 'strict',
-                path: '/',
-                maxAge: 15 * 60 * 1000
-            });
             const user = db.prepare('SELECT firstname, lastname, username, email, avatar FROM users WHERE email = ?').get(email);
             return reply.code(200).send({message: "AUTHORIZED", userData: user});
         }
@@ -67,7 +61,10 @@ export class AuthController {
             else if (error.message.includes('NOT NULL constraint failed'))
                 return reply.code(400).send({error: "MISSING_FIELD"});
             else
+            {
+                console.log(error.message);
                 return reply.code(500).send({error: error.message});
+            }
         }
     }
     
@@ -97,9 +94,21 @@ export class AuthController {
                     return reply.code(400).send("INVALID_AVATAR");
                 fileLink = `http://${request.host}/uploads/default/${avatar}.jpeg`;
             }
-            db.prepare('UPDATE users SET avatar = ? WHERE id = ?').run(fileLink, request.user.userId);
-            const user = db.prepare('SELECT firstname, lastname, username, email, avatar FROM users WHERE id = ?').get(request.user.userId);
-            reply.code(200).send({message: "SUCCESS", userData: user});
+            db.prepare('UPDATE users SET avatar = ?, isuserverified = ? WHERE id = ?').run(fileLink, 1,request.user.userId);
+            const user = db.prepare('SELECT id, firstname, lastname, username, email, avatar FROM users WHERE id = ?').get(request.user.userId);
+            const params = {
+                isUserVerified: !!user.isuserverified,
+                hasAvatar: !!user.avatar
+            }
+            const accessToken = generateToken(user.id, user.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION, params, "access");
+            reply.setCookie('accessToken', accessToken, {
+                httpOnly: true,
+                sameSite: 'strict',
+                path: '/',
+                maxAge: 15 * 60 * 1000
+            });
+            return reply.code(200).send({message: "SUCCESS", userData: user});
+            
         }
         catch (error)
         {
@@ -120,10 +129,16 @@ export class AuthController {
             if (blacklisted)
                 throw new Error("TOKEN_REVOKED");
             const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+            //query the status of isVerfied from the database to get fresh data in case refeesh token have old data
             const tokenDbResults = db.prepare('SELECT refresh_token FROM tokens WHERE refresh_token = ?').get(refreshToken); // check if token exists
             if (!tokenDbResults)
                 throw new Error("INVALID_TOKEN")
-            const newAccessToken = generateToken(decoded.userId, decoded.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION);
+            const user = db.prepare('SELECT id, firstname, lastname, username, email, avatar FROM users WHERE id = ?').get(request.user.userId);
+            const params = {
+                isUserVerified: !!user.isuserverified,
+                hasAvatar: !!user.avatar
+            }
+            const newAccessToken = generateToken(decoded.userId, decoded.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION, params, "access");
             reply.setCookie('accessToken', newAccessToken, {
                 httpOnly: true,
                 sameSite: 'strict',
@@ -275,6 +290,17 @@ export class AuthController {
             if (code !== user.otp)
                 throw new Error("INCORRECT ");
             db.prepare('UPDATE users SET isverified = ? WHERE id = ?').run(1, request.user.userId);
+            const params = {
+                isUserVerified: !!user.isuserverified,
+                hasAvatar: !!user.avatar
+            }
+            const accessToken = generateToken(user.id, user.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION, params, "access");
+            reply.setCookie('accessToken', accessToken, {
+                httpOnly: true,
+                sameSite: 'strict',
+                path: '/',
+                maxAge: 15 * 60 * 1000
+            });
             return reply.code(200).send({message: "EMAIL_CONFIREMED_SUCCESSFULLY"});
         }
         catch(error)
