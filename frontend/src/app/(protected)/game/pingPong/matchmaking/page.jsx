@@ -22,20 +22,20 @@ const emptyPlayer = () => ({
 
 export default function Matchmaking() {
   const { user } = useAuth();
-	console.log("======> user:", user);
+  console.log("======> user:", user);
 
   const [status, setStatus] = useState("Searching for opponent...");
   // const [playerToSend, setplayerToSend] = useState("Searching for opponent...");
   const [gameSession, setGameSession] = useState({
     player1: emptyPlayer(),
-    player2: emptyPlayer()
+    player2: emptyPlayer(),
   });
 
   /** Add user data to Player1 */
   useEffect(() => {
     if (!user) return;
 
-    setGameSession(prev => ({
+    setGameSession((prev) => ({
       ...prev,
       player1: {
         ...prev.player1,
@@ -43,7 +43,7 @@ export default function Matchmaking() {
         firstName: user.firstName,
         lastName: user.lastName,
         login: user.login,
-      }
+      },
     }));
   }, [user]);
 
@@ -63,9 +63,9 @@ export default function Matchmaking() {
       };
 
       // update socketId locally
-      setGameSession(prev => ({
+      setGameSession((prev) => ({
         ...prev,
-        player1: { ...prev.player1, socketId: socket.id }
+        player1: { ...prev.player1, socketId: socket.id },
       }));
 
       console.log("EMITTING join-game:", gameSession.player1);
@@ -77,9 +77,9 @@ export default function Matchmaking() {
     const handleMatchFound = (playerData) => {
       console.log("RECEIVED match-found:", playerData);
 
-      setGameSession(prev => ({
+      setGameSession((prev) => ({
         ...prev,
-        player2: { ...prev.player2, ...playerData }
+        player2: { ...prev.player2, ...playerData },
       }));
 
       setStatus("Match Found!");
@@ -96,26 +96,26 @@ export default function Matchmaking() {
 
   return (
     <div className="flex flex-col items-center bg-[#0F0F0F]/65 p-10 rounded-3xl">
-
-      <h3 className='text-3xl font-extrabold'>Find Match</h3>
-      <h3 className='mb-6 text-white/50'>{status}</h3>
+      <h3 className="text-3xl font-extrabold">Find Match</h3>
+      <h3 className="mb-6 text-white/50">{status}</h3>
 
       <div className="flex items-center justify-between gap-x-25">
-
         {/* Player 1 */}
-        <div className='flex flex-col items-center'>
+        <div className="flex flex-col items-center">
           <img
             src={gameSession.player1.avatar || "/gameAvatars/Empty.jpeg"}
             alt="profile"
             className="h-35 w-35 rounded-xl"
           />
 
-          <h3 className='text-xl font-semibold'>
+          <h3 className="text-xl font-semibold">
             {gameSession.player1.firstName || "Player 1"}
-            {gameSession.player1.lastName ? "." + gameSession.player1.lastName[0] : ""}
+            {gameSession.player1.lastName
+              ? "." + gameSession.player1.lastName[0]
+              : ""}
           </h3>
 
-          <h3 className='text-md font-medium text-[#6E6E6E]'>
+          <h3 className="text-md font-medium text-[#6E6E6E]">
             [{gameSession.player1.login || "loading"}]
           </h3>
         </div>
@@ -123,7 +123,7 @@ export default function Matchmaking() {
         <span className="text-3xl font-extrabold">VS</span>
 
         {/* Player 2 */}
-        <div className='flex flex-col items-center'>
+        <div className="flex flex-col items-center">
           <img
             src={
               gameSession.player2.socketId
@@ -134,117 +134,28 @@ export default function Matchmaking() {
             className="h-35 w-35 rounded-xl"
           />
 
-          <h3 className='text-xl font-semibold'>
+          <h3 className="text-xl font-semibold">
             {gameSession.player2.socketId
-              ? gameSession.player2.firstName + "." + gameSession.player2.lastName?.[0]
+              ? gameSession.player2.firstName +
+                "." +
+                gameSession.player2.lastName?.[0]
               : "Player 2"}
           </h3>
 
-          <h3 className='text-md font-medium text-[#6E6E6E]'>
-            [{gameSession.player2.socketId ? gameSession.player2.login : "waiting"}]
+          <h3 className="text-md font-medium text-[#6E6E6E]">
+            [
+            {gameSession.player2.socketId
+              ? gameSession.player2.login
+              : "waiting"}
+            ]
           </h3>
         </div>
-
       </div>
-
     </div>
   );
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // "use client";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // import { useAuth } from "@/contexts/authContext";
 // import { useState, useEffect } from "react";
@@ -296,7 +207,7 @@ export default function Matchmaking() {
 //   useEffect(() => {
 //     if (socket.connected) return;
 // 		socket.connect();
-	
+
 // /*----------------------------------------------------------*/
 //     socket.on("connect", () => {
 //       if (!user) return;
@@ -314,7 +225,7 @@ export default function Matchmaking() {
 // 			};
 // 			// console.log(playerToSend)
 // 			console.log("player:", gameSession.player1)
-		
+
 // 			socket.emit("join-game", playerToSend);
 //       setStatus("Waiting for opponent...");
 //     });
@@ -328,7 +239,7 @@ export default function Matchmaking() {
 // 				socketId: playerData.socketId,
 // 			},
 // 		}));
-				
+
 // 		setStatus("Match Found!");
 // 	});
 // /*----------------------------------------------------------*/
@@ -341,7 +252,7 @@ export default function Matchmaking() {
 
 // 	return (
 //     <div className='flex flex-col items-center bg-[#0F0F0F]/65 p-10 rounded-3xl'>
-      
+
 //       <h3 className='text-3xl font-extrabold'>Find Match</h3>
 //       <h3 className='mb-6 text-white/50'>{status}</h3>
 
@@ -368,8 +279,8 @@ export default function Matchmaking() {
 
 //         <div className='flex flex-col items-center'>
 //           <img
-//             src={gameSession.player2.socketId 
-//               ? gameSession.player2.avatar 
+//             src={gameSession.player2.socketId
+//               ? gameSession.player2.avatar
 //               : "/gameAvatars/Empty.jpeg"}
 //             alt="profile"
 //             className="h-35 w-35 rounded-xl"

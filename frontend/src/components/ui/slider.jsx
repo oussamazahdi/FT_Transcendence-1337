@@ -2,8 +2,6 @@
 
 import * as React from "react";
 
-
-
 const Slider = React.forwardRef(
   (
     {
@@ -126,12 +124,13 @@ const Slider = React.forwardRef(
           >
             {/* Filled track */}
             <div
-              className={`absolute left-0 top-0 h-full rounded-full transition-all duration-150 ease-out ${color === "foreground"
+              className={`absolute left-0 top-0 h-full rounded-full transition-all duration-150 ease-out ${
+                color === "foreground"
                   ? "bg-[#D9D9D9]"
                   : color === "primary"
                     ? "bg-blue-500"
                     : "bg-green-500"
-                }`}
+              }`}
               style={{ width: `${percentage}%` }}
             />
 
@@ -140,8 +139,9 @@ const Slider = React.forwardRef(
               steps.map((s, i) => (
                 <div
                   key={i}
-                  className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 rounded-full ${sizeConfig[size].step
-                    } ${s.percentage <= percentage ? "bg-white" : "bg-gray-400"}`}
+                  className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 rounded-full ${
+                    sizeConfig[size].step
+                  } ${s.percentage <= percentage ? "bg-white" : "bg-gray-400"}`}
                   style={{ left: `${s.percentage}%` }}
                 />
               ))}
@@ -149,16 +149,19 @@ const Slider = React.forwardRef(
 
           {/* Thumb */}
           <div
-            className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 rounded-full border-2 border-white shadow-md transition-transform duration-100 ease-in-out ${isDragging ? "scale-110" : "scale-100"
-              } ${disabled
+            className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 rounded-full border-2 border-white shadow-md transition-transform duration-100 ease-in-out ${
+              isDragging ? "scale-110" : "scale-100"
+            } ${
+              disabled
                 ? "cursor-not-allowed"
                 : "cursor-grab active:cursor-grabbing"
-              } ${color === "foreground"
+            } ${
+              color === "foreground"
                 ? "bg-slate-800"
                 : color === "primary"
                   ? "bg-blue-500"
                   : "bg-green-500"
-              } ${sizeConfig[size].thumb}`}
+            } ${sizeConfig[size].thumb}`}
             style={{ left: `${percentage}%` }}
           />
         </div>

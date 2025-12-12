@@ -433,9 +433,6 @@
   .mx-6 {
     margin-inline: calc(var(--spacing) * 6);
   }
-  .mx-20 {
-    margin-inline: calc(var(--spacing) * 20);
-  }
   .my-2 {
     margin-block: calc(var(--spacing) * 2);
   }
@@ -555,6 +552,9 @@
   .h-13 {
     height: calc(var(--spacing) * 13);
   }
+  .h-14 {
+    height: calc(var(--spacing) * 14);
+  }
   .h-16 {
     height: calc(var(--spacing) * 16);
   }
@@ -621,8 +621,8 @@
   .w-11 {
     width: calc(var(--spacing) * 11);
   }
-  .w-13 {
-    width: calc(var(--spacing) * 13);
+  .w-14 {
+    width: calc(var(--spacing) * 14);
   }
   .w-16 {
     width: calc(var(--spacing) * 16);
@@ -836,9 +836,6 @@
   .overflow-y-auto {
     overflow-y: auto;
   }
-  .overflow-y-hidden {
-    overflow-y: hidden;
-  }
   .rounded {
     border-radius: 0.25rem;
   }
@@ -898,6 +895,9 @@
   .border-\[\#A6A6A6\] {
     border-color: #A6A6A6;
   }
+  .border-\[\#BEBEBE\] {
+    border-color: #BEBEBE;
+  }
   .border-\[\#FFFFFF\]\/23 {
     border-color: color-mix(in oklab, #FFFFFF 23%, transparent);
   }
@@ -940,8 +940,8 @@
   .bg-\[\#0F2C34\] {
     background-color: #0F2C34;
   }
-  .bg-\[\#000000\]\/60 {
-    background-color: color-mix(in oklab, #000000 60%, transparent);
+  .bg-\[\#000000\]\/65 {
+    background-color: color-mix(in oklab, #000000 65%, transparent);
   }
   .bg-\[\#1A1A1A\]\/75 {
     background-color: color-mix(in oklab, #1A1A1A 75%, transparent);
@@ -1316,9 +1316,6 @@
     transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
     transition-duration: var(--tw-duration, var(--default-transition-duration));
   }
-  .delay-20 {
-    transition-delay: 20ms;
-  }
   .duration-100 {
     --tw-duration: 100ms;
     transition-duration: 100ms;
@@ -1326,10 +1323,6 @@
   .duration-150 {
     --tw-duration: 150ms;
     transition-duration: 150ms;
-  }
-  .duration-200 {
-    --tw-duration: 200ms;
-    transition-duration: 200ms;
   }
   .ease-in-out {
     --tw-ease: var(--ease-in-out);
@@ -1495,6 +1488,11 @@
       border-color: #0F2C34;
     }
   }
+  .focus\:bg-\[\#000000\]\/40 {
+    &:focus {
+      background-color: color-mix(in oklab, #000000 40%, transparent);
+    }
+  }
   .focus\:ring-1 {
     &:focus {
       --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
@@ -1522,6 +1520,11 @@
       background-color: var(--color-gray-500);
     }
   }
+  .md\:mx-10 {
+    @media (width >= 48rem) {
+      margin-inline: calc(var(--spacing) * 10);
+    }
+  }
   .md\:grid-cols-2 {
     @media (width >= 48rem) {
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1530,6 +1533,11 @@
   .md\:grid-cols-6 {
     @media (width >= 48rem) {
       grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+  }
+  .lg\:mx-20 {
+    @media (width >= 64rem) {
+      margin-inline: calc(var(--spacing) * 20);
     }
   }
   .lg\:mx-35 {

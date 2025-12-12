@@ -1,60 +1,42 @@
-"use client"
-import { useState, useEffect, useContext, createContext } from "react"
+"use client";
+import { useState, useContext, createContext } from "react";
 import { useRouter } from "next/navigation";
 
-const AuthContext = createContext();
+const UserContext = createContext(null);
 
-export function AuthProvider({ children }){
-  const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+export function UserProvider({ children, initialUser }) {
+  const [user, setUser] = useState(initialUser);
   const router = useRouter();
-
-  useEffect(() => {
-    const checkUser = async () => {
-      try{
-        const response = await fetch ("http://localhost:3001/api/auth/me", {
-          method: "GET",
-          credentials: "include",
-        })
-
-        const data = await response.json();
-        // console.log(data);
-        if (!response.ok){
-          throw new Error("Failed to fetch user session")
-        }
-
-        setUser(data.userData);
-      }catch (err){
-        // router.push('/sign-in');
-        // console.log("failed to fetch", err);
-        setUser(null);
-      }finally{
-        setIsLoading(false);
-      }
-    }
-
-    checkUser();
-  },[])
 
   const login = (userData) => {
     setUser(userData);
-  }
+  };
 
-  const logout = () => {
-    setUser(null);
-  }
+  const logout = async () => {
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
+        method: "POST",
+      });
+      setUser(null);
+
+      router.push("/sign-in");
+      router.refresh();
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  };
 
   const updateUser = (newData) => {
-    setUser((prev) => ({...prev, ...newData}));
-  }
+    setUser((prev) => ({ ...prev, ...newData }));
+  };
 
   return (
-    <AuthContext.Provider value={{ user,  isLoading, login, logout, updateUser }}>
+    <UserContext.Provider value={{ user, login, logout, updateUser }}>
       {children}
-    </AuthContext.Provider>
+    </UserContext.Provider>
   );
 }
 
 export function useAuth() {
-  return useContext(AuthContext);
+  return useContext(UserContext);
 }

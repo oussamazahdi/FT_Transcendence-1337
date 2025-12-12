@@ -11,7 +11,13 @@ const Friends = (props) => {
       onClick={() => setSelectedFriend(props)}
     >
       <div className="m-[1px] flex items-center rounded-lg cursor-pointer overflow-hidden">
-        <Image src={props.pdp} alt="" width={50} height={50} className=" object-cover" />
+        <Image
+          src={props.pdp}
+          alt=""
+          width={50}
+          height={50}
+          className=" object-cover"
+        />
       </div>
       <div className="ml-2 flex-1 flex items-start justify-between min-w-0">
         <div className="flex-1 min-w-0 pr-4">

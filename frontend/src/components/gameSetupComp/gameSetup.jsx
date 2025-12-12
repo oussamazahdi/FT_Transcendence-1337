@@ -4,10 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Slider } from "@/components/ui/slider";
 import Link from "next/link";
 
-const GameSetup = ({
-  isVisible,
-  onClose,
-}) => {
+const GameSetup = ({ isVisible, onClose }) => {
   if (!isVisible) return null;
 
   const avatarStyle =

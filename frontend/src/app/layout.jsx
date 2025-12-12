@@ -1,11 +1,8 @@
-"use client";
-
-// import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Poppins } from "next/font/google";
 import Background from "../components/Background"; // Adjusted path
-import { usePathname } from "next/navigation";
-import { AuthProvider } from "@/contexts/authContext";
+import { UserProvider } from "@/contexts/authContext";
+import { getCurrentUser } from "@/lib/auth";
 
 import "./globals.css";
 
@@ -24,20 +21,17 @@ const poppins = Poppins({
   weight: ["400", "500", "700"], // optional: choose the weights you need
 });
 
-export default function RootLayout({
-  children,
-}) {
-  const pathName = usePathname();
-  // const hideNavBar = pathName === "/game/pingPong/local-game"
+export default async function RootLayout({ children }) {
+  const user = await getCurrentUser();
   return (
     <html lang="en">
       <body
         suppressHydrationWarning
         className={`${poppins.className} ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>
+        <UserProvider initialUser={user}>
           <Background>{children}</Background>
-        </AuthProvider>
+        </UserProvider>
       </body>
     </html>
   );

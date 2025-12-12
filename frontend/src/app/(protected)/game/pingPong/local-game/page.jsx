@@ -167,10 +167,10 @@ export default function PingPongGame() {
       }
       if (
         state.ball.x - state.ball.radius <
-        state.player1.x + state.player1.width &&
+          state.player1.x + state.player1.width &&
         state.ball.y - state.ball.radius > state.player1.y &&
         state.ball.y + state.ball.radius <
-        state.player1.y + state.player1.height
+          state.player1.y + state.player1.height
       ) {
         state.ball.velocityX *= -1;
         state.ball.velocityY =

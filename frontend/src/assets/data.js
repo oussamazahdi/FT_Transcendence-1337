@@ -13,8 +13,8 @@ import SignUp_image from "./sign-up-image.jpg";
 import signIn_image from "./sign-in-img.jpg";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import communication from "./communication.png";
-import noUserFound from "./noUserFound.png"
-import noChatFound from "./no-chat.png"
+import noUserFound from "./noUserFound.png";
+import noChatFound from "./no-chat.png";
 
 export const assets = {
   soufiixPdp,
