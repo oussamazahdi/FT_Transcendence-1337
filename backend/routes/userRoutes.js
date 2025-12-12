@@ -1,3 +1,4 @@
+
 import { getAllUsers, getOneUser, updateUser, deleteUser, searchUsers } from "../controllers/userController.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 
