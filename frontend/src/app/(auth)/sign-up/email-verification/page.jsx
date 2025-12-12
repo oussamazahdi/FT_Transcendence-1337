@@ -86,7 +86,6 @@ const EmailVerification = () => {
       router.replace("/sign-up/email-verification/selecte-image")
     }catch(err){
       setError(err.message);
-      console.log("chnahowa l ERROR? hahowa : ", err.message);
     }finally{
       setIsVerifying(false);
     }
