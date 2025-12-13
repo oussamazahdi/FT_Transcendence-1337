@@ -7,14 +7,41 @@ import { generateFileNameByUser } from "../utils/authUtils.js";
 import { tokenModels } from "../models/tokenModel.js";
 import { getEmailLetter } from "../templates/emailLetter.js";
 
-function generateToken(userId, Username, secret, expiration)
+function generateToken(userId, Username, secret, expiration, params, type)
 {
-    const payload = {
-        userId: userId,
-        username: Username
-    };
-    console.log(payload);
+    let payload;
+    if (type === "access")
+    {
+        payload = {
+            userId: userId,
+            username: Username,
+            isVerified: params.isVerified,
+            hasAvatar: params.hasAvatar
+        };
+    }
+    else
+    {
+        payload = {
+            userId: userId,
+            username: Username
+        };
+    }
     return jwt.sign(payload, secret, { expiresIn: expiration });
+}
+
+function updateTokenFlags(user, reply)
+{
+    const params = {
+        isVerified: user.isverified,
+        hasAvatar: !!user.avatar
+    }
+    const accessToken = generateToken(user.id, user.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION, params, "access");
+    reply.setCookie('accessToken', accessToken, {
+        httpOnly: true,
+        sameSite: 'strict',
+        path: '/',
+        maxAge: 15 * 60 * 1000
+    });
 }
 
 export class AuthController {
@@ -25,12 +52,16 @@ export class AuthController {
         const db = request.server.db;
         try {
             const result = await authModels.loginUser(db, email, password);
+            const params = {
+                isVerified: result.isverified,
+                hasAvatar: !!result.avatar
+            }
             if (result.message && result.message.includes("USER_NOT_FOUND"))
                 return reply.code(404).send({error: "USER_NOT_FOUND"});
             if (result.message && result.message.includes("INVALID_PASSWORD"))
                 return reply.code(403).send({error: "INVALID_PASSWORD"});
-            const accessToken = generateToken(result.id, result.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION);
-            const refreshToken = generateToken(result.id, result.username, process.env.JWT_REFRESH_SECRET, process.env.JWT_REFRESH_EXPIRATION);
+            const accessToken = generateToken(result.id, result.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION, params, "access");
+            const refreshToken = generateToken(result.id, result.username, process.env.JWT_REFRESH_SECRET, process.env.JWT_REFRESH_EXPIRATION, null, "refresh");
             authModels.addNewToken(db, result.id, refreshToken);
             reply.setCookie('refreshToken', refreshToken, {
                 httpOnly: true,
@@ -44,8 +75,7 @@ export class AuthController {
                 path: '/',
                 maxAge: 15 * 60 * 1000
             });
-            const user = authModels.findUserByEmail(db, email);
-            return reply.code(200).send({message: "AUTHORIZED", userData: user});
+            return reply.code(200).send({message: "AUTHORIZED", userData: result});
         }
         catch (error) {
                 if (error.code)
@@ -62,8 +92,12 @@ export class AuthController {
         const db = request.server.db;
         try {
             const user = await authModels.addNewUser(db, firstname, lastname, username, email, password);
-            const accessToken = generateToken(user.id, user.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION);
-            const refreshToken = generateToken(user.id, user.username, process.env.JWT_REFRESH_SECRET, process.env.JWT_REFRESH_EXPIRATION);
+            const params = {
+                isVerified: user.isverified,
+                hasAvatar: !!user.avatar
+            }
+            const accessToken = generateToken(user.id, user.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION, params, "access");
+            const refreshToken = generateToken(user.id, user.username, process.env.JWT_REFRESH_SECRET, process.env.JWT_REFRESH_EXPIRATION, null, "refresh");
             authModels.addNewToken(db, user.id, refreshToken);
             reply.setCookie('refreshToken', refreshToken, {
                 httpOnly: true,
@@ -84,10 +118,7 @@ export class AuthController {
             if (error.code)
                 return reply.code(error.code).send({error: error.message});
             else
-            {
-                console.log(error.message);
                 return reply.code(500).send({error: error.message});
-            }
         }
     }
     
@@ -116,6 +147,7 @@ export class AuthController {
             }
             authModels.updateUserAvatar(db, request.user.userId, fileLink);
             const user = authModels.findUserById(db, request.user.userId);
+            updateTokenFlags(user, reply);
             reply.code(200).send({message: "SUCCESS", userData: user});
         }
         catch (error)
@@ -129,7 +161,6 @@ export class AuthController {
     
     async   generateNewToken(request, reply)
     {
-        /** check for refresh token expiration */
         const db = request.server.db;
         const refreshToken = request.cookies.refreshToken;
         const accessToken = request.cookies.accessToken;
@@ -144,14 +175,9 @@ export class AuthController {
             //query the status of isVerfied from the database to get fresh data in case refeesh token have old data
             const tokenDbResults = tokenModels.tokenExists(db, refreshToken); // check if token exists
             if (!tokenDbResults)
-                throw new Error("INVALID_TOKEN")
-            const newAccessToken = generateToken(decoded.userId, decoded.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION);
-            reply.setCookie('accessToken', newAccessToken, {
-                httpOnly: true,
-                sameSite: 'strict',
-                path: '/',
-                maxAge: 15 * 60 * 1000
-            });
+                throw new Error("INVALID_TOKEN");
+            const user = authModels.findUserById(db, decoded.userId);
+            updateTokenFlags(user, reply);
             return reply.code(201).send({message: "TOKEN_REFRESHED_SUCCESSFULLY"});
         }
         catch (error) {
@@ -167,7 +193,6 @@ export class AuthController {
         const db = request.server.db;
         try {
             const user = authModels.findUserById(db, request.user.userId, ['firstname', 'lastname', 'username', 'email', 'avatar', 'isverified']);
-            console.log(request.user.userId, user);
             return reply.code(200).send({message: "SUCCESS", userData: user});
         }
         catch (error) {
@@ -252,6 +277,8 @@ export class AuthController {
             if (code !== user.otp)
                 throw new Error("INCORRECT ");
             authModels.markEmailVerified(db, request.user.userId);
+            const userflags = authModels.findUserById(db, request.user.userId);
+            updateTokenFlags(userflags, reply);
             return reply.code(200).send({message: "EMAIL_CONFIREMED_SUCCESSFULLY"});
         }
         catch(error)
