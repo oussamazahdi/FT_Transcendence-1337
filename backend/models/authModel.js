@@ -61,7 +61,8 @@ export class AuthModels
 
     updateUserAvatar(db, userId, avatarUrl)
     {
-        try {
+        try 
+        {
             const result = db.prepare('UPDATE users SET avatar = ? WHERE id = ?').run(avatarUrl, userId);
             
             if (result.changes === 0) {
@@ -69,7 +70,9 @@ export class AuthModels
             }
             
             return result;
-        } catch (error) {
+        } 
+        catch (error) 
+        {
             if (error.code === 404) throw error;
             const dbError = handleDatabaseError(error, 'updateUserAvatar');
             throw dbError;
@@ -84,7 +87,8 @@ export class AuthModels
                 throw { code: 404, message: 'USER_NOT_FOUND' };
             }
             return user.email;
-        } catch (error) {
+        } catch (error) 
+        {
             if (error.code === 404) throw error;
             const dbError = handleDatabaseError(error, 'getUserEmail');
             throw dbError;
@@ -93,16 +97,18 @@ export class AuthModels
 
     updateUserOTP(db, userId, otp, expiration)
     {
-        try {
+        try 
+        {
             const result = db.prepare('UPDATE users SET otp = ?, otpexpiration = ? WHERE id = ?')
                 .run(otp, expiration, userId);
             
-            if (result.changes === 0) {
+            if (result.changes === 0) 
                 throw { code: 404, message: 'USER_NOT_FOUND' };
-            }
             
             return result;
-        } catch (error) {
+        } 
+        catch (error) 
+        {
             if (error.code === 404) throw error;
             const dbError = handleDatabaseError(error, 'updateUserOTP');
             throw dbError;
