@@ -29,7 +29,7 @@ export default function initSocketManager(io){
 	console.log("✅ New user connected:", socket.id);
 	socket.on("join-game", (playerData) => {
 		
-		console.log("============> player", playerData);
+		// console.log("============> player", playerData);
 		
 		if (!session.complete && !session.player1.socketId) {
 			Object.assign(session.player1, {

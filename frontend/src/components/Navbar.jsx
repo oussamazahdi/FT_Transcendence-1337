@@ -53,7 +53,7 @@ export default function Navbar() {
         </Link>
       </div>
 
-      <div className="flex items-center">{navBareMap};</div>
+      <div className="flex items-center">{navBareMap}</div>
 
       <div className="flex items-center my-2 border border-[#9D9D9D]/65 py-2 pl-4 text-white/60 rounded-full">
         <input

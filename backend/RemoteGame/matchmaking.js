@@ -30,7 +30,7 @@ export function handleConnection(socket) {
 	// 	return;
 	socket.on("join-game", (playerData) => {
 		
-		console.log("============> player", playerData);
+		// console.log("============> player", playerData);
 		
 		if (!session.complete && !session.player1.socketId) {
 			Object.assign(session.player1, {

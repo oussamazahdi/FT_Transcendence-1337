@@ -79,7 +79,7 @@ function searchUsers(request, reply){
 		const db = request.server.db;
 		const { query } = request.query;
 
-		console.log(query);
+		// console.log(query);
 		if (!query || typeof query !== 'string'){
 			return reply.code(400).json({ error: 'QUERY_PARAMETER_REQUERED' });
 		}

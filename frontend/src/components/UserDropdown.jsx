@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/authContext";
 
 const UserDropdown = () => {
   const { user, isLoading } = useAuth();
+	// console.log("===> user in navbar:", user);
   return (
     <div>
       <div className="flex items-center gap-3">

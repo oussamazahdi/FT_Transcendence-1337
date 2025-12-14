@@ -68,14 +68,14 @@ export default function Matchmaking() {
         player1: { ...prev.player1, socketId: socket.id },
       }));
 
-      console.log("EMITTING join-game:", gameSession.player1);
+      // console.log("EMITTING join-game:", gameSession.player1);
       socket.emit("join-game", user);
 
       setStatus("Waiting for opponent...");
     };
 
     const handleMatchFound = (playerData) => {
-      console.log("RECEIVED match-found:", playerData);
+      // console.log("RECEIVED match-found:", playerData);
 
       setGameSession((prev) => ({
         ...prev,

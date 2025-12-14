@@ -191,13 +191,16 @@ export class AuthController {
     async   getMe(request, reply) 
     {
         const db = request.server.db;
+				// console.log("*************> from getMe");
         try {
             const user = authModels.findUserById(db, request.user.userId, ['firstname', 'lastname', 'username', 'email', 'avatar', 'isverified']);
             return reply.code(200).send({message: "SUCCESS", userData: user});
         }
         catch (error) {
             if (error.code)
+							{
                 return reply.code(error.code).send({error: error.message});
+							}
             else
                 return reply.code(500).send({error: error.message});
         }
