@@ -11,7 +11,7 @@ import nodemailer from 'nodemailer'
 
 // locals
 import { initAllTables } from "./database/tables/initDatabase.js";
-import { initRoutes } from "./routes/routes.js";
+import { initializeRoutes } from "./routes/routes.js";
 import corsPlugin from "./plugins/cors.js";
 import { setupTokenCleanup } from './jobs/revokedTokensCleanup.js';
 
@@ -58,7 +58,7 @@ fastify.decorate('db', db);
 
 setupTokenCleanup(fastify.db);
 initAllTables(fastify.db);
-initRoutes(fastify);
+initializeRoutes(fastify);
 
 await fastify.listen({port: 3001}, (error) => {
     if (error)

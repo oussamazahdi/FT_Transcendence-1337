@@ -1,4 +1,5 @@
 import path from "path";
+import jwt from "jsonwebtoken"
 
 function generateFileNameByUser(username, filename)
 {
@@ -11,4 +12,41 @@ function generateFileNameByUser(username, filename)
     return file;
 }
 
-export { generateFileNameByUser }
+function generateToken(userId, Username, secret, expiration, params, type)
+{
+    let payload;
+    if (type === "access")
+    {
+        payload = {
+            userId: userId,
+            username: Username,
+            isVerified: params.isVerified,
+            hasAvatar: params.hasAvatar
+        };
+    }
+    else
+    {
+        payload = {
+            userId: userId,
+            username: Username
+        };
+    }
+    return jwt.sign(payload, secret, { expiresIn: expiration });
+}
+
+function updateTokenFlags(user, reply)
+{
+    const params = {
+        isVerified: user.isverified,
+        hasAvatar: !!user.avatar
+    }
+    const accessToken = generateToken(user.id, user.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION, params, "access");
+    reply.setCookie('accessToken', accessToken, {
+        httpOnly: true,
+        sameSite: 'strict',
+        path: '/',
+        maxAge: 15 * 60 * 1000
+    });
+}
+
+export { generateFileNameByUser, generateToken, updateTokenFlags }

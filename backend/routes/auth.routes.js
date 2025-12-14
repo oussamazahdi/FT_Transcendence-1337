@@ -1,4 +1,4 @@
-import { authController } from "../controllers/authController.js";
+import { authController } from "../controllers/auth.controller.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 function authRoutes(fastify)
@@ -63,8 +63,7 @@ function authRoutes(fastify)
     fastify.post("/refresh", authController.generateNewToken);
     fastify.post("/resendCode", {preHandler: authMiddleware}, authController.resendCode);
     fastify.post("/emailVerification", {preHandler: authMiddleware}, authController.verifyEmail);
-    // todo : 2FA, OAUTH
-    // fastify.post("/enable2fa", {preHandler: authMiddleware}, authController.enable2fa);
+    // todo : OAUTH
 }
 
 export { authRoutes };

@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken"
-import { tokenModels } from "../models/tokenModel.js";
+import { tokenModels } from "../models/token.model.js";
 
 async function authMiddleware(request, reply)
 {
