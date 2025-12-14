@@ -29,7 +29,7 @@ export class AuthModels
         try {
             let cryptedPass = await bcrypt.hash(password, 12);
             db.prepare(`INSERT INTO users (firstname, lastname, username, email, password) VALUES (?, ?, ?, ?, ?)`).run(firstname, lastname, username, email, cryptedPass);
-            const user = db.prepare(`SELECT id, firstname, lastname, username, email, avatar FROM users WHERE email = ?`).get(email);
+            const user = db.prepare(`SELECT id, firstname, lastname, username, email, avatar, isverified FROM users WHERE email = ?`).get(email);
             return (user);
         } 
         catch (error) {
@@ -37,7 +37,7 @@ export class AuthModels
                 throw dbError;
         }
     }
-    findUserById(db, userId, fields = ['firstname', 'lastname', 'username', 'email', 'avatar'])
+    findUserById(db, userId, fields = ['id', 'username', 'firstname', 'lastname', 'username', 'email', 'avatar', 'isverified'])
     {
         try {
             const fieldList = fields.join(', ');
@@ -48,7 +48,7 @@ export class AuthModels
         }
     }
 
-    findUserByEmail(db, email, fields = ['firstname', 'lastname', 'username', 'email', 'avatar'])
+    findUserByEmail(db, email, fields = ['firstname', 'lastname', 'username', 'email', 'avatar', 'isverified'])
     {
         try {
             const fieldList = fields.join(', ');
@@ -61,7 +61,8 @@ export class AuthModels
 
     updateUserAvatar(db, userId, avatarUrl)
     {
-        try {
+        try 
+        {
             const result = db.prepare('UPDATE users SET avatar = ? WHERE id = ?').run(avatarUrl, userId);
             
             if (result.changes === 0) {
@@ -69,7 +70,9 @@ export class AuthModels
             }
             
             return result;
-        } catch (error) {
+        } 
+        catch (error) 
+        {
             if (error.code === 404) throw error;
             const dbError = handleDatabaseError(error, 'updateUserAvatar');
             throw dbError;
@@ -84,7 +87,8 @@ export class AuthModels
                 throw { code: 404, message: 'USER_NOT_FOUND' };
             }
             return user.email;
-        } catch (error) {
+        } catch (error) 
+        {
             if (error.code === 404) throw error;
             const dbError = handleDatabaseError(error, 'getUserEmail');
             throw dbError;
@@ -93,16 +97,18 @@ export class AuthModels
 
     updateUserOTP(db, userId, otp, expiration)
     {
-        try {
+        try 
+        {
             const result = db.prepare('UPDATE users SET otp = ?, otpexpiration = ? WHERE id = ?')
                 .run(otp, expiration, userId);
             
-            if (result.changes === 0) {
+            if (result.changes === 0) 
                 throw { code: 404, message: 'USER_NOT_FOUND' };
-            }
             
             return result;
-        } catch (error) {
+        } 
+        catch (error) 
+        {
             if (error.code === 404) throw error;
             const dbError = handleDatabaseError(error, 'updateUserOTP');
             throw dbError;
