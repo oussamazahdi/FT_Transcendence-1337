@@ -1,5 +1,0 @@
-{
-  "/_not-found/page": "app/_not-found/page.js",
-  "/(protected)/game/pingPong/page": "app/(protected)/game/pingPong/page.js",
-  "/(protected)/game/pingPong/[roomId]/page": "app/(protected)/game/pingPong/[roomId]/page.js"
-}
