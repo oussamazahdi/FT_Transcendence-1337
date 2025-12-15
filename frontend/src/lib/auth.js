@@ -5,13 +5,13 @@ export async function getCurrentUser() {
   const aToken = cookieStore.get("accessToken");
   const rToken = cookieStore.get("refreshToken");
 
-  if (!token)
+  if (!aToken || !rToken)
       return (null);
   
   try{
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
       headers: {
-        'Cookie': `accessToken=${aToken}; refreshToken=${rToken}`
+        'Cookie': `accessToken=${aToken.value}; refreshToken=${rToken.value}`
       }
     });
 
@@ -20,7 +20,7 @@ export async function getCurrentUser() {
     }
     const data = await response.json();
 
-    return(data.UserData);
+    return(data.userData);
   }catch(error){
     console.error("Failed to fetch user:", error);
     return null

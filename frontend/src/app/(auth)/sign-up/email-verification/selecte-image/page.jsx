@@ -4,7 +4,7 @@ import Image from "next/image";
 import { assets } from "@/assets/data";
 import { useRouter } from "next/navigation";
 import { AUTH_ERRORS } from "@/lib/utils";
-
+import { useAuth } from "@/contexts/authContext";
 const SelecteImage = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
@@ -12,8 +12,9 @@ const SelecteImage = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // const {user, isLoading} = useAuth();
+  const { login } = useAuth();
   const router = useRouter();
+  let data;
 
 
   //to change after merging qith kamal
@@ -89,7 +90,7 @@ const SelecteImage = () => {
           },
         );
 
-        const data = await reply.json();
+        data = await reply.json();
 
         if (!reply.ok) {
           // const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
@@ -110,7 +111,7 @@ const SelecteImage = () => {
           body: JSON.stringify({ avatar: selectedAvatar }),
         });
 
-        const data = await reply.json();
+        data = await reply.json();
 
         if (!reply.ok) {
           // const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
@@ -120,6 +121,7 @@ const SelecteImage = () => {
 
         console.log("Avatar selection successful:", data);
       }
+      login(data.userData)
 
       // Navigate to dashboard on success
       router.replace("/dashboard");
