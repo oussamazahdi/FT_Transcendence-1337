@@ -1,291 +1,436 @@
 "use client";
 
 import { useAuth } from "@/contexts/authContext";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
+import { useRouter } from "next/navigation";
 
 const socket = io("http://localhost:3001", {
-	transports: ["websocket"],
-	autoConnect: false,
+  transports: ["websocket"],
+  autoConnect: false,
 });
 
 const emptyPlayer = () => ({
-	socketId: "",
-	firstName: "",
-	lastName: "",
-	login: "",
-	avatar: "",
-	score: 0,
-	roomId: "",
+  socketId: "",
+  firstName: "",
+  lastName: "",
+  login: "",
+  avatar: "",
+  score: 0,
+  roomId: "",
 });
 
 export default function Matchmaking() {
-	const { user } = useAuth();
-	
-	const [status, setStatus] = useState("Searching for opponent...");
-	const [gameSession, setGameSession] = useState({
-		player1: emptyPlayer(),
-		player2: emptyPlayer(),
-	});
+  const { user } = useAuth();
+  const router = useRouter();
 
+  const [status, setStatus] = useState("Searching for opponent...");
+  const [player1, setPlayer1] = useState(emptyPlayer());
+  const [player2, setPlayer2] = useState(emptyPlayer());
+
+  useEffect(() => {
+    if (!user) return;
+
+    setPlayer1((prev) => ({
+      ...prev,
+      firstName: user.firstname,
+      lastName: user.lastname,
+      login: user.username,
+      avatar: user.avatar,
+    }));
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    if (!socket.connected) socket.connect();
+
+    const handleConnect = () => {
+      setPlayer1((prev) => ({
+        ...prev,
+        socketId: socket.id,
+      }));
+
+      socket.emit("join-game", {
+        firstName: user.firstname,
+        lastName: user.lastname,
+        login: user.username,
+        avatar: user.avatar,
+      });
+
+      setStatus("Waiting for opponent...");
+    };
+
+    const handleMatchFound = (opponent) => {
+      setPlayer2(opponent);
+      setStatus("Match Found!");
+
+      // router.push(`/game/pingPong/${opponent.roomId}`);
+    };
+
+    socket.on("connect", handleConnect);
+    socket.on("match-found", handleMatchFound);
+
+    return () => {
+      socket.off("connect", handleConnect);
+      socket.off("match-found", handleMatchFound);
+    };
+  }, [user, router]);
 	useEffect(() => {
-		if (!user) return;
-		setGameSession((prev) => ({...prev, player1: { ...prev.player1,
-			avatar: user.avatar,
-			firstName: user.firstname,
-			lastName: user.lastname,
-			login: user.username, },
-		}));
-	}, [user]);
+		console.log("All Players Data:", {
+			player1,
+			player2
+		});
+	}, [player1, player2]);
 
-	useEffect(() => {
-		if (!user) return;
-		if (!socket.connected) socket.connect();
+  return (
+    <div className="flex flex-col items-center bg-[#0F0F0F]/65 p-10 rounded-3xl">
+      <h3 className="text-3xl font-extrabold">Find Match</h3>
+      <h3 className="mb-6 text-white/50">{status}</h3>
 
-		function handleConnect() {
-			setGameSession((prev) => ({...prev,player1: { ...prev.player1,
-				socketId: socket.id },
-			}));
-			socket.emit("join-game", gameSession.player1);
-			setStatus("Waiting for opponent...");
-		};
+      <div className="flex items-center justify-between gap-x-20">
+        {/* PLAYER 1 */}
+        <div className="flex flex-col items-center">
+          <img
+            src={player1.avatar || "/gameAvatars/Empty.jpeg"}
+            alt="profile"
+            className="h-36 w-36 rounded-xl"
+          />
 
-		function handleMatchFound(playerData){
-			setGameSession((prev) => ({...prev, player2: {
-				...prev.player2,
-				...playerData },
-			}));
-			setStatus("Match Found!");
-			setGameSession((prev) => ({...prev,player1: { ...prev.player1,
-				roomId: playerData.roomId},
-			}));
-			socket.join(gameSession.player2.roomId);
-		};
+          <h3 className="text-xl font-semibold">
+            {player1.firstName || "Player 1"}
+            {player1.lastName ? "." + player1.lastName[0] : ""}
+          </h3>
 
-		socket.on("connect", handleConnect);
-		socket.on("match-found", handleMatchFound);
+          <h3 className="text-md font-medium text-[#6E6E6E]">
+            [{player1.login || "loading"}]
+          </h3>
+        </div>
 
-		return () => {
-			socket.off("connect", handleConnect);
-			socket.off("match-found", handleMatchFound);
-		};
-	}, [user, gameSession.player1]);
+        <span className="text-3xl font-extrabold">VS</span>
 
-	return (
-		<div className="flex flex-col items-center bg-[#0F0F0F]/65 p-10 rounded-3xl">
-			<h3 className="text-3xl font-extrabold">Find Match</h3>
-			<h3 className="mb-6 text-white/50">{status}</h3>
+        {/* PLAYER 2 */}
+        <div className="flex flex-col items-center">
+          <img
+            src={
+              player2.socketId
+                ? player2.avatar
+                : "/gameAvatars/Empty.jpeg"
+            }
+            alt="profile"
+            className="h-36 w-36 rounded-xl"
+          />
 
-			<div className="flex items-center justify-between gap-x-25">
-				{/* Player 1 */}
-				<div className="flex flex-col items-center">
-					<img
-						src={gameSession.player1.avatar || "/gameAvatars/Empty.jpeg"}
-						alt="profile"
-						className="h-35 w-35 rounded-xl"
-					/>
+          <h3 className="text-xl font-semibold">
+            {player2.socketId
+              ? `${player2.firstName}.${player2.lastName?.[0]}`
+              : "Player 2"}
+          </h3>
 
-					<h3 className="text-xl font-semibold">
-						{gameSession.player1.firstName || "Player 1"}
-						{gameSession.player1.lastName
-							? "." + gameSession.player1.lastName[0]
-							: ""}
-					</h3>
-
-					<h3 className="text-md font-medium text-[#6E6E6E]">
-						[{gameSession.player1.login || "loading"}]
-					</h3>
-				</div>
-
-				<span className="text-3xl font-extrabold">VS</span>
-
-				{/* Player 2 */}
-				<div className="flex flex-col items-center">
-					<img
-						src={
-							gameSession.player2.socketId
-								? gameSession.player2.avatar
-								: "/gameAvatars/Empty.jpeg"
-						}
-						alt="profile"
-						className="h-35 w-35 rounded-xl"
-					/>
-
-					<h3 className="text-xl font-semibold">
-						{gameSession.player2.socketId
-							? gameSession.player2.firstName +
-								"." +
-								gameSession.player2.lastName?.[0]
-							: "Player 2"}
-					</h3>
-
-					<h3 className="text-md font-medium text-[#6E6E6E]">
-						[
-						{gameSession.player2.socketId
-							? gameSession.player2.login
-							: "waiting"}
-						]
-					</h3>
-				</div>
-			</div>
-		</div>
-	);
+          <h3 className="text-md font-medium text-[#6E6E6E]">
+            [{player2.socketId ? player2.login : "waiting"}]
+          </h3>
+        </div>
+      </div>
+    </div>
+  );
 }
+
+
+
 
 // "use client";
 
 // import { useAuth } from "@/contexts/authContext";
 // import { useState, useEffect } from "react";
 // import { io } from "socket.io-client";
+// import { useRouter } from "next/navigation";
 
 // const socket = io("http://localhost:3001", {
-//	 transports: ["websocket"],
-//	 autoConnect: false,
+// 	transports: ["websocket"],
+// 	autoConnect: false,
 // });
 
-// class Player {
-//	 constructor() {
-//		 this.socketId = "";
-//		 this.firstName = "";
-//		 this.lastName = "";
-//		 this.login = "";
-//		 this.avatar = "";
-//		 this.score = 0;
-//		 this.roomId = "";
-//	 }
-// }
-
-// const GameSessionTemplate = {
-//	 player1: new Player(),
-//	 player2: new Player(),
-// };
+// const emptyPlayer = () => ({
+// 	socketId: "",
+// 	firstName: "",
+// 	lastName: "",
+// 	login: "",
+// 	avatar: "",
+// 	score: 0,
+// 	roomId: "",
+// });
 
 // export default function Matchmaking() {
-//	 const { user } = useAuth();
-//	 const [status, setStatus] = useState("Searching for opponent...");
-//	 const [gameSession, setGameSession] = useState(GameSessionTemplate);
-
-//	 /* Fill Player1 with user data */
-//	 useEffect(() => {
-//		 if (!user) return;
-//		 setGameSession(prev => ({
-//			 ...prev,
-//			 player1: {
-//				 ...prev.player1,
-//				 avatar: user.avatar,
-//				 firstName: user.firstName,
-//				 lastName: user.lastName,
-//				 login: user.login,
-//			 }
-//		 }));
-//	 }, [user]);
-
-//	 /* Socket setup */
-//	 useEffect(() => {
-//		 if (socket.connected) return;
-// 		socket.connect();
-
-// /*----------------------------------------------------------*/
-//		 socket.on("connect", () => {
-//			 if (!user) return;
-
-//			 setGameSession(prev => ({
-//				 ...prev,
-//				 player1: { ...prev.player1, socketId: socket.id },
-//			 }));
-// 			const playerToSend = {
-// 				firstName: user.firstName,
-// 				lastName: user.lastName,
-// 				login: user.login,
-// 				avatar: user.avatar,
-// 				socketId: socket.id
-// 			};
-// 			// console.log(playerToSend)
-// 			console.log("player:", gameSession.player1)
-
-// 			socket.emit("join-game", playerToSend);
-//			 setStatus("Waiting for opponent...");
-//		 });
-// /*----------------------------------------------------------*/
-// 	socket.on("match-found", (playerData) => {
-// 		setGameSession(prev => ({...prev, player2: { ...prev.player2,
-// 				avatar: playerData.avatar,
-// 				firstName: playerData.firstName,
-// 				lastName: playerData.lastName,
-// 				login: playerData.login,
-// 				socketId: playerData.socketId,
-// 			},
-// 		}));
-
-// 		setStatus("Match Found!");
+// 	const { user } = useAuth();
+// 	const router = useRouter();
+	
+// 	const [status, setStatus] = useState("Searching for opponent...");
+// 	const [gameSession, setGameSession] = useState({
+// 		player1: emptyPlayer(),
+// 		player2: emptyPlayer(),
 // 	});
-// /*----------------------------------------------------------*/
 
-//		 return () => {
-//			 socket.off("connect");
-//			 socket.off("match-found");
-//		 };
-//	 }, [user]);
+// 	useEffect(() => {
+// 		if (!user) return;
+// 		setGameSession((prev) => ({...prev, player1: { ...prev.player1,
+// 			avatar: user.avatar,
+// 			firstName: user.firstname,
+// 			lastName: user.lastname,
+// 			login: user.username, },
+// 		}));
+// 	}, [user]);
+
+// 	useEffect(() => {
+// 		if (!user) return;
+// 		if (!socket.connected) socket.connect();
+
+// 		function handleConnect() {
+// 			setGameSession((prev) => ({...prev,player1: { ...prev.player1,
+// 				socketId: socket.id },
+// 			}));
+// 			socket.emit("join-game", gameSession.player1);
+// 			setStatus("Waiting for opponent...");
+// 		};
+
+// 		function handleMatchFound(playerData){
+// 			setGameSession((prev) => ({...prev, player2: {
+// 				...prev.player2,
+// 				...playerData },
+// 			}));
+// 			setStatus("Match Found!");
+// 			setGameSession((prev) => ({...prev,player1: { ...prev.player1,
+// 				roomId: playerData.roomId},
+// 			}));
+// 			console.log("******************> RoomId:", gameSession.player2.roomId);
+// 			router.push(`/game/pingPong/${gameSession.player2.roomId}`);
+// 			socket.join(gameSession.player2.roomId);
+// 		};
+
+// 		socket.on("connect", handleConnect);
+// 		socket.on("match-found", handleMatchFound);
+
+// 		return () => {
+// 			socket.off("connect", handleConnect);
+// 			socket.off("match-found", handleMatchFound);
+// 		};
+// 	}, [user, gameSession.player1]);
 
 // 	return (
-//		 <div className='flex flex-col items-center bg-[#0F0F0F]/65 p-10 rounded-3xl'>
+// 		<div className="flex flex-col items-center bg-[#0F0F0F]/65 p-10 rounded-3xl">
+// 			<h3 className="text-3xl font-extrabold">Find Match</h3>
+// 			<h3 className="mb-6 text-white/50">{status}</h3>
 
-//			 <h3 className='text-3xl font-extrabold'>Find Match</h3>
-//			 <h3 className='mb-6 text-white/50'>{status}</h3>
+// 			<div className="flex items-center justify-between gap-x-25">
+// 				{/* Player 1 */}
+// 				<div className="flex flex-col items-center">
+// 					<img
+// 						src={gameSession.player1.avatar || "/gameAvatars/Empty.jpeg"}
+// 						alt="profile"
+// 						className="h-35 w-35 rounded-xl"
+// 					/>
 
-//			 <div className="flex items-center justify-between gap-x-25">
+// 					<h3 className="text-xl font-semibold">
+// 						{gameSession.player1.firstName || "Player 1"}
+// 						{gameSession.player1.lastName
+// 							? "." + gameSession.player1.lastName[0]
+// 							: ""}
+// 					</h3>
 
-//				 <div className='flex flex-col items-center'>
-//					 <img
-//						 src={gameSession.player1.avatar || "/gameAvatars/Empty.jpeg"}
-//						 alt="profile"
-//						 className="h-35 w-35 rounded-xl"
-//					 />
+// 					<h3 className="text-md font-medium text-[#6E6E6E]">
+// 						[{gameSession.player1.login || "loading"}]
+// 					</h3>
+// 				</div>
 
-//					 <h3 className='text-xl font-semibold'>
-//						 {gameSession.player1.firstName || "Player 1"}
-//						 {gameSession.player1.lastName ? "." + gameSession.player1.lastName[0] : ""}
-//					 </h3>
+// 				<span className="text-3xl font-extrabold">VS</span>
 
-//					 <h3 className='text-md font-medium text-[#6E6E6E]'>
-//						 [{gameSession.player1.login || "loading"}]
-//					 </h3>
-//				 </div>
+// 				{/* Player 2 */}
+// 				<div className="flex flex-col items-center">
+// 					<img
+// 						src={
+// 							gameSession.player2.socketId
+// 								? gameSession.player2.avatar
+// 								: "/gameAvatars/Empty.jpeg"
+// 						}
+// 						alt="profile"
+// 						className="h-35 w-35 rounded-xl"
+// 					/>
 
-//				 <span className="text-3xl font-extrabold">VS</span>
+// 					<h3 className="text-xl font-semibold">
+// 						{gameSession.player2.socketId
+// 							? gameSession.player2.firstName +
+// 								"." +
+// 								gameSession.player2.lastName?.[0]
+// 							: "Player 2"}
+// 					</h3>
 
-//				 <div className='flex flex-col items-center'>
-//					 <img
-//						 src={gameSession.player2.socketId
-//							 ? gameSession.player2.avatar
-//							 : "/gameAvatars/Empty.jpeg"}
-//						 alt="profile"
-//						 className="h-35 w-35 rounded-xl"
-//					 />
-
-//					 <h3 className='text-xl font-semibold'>
-//						 {gameSession.player2.socketId
-//							 ? gameSession.player2.firstName + "." + gameSession.player2.lastName?.[0]
-//							 : "Player 2"}
-//					 </h3>
-
-//					 <h3 className='text-md font-medium text-[#6E6E6E]'>
-//						 [{gameSession.player2.socketId ? gameSession.player2.login : "waiting"}]
-//					 </h3>
-//				 </div>
-//			 </div>
-
-//			 {/* {timer && (
-//				 <CountdownTimer
-//					 totalMinutes={0}
-//					 totalSeconds={3}
-//					 onFinish={() => console.log("Timer finished")}
-//					 startColor="#D9D9D9"
-//					 endColor="#D9D9D9"
-//					 size="md"
-//				 />
-//			 )} */}
-
-//		 </div>
-//	 )
+// 					<h3 className="text-md font-medium text-[#6E6E6E]">
+// 						[
+// 						{gameSession.player2.socketId
+// 							? gameSession.player2.login
+// 							: "waiting"}
+// 						]
+// 					</h3>
+// 				</div>
+// 			</div>
+// 		</div>
+// 	);
 // }
+
+// // "use client";
+
+// // import { useAuth } from "@/contexts/authContext";
+// // import { useState, useEffect } from "react";
+// // import { io } from "socket.io-client";
+
+// // const socket = io("http://localhost:3001", {
+// //	 transports: ["websocket"],
+// //	 autoConnect: false,
+// // });
+
+// // class Player {
+// //	 constructor() {
+// //		 this.socketId = "";
+// //		 this.firstName = "";
+// //		 this.lastName = "";
+// //		 this.login = "";
+// //		 this.avatar = "";
+// //		 this.score = 0;
+// //		 this.roomId = "";
+// //	 }
+// // }
+
+// // const GameSessionTemplate = {
+// //	 player1: new Player(),
+// //	 player2: new Player(),
+// // };
+
+// // export default function Matchmaking() {
+// //	 const { user } = useAuth();
+// //	 const [status, setStatus] = useState("Searching for opponent...");
+// //	 const [gameSession, setGameSession] = useState(GameSessionTemplate);
+
+// //	 /* Fill Player1 with user data */
+// //	 useEffect(() => {
+// //		 if (!user) return;
+// //		 setGameSession(prev => ({
+// //			 ...prev,
+// //			 player1: {
+// //				 ...prev.player1,
+// //				 avatar: user.avatar,
+// //				 firstName: user.firstName,
+// //				 lastName: user.lastName,
+// //				 login: user.login,
+// //			 }
+// //		 }));
+// //	 }, [user]);
+
+// //	 /* Socket setup */
+// //	 useEffect(() => {
+// //		 if (socket.connected) return;
+// // 		socket.connect();
+
+// // /*----------------------------------------------------------*/
+// //		 socket.on("connect", () => {
+// //			 if (!user) return;
+
+// //			 setGameSession(prev => ({
+// //				 ...prev,
+// //				 player1: { ...prev.player1, socketId: socket.id },
+// //			 }));
+// // 			const playerToSend = {
+// // 				firstName: user.firstName,
+// // 				lastName: user.lastName,
+// // 				login: user.login,
+// // 				avatar: user.avatar,
+// // 				socketId: socket.id
+// // 			};
+// // 			// console.log(playerToSend)
+// // 			console.log("player:", gameSession.player1)
+
+// // 			socket.emit("join-game", playerToSend);
+// //			 setStatus("Waiting for opponent...");
+// //		 });
+// // /*----------------------------------------------------------*/
+// // 	socket.on("match-found", (playerData) => {
+// // 		setGameSession(prev => ({...prev, player2: { ...prev.player2,
+// // 				avatar: playerData.avatar,
+// // 				firstName: playerData.firstName,
+// // 				lastName: playerData.lastName,
+// // 				login: playerData.login,
+// // 				socketId: playerData.socketId,
+// // 			},
+// // 		}));
+
+// // 		setStatus("Match Found!");
+// // 	});
+// // /*----------------------------------------------------------*/
+
+// //		 return () => {
+// //			 socket.off("connect");
+// //			 socket.off("match-found");
+// //		 };
+// //	 }, [user]);
+
+// // 	return (
+// //		 <div className='flex flex-col items-center bg-[#0F0F0F]/65 p-10 rounded-3xl'>
+
+// //			 <h3 className='text-3xl font-extrabold'>Find Match</h3>
+// //			 <h3 className='mb-6 text-white/50'>{status}</h3>
+
+// //			 <div className="flex items-center justify-between gap-x-25">
+
+// //				 <div className='flex flex-col items-center'>
+// //					 <img
+// //						 src={gameSession.player1.avatar || "/gameAvatars/Empty.jpeg"}
+// //						 alt="profile"
+// //						 className="h-35 w-35 rounded-xl"
+// //					 />
+
+// //					 <h3 className='text-xl font-semibold'>
+// //						 {gameSession.player1.firstName || "Player 1"}
+// //						 {gameSession.player1.lastName ? "." + gameSession.player1.lastName[0] : ""}
+// //					 </h3>
+
+// //					 <h3 className='text-md font-medium text-[#6E6E6E]'>
+// //						 [{gameSession.player1.login || "loading"}]
+// //					 </h3>
+// //				 </div>
+
+// //				 <span className="text-3xl font-extrabold">VS</span>
+
+// //				 <div className='flex flex-col items-center'>
+// //					 <img
+// //						 src={gameSession.player2.socketId
+// //							 ? gameSession.player2.avatar
+// //							 : "/gameAvatars/Empty.jpeg"}
+// //						 alt="profile"
+// //						 className="h-35 w-35 rounded-xl"
+// //					 />
+
+// //					 <h3 className='text-xl font-semibold'>
+// //						 {gameSession.player2.socketId
+// //							 ? gameSession.player2.firstName + "." + gameSession.player2.lastName?.[0]
+// //							 : "Player 2"}
+// //					 </h3>
+
+// //					 <h3 className='text-md font-medium text-[#6E6E6E]'>
+// //						 [{gameSession.player2.socketId ? gameSession.player2.login : "waiting"}]
+// //					 </h3>
+// //				 </div>
+// //			 </div>
+
+// //			 {/* {timer && (
+// //				 <CountdownTimer
+// //					 totalMinutes={0}
+// //					 totalSeconds={3}
+// //					 onFinish={() => console.log("Timer finished")}
+// //					 startColor="#D9D9D9"
+// //					 endColor="#D9D9D9"
+// //					 size="md"
+// //				 />
+// //			 )} */}
+
+// //		 </div>
+// //	 )
+// // }
