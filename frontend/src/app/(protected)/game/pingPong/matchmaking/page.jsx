@@ -5,17 +5,12 @@ import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { useRouter } from "next/navigation";
 
-/* --------------------------------------------------
-   SOCKET (SINGLE INSTANCE)
--------------------------------------------------- */
 const socket = io("http://localhost:3001", {
 	transports: ["websocket"],
 	autoConnect: false,
 });
 
-/* --------------------------------------------------
-   HELPERS
--------------------------------------------------- */
+
 const emptyPlayer = () => ({
 	socketId: "",
 	firstName: "",
@@ -34,12 +29,8 @@ export default function Matchmaking() {
 	const [player1, setPlayer1] = useState(emptyPlayer());
 	const [player2, setPlayer2] = useState(emptyPlayer());
 
-	// prevents double emits on fast refresh / strict mode
 	const joinedRef = useRef(false);
 
-	/* --------------------------------------------------
-	   SET PLAYER 1 FROM AUTH
-	-------------------------------------------------- */
 	useEffect(() => {
 		if (!user) return;
 
@@ -52,26 +43,18 @@ export default function Matchmaking() {
 		});
 	}, [user]);
 
-	/* --------------------------------------------------
-	   SOCKET SETUP
-	-------------------------------------------------- */
 	useEffect(() => {
 		if (!user) return;
 
-		if (!socket.connected) {
+		if (!socket.connected)
 			socket.connect();
-		}
 
-		/* ---------- CONNECT ---------- */
 		const handleConnect = () => {
-			console.log("🟢 Connected:", socket.id);
-
 			setPlayer1(prev => ({
 				...prev,
 				socketId: socket.id,
 			}));
 
-			// IMPORTANT: emit only once per page life
 			if (!joinedRef.current) {
 				socket.emit("join-game", {
 					firstName: user.firstname,
@@ -87,13 +70,8 @@ export default function Matchmaking() {
 
 		/* ---------- MATCH FOUND ---------- */
 		const handleMatchFound = opponent => {
-			console.log("🔥 Match found:", opponent);
-
 			setPlayer2(opponent);
 			setStatus("Match Found!");
-
-			// OPTIONAL redirect
-			// router.push(`/game/pingPong/${opponent.roomId}`);
 		};
 
 		/* ---------- MATCH CANCELED ---------- */
@@ -116,7 +94,15 @@ export default function Matchmaking() {
 		/* ---------- OPPONENT LEFT ---------- */
 		const handleOpponentLeft = () => {
 			console.log("🏆 Opponent left");
-
+			// setPlayer2({
+			// 	socketId: "",
+			// 	firstName: "",
+			// 	lastName: "",
+			// 	username: "",
+			// 	avatar: "",
+			// 	score: 0,
+			// 	roomId: "",
+			// })
 			setStatus("Opponent disconnected. You win!");
 		};
 
@@ -126,7 +112,8 @@ export default function Matchmaking() {
 		socket.on("opponent-left", handleOpponentLeft);
 		socket.on("start-match", ({roomId}) => {
 			console.log("*******> player1.roomId:", roomId);
-			// router.push(`/game/pingPong/${player1.roomId}`);
+			router.push(`/game/pingPong/${roomId}`, undefined, { shallow: true });
+			router.refresh()
 		});
 
 		return () => {
@@ -137,16 +124,6 @@ export default function Matchmaking() {
 		};
 	}, [user, router]);
 
-	/* --------------------------------------------------
-	   DEBUG
-	-------------------------------------------------- */
-	useEffect(() => {
-		console.log("👥 Players:", { player1, player2 });
-	}, [player1, player2]);
-
-	/* --------------------------------------------------
-	   UI
-	-------------------------------------------------- */
 	return (
 		<div className="flex flex-col items-center bg-[#0F0F0F]/65 p-10 rounded-3xl">
 			<h3 className="text-3xl font-extrabold">Find Match</h3>

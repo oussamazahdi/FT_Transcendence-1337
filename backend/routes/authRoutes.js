@@ -65,6 +65,9 @@ function authRoutes(fastify)
     fastify.post("/emailVerification", {preHandler: authMiddleware}, authController.verifyEmail);
     // todo : 2FA, OAUTH
     // fastify.post("/enable2fa", {preHandler: authMiddleware}, authController.enable2fa);
+
+
+		//todo: protect game room (dynamic router) check if there is any room with that id and check if that player part of that game 
 }
 
 export { authRoutes };

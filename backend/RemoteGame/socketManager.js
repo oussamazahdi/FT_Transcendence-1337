@@ -115,7 +115,8 @@ function handleJoin(socket, io, playerData) {
 		// }, 3000);
 		
 
-		setTimeout(() => {
+		// setTimeout(() => {
+			session.state = "PLAYING";
 			session.state = "PLAYING";
 			
 			io.to(session.player1.socketId).emit("start-match", {
@@ -127,7 +128,7 @@ function handleJoin(socket, io, playerData) {
 			});
 			games.push(session);
 			session = createFreshSession(); // ✅ NO LEAK
-		}, 3000);
+		// }, 3000);
 		
 	}
 }
