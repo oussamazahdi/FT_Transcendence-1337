@@ -13,6 +13,9 @@ export const swaggerConfig = {
 
 export const swaggerUiConfig = {
     routePrefix: '/docs',
+    theme: {
+        title: 'ft_transcendence API Docs'
+    },
     uiConfig: {
         docExpansion: 'list',
         deepLinking: false

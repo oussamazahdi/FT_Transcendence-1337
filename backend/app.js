@@ -12,19 +12,14 @@ dotenv.config({ path: '../.env' });
 
 const app = Fastify(serverConfig);
 
-// Setup decorators (db, nodemailer)
 registerDecorators(app);
 
-// Initialize database
 initAllTables(app.db);
 
-// Setup cron jobs
 setupTokenCleanup(app.db);
 
-// Register plugins
 await registerPlugins(app);
 
-// Register routes
 initializeRoutes(app);
 
 export default app;

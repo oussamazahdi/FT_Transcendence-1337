@@ -1,5 +1,8 @@
 import bcrypt from "bcrypt"
 
+/**
+ * still neeed to apply erroring system
+ */
 
 export class UserController 
 {
@@ -8,7 +11,7 @@ export class UserController
 		try {
 			const db = request.server.db;
 			const users = db.prepare('SELECT id, firstname, lastname, username, email, avatar FROM users').all();
-			return reply.code(200).send({message: "SUCCESS", data: users});
+			return reply.code(200).send({message: "SUCCESS", userData: users});
 		}
 		catch (error) {
 			return reply.code(500).send({error: error.message});
@@ -22,7 +25,7 @@ export class UserController
 			const user = db.prepare('SELECT id, firstname, lastname, username, email, avatar From users WHERE id = ?').get(request.params.id);
 			if (!user)
 				return reply.code(404).send({error: "USER_NOT_FOUND"});
-			return reply.code(200).send({message: "SUCCESS", data: user});
+			return reply.code(200).send({message: "SUCCESS", userData: user});
 		}
 		catch (error) {
 			return reply.code(500).send({error: error.message});
