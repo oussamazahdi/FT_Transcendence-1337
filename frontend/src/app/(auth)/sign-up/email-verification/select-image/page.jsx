@@ -1,12 +1,12 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { assets } from "@/assets/data";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/authContext";
 import { AUTH_ERRORS } from "@/lib/utils";
 
-const SelecteImage = () => {
+const SelectImage = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
   const [selectedAvatar, setSelectedAvatar] = useState("");
@@ -15,19 +15,42 @@ const SelecteImage = () => {
 
   const { login } = useAuth();
   const router = useRouter();
-  let data; 
-
+  let data;
 
   const avatarStyle =
     "w-11 h-11 rounded-lg object-cover cursor-pointer transition-all hover:scale-110";
 
   const avatars = [
-    { color: "/gameAvatars/profile1.jpeg", black: "/gameAvatars/blackAvatar/avatar1.png", alt: "profile1",},
-    { color: "/gameAvatars/profile2.jpeg", black: "/gameAvatars/blackAvatar/avatar2.png", alt: "profile2", },
-    { color: "/gameAvatars/profile3.jpeg", black: "/gameAvatars/blackAvatar/avatar3.png", alt: "profile3", },
-    { color: "/gameAvatars/profile4.jpeg", black: "/gameAvatars/blackAvatar/avatar4.png", alt: "profile4", },
-    { color: "/gameAvatars/profile5.jpeg", black: "/gameAvatars/blackAvatar/avatar5.png", alt: "profile5", },
-    { color: "/gameAvatars/profile6.jpeg", black: "/gameAvatars/blackAvatar/avatar6.png", alt: "profile6", },
+    {
+      color: "/gameAvatars/profile1.jpeg",
+      black: "/gameAvatars/blackAvatar/avatar1.png",
+      alt: "profile1",
+    },
+    {
+      color: "/gameAvatars/profile2.jpeg",
+      black: "/gameAvatars/blackAvatar/avatar2.png",
+      alt: "profile2",
+    },
+    {
+      color: "/gameAvatars/profile3.jpeg",
+      black: "/gameAvatars/blackAvatar/avatar3.png",
+      alt: "profile3",
+    },
+    {
+      color: "/gameAvatars/profile4.jpeg",
+      black: "/gameAvatars/blackAvatar/avatar4.png",
+      alt: "profile4",
+    },
+    {
+      color: "/gameAvatars/profile5.jpeg",
+      black: "/gameAvatars/blackAvatar/avatar5.png",
+      alt: "profile5",
+    },
+    {
+      color: "/gameAvatars/profile6.jpeg",
+      black: "/gameAvatars/blackAvatar/avatar6.png",
+      alt: "profile6",
+    },
   ];
 
   const handleImageChange = (e) => {
@@ -65,14 +88,15 @@ const SelecteImage = () => {
 
     try {
       if (profileImage) {
-        console.log("request from image")
+        console.log("request from image");
         // Upload custom image
         const formData = new FormData();
         formData.append("image/", profileImage);
-        const reply = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/uploadImage`,{
+        const reply = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/auth/uploadImage`,
+          {
             method: "POST",
-            headers:{
-            },
+            headers: {},
             credentials: "include",
             body: formData,
           },
@@ -83,28 +107,31 @@ const SelecteImage = () => {
         if (!reply.ok) {
           // const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
           const errorMessage = data.error;
-          throw new Error (errorMessage);
+          throw new Error(errorMessage);
         }
 
         console.log("Upload successful:", data);
       } else if (selectedAvatar) {
-        console.log("request from avatar")
+        console.log("request from avatar");
         // Select predefined avatar
-        const reply = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/uploadImage`, {
-          method: "POST",
-          headers:{
-            "Content-Type": "application/json",
+        const reply = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/auth/uploadImage`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({ avatar: selectedAvatar }),
           },
-          credentials: "include",
-          body: JSON.stringify({ avatar: selectedAvatar }),
-        });
+        );
 
         data = await reply.json();
 
         if (!reply.ok) {
           // const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
           const errorMessage = data.error;
-          throw new Error (errorMessage);
+          throw new Error(errorMessage);
         }
 
         console.log("Avatar selection successful:", data);
@@ -121,7 +148,6 @@ const SelecteImage = () => {
   };
 
   // if (isLoading) return <div className="text-white text-center mt-20">Loading...</div>;
-
 
   return (
     <div className="min-h-screen flex justify-center items-center">
@@ -220,4 +246,4 @@ const SelecteImage = () => {
   );
 };
 
-export default SelecteImage;
+export default SelectImage;

@@ -1,7 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import { Poppins } from "next/font/google";
 import Background from "../components/Background"; // Adjusted path
-import { UserProvider } from "@/contexts/authContext"
+import { UserProvider } from "@/contexts/authContext";
 import { getCurrentUser } from "@/lib/auth";
 
 import "./globals.css";
@@ -21,7 +21,7 @@ const poppins = Poppins({
   weight: ["400", "500", "700"], // optional: choose the weights you need
 });
 
-export default async function RootLayout({children}) {
+export default async function RootLayout({ children }) {
   const user = await getCurrentUser();
   return (
     <html lang="en">

@@ -15,10 +15,8 @@ import {
 } from "@heroicons/react/24/outline";
 import UserDropdown from "./UserDropdown";
 
-
 export default function Navbar() {
   const pathname = usePathname();
-
 
   const navItems = [
     { href: "/dashboard", label: "dashboard", icon: HomeIcon },
@@ -27,17 +25,19 @@ export default function Navbar() {
     { href: "/leaderboard", label: "Leaderboard", icon: ChartBarIcon },
   ];
   const [search, setSearch] = useState("");
-  
-  const navBareMap= navItems.map((item) => {
+
+  const navBareMap = navItems.map((item) => {
     const isActive = pathname.startsWith(item.href);
-    return(
-    <Link 
-      key={item.href}
-      href={item.href} 
-      className={`mx-2 text-[#BEBEBE] border border-[#BEBEBE] hover:text-white hover:bg-[#000000]/40 focus:bg-[#000000]/40 rounded-full cursor-pointer py-2 px-4 ${isActive ? "bg-[#000000]/40" : ""}`}>
+    return (
+      <Link
+        key={item.href}
+        href={item.href}
+        className={`mx-2 text-[#BEBEBE] border border-[#BEBEBE] hover:text-white hover:bg-[#000000]/40 focus:bg-[#000000]/40 rounded-full cursor-pointer py-2 px-4 ${isActive ? "bg-[#000000]/40" : ""}`}
+      >
         {item.label}
-    </Link>
-  )})
+      </Link>
+    );
+  });
 
   return (
     <div className="relative mt-8 mx-4 md:mx-10 lg:mx-20 lg:mx-35 flex justify-between">
@@ -53,9 +53,7 @@ export default function Navbar() {
         </Link>
       </div>
 
-      <div className="flex items-center">
-        {navBareMap};
-      </div>
+      <div className="flex items-center">{navBareMap};</div>
 
       <div className="flex items-center my-2 border border-[#9D9D9D]/65 py-2 pl-4 text-white/60 rounded-full">
         <input
@@ -67,7 +65,7 @@ export default function Navbar() {
         />
         <MagnifyingGlassIcon className="w-6 h-6 ml-3 mr-3 text-white/60" />
       </div>
-      <UserDropdown/>
+      <UserDropdown />
     </div>
   );
 }

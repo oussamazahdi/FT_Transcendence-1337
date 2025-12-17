@@ -23,33 +23,35 @@ const SignIn = () => {
     setLoading(true);
 
     try {
-      const reply = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const reply = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            email,
+            password,
+          }),
         },
-        credentials: "include",
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
+      );
 
       if (!reply.ok) {
         const errorData = await reply.json();
-        const errorMessage = AUTH_ERRORS[errorData.error] || AUTH_ERRORS["default"]
+        const errorMessage =
+          AUTH_ERRORS[errorData.error] || AUTH_ERRORS["default"];
         throw new Error(errorMessage);
       }
 
       const data = await reply.json();
-      login(data.userData)
+      login(data.userData);
 
       router.push("/dashboard");
     } catch (err) {
-      if (err instanceof Error)
-        setError(err.message);
-      else
-        setError("An unknown error occurred");
+      if (err instanceof Error) setError(err.message);
+      else setError("An unknown error occurred");
     } finally {
       setLoading(false);
     }

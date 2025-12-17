@@ -1,7 +1,5 @@
 "use client";
-export default function Background({
-  children,
-}) {
+export default function Background({ children }) {
   return (
     <div className="min-h-screen">
       <div className="fixed inset-0 z-0">

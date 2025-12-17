@@ -40,7 +40,7 @@ function updateTokenFlags(user, reply)
         httpOnly: true,
         sameSite: 'strict',
         path: '/',
-        maxAge: 7 * 24 * 60 * 60 * 1000
+        maxAge: 15 * 60 * 60 * 1000
     });
 }
 
@@ -73,7 +73,7 @@ export class AuthController {
                 httpOnly: true,
                 sameSite: 'strict',
                 path: '/',
-                maxAge: 7 * 24 * 60 * 60 * 1000
+                maxAge: 15 * 60 * 60 * 1000
             });
             return reply.code(200).send({message: "AUTHORIZED", userData: result});
         }
@@ -110,7 +110,7 @@ export class AuthController {
                 httpOnly: true,
                 sameSite: 'strict',
                 path: '/',
-                maxAge: 7 * 24 * 60 * 60 * 1000
+                maxAge: 15 * 60 * 60 * 1000
             });
             return reply.code(201).send({message: "USER_CREATED_SUCCESSFULLY"});
         }
@@ -194,7 +194,7 @@ export class AuthController {
     {
         const db = request.server.db;
         try {
-            const user = authModels.findUserById(db, request.user.userId, ['firstname', 'lastname', 'username', 'email', 'avatar', 'isverified']);
+            const user = authModels.findUserById(db, request.user.userId, ['id', 'firstname', 'lastname', 'username', 'email', 'avatar', 'isverified']);
             return reply.code(200).send({message: "SUCCESS", userData: user});
         }
         catch (error) {

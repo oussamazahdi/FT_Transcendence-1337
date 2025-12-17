@@ -13,7 +13,22 @@ import SignUp_image from "./sign-up-image.jpg";
 import signIn_image from "./sign-in-img.jpg";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import communication from "./communication.png";
-import noChatFound from "./no-chat.png"
+import noChatFound from "./no-chat.png";
+import profile from "./profile.png";
+import settings from "./settings.png";
+import signOut from "./sign-out.png";
+import twoFA from "./twoFA.png";
+import block from "./block.png";
+import gamepad from "./gamepad.png";
+import lock from "./lock.png";
+import personal from "./personal.png";
+import trash from "./trash.png";
+import uploadSettings from "./uploadSettings.png";
+import defaultProfile from "./default-profil.jpg";
+import deblock from "./Deblock.png";
+import blockUser from "./block-user.png";
+import eye from './eye.png'
+import visible from './visible.png'
 
 export const assets = {
   soufiixPdp,
@@ -32,4 +47,19 @@ export const assets = {
   signIn_image,
   MagnifyingGlassIcon,
   noChatFound,
+  profile,
+  settings,
+  signOut,
+  twoFA,
+  block,
+  gamepad,
+  lock,
+  personal,
+  uploadSettings,
+  trash,
+  defaultProfile,
+  deblock,
+  blockUser,
+  eye,
+  visible,
 };
