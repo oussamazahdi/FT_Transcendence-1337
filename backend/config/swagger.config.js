@@ -6,7 +6,7 @@ export const swaggerConfig = {
             version: '1.0.0'
         },
         servers: [
-            { url: 'http://localhost:3001', description: 'Development' }
+            { url: 'http://localhost:3001', description: 'Development' } // change port to env var
         ]
     }
 };

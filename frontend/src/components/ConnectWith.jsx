@@ -6,6 +6,15 @@ const ConnectWith = () => {
   const buttonStyle =
     "flex items-center justify-center w-18 h-6 bg-[#4D4D4D]/40 rounded-sm cursor-pointer hover:bg-white/20";
 
+  const handleGoogleAuth = () => {
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/oauth/google`;
+  };
+
+  const handleGitAuth = () => {
+    // TODO: n7aydo github makayn lach ymken
+    console.log("GitHub auth not implemented yet");
+  };
+
   return (
     <div>
       <div className="flex flex-row pt-4 justify-center items-center">
@@ -15,7 +24,7 @@ const ConnectWith = () => {
       </div>
 
       <div className="w-full flex flex-row items-center justify-center space-x-8 mt-2">
-        <button className={buttonStyle} /*onClick={handleGoogleAuth()}*/>
+        <button className={buttonStyle} onClick={handleGoogleAuth}>
           <Image
             src={assets.iconGoogle}
             alt="icon"
@@ -23,7 +32,7 @@ const ConnectWith = () => {
           />
         </button>
 
-        <button className={buttonStyle} /*onClick={handleGitAuth()}*/>
+        <button className={buttonStyle} onClick={handleGitAuth}>
           <Image
             src={assets.iconGit2}
             alt="icon"

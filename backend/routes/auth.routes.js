@@ -167,7 +167,6 @@ function authRoutes(fastify)
         }
     }, authController.verifyEmail);
 
-    // todo : OAUTH
 }
 
 export { authRoutes };

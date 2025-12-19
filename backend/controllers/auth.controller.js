@@ -17,7 +17,7 @@ export class AuthController {
         try {
             const result = await authModels.loginUser(db, email, password);
             const params = {
-                isVerified: result.isverified,
+                isVerified: !!result.isverified, // i changed it from int to bool
                 hasAvatar: !!result.avatar
             }
             if (result.message && result.message.includes("USER_NOT_FOUND"))
@@ -57,7 +57,7 @@ export class AuthController {
         try {
             const user = await authModels.addNewUser(db, firstname, lastname, username, email, password);
             const params = {
-                isVerified: user.isverified,
+                isVerified: !!user.isverified,
                 hasAvatar: !!user.avatar
             }
             const accessToken = generateToken(user.id, user.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION, params, "access");

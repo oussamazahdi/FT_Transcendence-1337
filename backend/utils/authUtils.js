@@ -1,6 +1,17 @@
 import path from "path";
 import jwt from "jsonwebtoken"
 
+function randomPasswordGenerator(length)
+{
+    var result           = '';
+    var characters       = '!@#$%^&*()_+{}<>?/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}
+
 function generateFileNameByUser(username, filename)
 {
     const extension = path.extname(filename).toLowerCase();
@@ -37,7 +48,7 @@ function generateToken(userId, Username, secret, expiration, params, type)
 function updateTokenFlags(user, reply)
 {
     const params = {
-        isVerified: user.isverified,
+        isVerified: !!user.isverified,
         hasAvatar: !!user.avatar
     }
     const accessToken = generateToken(user.id, user.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION, params, "access");
@@ -49,4 +60,4 @@ function updateTokenFlags(user, reply)
     });
 }
 
-export { generateFileNameByUser, generateToken, updateTokenFlags }
+export { generateFileNameByUser, generateToken, updateTokenFlags, randomPasswordGenerator }
