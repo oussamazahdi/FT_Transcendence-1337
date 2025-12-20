@@ -22,4 +22,4 @@ export class GameSession {
   }
 }
 
-export const games = [];
+export let games = [];

@@ -72,6 +72,10 @@ export default function Matchmaking() {
 		const handleMatchFound = opponent => {
 			setPlayer2(opponent);
 			setStatus("Match Found!");
+			setTimeout(()=>{
+				router.push(`/game/pingPong/${opponent.roomId}`);
+				router.refresh()
+			}, 3000);
 		};
 
 		/* ---------- MATCH CANCELED ---------- */
@@ -110,11 +114,11 @@ export default function Matchmaking() {
 		socket.on("match-found", handleMatchFound);
 		socket.on("match-canceled", handleMatchCanceled);
 		socket.on("opponent-left", handleOpponentLeft);
-		socket.on("start-match", ({roomId}) => {
-			console.log("*******> player1.roomId:", roomId);
-			router.push(`/game/pingPong/${roomId}`, undefined, { shallow: true });
-			router.refresh()
-		});
+		// socket.on("start-match", ({roomId}) => {
+		// 	console.log("*******> player1.roomId:", roomId);
+		// 	router.push(`/game/pingPong/${roomId}`, undefined, { shallow: true });
+		// 	router.refresh()
+		// });
 
 		return () => {
 			socket.off("connect", handleConnect);

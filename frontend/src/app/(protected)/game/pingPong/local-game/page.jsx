@@ -46,10 +46,6 @@ export default function PingPongGame() {
     const paddleHeight = 90 + 15 * data.paddleSize;
     const width = 1024;
     const height = 700;
-    // const angle = (Math.random() * Math.PI) / 2 - Math.PI / 4
-    // const direction = Math.random() > 0.5 ? 1 : -1
-    // state.ball.dx = Math.cos(angle) * settings.ballSpeed * direction
-    // state.ball.dy = Math.sin(angle) * settings.ballSpeed
 
     const angle = (Math.random() * Math.PI) / 2 - Math.PI / 4;
     const direction = Math.random() > 0.5 ? 1 : -1;
