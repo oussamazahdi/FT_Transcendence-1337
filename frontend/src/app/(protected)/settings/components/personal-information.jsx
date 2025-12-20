@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useAuth } from "@/contexts/authContext";
 import { assets } from "@/assets/data";
 
+//check if data empty
 export default function Personal_information() {
   const { user, login } = useAuth();
   // console.log("this is the user",user)

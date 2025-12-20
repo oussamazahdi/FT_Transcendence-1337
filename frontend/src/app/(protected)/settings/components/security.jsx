@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/authContext";
 import TwoFA from "./TwoFA";
 import TwoFaSetup from "./TwoFaSetup";
 
+//check if data empty
 const PasswordInput = ({label, name, value, show, setShow, onChange}) => (
   <div className="relative w-full flex justify-center items-center">
     <input
@@ -62,7 +63,7 @@ export default function Security() {
         </button>
       </form>
       {view === "status" ?
-        <TwoFA isEnable={isEnable} onEnableClick={() => setView("setup")}/>
+        <TwoFA isEnable={isEnable} onEnableClick={() => setView("setup")} setIsEnable={setIsEnable}/>
         :
         <TwoFaSetup onEnableClick={() =>{ setView("status"); setIsEnable(true)}}/>
       }

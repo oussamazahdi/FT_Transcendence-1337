@@ -2,7 +2,7 @@
 "use client"
 import React, { useState } from "react";
 
-export default function TwoFA({isEnable, onEnableClick}){
+export default function TwoFA({isEnable, onEnableClick, setIsEnable}){
   const [showConfirm, setShowconfirm] = useState(false);
   
   return(
@@ -17,7 +17,7 @@ export default function TwoFA({isEnable, onEnableClick}){
         type="submit"
         onClick={() => setShowconfirm(true)}
         className="w-60 h-8 text-xs rounded-sm mt-4 hover:bg-[#0F2C34]/40 border-[#414141]/60 border-1 bg-[#442222] text-white hover:text-white cursor-pointer">
-        Desable
+        Disable
       </button>
       :
       <button
@@ -38,7 +38,7 @@ export default function TwoFA({isEnable, onEnableClick}){
           <div className="flex justify-center items-center gap-4">
             <button
               type="submit"
-              onClick={()=> setShowconfirm(false)}
+              onClick={()=> {setShowconfirm(false); setIsEnable(false)}}
               className="w-30 h-8 text-xs rounded-sm mt-4 hover:bg-[#442222]/40 bg-[#442222] text-[#FF4848] cursor-pointer">
               Disable 2FA
             </button>

@@ -29,6 +29,7 @@ import deblock from "./Deblock.png";
 import blockUser from "./block-user.png";
 import eye from './eye.png'
 import visible from './visible.png'
+import coverPicture from './coverPicture.png'
 
 export const assets = {
   soufiixPdp,
@@ -62,4 +63,5 @@ export const assets = {
   blockUser,
   eye,
   visible,
+  coverPicture,
 };
