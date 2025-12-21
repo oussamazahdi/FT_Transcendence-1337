@@ -21,7 +21,7 @@ const friendsData = [
 ]
 
 const renderFriends = friendsData.map((user) => (
-  <div key={user.id} className='flex items-center w-full h-full bg-[#414141]/60 rounded-lg p-1 pr-2'>
+  <div key={user.id} className='flex items-center w-full bg-[#414141]/60 rounded-lg p-1 pr-2'>
     <Image src={user.avatar} alt="icon" width={40} height={40} className='rounded-md mr-1'/>
     <div>
       <p className='text-xs font-bold'>{user.firstname} [{user.username}]</p>
@@ -43,7 +43,7 @@ const renderFriends = friendsData.map((user) => (
 
 const Friends = () => {
   return (
-    <div className="bg-[#0F0F0F]/75 basis-3/10 rounded-[20px] p-3 h-full flex flex-col">
+    <div className=" basis-1/2 bg-[#0F0F0F]/75 rounded-[20px] p-3 h-1/2 flex flex-col">
       <p className='font-bold text-sm shrink-0'>Friends</p>
       <div className='flex flex-col gap-1 w-full mt-2 overflow-y-auto custom-scrollbar flex-1 min-h-0'>
         {renderFriends}

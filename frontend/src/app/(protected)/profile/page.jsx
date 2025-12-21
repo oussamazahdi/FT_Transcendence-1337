@@ -5,6 +5,7 @@ import MatchPlayed from "./components/MatchPlayed";
 import Profile from "./components/Profile";
 import WinRate from "./components/WinRate";
 import { useAuth } from "@/contexts/authContext";
+import MatchHistory from "./components/MatchHistory";
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -17,7 +18,10 @@ export default function ProfilePage() {
           <WinRate/>
         </div>
       </div>
-      <Friends/>
+      <div className="basis-3/10  flex flex-col gap-4">
+        <Friends />
+        <MatchHistory />
+      </div>
     </div>
   );
 }
