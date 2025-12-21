@@ -29,7 +29,12 @@ export async function registerPlugins(fastify) {
     await fastify.register(googleOAuth2, oauth2Config);
     
     // Other plugins
-    await fastify.register(multipart);
+    await fastify.register(multipart, {
+        limits: {
+        fileSize: 5 * 1024 * 1024,
+        files: 1
+        }
+    });
     
     // Static files
     await fastify.register(fastifyStatic, {

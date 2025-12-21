@@ -8,8 +8,8 @@ export class OAuthController
     {
         const db =  request.server.db;
         const params = {
-                isVerified: true,
-                hasAvatar: true
+            isVerified: true,
+            hasAvatar: true
         }
         try {
             const { token } = await request.server.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(request);
@@ -24,7 +24,6 @@ export class OAuthController
             {
                 const username = `${googleUser.given_name}-${googleUser.id}`;
                 const password = randomPasswordGenerator(20);
-                console.log(password);
                 const user = await oauthModels.addNewUser(db, googleUser.id, googleUser.given_name, googleUser.family_name, username, googleUser.email, googleUser.picture, password);
                 console.log("===================== signup ======================");
                 console.log(user);

@@ -12,11 +12,14 @@ function randomPasswordGenerator(length)
     return result;
 }
 
-function generateFileNameByUser(username, filename)
+function generateFileNameByUser(username, filename, mimetype)
 {
     const extension = path.extname(filename).toLowerCase();
     const date = Date.now();
     const allowdExts = [".png", ".jpg", ".jpeg", ".webp"];
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg']
+    if (!allowedTypes.includes(mimetype))
+        throw new Error("USUPPORTED_IMAGE_TYPE");
     if (!allowdExts.includes(extension))
         throw new Error("USUPPORTED_IMAGE_TYPE");
     const file = `${username}-${date}${extension}`

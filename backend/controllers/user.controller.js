@@ -1,8 +1,21 @@
 import bcrypt from "bcrypt"
+import { userModels } from "../models/user.model.js";
+import { generateFileNameByUser } from "../utils/authUtils.js";
 
 /**
  * still neeed to apply erroring system
  */
+
+async function fileUpload(user, file)
+{
+	const uploadDir = path.join(process.cwd(), 'uploads');
+	const image = file.file;
+	const filename = generateFileNameByUser(user.username, file.filename, file.mimetype);
+	const filePath = path.join(uploadDir, filename);
+	await pipeline(image.file, fs.createWriteStream(filePath));
+	fileLink = `http://${request.host}/uploads/${filename}`;
+	return (fileLink);
+}
 
 export class UserController 
 {
@@ -10,53 +23,85 @@ export class UserController
 	{
 		try {
 			const db = request.server.db;
-			const users = db.prepare('SELECT id, firstname, lastname, username, email, avatar FROM users').all();
+			const users = userModels.getAllUsers(db);
 			return reply.code(200).send({message: "SUCCESS", userData: users});
 		}
 		catch (error) {
-			return reply.code(500).send({error: error.message});
-		}
+			if (error.code)
+				return reply.code(error.code).send({error: error.message});
+			else
+				return reply.code(500).send({error: error.message});
+        }
 	}
 	
 	getOneUser(request, reply)
 	{
 		try {
 			const db = request.server.db;
-			const user = db.prepare('SELECT id, firstname, lastname, username, email, avatar From users WHERE id = ?').get(request.params.id);
+			const user = userModels.getUserById(db, request.params.id);
 			if (!user)
 				return reply.code(404).send({error: "USER_NOT_FOUND"});
 			return reply.code(200).send({message: "SUCCESS", userData: user});
 		}
 		catch (error) {
-			return reply.code(500).send({error: error.message});
-		}
+			if (error.code)
+				return reply.code(error.code).send({error: error.message});
+			else
+				return reply.code(500).send({error: error.message});
+        }
 	}
+
+
 	
 	async  updateUser(request, reply)
 	{
 		try {
 			const db = request.server.db;
+			let userData = {};
+			let fileInfo = {};
+
 			if (request.user.userId !== parseInt(request.params.id))
 				return reply.code(403).send({error: "FORBIDDEN"});
-			const user = db.prepare('SELECT id, firstname, lastname, username, email, password, avatar From users WHERE id = ?').get(request.params.id);
+			for await (const part of request.parts())
+			{
+				console.log(userData);
+				if (part.type === "field")
+					userData[part.fieldname] = part.value;
+				else if (part.type === "file")
+				{
+					fileInfo = {
+						filename: part.filename,
+						encoding: part.encoding,
+						mimetype: part.mimetype,
+						fileStream: part.file
+					}
+				}
+			}
+			if (fileInfo.filename)
+				userData[avatar] = fileUpload(request.user, fileInfo);
+
+			const user = userModels.getUserById(db, request.params.id);
 			if (!user)
 				return reply.code(404).send({error: "USER_NOT_FOUND"});
-			const firstname = request.body.firstname || user.firstname;
-			const lastname = request.body.lastname || user.lastname;
-			const username = request.body.username || user.username;
-			const email = request.body.email || user.email;
-			const password = (request.body.password) ? await bcrypt.hash(request.body.password, 12) : user.password;
-			const avatar = request.body.avatar || user.avatar;
+
+			userData = {
+				firstname: userData.firstname || user.firstname,
+				lastname: userData.lastname || user.lastname,
+				username: userData.username || user.username,
+				email: userData.email || user.email,
+				avatar: userData.avatar || user.avatar
+			}
 			
-			const updated = db.prepare('UPDATE users SET firstname = ?, lastname = ?, username = ?, email = ?, password = ?, avatar = ? WHERE id = ?')
-			.run(firstname, lastname, username, email, password, avatar, request.params.id);
+			userModels.updateUserById(db, request.params.id, userData);
 			
 			return reply.code(204).send({message: "SUCCESS"});
 		}
-		catch (error)
-		{
-			return reply.code(500).send({error: error.message});
-		}
+		catch (error) {
+			if (error.code)
+				return reply.code(error.code).send({error: error.message});
+			else
+				return reply.code(500).send({error: error.message});
+        }
 	}
 	
 	deleteUser(request, reply)
@@ -72,13 +117,41 @@ export class UserController
 			
 			return reply.code(204).send({message: "SUCCESS"});
 		}
-		catch (error)
-		{
-			return reply.code(500).send({error: error.message});
-		}
+		catch (error) {
+			if (error.code)
+				return reply.code(error.code).send({error: error.message});
+			else
+				return reply.code(500).send({error: error.message});
+        }
 		
 	}
 	
+	async changePassword(request, reply)
+	{
+		const db = request.server.db;
+
+		try
+		{
+			const { oldPassword, newPassword, repeatNewPassword} = request.body;
+			if (newPassword !== repeatNewPassword)
+				return reply.code(400).send({error: 'NEW_PASSWORDS_DO_NOT_MATCH'});
+			if (newPassword === oldPassword)
+				return reply.code(400).send({error: 'NEW_PASSWORD_MATCHS_OLD_PASSWORD'});
+
+			const userPassword = userModels.getPassword(db, request.user.userId);
+			const match = await bcrypt.compare(oldPassword, userPassword);
+			if (!match)
+				return reply.code(401).send({ error: 'CURRENT_PASSWORD_IS_INCORRECT' });
+			await userModels.setNewPassword(db, request.user.userId, newPassword);
+			return reply.code(200).send({message: "PASSWORD_CHANGED_SUCCESSFULLY"});
+		}
+		catch (error) {
+			if (error.code)
+				return reply.code(error.code).send({error: error.message});
+			else
+				return reply.code(500).send({error: error.message});
+        }
+	}
 	searchUsers(request, reply){
 		try{
 			const db = request.server.db;
@@ -143,9 +216,12 @@ export class UserController
 	
 			return reply.code(200).send(formattedResults);
 		}
-		catch(error) {
-			return reply.code(500).send({ error: error.message })
-		}
+		catch (error) {
+			if (error.code)
+				return reply.code(error.code).send({error: error.message});
+			else
+				return reply.code(500).send({error: error.message});
+        }
 	
 	}
 }

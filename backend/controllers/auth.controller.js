@@ -95,11 +95,11 @@ export class AuthController {
             if (isMultipart)
             {
                 const uploadDir = path.join(process.cwd(), 'uploads');
-                    const image = await request.file();
-                    const filename = generateFileNameByUser(request.user.username, image.filename);
-                    const filePath = path.join(uploadDir, filename);
-                    await pipeline(image.file, fs.createWriteStream(filePath));
-                    fileLink = `http://${request.host}/uploads/${filename}`;
+                const image = await request.file();
+                const filename = generateFileNameByUser(request.user.username, image.filename, image.mimetype);
+                const filePath = path.join(uploadDir, filename);
+                await pipeline(image.file, fs.createWriteStream(filePath));
+                fileLink = `http://${request.host}/uploads/${filename}`;
             }
             else 
             {
