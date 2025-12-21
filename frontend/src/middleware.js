@@ -34,24 +34,8 @@ export async function middleware(request) {
       // Read flags from token payload
       isVerified = payload.isVerified === true;
       hasAvatar = payload.hasAvatar === true;
-
-      // FETCH FRESH DATA FROM BACKEND
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
-          headers: {
-            'Cookie': `accessToken=${accessToken}; refreshToken=${refreshToken}`
-          }
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          // Update status with fresh data from DB
-          isVerified = data.userData.isverified === 1 || data.userData.isverified === true;
-          hasAvatar = !!data.userData.avatar;
-        }
-      } catch (fetchError) {
-        console.error("Failed to fetch fresh user data in middleware:", fetchError.message);
-      }
+      console.log("waaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa reb :",payload);
+      console.log("🔍 After fetch - isVerified:", isVerified, "hasAvatar:", hasAvatar);
 
     } catch (error) {
       // Check for expiration
@@ -138,6 +122,7 @@ export async function middleware(request) {
   }
 
   // Force incomplete onboarding for authenticated users
+  console.log("🚨 Checking onboarding redirect - isValidAccess:", isValidAccess, "pathname:", pathname, "isVerified:", isVerified, "hasAvatar:", hasAvatar);
   if (isValidAccess && !isOnboardingRoute && !isAuthRoute && pathname !== '/') {
     if (!isVerified) {
       return NextResponse.redirect(new URL('/sign-up/email-verification', request.url));

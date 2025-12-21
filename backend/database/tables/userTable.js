@@ -3,6 +3,7 @@ function createUserTable(db)
     try {
         db.exec(`CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            google_id TEXT UNIQUE,
             firstname TEXT,
             lastname TEXT,
             username TEXT UNIQUE,
