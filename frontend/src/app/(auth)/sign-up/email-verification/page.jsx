@@ -115,7 +115,8 @@ const EmailVerification = () => {
   };
 
   const handleChange = (element, index) => {
-    if (isNaN(element.value)) return;
+    if (isNaN(element.value))
+        return;
     const newOtp = [...otp];
     newOtp[index] = element.value;
     setOtp(newOtp);

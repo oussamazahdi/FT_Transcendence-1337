@@ -2,94 +2,22 @@ import React from "react";
 import { assets } from "@/assets/data";
 import Image from "next/image";
 const FriendData = [
-  {
-    id: "1",
-    firstname: "soufiane",
-    lastname: "arif",
-    username: "soufiix",
-    avatar: assets.soufiixPdp,
-  },
-  {
-    id: "2",
-    firstname: "kamal",
-    lastname: "alamai",
-    username: "kael-ala",
-    avatar: assets.kamalPdp,
-  },
-  {
-    id: "3",
-    firstname: "oussama",
-    lastname: "zahdi",
-    username: "ouss",
-    avatar: assets.mohcinePdp,
-  },
-  {
-    id: "1",
-    firstname: "soufiane",
-    lastname: "arif",
-    username: "soufiix",
-    avatar: assets.soufiixPdp,
-  },
-  {
-    id: "2",
-    firstname: "kamal",
-    lastname: "alamai",
-    username: "kael-ala",
-    avatar: assets.kamalPdp,
-  },
-  {
-    id: "3",
-    firstname: "oussama",
-    lastname: "zahdi",
-    username: "ouss",
-    avatar: assets.mohcinePdp,
-  },
-  {
-    id: "1",
-    firstname: "soufiane",
-    lastname: "arif",
-    username: "soufiix",
-    avatar: assets.soufiixPdp,
-  },
-  {
-    id: "2",
-    firstname: "kamal",
-    lastname: "alamai",
-    username: "kael-ala",
-    avatar: assets.kamalPdp,
-  },
-  {
-    id: "3",
-    firstname: "oussama",
-    lastname: "zahdi",
-    username: "ouss",
-    avatar: assets.mohcinePdp,
-  },
-  {
-    id: "1",
-    firstname: "soufiane",
-    lastname: "arif",
-    username: "soufiix",
-    avatar: assets.soufiixPdp,
-  },
-  {
-    id: "2",
-    firstname: "kamal",
-    lastname: "alamai",
-    username: "kael-ala",
-    avatar: assets.kamalPdp,
-  },
-  {
-    id: "3",
-    firstname: "oussama",
-    lastname: "zahdi",
-    username: "ouss",
-    avatar: assets.mohcinePdp,
-  },
+  { id: "1", firstname: "soufiane", lastname: "arif", username: "soufiix", avatar: assets.soufiixPdp },
+  { id: "2", firstname: "kamal", lastname: "alamai", username: "kael-ala", avatar: assets.kamalPdp },
+  { id: "3", firstname: "oussama", lastname: "zahdi", username: "ouss", avatar: assets.mohcinePdp },
+  { id: "4", firstname: "soufiane", lastname: "arif", username: "soufiix", avatar: assets.soufiixPdp },
+  { id: "5", firstname: "kamal", lastname: "alamai", username: "kael-ala", avatar: assets.kamalPdp },
+  { id: "6", firstname: "oussama", lastname: "zahdi", username: "ouss", avatar: assets.mohcinePdp },
+  { id: "7", firstname: "soufiane", lastname: "arif", username: "soufiix", avatar: assets.soufiixPdp },
+  { id: "8", firstname: "kamal", lastname: "alamai", username: "kael-ala", avatar: assets.kamalPdp },
+  { id: "9", firstname: "oussama", lastname: "zahdi", username: "ouss", avatar: assets.mohcinePdp },
+  { id: "10", firstname: "soufiane", lastname: "arif", username: "soufiix", avatar: assets.soufiixPdp },
+  { id: "11", firstname: "kamal", lastname: "alamai", username: "kael-ala", avatar: assets.kamalPdp },
+  { id: "12", firstname: "oussama", lastname: "zahdi", username: "ouss", avatar: assets.mohcinePdp },
 ];
 
 const FriendComponent = FriendData.map((user) => (
-  <div className="w-200 h-14 mx-4 rounded-[12px] bg-[#414141]/35 flex items-center gap-1 p-1 hover:bg-[#414141] cursor-pointer">
+  <div key={user.id} className="w-200 h-14 mx-4 rounded-[12px] bg-[#414141]/35 flex items-center gap-1 p-1 hover:bg-[#414141] cursor-pointer">
     <Image
       src={user.avatar}
       width={48}

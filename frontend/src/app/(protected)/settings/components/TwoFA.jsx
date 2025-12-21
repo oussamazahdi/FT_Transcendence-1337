@@ -6,8 +6,7 @@ export default function TwoFA({isEnable, onEnableClick, setIsEnable}){
   const [showConfirm, setShowconfirm] = useState(false);
   
   return(
-    <div className="flex flex-col justify-center items-center gap-2">
-      <div className="border-t border-[#FFFFFF]/23 h-1 w-120 mt-3"></div>
+    <div className="flex flex-col justify-start items-center gap-2">
       <p className="font-bold ">Two-Factor Authentication</p>
       <p className="text-xs text-gray-500">
         Two-factor authentication adds an extra layer of security to your account.

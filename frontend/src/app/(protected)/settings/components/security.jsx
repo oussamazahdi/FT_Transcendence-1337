@@ -48,11 +48,11 @@ export default function Security() {
 
   return (
     <div className="h-full flex flex-col justify-center items-center gap-3">
+      <form className="flex flex-col justify-end items-center gap-1 h-full basis-1/2">
       <p className="font-bold ">Change Password</p>
       <p className="text-xs text-gray-500">
         Update password for enhanced account security
       </p>
-      <form className="flex flex-col justify-center items-center gap-1">
         <PasswordInput label="Current password" name="current" show={showCurr} setShow={setShowcurr} value={passwords.current} onChange={handleChange} />
         <PasswordInput label="New password" name="newPass" show={showNew} setShow={setShowNew} value={passwords.newPass} onChange={handleChange} />
         <PasswordInput label="Confirm new password" name="confirmPass" show={showconfirm} setShow={setShowconfirm} value={passwords.confirmPass} onChange={handleChange} />
@@ -61,12 +61,15 @@ export default function Security() {
           className="w-60 h-8 text-xs rounded-sm mt-4 hover:bg-[#0F2C34]/40 border-[#414141]/60 border-1 bg-[#070707] text-white hover:text-white cursor-pointer">
           save change
         </button>
+        <div className="border-t border-[#FFFFFF]/23 h-1 w-120 mt-3"></div>
       </form>
-      {view === "status" ?
-        <TwoFA isEnable={isEnable} onEnableClick={() => setView("setup")} setIsEnable={setIsEnable}/>
-        :
-        <TwoFaSetup onEnableClick={() =>{ setView("status"); setIsEnable(true)}}/>
-      }
+      <div className="basis-1/2">
+        {view === "status" ?
+          <TwoFA isEnable={isEnable} onEnableClick={() => setView("setup")} setIsEnable={setIsEnable}/>
+          :
+          <TwoFaSetup onEnableClick={() =>{ setView("status"); setIsEnable(true)}}/>
+        }
+      </div>
     </div>
   );
 }

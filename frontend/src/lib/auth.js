@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 export async function getCurrentUser() {
   const cookieStore = await cookies();
   const token = cookieStore.get("accessToken");
-  const refreshToken = cookieStore.get("refreshToken");
+  // const refreshToken = cookieStore.get("refreshToken");
 
   if (!token) return null;
 

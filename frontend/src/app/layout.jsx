@@ -23,6 +23,8 @@ const poppins = Poppins({
 
 export default async function RootLayout({ children }) {
   const user = await getCurrentUser();
+  // if(!user) 
+  //   return redirect("/sign-in");
   return (
     <html lang="en">
       <body

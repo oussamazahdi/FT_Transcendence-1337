@@ -30,6 +30,9 @@ import blockUser from "./block-user.png";
 import eye from './eye.png'
 import visible from './visible.png'
 import coverPicture from './coverPicture.png'
+import gamepadeButton from './gamepadButton.png'
+import profileButton from './ProfileButton.png'
+import QRcode from './QRcode.png' // to delete after TwoFA finished
 
 export const assets = {
   soufiixPdp,
@@ -64,4 +67,7 @@ export const assets = {
   eye,
   visible,
   coverPicture,
+  gamepadeButton,
+  profileButton,
+  QRcode, // to delete
 };
