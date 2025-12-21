@@ -14,7 +14,7 @@ export function UserProvider({ children, initialUser }){
 
   const logout = async () => {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, { method: 'POST' }); 
+      await fetch(`${process.env.API_URL}/api/auth/logout`, { method: 'POST' }); 
       setUser(null);
       
       router.push('/sign-in'); 

@@ -1,19 +1,24 @@
 import bcrypt from "bcrypt"
+import path from "path";
+import { pipeline } from 'stream/promises';
+import fs from "fs"
+
 import { userModels } from "../models/user.model.js";
 import { generateFileNameByUser } from "../utils/authUtils.js";
 
 /**
  * still neeed to apply erroring system
- */
+*/
 
 async function fileUpload(user, file)
 {
 	const uploadDir = path.join(process.cwd(), 'uploads');
-	const image = file.file;
+	const image = file.fileStream;
 	const filename = generateFileNameByUser(user.username, file.filename, file.mimetype);
 	const filePath = path.join(uploadDir, filename);
-	await pipeline(image.file, fs.createWriteStream(filePath));
-	fileLink = `http://${request.host}/uploads/${filename}`;
+	await pipeline(image, fs.createWriteStream(filePath));
+	const fileLink = `${process.env.API_URL}/uploads/${filename}`;
+	console.log(fileLink);
 	return (fileLink);
 }
 
@@ -64,7 +69,6 @@ export class UserController
 				return reply.code(403).send({error: "FORBIDDEN"});
 			for await (const part of request.parts())
 			{
-				console.log(userData);
 				if (part.type === "field")
 					userData[part.fieldname] = part.value;
 				else if (part.type === "file")
@@ -78,7 +82,7 @@ export class UserController
 				}
 			}
 			if (fileInfo.filename)
-				userData[avatar] = fileUpload(request.user, fileInfo);
+				userData["avatar"] = await fileUpload(request.user, fileInfo);
 
 			const user = userModels.getUserById(db, request.params.id);
 			if (!user)
@@ -94,7 +98,7 @@ export class UserController
 			
 			userModels.updateUserById(db, request.params.id, userData);
 			
-			return reply.code(204).send({message: "SUCCESS"});
+			return reply.code(201).send({message: "SUCCESS"});
 		}
 		catch (error) {
 			if (error.code)

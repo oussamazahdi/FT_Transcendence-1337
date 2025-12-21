@@ -21,7 +21,7 @@ const EmailVerification = () => {
 
   const sendVerificationCode = useCallback( async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/resendCode`,{
+      const response = await fetch(`${process.env.API_URL}/api/auth/resendCode`,{
         method:"POST",
         credentials:"include",
       })
@@ -68,7 +68,7 @@ const EmailVerification = () => {
     setError("");
     setIsVerifying(true);
     try{
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/emailVerification`,{
+      const response = await fetch(`${process.env.API_URL}/api/auth/emailVerification`,{
           method:"POST",
           headers:{
             "Content-Type": "application/json",

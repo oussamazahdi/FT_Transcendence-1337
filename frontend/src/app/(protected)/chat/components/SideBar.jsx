@@ -153,7 +153,7 @@ export default function SideBar() {
     const fetchconversation = async () => {
       setLoading(true);
       try{
-        // const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/conversations`,{
+        // const response = await fetch(`${process.env.API_URL}/api/chat/conversations`,{
           //   method:"GET",
           //   credentials: "include",
           // })
@@ -211,7 +211,7 @@ export default function SideBar() {
       console.log(searchQuery);
       setLoading(true);
       try{
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/search?query=${searchQuery}`,{
+        const response = await fetch(`${process.env.API_URL}/api/users/search?query=${searchQuery}`,{
           method: 'GET',
           credentials: "include",
         })

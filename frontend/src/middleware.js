@@ -49,7 +49,7 @@ export async function middleware(request) {
   // TOKEN REFRESH LOGIC
   if ((isAccessTokenExpired || !accessToken) && refreshToken) {
     try {
-      const refreshResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/refresh`, {
+      const refreshResponse = await fetch(`${process.env.API_URL}/api/auth/refresh`, {
         method: 'POST',
         credentials: 'include',
         headers: {

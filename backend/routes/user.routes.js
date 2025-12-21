@@ -79,7 +79,6 @@ function userRoutes(fastify)
             //                 minLength: 8,
             //             },
             //     },
-
             // },
             response: {
                 200: emptySuccessResponse,

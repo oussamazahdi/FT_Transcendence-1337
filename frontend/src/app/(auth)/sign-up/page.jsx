@@ -33,7 +33,7 @@ export default function SignUp() {
     setLoading(true);
 
     try {
-      const reply = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
+      const reply = await fetch(`${process.env.API_URL}/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

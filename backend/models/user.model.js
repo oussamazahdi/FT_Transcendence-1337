@@ -33,7 +33,7 @@ export class UserModels
     {
         try {
             const result = db.prepare('UPDATE users SET firstname = ?, lastname = ?, username = ?, email = ?, avatar = ? WHERE id = ?')
-			.run(userData.firstname, userData.lastname, userData.username, userData.email, userData.avatar, request.params.id);
+			.run(userData.firstname, userData.lastname, userData.username, userData.email, userData.avatar, userId);
             return (result);
         }
         catch (error) {

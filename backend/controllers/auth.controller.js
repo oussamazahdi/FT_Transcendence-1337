@@ -99,7 +99,7 @@ export class AuthController {
                 const filename = generateFileNameByUser(request.user.username, image.filename, image.mimetype);
                 const filePath = path.join(uploadDir, filename);
                 await pipeline(image.file, fs.createWriteStream(filePath));
-                fileLink = `http://${request.host}/uploads/${filename}`;
+                fileLink = `http://${process.env.API_URL}/uploads/${filename}`;
             }
             else 
             {
@@ -107,7 +107,7 @@ export class AuthController {
                 const availableAvatars = ["profile1", "profile2", "profile3", "profile4", "profile5", "profile6"];
                 if (!availableAvatars.includes(avatar))
                     return reply.code(400).send("INVALID_AVATAR");
-                fileLink = `http://${request.host}/uploads/default/${avatar}.jpeg`;
+                fileLink = `http://${process.env.API_URL}/uploads/default/${avatar}.jpeg`;
             }
             authModels.updateUserAvatar(db, request.user.userId, fileLink);
             const user = authModels.findUserById(db, request.user.userId);

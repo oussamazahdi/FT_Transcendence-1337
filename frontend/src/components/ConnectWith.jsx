@@ -7,7 +7,7 @@ const ConnectWith = () => {
     "flex items-center justify-center w-18 h-6 bg-[#4D4D4D]/40 rounded-sm cursor-pointer hover:bg-white/20";
 
   const handleGoogleAuth = () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/oauth/google`;
+    window.location.href = `${process.env.API_URL}/api/oauth/google`;
   };
 
   const handleGitAuth = () => {
