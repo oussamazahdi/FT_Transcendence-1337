@@ -1,5 +1,3 @@
-import { randomUUID } from "crypto";
-
 export class paddle {
 	constructor() {
 		this.x = "";
@@ -31,5 +29,3 @@ export class GameSession {
 		this.player2 = new Player();
   }
 }
-
-export let games = [];

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/contexts/authContext";
 import { io } from "socket.io-client";
 
@@ -21,6 +21,7 @@ const emptyPlayer = () => ({
 
 export default function Page() {
 	const { user } = useAuth();
+	const canvasRef = useRef(null);
 
 	const [currentPlayer, setCurrentPlayer] = useState(null);
 	const [player1, setPlayer1] = useState(emptyPlayer());
@@ -40,6 +41,11 @@ export default function Page() {
 
 	useEffect(() => {
 		if (!currentPlayer) return;
+		
+		const canvas = canvasRef.current;
+		if(!canvas) return;
+		const context = canvas.getContext("2d");
+		if(!context) return;
 
 		if (!socket.connected) socket.connect();
 
@@ -49,6 +55,9 @@ export default function Page() {
 			setPlayer1(game.player1.username === currentPlayer.username ? game.player1 : game.player2);
 			setPlayer2(game.player1.username === currentPlayer.username ? game.player2 : game.player1);
 			setRoomId(game.roomId);
+
+			
+
 		});
 
 		return () => {
