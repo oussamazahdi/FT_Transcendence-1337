@@ -7,7 +7,9 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import cors from '@fastify/cors'
 import googleOAuth2 from '@fastify/oauth2';
+import rateLimit from '@fastify/rate-limit';
 
+import { multipartConfig } from "../config/multipart.config.js";
 import { corsConfig } from "../config/cors.config.js";
 import { swaggerConfig, swaggerUiConfig } from '../config/swagger.config.js';
 import { oauth2Config } from '../config/oauth.config.js';
@@ -21,6 +23,11 @@ export async function registerPlugins(fastify) {
     await fastify.register(swagger, swaggerConfig);
     await fastify.register(swaggerUi, swaggerUiConfig);
 
+    // await fastify.register(rateLimit, {
+    //     max: 1,
+    //     timeWindow: '1 minute'
+    // });
+
     //oauth2
     // await fastify.register(cookie,  {
     //     secret: process.env.JWT_SECRET  // Use a consistent secret
@@ -29,12 +36,7 @@ export async function registerPlugins(fastify) {
     await fastify.register(googleOAuth2, oauth2Config);
     
     // Other plugins
-    await fastify.register(multipart, {
-        limits: {
-        fileSize: 5 * 1024 * 1024,
-        files: 1
-        }
-    });
+    await fastify.register(multipart, multipartConfig);
     
     // Static files
     await fastify.register(fastifyStatic, {

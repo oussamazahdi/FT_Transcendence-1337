@@ -5,6 +5,7 @@ import fs from "fs"
 
 import { userModels } from "../models/user.model.js";
 import { generateFileNameByUser } from "../utils/authUtils.js";
+import { updateUserSchema, zErrorHandler } from "../utils/inputValidator.js"
 
 /**
  * still neeed to apply erroring system
@@ -82,7 +83,7 @@ export class UserController
 					userData["avatar"] = await fileUpload(request.user, fileInfo);
 				}
 			}
-
+			const validatedData = updateUserSchema.parse(userData);
 			const user = userModels.getUserById(db, request.params.id);
 			if (!user)
 				return reply.code(404).send({error: "USER_NOT_FOUND"});
@@ -100,6 +101,7 @@ export class UserController
 			return reply.code(201).send({message: "SUCCESS"});
 		}
 		catch (error) {
+			console.log(zErrorHandler(error));
 			if (error.code)
 				return reply.code(error.code).send({error: error.message});
 			else
