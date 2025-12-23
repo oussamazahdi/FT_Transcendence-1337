@@ -89,11 +89,11 @@ export class UserController
 				return reply.code(404).send({error: "USER_NOT_FOUND"});
 
 			userData = {
-				firstname: userData.firstname || user.firstname,
-				lastname: userData.lastname || user.lastname,
-				username: userData.username || user.username,
-				email: userData.email || user.email,
-				avatar: userData.avatar || user.avatar
+				firstname: validatedData.firstname || user.firstname,
+				lastname: validatedData.lastname || user.lastname,
+				username: validatedData.username || user.username,
+				email: validatedData.email || user.email,
+				avatar: validatedData.avatar || user.avatar
 			}
 			
 			userModels.updateUserById(db, request.params.id, userData);
@@ -101,7 +101,9 @@ export class UserController
 			return reply.code(201).send({message: "SUCCESS"});
 		}
 		catch (error) {
-			console.log(zErrorHandler(error));
+			const zError = zErrorHandler(error);
+			if (zError !== null)
+				return reply.code(zError.code).send({error: zError.message});
 			if (error.code)
 				return reply.code(error.code).send({error: error.message});
 			else

@@ -1,6 +1,7 @@
 import { authController } from "../controllers/auth.controller.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { errorResponse, emptySuccessResponse, objectSuccessResponse } from "../config/schemes.config.js";
+import { maxLength } from "zod";
 
 function authRoutes(fastify)
 {
@@ -44,16 +45,19 @@ function authRoutes(fastify)
                         type: 'string',
                         minLength: 3,
                         maxLength: 15,
+                        pattern: '^[a-zA-ZÀ-ÿ\\s\'-]+$'
                     },
                     lastname: {
                         type: 'string',
                         minLength: 3,
                         maxLength: 15,
+                        pattern: '^[a-zA-ZÀ-ÿ\\s\'-]+$'
                     },
                     username: {
                         type: 'string',
                         minLength: 3,
                         maxLength: 15,
+                        pattern: '^[a-zA-Z0-9_-]+$'
                     },
                     email: {
                         type: 'string',
@@ -62,6 +66,7 @@ function authRoutes(fastify)
                     password: {
                         type: 'string',
                         minLength: 8,
+                        maxLength: 64,
                     },
                 }
             },
