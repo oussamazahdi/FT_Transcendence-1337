@@ -119,14 +119,17 @@ function userRoutes(fastify)
                 type: 'object',
                 properties: {
                     oldPassword: {
+                        type: 'string',
                         minLength: 8,
                         maxLength: 64,
                     },
                     newPassword: {
+                        type: 'string',
                         minLength: 8,
                         maxLength: 64,
                     },
                     repeatNewPassword: {
+                        type: 'string',
                         minLength: 8,
                         maxLength: 64,
                     },

@@ -79,10 +79,9 @@ export class UserController
 						mimetype: part.mimetype,
 						fileStream: part.file
 					}
+					userData["avatar"] = await fileUpload(request.user, fileInfo);
 				}
 			}
-			if (fileInfo.filename)
-				userData["avatar"] = await fileUpload(request.user, fileInfo);
 
 			const user = userModels.getUserById(db, request.params.id);
 			if (!user)
