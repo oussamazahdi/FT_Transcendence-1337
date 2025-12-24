@@ -1,97 +1,154 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/authContext";
 import { io } from "socket.io-client";
 
 const socket = io("http://localhost:3001", {
-	transports: ["websocket"],
-	autoConnect: false,
+  transports: ["websocket"],
+  autoConnect: false,
 });
 
-const emptyPlayer = () => ({
-	socketId: "",
-	firstName: "",
-	lastName: "",
-	username: "",
-	avatar: "",
-	score: 0,
-	roomId: "",
-});
+const GAME_WIDTH = 1024;
+const GAME_HEIGHT = 700;
 
 export default function Page() {
-	const { user } = useAuth();
-	const canvasRef = useRef(null);
+  const { user } = useAuth();
 
-	const [currentPlayer, setCurrentPlayer] = useState(null);
-	const [player1, setPlayer1] = useState(emptyPlayer());
-	const [player2, setPlayer2] = useState(emptyPlayer());
-	const [roomId, setRoomId] = useState("");
+  const canvasRef = useRef(null);
+  const wrapperRef = useRef(null);
+  const bgRef = useRef(null);
 
-	useEffect(() => {
-		if (!user) return;
+  const [game, setGame] = useState(null);
+  const [scale, setScale] = useState(1);
 
-		setCurrentPlayer({
-			username: user.username,
-			firstName: user.firstname,
-			lastName: user.lastname,
-			avatar: user.avatar,
-		});
-	}, [user]);
+  useEffect(() => {
+    if (!user) return;
 
-	useEffect(() => {
-		if (!currentPlayer) return;
-		
-		const canvas = canvasRef.current;
-		if(!canvas) return;
-		const context = canvas.getContext("2d");
-		if(!context) return;
+    if (!socket.connected) socket.connect();
+    socket.emit("update-data", {
+      username: user.username,
+      firstName: user.firstname,
+      lastName: user.lastname,
+      avatar: user.avatar,
+    });
+  }, [user]);
 
-		if (!socket.connected) socket.connect();
+  useEffect(() => {
+    socket.on("match-data", setGame);
+    socket.on("game-state", setGame);
 
-		socket.emit("update-data", currentPlayer);
+    return () => {
+      socket.off("match-data");
+      socket.off("game-state");
+    };
+  }, []);
 
-		socket.on("match-data", game => {
-			setPlayer1(game.player1.username === currentPlayer.username ? game.player1 : game.player2);
-			setPlayer2(game.player1.username === currentPlayer.username ? game.player2 : game.player1);
-			setRoomId(game.roomId);
+  useEffect(() => {
+    const img = new Image();
+    img.src = "/BGs/BG1.jpeg";
+    img.onload = () => (bgRef.current = img);
+  }, []);
 
-			
+  useEffect(() => {
+    const resize = () => {
+      if (!wrapperRef.current) return;
 
-		});
+      const availableWidth = wrapperRef.current.clientWidth;
+      const newScale = availableWidth / GAME_WIDTH;
 
-		return () => {
-			socket.off("match-data");
-		};
-	}, [currentPlayer]);
+      setScale(Math.min(newScale, 1));
+    };
 
-	return (
-		<div>
-			<div className="flex flex-row items-center justify-between w-full lg:max-w-5xl px-5">
-        <div className="flex gap-1 flex-col items-center">
-          <img
-            src={player1.avatar}
-            alt="player 1 avatar"
-            className="w-20 h-20 rounded-lg object-cover"
-          />
-          <h3 className="text-xl font-semibold">{player1.firstName}.{player1.lastName[0]}</h3>
-          <p className="text-md text-[#858585]">[{player1.username}]</p>
+    resize();
+    window.addEventListener("resize", resize);
+    return () => window.removeEventListener("resize", resize);
+  }, []);
+
+  useEffect(() => {
+    if (!game) return;
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = GAME_WIDTH;
+    canvas.height = GAME_HEIGHT;
+
+    const render = () => {
+      ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+      if (bgRef.current) {
+        ctx.drawImage(bgRef.current, 0, 0, GAME_WIDTH, GAME_HEIGHT);
+      }
+
+      ctx.fillStyle = "black";
+      ctx.beginPath();
+      ctx.arc(
+        game.ball.x,
+        game.ball.y,
+        game.ball.radius,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+
+      drawPaddle(ctx, game.player1.player);
+      drawPaddle(ctx, game.player2.player);
+
+      requestAnimationFrame(render);
+    };
+
+    render();
+  }, [game]);
+
+  return (
+    <div className="flex flex-col items-center w-full">
+      {game && (
+        <div className="flex justify-between w-full max-w-5xl px-4 mt-6 mb-5">
+          <PlayerCard player={game.player1} />
+          <p className="text-4xl font-bold">
+            {game.player1.score} - {game.player2.score}
+          </p>
+          <PlayerCard player={game.player2} />
         </div>
+      )}
 
-        <div className="flex flex-col items-center">
-          <p className="text-5xl font-bold">{`0 - 0`}</p>
-        </div>
-
-        <div className="flex gap-1 flex-col items-center">
-          <img
-            src={player2.avatar}
-            alt="player 2 avatar"
-            className="w-20 h-20 rounded-lg object-cover"
-          />
-          <h3 className="text-xl font-semibold">{player2.firstName}.{player2.lastName[0]}</h3>
-          <p className="text-md text-[#858585]">[{player2.username}]</p>
-        </div>
+      <div
+        ref={wrapperRef}
+        className="w-full max-w-5xl flex justify-center"
+      >
+        <canvas
+          ref={canvasRef}
+          style={{
+            width: GAME_WIDTH * scale,
+            height: GAME_HEIGHT * scale,
+          }}
+          className="rounded-2xl border border-white/60"
+        />
       </div>
-		</div>
-	);
+    </div>
+  );
 }
+
+function drawPaddle(ctx, paddle) {
+  ctx.fillStyle = "black";
+  ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+}
+
+function PlayerCard({ player }) {
+  return (
+    <div className="flex flex-col items-center">
+      <img
+        src={player.avatar}
+        className="w-14 h-14 rounded-lg object-cover"
+      />
+      <p className="font-semibold">
+        {player.firstName}.{player.lastName?.[0]}
+      </p>
+      <span className="text-sm text-gray-400">
+        [@{player.username}]
+      </span>
+    </div>
+  );
+}
+
