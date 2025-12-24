@@ -45,13 +45,13 @@ function authRoutes(fastify)
                         type: 'string',
                         minLength: 3,
                         maxLength: 15,
-                        pattern: '^[a-zA-ZÀ-ÿ\\s\'-]+$'
+                        pattern: '^[a-zA-ZÀ-ÿ\\s\']+$'
                     },
                     lastname: {
                         type: 'string',
                         minLength: 3,
                         maxLength: 15,
-                        pattern: '^[a-zA-ZÀ-ÿ\\s\'-]+$'
+                        pattern: '^[a-zA-ZÀ-ÿ\\s\']+$'
                     },
                     username: {
                         type: 'string',

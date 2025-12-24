@@ -17,8 +17,8 @@ export class AuthController {
         try {
             const result = await authModels.loginUser(db, email, password);
             const params = {
-                isVerified: !!result.isverified, // i changed it from int to bool
-                hasAvatar: !!result.avatar
+                isVerified: !!result.isverified,
+                status2fa: !!result.status2fa
             }
             if (result.message && result.message.includes("USER_NOT_FOUND"))
                 return reply.code(404).send({error: "USER_NOT_FOUND"});
@@ -58,7 +58,8 @@ export class AuthController {
             const user = await authModels.addNewUser(db, firstname, lastname, username, email, password);
             const params = {
                 isVerified: !!user.isverified,
-                hasAvatar: !!user.avatar
+                hasAvatar: !!user.avatar,
+                status2fa: !!user.status2fa
             }
             const accessToken = generateToken(user.id, user.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION, params, "access");
             const refreshToken = generateToken(user.id, user.username, process.env.JWT_REFRESH_SECRET, process.env.JWT_REFRESH_EXPIRATION, null, "refresh");

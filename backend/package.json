@@ -27,6 +27,7 @@
     "fastify": "^5.6.2",
     "fastify-nodemailer": "^5.0.0",
     "fastify-plugin": "^5.1.0",
+    "fastify-totp": "^1.0.0",
     "jsonwebtoken": "^9.0.2",
     "node-cron": "^4.2.1",
     "nodemailer": "^7.0.11",

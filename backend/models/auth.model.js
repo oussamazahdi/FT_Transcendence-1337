@@ -34,7 +34,7 @@ export class AuthModels
         try {
             let cryptedPass = await bcrypt.hash(password, 12);
             db.prepare(`INSERT INTO users (firstname, lastname, username, email, password) VALUES (?, ?, ?, ?, ?)`).run(firstname, lastname, username, email, cryptedPass);
-            const user = db.prepare(`SELECT id, firstname, lastname, username, email, avatar, isverified FROM users WHERE email = ?`).get(email);
+            const user = db.prepare(`SELECT id, firstname, lastname, username, email, avatar, isverified, status2fa FROM users WHERE email = ?`).get(email);
             return (user);
         } 
         catch (error) {
@@ -42,7 +42,7 @@ export class AuthModels
                 throw dbError;
         }
     }
-    findUserById(db, userId, fields = ['id', 'username', 'firstname', 'lastname', 'username', 'email', 'avatar', 'isverified'])
+    findUserById(db, userId, fields = ['id', 'username', 'firstname', 'lastname', 'username', 'email', 'avatar', 'isverified', 'status2fa'])
     {
         try {
             const fieldList = fields.join(', ');

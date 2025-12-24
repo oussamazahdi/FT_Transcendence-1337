@@ -8,6 +8,7 @@ import path from 'path';
 import cors from '@fastify/cors'
 import googleOAuth2 from '@fastify/oauth2';
 import rateLimit from '@fastify/rate-limit';
+import twoFactor from "fastify-totp";
 
 import { multipartConfig } from "../config/multipart.config.js";
 import { corsConfig } from "../config/cors.config.js";
@@ -27,6 +28,7 @@ export async function registerPlugins(fastify) {
     //     max: 1,
     //     timeWindow: '1 minute'
     // });
+    await fastify.register(twoFactor);
 
     //oauth2
     // await fastify.register(cookie,  {

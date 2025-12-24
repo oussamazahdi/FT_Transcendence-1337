@@ -19,14 +19,11 @@ export class OAuthController
             })
             const googleUser = await response.json();
             const result = oauthModels.getUserByGoogleId(db, googleUser.id);
-            console.log("cheeeeeeeeeeeeeeeeeeeeeeck =>>>>>>>>>>>>>>>>>>>>>>>>>>", result);
             if (!result)
             {
                 const username = `${googleUser.given_name}-${googleUser.id}`;
                 const password = randomPasswordGenerator(20);
                 const user = await oauthModels.addNewUser(db, googleUser.id, googleUser.given_name, googleUser.family_name, username, googleUser.email, googleUser.picture, password);
-                console.log("===================== signup ======================");
-                console.log(user);
                 const accessToken = generateToken(user.id, user.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION, params, "access");
                 const refreshToken = generateToken(user.id, user.username, process.env.JWT_REFRESH_SECRET, process.env.JWT_REFRESH_EXPIRATION, null, "refresh");
                 authModels.addNewToken(db, user.id, refreshToken);
@@ -44,8 +41,6 @@ export class OAuthController
                 });
                 return reply.redirect('http://localhost:3000/dashboard');
             }
-            console.log("===================== login ======================");
-            console.log(result);
             const accessToken = generateToken(result.id, result.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION, params, "access");
             const refreshToken = generateToken(result.id, result.username, process.env.JWT_REFRESH_SECRET, process.env.JWT_REFRESH_EXPIRATION, null, "refresh");
             authModels.addNewToken(db, result.id, refreshToken);
