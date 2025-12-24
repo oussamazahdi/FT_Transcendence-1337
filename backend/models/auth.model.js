@@ -1,5 +1,4 @@
 import bcrypt from "bcrypt"
-import jwt from "jsonwebtoken"
 import { handleDatabaseError } from '../utils/dbErrorHandler.js';
 
 export class AuthModels 
@@ -16,13 +15,19 @@ export class AuthModels
     }
     async loginUser(db, email, password)
     {
-        const user = db.prepare(`SELECT * FROM users WHERE email = ?`).get(email);
-        if (!user)
-            return ({message: "USER_NOT_FOUND"});
-        const match = await bcrypt.compare(password, user.password);
-        if (!match)
-            return ({message: "INVALID_PASSWORD"});
-        return (user);
+        try {
+            const user = db.prepare(`SELECT * FROM users WHERE email = ?`).get(email);
+            if (!user)
+                return ({message: "USER_NOT_FOUND"});
+            const match = await bcrypt.compare(password, user.password);  // maybe i can move it to controller later
+            if (!match)
+                return ({message: "INVALID_PASSWORD"});
+            return (user);
+        }
+        catch (error) {
+            const dbError = handleDatabaseError(error, 'addNewUser');
+            throw dbError;
+        }
     }
     async addNewUser(db, firstname, lastname, username, email, password)
     {
@@ -42,7 +47,8 @@ export class AuthModels
         try {
             const fieldList = fields.join(', ');
             return db.prepare(`SELECT ${fieldList} FROM users WHERE id = ?`).get(userId);
-        } catch (error) {
+        } 
+        catch (error) {
             const dbError = handleDatabaseError(error, 'findUserById');
             throw dbError;
         }
@@ -53,7 +59,8 @@ export class AuthModels
         try {
             const fieldList = fields.join(', ');
             return db.prepare(`SELECT ${fieldList} FROM users WHERE email = ?`).get(email);
-        } catch (error) {
+        } 
+        catch (error) {
             const dbError = handleDatabaseError(error, 'findUserByEmail');
             throw dbError;
         }
@@ -64,11 +71,6 @@ export class AuthModels
         try 
         {
             const result = db.prepare('UPDATE users SET avatar = ? WHERE id = ?').run(avatarUrl, userId);
-            
-            if (result.changes === 0) {
-                throw { code: 404, message: 'USER_NOT_FOUND' };
-            }
-            
             return result;
         } 
         catch (error) 
@@ -87,7 +89,8 @@ export class AuthModels
                 throw { code: 404, message: 'USER_NOT_FOUND' };
             }
             return user.email;
-        } catch (error) 
+        } 
+        catch (error) 
         {
             if (error.code === 404) throw error;
             const dbError = handleDatabaseError(error, 'getUserEmail');
@@ -123,7 +126,8 @@ export class AuthModels
                 throw { code: 404, message: 'USER_NOT_FOUND' };
             }
             return user;
-        } catch (error) {
+        } 
+        catch (error) {
             if (error.code === 404) throw error;
             const dbError = handleDatabaseError(error, 'getUserVerificationData');
             throw dbError;
@@ -140,7 +144,8 @@ export class AuthModels
             }
             
             return result;
-        } catch (error) {
+        } 
+        catch (error) {
             if (error.code === 404) throw error;
             const dbError = handleDatabaseError(error, 'markEmailVerified');
             throw dbError;

@@ -33,6 +33,9 @@ import coverPicture from './coverPicture.png'
 import gamepadeButton from './gamepadButton.png'
 import profileButton from './ProfileButton.png'
 import QRcode from './QRcode.png' // to delete after TwoFA finished
+import addFriend from './Add-Friend.png'
+import block_User from './BlockUser.png'
+import startConversation from './startConversation.png'
 
 export const assets = {
   soufiixPdp,
@@ -70,4 +73,7 @@ export const assets = {
   gamepadeButton,
   profileButton,
   QRcode, // to delete
+  addFriend,
+  block_User,
+  startConversation,
 };

@@ -1,6 +1,7 @@
 import React from 'react'
 import { assets } from '@/assets/data'
 import Image from 'next/image'
+import Link from 'next/link'
 
 const friendsData = [
   {id:"1", firstname:"Kamal", username:"kael-ala", status:"Online", avatar:assets.kamalPdp},
@@ -36,7 +37,7 @@ const renderFriends = friendsData.map((user) => (
     </div>
     <div className='ml-auto flex items-center gap-1'>
         <button><Image src={assets.gamepadeButton} alt='icon' width={52} height={52} className='cursor-pointer hover:brightness-150 hover:scale-110'/> </button>
-        <button><Image src={assets.profileButton} alt='icon' width={52} height={52} className='cursor-pointer hover:brightness-150 hover:scale-110'/></button>
+        <Link href={`/profile/${user.id}`}><Image src={assets.profileButton} alt='icon' width={52} height={52} className='cursor-pointer hover:brightness-150 hover:scale-110'/></Link>
     </div>
   </div>
 ))

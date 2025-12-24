@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useAuth } from "@/contexts/authContext";
 import { assets } from "@/assets/data";
@@ -7,15 +7,27 @@ import { assets } from "@/assets/data";
 //check if data empty
 export default function Personal_information() {
   const { user, login } = useAuth();
-  // console.log("this is the user",user)
   const [formData, setFormData] = useState({
     firstname: user.firstname,
     lastname: user.lastname,
     username: user.username,
     email: user.email,
-    avatar: user.avatar,
+    avatar: user.avatar === "null" ? null : user.avatar,
   });
-  // console.log(formData);
+
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        firstname: user.firstname || "",
+        lastname: user.lastname || "",
+        username: user.username || "",
+        email: user.email || "",
+        avatar: user.avatar === "null" ? null : user.avatar,
+      });
+      setImagePreview(user.avatar === "null" ? null : user.avatar);
+    }
+  }, [user]);
+
   const [error, setError] = useState(null);
   const [imagePreview, setImagePreview] = useState(formData.avatar);
   const isChanged =
@@ -27,7 +39,6 @@ export default function Personal_information() {
 
   function handleUpload(e) {
     const file = e.target.files?.[0];
-    // console.log("====>", file)
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
@@ -49,33 +60,40 @@ export default function Personal_information() {
     e.preventDefault();
     setError("");
 
+    const userData = new FormData()
+
+    userData.append("firstname", formData.firstname);
+    userData.append("lastname", formData.lastname);
+    userData.append("username", formData.username);
+    userData.append("email", formData.email);
+    if (formData.avatar instanceof File) {
+      userData.append("avatar", formData.avatar);
+    }
+
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/users/${user.id}`,
         {
           method: "PUT",
-          headers: {
-            "content-Type": "application/json",
-          },
           credentials: "include",
           //can't send data like must create an new FormData type and append to it all the data from my formData
-          body: JSON.stringify({
-            firstname: formData.firstname,
-            lastname: formData.lastname,
-            username: formData.username,
-            email: formData.email,
-            avatar: formData.avatar,
-          }),
+          body: userData,
         },
       );
 
-      if (!response.ok) throw new Error("failde to update information");
+      if (!response.ok) 
+        throw new Error("failde to update information");
 
-      login({ ...user, formData });
+      const data = await response.json();
+      console.log(data.user);
+
+      const newUser = data.user;
+
+      login({...user, ...newUser});
       console.log("user update successfully :)");
     } catch (err) {
       console.log("failed to updare user :( ", err.message);
-      setError(err.error);
+      setError(err.error || "Something went wrong");
     }
   }
 
@@ -88,7 +106,7 @@ export default function Personal_information() {
       <h3 className="text-[#ABABAB] text-sm">
         Keep your player profile accurate for a better gaming experience.
       </h3>
-      <div className="w-32 h-32 flex justify-center items-center">
+      <div className="w-32 h-32 flex justify-center items-center overflow-hidden">
         {imagePreview ? (
           <Image
             src={imagePreview}
@@ -141,7 +159,7 @@ export default function Personal_information() {
             setFormData((prev) => ({ ...prev, firstname: e.target.value }))
           }
           className="bg-[#414141]/60 rounded-sm p-2 text-sm w-52 focus:outline-none"
-          defaultValue={formData.firstname}
+          value={formData.firstname}
         />
         <input
           required
@@ -150,7 +168,7 @@ export default function Personal_information() {
             setFormData((prev) => ({ ...prev, lastname: e.target.value }))
           }
           className="bg-[#414141]/60 rounded-sm p-2 text-sm w-52 focus:outline-none"
-          defaultValue={formData.lastname}
+          value={formData.lastname}
         />
       </div>
       <input
@@ -160,7 +178,7 @@ export default function Personal_information() {
           setFormData((prev) => ({ ...prev, username: e.target.value }))
         }
         className="bg-[#414141]/60 rounded-sm p-2 text-sm w-105 focus:outline-none"
-        defaultValue={formData.username}
+        value={formData.username}
       />
       <input
         required
@@ -169,7 +187,7 @@ export default function Personal_information() {
           setFormData((prev) => ({ ...prev, email: e.target.value }))
         }
         className="bg-[#414141]/60 rounded-sm p-2 text-sm w-105 focus:outline-none"
-        defaultValue={formData.email}
+        value={formData.email}
       />
       {error && <p className="text-xsm text-red-700">{error}</p>}
       <button

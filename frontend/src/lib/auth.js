@@ -1,26 +1,26 @@
 import { cookies } from "next/headers";
 
 export async function getCurrentUser() {
+  // console.log("==>" ,process.env.NEXT_PUBLIC_API_URL)
   const cookieStore = await cookies();
-  const token = cookieStore.get("accessToken");
-  // const refreshToken = cookieStore.get("refreshToken");
+  const aToken = cookieStore.get("accessToken");
+  const rToken = cookieStore.get("refreshToken");
 
-  if (!token) return null;
+  if (!rToken || !aToken)
+      return (null);
+  
+  try{
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
+      headers: {
+        "Cookie": `accessToken=${aToken.value}; refreshToken=${rToken.value}`
+      }
+    });
 
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`,
-      {
-        headers: {
-          Cookie: `accessToken=${token.value}`,
-        },
-      },
-    );
+    const data = await response.json();
 
     if (!response.ok) {
       return null;
     }
-    const data = await response.json();
 
     return data.userData;
   } catch (error) {

@@ -1,69 +1,17 @@
-import Fastify from "fastify"
-import Sqlite3 from "better-sqlite3"
-import dotenv from 'dotenv';
-import multipart from '@fastify/multipart';
-import cookie from '@fastify/cookie';
-import { fileURLToPath } from 'url';
-import path from 'path';
-import fastifyStatic from "@fastify/static";
-import nodemailer from 'nodemailer'
-// import fastifyTotp from 'fastify-totp'
+import app from './app.js';
 
-// locals
-import { initAllTables } from "./database/tables/initDatabase.js";
-import { initRoutes } from "./routes/routes.js";
-import corsPlugin from "./plugins/cors.js";
-import { setupTokenCleanup } from './jobs/revokedTokensCleanup.js';
+const PORT = process.env.BACKEND_PORT;
 
-dotenv.config({ path: '../.env' });
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-const db = new Sqlite3('./database/transcendence.db', { 
-    verbose: console.log  // Optional: log queries
-});
-
-const fastify = Fastify({
-    logger: {
-        transport: {
-            target: 'pino-pretty',
-            options: {
-                colorize: true,
-                translateTime: 'yyyy-mm-dd HH:MM:ss',
-                ignore: 'pid,hostname',
-            }
-        }
-    }
-});
-
-const transporter = nodemailer.createTransport( {
-    host: process.env.SMTP_SERVER,
-    port: parseInt(process.env.SMTP_PORT),
-    secure: false,
-    auth: {
-        user: process.env.SMTP_EMAIL,
-        pass:process.env.SMTP_PASSWORD
-    }
-});
-
-fastify.decorate('nodemailer', transporter);
-// await fastify.register(fastifyTotp);
-fastify.register(multipart);
-fastify.register(corsPlugin);
-fastify.register(cookie);
-fastify.register(fastifyStatic, {
-  root: path.join(__dirname, 'uploads'),
-  prefix: '/uploads/'
-});
-fastify.decorate('db', db);
-
-setupTokenCleanup(fastify.db);
-initAllTables(fastify.db);
-initRoutes(fastify);
-
-await fastify.listen({port: 3001}, (error) => {
-    if (error)
-    {
-        console.error(error.message);
+const start = async () => {
+    try {
+        await app.listen({ port: PORT,  host: '0.0.0.0' });
+        console.log(process.env.GOOGLE_CLIENT_SECRET);
+        console.log(`Server running on http://localhost:${PORT}`);
+        console.log(`Docs available at http://localhost:${PORT}/docs`);
+    } catch (error) {
+        app.log.error(error);
         process.exit(1);
     }
-});
+};
+
+start();

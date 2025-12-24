@@ -1,5 +1,5 @@
 "use client"
-import react, { useReducer, useRef, useState } from "react"
+import react, { useRef, useState } from "react"
 import Image from "next/image"
 import { assets } from "@/assets/data"
 

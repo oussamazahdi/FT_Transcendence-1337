@@ -7,7 +7,6 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   MagnifyingGlassIcon,
-  BellAlertIcon,
   HomeIcon,
   ChatBubbleOvalLeftIcon,
   TrophyIcon,
@@ -40,7 +39,7 @@ export default function Navbar() {
   });
 
   return (
-    <div className="relative mt-8 mx-4 md:mx-10 lg:mx-20 lg:mx-35 flex justify-between">
+    <div className="relative mt-8 mx-4 md:mx-10 lg:mx-35 flex justify-between">
       <div>
         <Link href="/dashboard">
           <Image
