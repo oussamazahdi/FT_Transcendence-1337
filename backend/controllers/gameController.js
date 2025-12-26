@@ -1,4 +1,5 @@
 import { GameSession, Paddle } from "../store/game.store.js";
+import { randomUUID } from "crypto";
 
 let waitingPlayer = null;
 const activeGames = new Map();
@@ -49,8 +50,19 @@ function updateGame(io, roomId) {
 	const game = activeGames.get(roomId);
 	if (!game || game.state !== "PLAYING") return;
 
-	game.ball.x += game.ball.velocityX;
-	game.ball.y += game.ball.velocityY;
+	if ( game.ball.y - game.ball.radius <= 0 || game.ball.y + game.ball.radius >= 700)
+		game.ball.velocityY *= -1;
+
+	if (game.ball.x <= 0 || game.ball.x >= 1024) {
+		// if (game.ball.x >= 1024) setScore1((s) => s + 1);
+		// if (game.ball.x <= 0) setScore2((s) => s + 1);
+		game.ball.x = 512;
+		game.ball.y = 350;
+	}
+
+	game.ball.x += game.ball.velocityX * game.ball.speed;
+	game.ball.y += game.ball.velocityY * game.ball.speed;
+
 
 	io.to(roomId).emit("game-state", game);
 }
@@ -60,7 +72,7 @@ export function startGameLoop(io, roomId) {
 
 	const loop = setInterval(() => {
 		updateGame(io, roomId);
-	}, 1000 / 60);
+	}, 1000 / 25);
 
 	loops.set(roomId, loop);
 }
@@ -84,19 +96,21 @@ export function handleUpdateData(socket, io, playerData) {
 
 function matchFound(io, socket, playerData) {
 	const game = new GameSession();
+	game.roomId = randomUUID();
 
+	
 	Object.assign(game.player1, {
 		...waitingPlayer.playerData,
 		socketId: waitingPlayer.socketId,
 		roomId: game.roomId,
-		player: new Paddle(20),
+		player: new Paddle(40),
 	});
 
 	Object.assign(game.player2, {
 		...playerData,
 		socketId: socket.id,
 		roomId: game.roomId,
-		player: new Paddle(1004),
+		player: new Paddle(1024 - 60),
 	});
 
 	game.state = "MATCHED";
@@ -157,4 +171,30 @@ export function handleDisconnect(socket, io) {
 
 	io.to(remaining.socketId).emit("opponent-left");
 	removeGame(game.roomId);
+}
+
+const PADDLESIZE = 120;
+
+export function handlePaddleMove(socket, io, paddle)
+{
+	const game = getGameBySocket(socket.id);
+	const player = socket.id === game.player1.socketId ? game.player1 : game.player2;
+	if (!game) return;
+	
+	if (paddle.direction === "up")
+		{
+			if (player.player.y - 14 <= 0)
+				player.player.y = 0;
+			else
+			player.player.y -= 14;
+	}
+	else
+	{
+		if (player.player.y + PADDLESIZE + 14 >= 700)
+			player.player.y = 700 - PADDLESIZE;
+		else
+		player.player.y += 14;
+}
+
+	io.to(game.roomId).emit("game-state", game);
 }

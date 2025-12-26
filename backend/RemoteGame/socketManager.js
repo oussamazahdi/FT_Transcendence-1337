@@ -1,9 +1,12 @@
-import { handleJoin, handleDisconnect, handleUpdateData } from "../controllers/gameController.js"
+import { handleJoin, handleDisconnect, handleUpdateData, handlePaddleMove } from "../controllers/gameController.js"
 
 export default function initSocketManager(io) {
 	io.on("connection", socket => {
 		console.log("✅ Connected:", socket.id);
 
+		socket.on("paddle-move", (playerData)=>{
+			handlePaddleMove(socket, io, playerData);
+		})
 		socket.on("update-data", (playerData)=>{
 			handleUpdateData(socket, io, playerData);
 		})

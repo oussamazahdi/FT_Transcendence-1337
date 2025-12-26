@@ -1,25 +1,34 @@
 import { randomUUID } from "crypto";
 
+export const GAME_WIDTH = 1024;
+export const GAME_HEIGHT = 700;
+
+/* ================= BALL ================= */
 export class Ball {
 	constructor() {
-		this.x = 300;
-		this.y = 200;
-		this.velocityX = 0.5;
-		this.velocityY = 0.5;
-		this.speed = 1.5;
+		const angle = Math.random() * Math.PI / 2 - Math.PI / 4;
+		const speed = 0.5;
+
+		this.x = GAME_WIDTH / 2;
+		this.y = GAME_HEIGHT / 2;
 		this.radius = 10;
+		this.speed = speed;
+		this.velocityX = Math.cos(angle) * speed;
+		this.velocityY = Math.sin(angle) * speed;
 	}
 }
 
+/* ================= PADDLE ================= */
 export class Paddle {
 	constructor(x) {
+		this.width = 15;
+		this.height = 120;
 		this.x = x;
-		this.y = 150;
-		this.width = 10;
-		this.height = 80;
+		this.y = (GAME_HEIGHT - this.height) / 2;
 	}
 }
 
+/* ================= PLAYER ================= */
 export class Player {
 	constructor() {
 		this.socketId = "";
@@ -29,10 +38,11 @@ export class Player {
 		this.avatar = "";
 		this.score = 0;
 		this.roomId = "";
-		this.paddle = null;
+		this.player = null;
 	}
 }
 
+/* ================= GAME ================= */
 export class GameSession {
 	constructor() {
 		this.state = "WAITING"; // WAITING | PLAYING | FINISHED

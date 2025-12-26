@@ -107,7 +107,7 @@ export default function PingPongGame() {
 			if (e.key === "s") state.keys.s = true;
 			if (e.key === "ArrowUp") state.keys.ArrowUp = true;
 			if (e.key === "ArrowDown") state.keys.ArrowDown = true;
-			if (e.key === " ") togglePause(); // spacebar toggles pause too
+			if (e.key === " ") togglePause();
 		};
 
 		const keyUpHandler = (e) => {

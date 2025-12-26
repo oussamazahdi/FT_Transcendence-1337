@@ -11,11 +11,11 @@ export class Ball {
 	}
 }
 
-export class paddle {
-	constructor() {
-		this.x = 50;
-		this.y = 80;
-		this.width = 10;
+export class Paddle {
+	constructor(x) {
+		this.x = x;
+		this.y = 700 / 2 - 160;
+		this.width = 15;
 		this.height = 80;
 	}
 }
