@@ -71,7 +71,7 @@ const SelectImage = () => {
 
     setError(null);
     setProfileImage(file);
-    setSelectedAvatar(null); // Clear avatar selection if custom image is chosen
+    setSelectedAvatar(null);
 
     const preview = URL.createObjectURL(file);
     setImagePreview(preview);
@@ -89,7 +89,6 @@ const SelectImage = () => {
     try {
       if (profileImage) {
         console.log("request from image");
-        // Upload custom image
         const formData = new FormData();
         formData.append("image/", profileImage);
         const reply = await fetch(
@@ -105,15 +104,13 @@ const SelectImage = () => {
         data = await reply.json();
 
         if (!reply.ok) {
-          // const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
-          const errorMessage = data.error;
+          const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
           throw new Error(errorMessage);
         }
 
         console.log("Upload successful:", data);
       } else if (selectedAvatar) {
         console.log("request from avatar");
-        // Select predefined avatar
         const reply = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/auth/uploadImage`,
           {
@@ -129,15 +126,12 @@ const SelectImage = () => {
         data = await reply.json();
 
         if (!reply.ok) {
-          // const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
-          const errorMessage = data.error;
+          const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
           throw new Error(errorMessage);
         }
 
         console.log("Avatar selection successful:", data);
       }
-
-      // Navigate to dashboard on success
       login(data.userData);
       router.replace("/dashboard");
     } catch (err) {
@@ -215,7 +209,7 @@ const SelectImage = () => {
                 onClick={() => {
                   setSelectedAvatar(a.alt);
                   setImagePreview(a.color);
-                  setProfileImage(null); // Clear custom image if avatar is chosen
+                  setProfileImage(null);
                 }}
               />
             ))}

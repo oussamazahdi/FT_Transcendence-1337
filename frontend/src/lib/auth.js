@@ -1,7 +1,6 @@
 import { cookies } from "next/headers";
 
 export async function getCurrentUser() {
-  // console.log("==>" ,process.env.NEXT_PUBLIC_API_URL)
   const cookieStore = await cookies();
   const aToken = cookieStore.get("accessToken");
   const rToken = cookieStore.get("refreshToken");

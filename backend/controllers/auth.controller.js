@@ -17,8 +17,8 @@ export class AuthController {
         try {
             const result = await authModels.loginUser(db, email, password);
             const params = {
-                isVerified: !!result.isverified, // i changed it from int to bool
-                hasAvatar: !!result.avatar
+                isVerified: !!result.isverified,
+                status2fa: !!result.status2fa
             }
             if (result.message && result.message.includes("USER_NOT_FOUND"))
                 return reply.code(404).send({error: "USER_NOT_FOUND"});
@@ -37,7 +37,7 @@ export class AuthController {
                 httpOnly: true,
                 sameSite: 'strict',
                 path: '/',
-                maxAge: 15 * 60 * 60 * 1000
+                maxAge: 7 * 24 * 60 * 60 * 1000
             });
             return reply.code(200).send({message: "AUTHORIZED", userData: result});
         }
@@ -59,7 +59,8 @@ export class AuthController {
             const user = await authModels.addNewUser(db, firstname, lastname, username, email, password);
             const params = {
                 isVerified: !!user.isverified,
-                hasAvatar: !!user.avatar
+                hasAvatar: !!user.avatar,
+                status2fa: !!user.status2fa
             }
             const accessToken = generateToken(user.id, user.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION, params, "access");
             const refreshToken = generateToken(user.id, user.username, process.env.JWT_REFRESH_SECRET, process.env.JWT_REFRESH_EXPIRATION, null, "refresh");
@@ -74,7 +75,7 @@ export class AuthController {
                 httpOnly: true,
                 sameSite: 'strict',
                 path: '/',
-                maxAge: 15 * 60 * 60 * 1000
+                maxAge: 7 * 24 * 60 * 60 * 1000
             });
             return reply.code(201).send({message: "USER_CREATED_SUCCESSFULLY"});
         }
@@ -158,7 +159,8 @@ export class AuthController {
     {
         const db = request.server.db;
         try {
-            const user = authModels.findUserById(db, request.user.userId, ['id', 'firstname', 'lastname', 'username', 'email', 'avatar', 'isverified']);
+            const user = authModels.findUserById(db, request.user.userId);
+            console.log(user)
             return reply.code(200).send({message: "SUCCESS", userData: user});
         }
         catch (error) {
@@ -242,7 +244,7 @@ export class AuthController {
             if (today > user.otpexpiration)
                 throw new Error("EXPIRED_OTP");
             if (code !== user.otp)
-                throw new Error("INCORRECT ");
+                throw new Error("INCORRECT");
             authModels.markEmailVerified(db, request.user.userId);
             const userflags = authModels.findUserById(db, request.user.userId);
             updateTokenFlags(userflags, reply);

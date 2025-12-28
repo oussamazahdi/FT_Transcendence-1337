@@ -2,11 +2,44 @@
 import React, { useState, useRef } from 'react'
 import { assets } from '@/assets/data'
 import Image from 'next/image'
+import { useRouter } from "next/navigation";
+import { AUTH_ERRORS } from '@/lib/utils';
 
 const TwoFA = () => {
   const [loading, setLoading] = useState(false)
   const [TwoFAcode, setTwoFAcode] = useState(new Array(6).fill(""));
   const inputRefs = useRef([]);
+  const [error, setError] = useState("");
+  const router = useRouter();
+
+  const VerifyQrCode = async () => {
+    setLoading(true);
+    setError("");
+    try{
+      const twofaToken = TwoFAcode.join("");
+      if(!twofaToken)
+          throw new Error("enter the code firstly");
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/2fa/verify`,{
+        method:"post",
+        credentials:"include",
+        headers:{
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({token: twofaToken})
+      })
+      const data = await response.json();
+      if(!response.ok){
+        throw new Error(AUTH_ERRORS[data.error] || AUTH_ERRORS["default"])
+      }
+
+      router.push('/dashboard');
+    }catch(err){
+      setError(err.message);
+      console.log(err.message);
+    }finally{
+      setLoading(false)
+    }
+  }
 
   const handleChange = (element, index) => {
     console.log(element);
@@ -54,6 +87,7 @@ const TwoFA = () => {
             {TwoFAcode.map((data, index) => (
               <input
                 key={index}
+                required
                 type="text"
                 maxLength="1"
                 ref={(el) => (inputRefs.current[index] = el)}
@@ -65,14 +99,15 @@ const TwoFA = () => {
               />
             ))}
           </div>
+          {error && (<p className="text-red-600 text-xs text-center px-3 py-1 bg-red-300/20 border-1">{error}</p>)}
           <button
             type="submit"
             disabled={loading}
+            onClick={()=>VerifyQrCode()}
             className="px-30 py-2 mt-2 text-sm bg-[#0F2C34] text-white rounded hover:bg-green-500/40 disabled:bg-gray-500 transition-all cursor-pointer"
           >
             {loading ? "Verifing..." : "Verify"}
           </button>
-          <div className='text-xs text-white hover:underline cursor-pointer'>Skip for now</div>
         </div>      
         <div className="relative overflow-hidden m-2 bg-white rounded-xl w-[400px]">
           <Image

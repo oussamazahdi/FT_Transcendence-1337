@@ -35,7 +35,8 @@ function generateToken(userId, Username, secret, expiration, params, type)
             userId: userId,
             username: Username,
             isVerified: params.isVerified,
-            hasAvatar: params.hasAvatar
+            hasAvatar: params.hasAvatar,
+            status2fa: params.status2fa
         };
     }
     else
@@ -52,7 +53,8 @@ function updateTokenFlags(user, reply)
 {
     const params = {
         isVerified: !!user.isverified,
-        hasAvatar: !!user.avatar
+        hasAvatar: !!user.avatar,
+        status2fa: !!user.status2fa
     }
     const accessToken = generateToken(user.id, user.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION, params, "access");
     reply.setCookie('accessToken', accessToken, {

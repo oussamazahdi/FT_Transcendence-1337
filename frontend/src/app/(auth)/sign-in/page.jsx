@@ -19,10 +19,12 @@ const SignIn = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setError("");
     setLoading(true);
 
     try {
+      if (password.length < 8)
+        throw new Error("Password must be at least 8 characters")
       const reply = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
         {
@@ -40,8 +42,7 @@ const SignIn = () => {
 
       if (!reply.ok) {
         const errorData = await reply.json();
-        const errorMessage =
-          AUTH_ERRORS[errorData.error] || AUTH_ERRORS["default"];
+        const errorMessage = AUTH_ERRORS[errorData.error] || AUTH_ERRORS["default"];
         throw new Error(errorMessage);
       }
 
@@ -50,7 +51,8 @@ const SignIn = () => {
 
       router.push("/dashboard");
     } catch (err) {
-      if (err instanceof Error) setError(err.message);
+      if (err instanceof Error) 
+        setError(err.message);
       else setError("An unknown error occurred");
     } finally {
       setLoading(false);
@@ -85,10 +87,7 @@ const SignIn = () => {
                 placeholder="your password"
               />
             </div>
-
-            {error && (
-              <p className="text-red-500 text-xs text-center">{error}</p>
-            )}
+            {error && (<p className="text-red-600 text-xs text-center px-3 py-1 bg-red-300/20 border-1">{error}</p>)}
             <button
               type="submit"
               disabled={loading}

@@ -3,6 +3,7 @@ import React, { useRef, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { assets } from "@/assets/data";
 import { useRouter } from "next/navigation";
+import { AUTH_ERRORS } from "@/lib/utils";
 
 const EmailVerification = () => {
   const [otp, setOtp] = useState(new Array(6).fill(""));
@@ -30,11 +31,9 @@ const EmailVerification = () => {
       );
 
       const data = await response.json();
-      console.log("==>", data);
 
       if (!response.ok) {
-        // const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
-        const errorMessage = data.error;
+        const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
         throw new Error(errorMessage);
       }
     } catch (err) {
@@ -85,8 +84,8 @@ const EmailVerification = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        // const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
-        throw new Error(data.error);
+        const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
+        throw new Error(errorMessage);
       }
       router.replace("/sign-up/email-verification/select-image");
     } catch (err) {

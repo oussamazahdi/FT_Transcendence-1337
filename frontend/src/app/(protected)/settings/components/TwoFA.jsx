@@ -2,8 +2,31 @@
 "use client"
 import React, { useState } from "react";
 
-export default function TwoFA({isEnable, onEnableClick, setIsEnable}){
+export default function TwoFA({isEnable, setView, setIsEnable}){
   const [showConfirm, setShowconfirm] = useState(false);
+  const [error, setError] = useState("");
+  
+
+  const disableTwoFA = async() => {
+    setError("");
+    try{
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/2fa/disable`,{
+        method:"post",
+        credentials:"include",
+      })
+
+      const data = await response.json();
+      if (!response.ok)
+        throw new Error(data.error);
+
+      console.log("TwoFA disabled successfuly");
+      setIsEnable(false);
+      setShowconfirm(false);
+    }catch(err){
+      console.log(err.message);
+      setError(err.message);
+    }
+  }
   
   return(
     <div className="flex flex-col justify-start items-center gap-2">
@@ -21,7 +44,7 @@ export default function TwoFA({isEnable, onEnableClick, setIsEnable}){
       :
       <button
         type="submit"
-        onClick={onEnableClick}
+        onClick={() => setView("setup")}
         className="w-60 h-8 text-xs rounded-sm mt-4 hover:bg-[#0F2C34]/40 border-[#414141]/60 border-1 bg-[#070707] text-white hover:text-white cursor-pointer">
         Enable
       </button>}
@@ -37,7 +60,7 @@ export default function TwoFA({isEnable, onEnableClick, setIsEnable}){
           <div className="flex justify-center items-center gap-4">
             <button
               type="submit"
-              onClick={()=> {setShowconfirm(false); setIsEnable(false)}}
+              onClick={()=> disableTwoFA()}
               className="w-30 h-8 text-xs rounded-sm mt-4 hover:bg-[#442222]/40 bg-[#442222] text-[#FF4848] cursor-pointer">
               Disable 2FA
             </button>

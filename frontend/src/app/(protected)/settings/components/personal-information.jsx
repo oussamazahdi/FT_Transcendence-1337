@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useAuth } from "@/contexts/authContext";
 import { assets } from "@/assets/data";
+import { USER_ERROR } from "@/lib/utils";
 
 //check if data empty
 export default function Personal_information() {
@@ -81,19 +82,20 @@ export default function Personal_information() {
         },
       );
 
-      if (!response.ok) 
-        throw new Error("failde to update information");
-
       const data = await response.json();
-      console.log(data.user);
+
+      if (!response.ok){
+        if (data.error === 'INVALID_INPUT')
+          throw new Error(`invalid ${data.fields}`)
+        throw new Error(USER_ERROR[data.error] || USER_ERROR["default"]);
+      }
 
       const newUser = data.user;
-
       login({...user, ...newUser});
       console.log("user update successfully :)");
     } catch (err) {
       console.log("failed to updare user :( ", err.message);
-      setError(err.error || "Something went wrong");
+      setError(err.message);
     }
   }
 
@@ -189,7 +191,7 @@ export default function Personal_information() {
         className="bg-[#414141]/60 rounded-sm p-2 text-sm w-105 focus:outline-none"
         value={formData.email}
       />
-      {error && <p className="text-xsm text-red-700">{error}</p>}
+      {error && (<p className="text-red-600 text-xs text-center px-3 py-1 bg-red-300/20 border-1">{error}</p>)}
       <button
         disabled={!isChanged}
         type="submit"

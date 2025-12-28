@@ -82,7 +82,13 @@ function userRoutes(fastify)
             // },
             response: {
                 200: emptySuccessResponse,
-                400: errorResponse,
+                400: {
+                    type: 'object',
+                    properties: {
+                        error: {type: 'string'},
+                        fields: {type: 'string'}
+                    }
+                },
                 401: errorResponse,
                 500: errorResponse
             }
@@ -119,14 +125,17 @@ function userRoutes(fastify)
                 type: 'object',
                 properties: {
                     oldPassword: {
+                        type: 'string',
                         minLength: 8,
                         maxLength: 64,
                     },
                     newPassword: {
+                        type: 'string',
                         minLength: 8,
                         maxLength: 64,
                     },
                     repeatNewPassword: {
+                        type: 'string',
                         minLength: 8,
                         maxLength: 64,
                     },

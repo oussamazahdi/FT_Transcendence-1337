@@ -1,4 +1,4 @@
-import './env.js'; // Load environment variables FIRST
+import './env.js';
 
 import Fastify from "fastify";
 import { serverConfig } from "./config/server.config.js";

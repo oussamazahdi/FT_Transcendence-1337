@@ -5,6 +5,7 @@ import fs from "fs"
 
 import { userModels } from "../models/user.model.js";
 import { generateFileNameByUser } from "../utils/authUtils.js";
+import { updateUserSchema, zErrorHandler } from "../utils/inputValidator.js"
 
 /**
  * still neeed to apply erroring system
@@ -74,28 +75,27 @@ export class UserController
 				if (part.type === "field")
 					userData[part.fieldname] = part.value;
 				else if (part.type === "file")
-					{
-						fileInfo = {
-							filename: part.filename,
-							encoding: part.encoding,
-							mimetype: part.mimetype,
-							fileStream: part.file
-						}
+				{
+					fileInfo = {
+						filename: part.filename,
+						encoding: part.encoding,
+						mimetype: part.mimetype,
+						fileStream: part.file
 					}
-				}
-				if (fileInfo.filename)
 					userData["avatar"] = await fileUpload(request.user, fileInfo);
-				
-				const user = userModels.getUserById(db, request.params.id);
-				if (!user)
-					return reply.code(404).send({error: "USER_NOT_FOUND"});
-				
+				}
+			}
+			const validatedData = updateUserSchema.parse(userData);
+			const user = userModels.getUserById(db, request.params.id);
+			if (!user)
+				return reply.code(404).send({error: "USER_NOT_FOUND"});
+
 			userData = {
-				firstname: userData.firstname || user.firstname,
-				lastname: userData.lastname || user.lastname,
-				username: userData.username || user.username,
-				email: userData.email || user.email,
-				avatar: userData.avatar || user.avatar
+				firstname: validatedData.firstname || user.firstname,
+				lastname: validatedData.lastname || user.lastname,
+				username: validatedData.username || user.username,
+				email: validatedData.email || user.email,
+				avatar: validatedData.avatar || user.avatar
 			}
 			
 			userModels.updateUserById(db, request.params.id, userData);
@@ -103,6 +103,10 @@ export class UserController
 			return reply.code(201).send({message: "SUCCESS", user:userData});
 		}
 		catch (error) {
+			const zError = zErrorHandler(error);
+			console.log(zError.fields);
+			if (zError !== null)
+				return reply.code(zError.code).send({error: zError.error, fields: zError.fields});
 			if (error.code)
 				return reply.code(error.code).send({error: error.message});
 			else

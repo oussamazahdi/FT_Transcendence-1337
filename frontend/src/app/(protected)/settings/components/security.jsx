@@ -5,6 +5,7 @@ import { assets } from "@/assets/data";
 import { useAuth } from "@/contexts/authContext";
 import TwoFA from "./TwoFA";
 import TwoFaSetup from "./TwoFaSetup";
+import { USER_ERROR } from "@/lib/utils";
 
 //check if data empty
 const PasswordInput = ({label, name, value, show, setShow, onChange}) => (
@@ -37,8 +38,7 @@ export default function Security() {
   });
   const {user} = useAuth()
 
-  // const [isEnable, setIsEnable] = useState(user.isEnable);
-  const [isEnable, setIsEnable] = useState(false);
+  const [isEnable, setIsEnable] = useState(user.status2fa);
   const [view, setView] = useState("status");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -52,9 +52,9 @@ export default function Security() {
     
     try{
       if (passwords.current === passwords.newPass)
-        throw new Error("New password must be different.")
+        throw new Error(USER_ERROR["NEW_PASSWORD_MATCHS_OLD_PASSWORD"] || USER_ERROR["default"])
       if (passwords.newPass !== passwords.confirmPass)
-        throw new Error("Passwords do not match.")
+        throw new Error(USER_ERROR["NEW_PASSWORDS_DO_NOT_MATCH"] || USER_ERROR["default"])
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/change-password`,{
         method:"POST",
@@ -78,7 +78,6 @@ export default function Security() {
       setPasswords({ current: "", newPass: "", confirmPass: "" });
     }catch(err){
       setError(err.message);
-      console.log("failed to change password")
     }finally{
       setLoading(false);
     }
@@ -99,7 +98,7 @@ export default function Security() {
         <PasswordInput label="Current password" name="current" show={showCurr} setShow={setShowCurr} value={passwords.current} onChange={handleChange} />
         <PasswordInput label="New password" name="newPass" show={showNew} setShow={setShowNew} value={passwords.newPass} onChange={handleChange} />
         <PasswordInput label="Confirm new password" name="confirmPass" show={showconfirm} setShow={setShowconfirm} value={passwords.confirmPass} onChange={handleChange} />
-        {error && (<p className="text-red-600 text-xs text-center w-full h-6 bg-red-300/20 border-1 p-1">{error}</p>)}
+        {error && (<p className="text-red-600 text-xs text-center px-3 py-1 bg-red-300/20 border-1">{error}</p>)}
         {greeting && (<p className="text-white text-xs text-center w-full h-6 bg-orange-300/20 border-1 border-green-500/20 p-1">{greeting}</p>)}
         <button
           type="submit"
@@ -111,9 +110,9 @@ export default function Security() {
       </form>
       <div className="basis-1/2">
         {view === "status" ?
-          <TwoFA isEnable={isEnable} onEnableClick={() => setView("setup")} setIsEnable={setIsEnable}/>
+          <TwoFA isEnable={isEnable} setIsEnable={setIsEnable} setView={setView}/>
           :
-          <TwoFaSetup onEnableClick={() =>{ setView("status"); setIsEnable(true)}}/>
+          <TwoFaSetup setEnable={setIsEnable} setView={setView}/>
         }
       </div>
     </div>

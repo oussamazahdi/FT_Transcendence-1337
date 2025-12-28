@@ -13,6 +13,8 @@ function createUserTable(db)
             isverified BOOLEAN DEFAULT false,
             otp TEXT,
             otpexpiration TIMESTAMP,
+            status2fa BOOLEAN DEFAULT false,
+            secret2fa TEXT,
             createdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )`);
         // console.log("Database initialized successfully!")

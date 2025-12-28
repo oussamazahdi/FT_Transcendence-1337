@@ -1,14 +1,67 @@
 "use client"
-import react, { useRef, useState } from "react"
+import react, { useRef, useState, useEffect } from "react"
 import Image from "next/image"
-import { assets } from "@/assets/data"
 
-export default function TwoFaSetup ({onEnableClick}){
+export default function TwoFaSetup ({setEnable, setView}){
   const [TwoFAcode, setTwoFAcode] = useState(new Array(6).fill(""));
   const inputRefs = useRef([]);
+  const [imagePreview, setImagePreview] = useState("");
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setError("");
+    const getQrCode = async()=>{
+      try{
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/2fa/setup`,{
+          method:"post",
+          credentials:"include"
+        })
+        
+        const data = await response.json();
+        if(!response.ok)
+          throw new Error(data.error);
+
+        setImagePreview(data.qr)
+      }catch(err){
+        console.log(err.message);
+        setError(err.message);
+      }finally{
+        setLoading(false);
+      }
+    }
+    getQrCode();
+  },[])
+
+  const VerifyQrCode = async () => {
+    setError("");
+    console.log("hna tah rial")
+    try{
+      const tokenString = TwoFAcode.join("");
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/2fa/enable`,{
+        method:"post",
+        credentials:"include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token: tokenString }),
+      })
+
+      const data = await response.json();
+      if(!response.ok)
+        throw new Error(data.error)
+
+      console.log("hna nla3bo 3lih")
+
+      setEnable(true);
+      setView("status");
+    }catch(err){
+      console.log(err.message)
+      setError(err.message)
+    }
+  }
 
   const handleChange = (element, index) => {
-    console.log(element);
     if (isNaN(element.value)) 
       return;
     const newTwoFAcode = [...TwoFAcode];
@@ -47,7 +100,9 @@ export default function TwoFaSetup ({onEnableClick}){
       <p className="font-bold ">Two-Factor Authentication</p>
       <p className="text-xs text-gray-500">Scan the QR code with your authentication app or manually enter the code below.</p>
       <div className="border-1 border-dashed w-24 h-24 p-[2px] rounded-[9px]">
-        <Image src={assets.QRcode} alt="icon to replace later" width={90} height={90} className="rounded-[3px]"/>
+        {!loading ? (<Image src={imagePreview} alt="icon to replace later" width={90} height={90} className="rounded-[6px]"/>)
+        :
+        (<p>Loading...</p>)}
       </div>
       <p className="text-xs text-gray-500">Enter your 2FA code here</p>
       <div className="flex gap-2">
@@ -65,9 +120,10 @@ export default function TwoFaSetup ({onEnableClick}){
           />
         ))}
       </div>
+      {error && <p>{error}</p>}
       <button
         type="submit"
-        onClick={onEnableClick}
+        onClick={() => VerifyQrCode()}
         className="w-60 h-8 text-xs rounded-sm mt-4 hover:bg-[#0F2C34]/40 border-[#414141]/60 border-1 bg-[#070707] text-white hover:text-white cursor-pointer">
         Enable
       </button>
