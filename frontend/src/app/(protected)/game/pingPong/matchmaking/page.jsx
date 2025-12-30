@@ -34,8 +34,7 @@ export default function Matchmaking() {
 	useEffect(() => {
 		if (!user) return;
 
-		setPlayer1({
-			...emptyPlayer(),
+		setPlayer1({ ...emptyPlayer(),
 			firstName: user.firstname,
 			lastName: user.lastname,
 			username: user.username,
@@ -45,13 +44,10 @@ export default function Matchmaking() {
 
 	useEffect(() => {
 		if (!user) return;
+		if (!socket.connected) socket.connect();
 
-		if (!socket.connected)
-			socket.connect();
-
-		const handleConnect = () => {
-			setPlayer1(prev => ({
-				...prev,
+		function handleConnect() {
+			setPlayer1(prev => ({...prev,
 				socketId: socket.id,
 			}));
 
@@ -67,24 +63,20 @@ export default function Matchmaking() {
 
 			setStatus("Waiting for opponent...");
 		};
-
+		
 		const handleMatchFound = opponent => {
 			setPlayer2(opponent);
 			setStatus("Match Found!");
-			setTimeout(()=>{
-				router.push(`/game/pingPong/${opponent.roomId}`);
-				router.refresh()
-			}, 3000);
 		};
-
+		
 		const handleMatchCanceled = () => {
-			console.log("❌ Match canceled");
-
+			console.log("❌ Match canceled"); // remove
+			
 			setPlayer2(emptyPlayer());
 			setStatus("Opponent left. Searching again...");
-
+			
 			joinedRef.current = false;
-
+			
 			socket.emit("join-game", {
 				firstName: user.firstname,
 				lastName: user.lastname,
@@ -93,21 +85,21 @@ export default function Matchmaking() {
 			});
 		};
 
-		const handleOpponentLeft = () => {
-			console.log("🏆 Opponent left");
-			setStatus("Opponent disconnected. You win!");
-		};
+		const handleMatchStarted = roomId => {
+			router.push(`/game/pingPong/${roomId}`);
+			router.refresh()
+		}
 
 		socket.on("connect", handleConnect);
 		socket.on("match-found", handleMatchFound);
 		socket.on("match-canceled", handleMatchCanceled);
-		socket.on("opponent-left", handleOpponentLeft);
-
+		socket.on("match-started", handleMatchStarted);
+		
 		return () => {
 			socket.off("connect", handleConnect);
 			socket.off("match-found", handleMatchFound);
 			socket.off("match-canceled", handleMatchCanceled);
-			socket.off("opponent-left", handleOpponentLeft);
+			socket.on("match-started", handleMatchStarted);
 		};
 	}, [user, router]);
 	

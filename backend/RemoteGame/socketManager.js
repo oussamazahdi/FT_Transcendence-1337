@@ -2,7 +2,7 @@ import { handleJoin, handleDisconnect, handleUpdateData, handlePaddleMove } from
 
 export default function initSocketManager(io) {
 	io.on("connection", socket => {
-		console.log("✅ Connected:", socket.id);
+		console.log("✅ Connected:", socket.id); // remove
 
 		socket.on("paddle-move", (playerData)=>{
 			handlePaddleMove(socket, io, playerData);

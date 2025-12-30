@@ -39,7 +39,6 @@ export default function Page() {
 	useEffect(() => {
 		socket.on("match-data", setGame);
 		socket.on("game-state", setGame);
-		// socket.on("game-end", setGame);
 		return () => {
 			socket.off("match-data");
 			socket.off("game-state");
