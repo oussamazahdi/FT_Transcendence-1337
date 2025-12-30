@@ -212,3 +212,24 @@ export function handleDisconnect(socket, io) {
 	removeGame(game.roomId);
 	io.to(remaining.socketId).emit("match-canceled");
 }
+
+export function handleLeave(socket, io) {
+	// If player is waiting
+	if (waitingPlayer?.socketId === socket.id) {
+		waitingPlayer = null;
+		return;
+	}
+
+	const game = getGameBySocket(socket.id);
+	if (!game) return;
+
+	const remaining =
+		game.player1.socketId === socket.id
+			? game.player2
+			: game.player1;
+
+	removeGame(game.roomId);
+
+	// Notify opponent
+	io.to(remaining.socketId).emit("match-canceled");
+}

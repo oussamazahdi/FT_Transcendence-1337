@@ -28,6 +28,7 @@ export default function Matchmaking() {
 	const [status, setStatus] = useState("Searching for opponent...");
 	const [player1, setPlayer1] = useState(emptyPlayer());
 	const [player2, setPlayer2] = useState(emptyPlayer());
+	const [canExit, setCanExit] = useState(true);
 
 	const joinedRef = useRef(false);
 
@@ -41,6 +42,17 @@ export default function Matchmaking() {
 			avatar: user.avatar,
 		});
 	}, [user]);
+
+	const handleExit = () => {
+		socket.emit("leave-game");
+		joinedRef.current = false;
+	
+		setPlayer2(emptyPlayer());
+		setStatus("You left the match");
+	
+		socket.disconnect();
+		router.push("/game/pingPong");
+	};
 
 	useEffect(() => {
 		if (!user) return;
@@ -67,6 +79,7 @@ export default function Matchmaking() {
 		const handleMatchFound = opponent => {
 			setPlayer2(opponent);
 			setStatus("Match Found!");
+			setCanExit(false)
 		};
 		
 		const handleMatchCanceled = () => {
@@ -74,6 +87,7 @@ export default function Matchmaking() {
 			
 			setPlayer2(emptyPlayer());
 			setStatus("Opponent left. Searching again...");
+			setCanExit(true)
 			
 			joinedRef.current = false;
 			
@@ -89,6 +103,9 @@ export default function Matchmaking() {
 			router.push(`/game/pingPong/${roomId}`);
 			router.refresh()
 		}
+
+		
+		
 
 		socket.on("connect", handleConnect);
 		socket.on("match-found", handleMatchFound);
@@ -114,6 +131,12 @@ export default function Matchmaking() {
 				<PlayerCard player={player2}/>
 
 			</div>
+			<button onClick={canExit ? handleExit : undefined} className={`mt-6 rounded-md px-6 py-2 font-medium transition duration-100 ${
+			canExit ? "bg-[#442222] text-[#FF4848] hover:bg-[#3C1C1C] hover:text-[#BE3838]" : "bg-[#252525] text-[#717171] cursor-not-allowed"}`}>Exit</button>
+
+			{/* <button onClick={handleExit} className="mt-6 rounded-md bg-[#442222] px-6 py-2 font-medium text-[#FF4848] hover:bg-[#3C1C1C] hover:text-[#BE3838] transition duration-100">Exit</button> */}
+			{/* <button  className="mt-6 rounded-md bg-[#252525] px-6 py-2 font-medium text-[#717171]">Exit</button> */}
+
 		</div>
 	);
 }
