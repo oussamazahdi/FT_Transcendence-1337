@@ -50,21 +50,46 @@ function updateGame(io, roomId) {
 	const game = activeGames.get(roomId);
 	if (!game || game.state !== "PLAYING") return;
 
-	if ( game.ball.y - game.ball.radius <= 0 || game.ball.y + game.ball.radius >= 700)
-		game.ball.velocityY *= -1;
+	const ball = game.ball;
+	const player1 = game.player1.player;
+	const player2 = game.player2.player;
 
-	if (game.ball.x <= 0 || game.ball.x >= 1024) {
-		// if (game.ball.x >= 1024) setScore1((s) => s + 1);
-		// if (game.ball.x <= 0) setScore2((s) => s + 1);
-		game.ball.x = 512;
-		game.ball.y = 350;
+	if (ball.y - ball.radius <= 0 || ball.y + ball.radius >= 700)
+		ball.velocityY *= -1;
+
+	if (ball.x - ball.radius <= player1.x + player1.width && ball.x > player1.x &&
+	ball.y + ball.radius >= player1.y && ball.y - ball.radius <= player1.y + player1.height) {
+		ball.speed += 0.2;
+		ball.velocityX = Math.abs(ball.velocityX);
+		ball.velocityY = ((ball.y - player1.y) / player1.height - 0.5) * 2;
 	}
 
-	game.ball.x += game.ball.velocityX * game.ball.speed;
-	game.ball.y += game.ball.velocityY * game.ball.speed;
+	if (ball.x + ball.radius >= player2.x && ball.x < player2.x + player2.width &&
+	ball.y + ball.radius >= player2.y && ball.y - ball.radius <= player2.y + player2.height) {
+		ball.speed += 0.2;
+		ball.velocityX = -Math.abs(ball.velocityX);
+		ball.velocityY = ((ball.y - player2.y) / player2.height - 0.5) * 2;
+	}
 
+	if (ball.x <= 0 || ball.x >= 1024) {
+		if (ball.x <= 0) game.player2.score += 1;
+		else game.player1.score += 1;
 
-	io.to(roomId).emit("game-state", game);
+		ball.x = 512;
+		ball.y = 350;
+		ball.velocityX *= -1;
+		ball.speed = 2.5;
+	}
+
+	if (game.player1.score === 10 || game.player2.score === 10) {
+		game.state = "FINISHED";
+		io.to(roomId).emit("game-state", game);
+		removeGame(game.roomId);
+	} else {
+		ball.x += ball.velocityX * ball.speed;
+		ball.y += ball.velocityY * ball.speed;
+		io.to(roomId).emit("game-state", game);
+	}
 }
 
 export function startGameLoop(io, roomId) {
@@ -72,7 +97,7 @@ export function startGameLoop(io, roomId) {
 
 	const loop = setInterval(() => {
 		updateGame(io, roomId);
-	}, 1000 / 25);
+	}, 1000 / 60);
 
 	loops.set(roomId, loop);
 }

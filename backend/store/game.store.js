@@ -7,7 +7,7 @@ export const GAME_HEIGHT = 700;
 export class Ball {
 	constructor() {
 		const angle = Math.random() * Math.PI / 2 - Math.PI / 4;
-		const speed = 0.5;
+		const speed = 2.5;
 
 		this.x = GAME_WIDTH / 2;
 		this.y = GAME_HEIGHT / 2;

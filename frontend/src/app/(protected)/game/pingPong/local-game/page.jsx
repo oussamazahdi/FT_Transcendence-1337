@@ -159,7 +159,6 @@ export default function PingPongGame() {
 				state.ball.velocityX *= -1;
 				state.ball.velocityY =
 					(state.ball.y - state.player2.y) / state.player2.height - 0.5;
-				// console.log("ball x: ", state.ball.x, " ball y: ", state.ball.y, " player 2 x : ", state.player2.x ," player 2 y : ", state.player2.y)
 			}
 			if (
 				state.ball.x - state.ball.radius <
@@ -219,7 +218,6 @@ export default function PingPongGame() {
 			);
 			context.fillStyle = players.ballColor;
 			context.fill();
-			// console.log("ball color : ", players.ballColor, " paddle color : ", players.player1.color)
 
 			animationRef.current = requestAnimationFrame(gameLoop);
 		};
