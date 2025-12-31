@@ -18,21 +18,21 @@ dotenv.config({ path: '../.env' });
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const db = new Sqlite3('./database/transcendence.db');
-const fastify = Fastify({
-	logger: {
-			transport: {
-					target: 'pino-pretty',
-					options: {
-							colorize: true,
-							translateTime: 'yyyy-mm-dd HH:MM:ss',
-							ignore: 'pid,hostname',
-					}
-			}
-	}
-});
 // const fastify = Fastify({
-// 	logger:false
+// 	logger: {
+// 			transport: {
+// 					target: 'pino-pretty',
+// 					options: {
+// 							colorize: true,
+// 							translateTime: 'yyyy-mm-dd HH:MM:ss',
+// 							ignore: 'pid,hostname',
+// 					}
+// 			}
+// 	}
 // });
+const fastify = Fastify({
+	logger:false
+});
 
 
 const transporter = nodemailer.createTransport( {

@@ -38,6 +38,7 @@ export class GameSession {
     this.state = "WAITING"; // WAITING | MATCHED | PLAYING | FINISHED
 		this.gameType = "PingPong";
 		this.roomId = randomUUID();
+		this.canceled = false;
 		this.player1 = new Player();
 		this.player2 = new Player();
 		this.ball = new Ball();

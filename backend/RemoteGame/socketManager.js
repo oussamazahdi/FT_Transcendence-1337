@@ -1,4 +1,4 @@
-import { handleJoin, handleDisconnect, handleUpdateData, handlePaddleMove, handleLeave } from "../controllers/gameController.js"
+import { handleJoin, handleDisconnect, handleUpdateData, handlePaddleMove } from "../controllers/gameController.js"
 
 export default function initSocketManager(io) {
 	io.on("connection", socket => {
@@ -18,6 +18,6 @@ export default function initSocketManager(io) {
 		socket.on("disconnect", () => {
 			handleDisconnect(socket, io);
 		});
-		socket.on("leave-game", () => handleLeave(socket, io));
+		socket.on("leave-game", () => handleDisconnect(socket, io));
 	});
 }
