@@ -12,9 +12,9 @@ const ConnectWith = () => {
   return (
     <div>
       <div className="flex flex-row pt-4 justify-center items-center">
-        <div className="border-t border-[#FFFFFF]/23 h-1 w-24"></div>
+        <div className="hidden md:block border-t border-[#FFFFFF]/23 h-1 w-24"></div>
         <p className="text-xs text-[#FFFFFF]/23 px-4 pb-1">Or connect with</p>
-        <div className="border-t border-[#FFFFFF]/23 h-1 w-24"></div>
+        <div className="hidden md:block border-t border-[#FFFFFF]/23 h-1 w-24"></div>
       </div>
 
       <div className="w-full flex flex-row items-center justify-center space-x-8 mt-2">

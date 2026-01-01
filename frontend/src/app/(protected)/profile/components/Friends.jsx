@@ -2,6 +2,8 @@ import React from 'react'
 import { assets } from '@/assets/data'
 import Image from 'next/image'
 import Link from 'next/link'
+import { UserIcon } from '@heroicons/react/24/outline'
+import { Gamepad2 } from 'lucide-react'
 
 const friendsData = [
   {id:"1", firstname:"Kamal", username:"kael-ala", status:"Online", avatar:assets.kamalPdp},
@@ -36,15 +38,15 @@ const renderFriends = friendsData.map((user) => (
       </div>
     </div>
     <div className='ml-auto flex items-center gap-1'>
-        <button><Image src={assets.gamepadeButton} alt='icon' width={52} height={52} className='cursor-pointer hover:brightness-150 hover:scale-110'/> </button>
-        <Link href={`/profile/${user.id}`}><Image src={assets.profileButton} alt='icon' width={52} height={52} className='cursor-pointer hover:brightness-150 hover:scale-110'/></Link>
+        <button className='w-12 h-7 bg-[#151515]/70 flex justify-center items-center rounded-lg cursor-pointer hover:brightness-150 hover:scale-110'><Gamepad2 className='size-4'/> </button>
+        <Link href={`/profile/${user.id}`} className='w-12 h-7 bg-[#151515]/70 flex justify-center items-center rounded-lg cursor-pointer hover:brightness-150 hover:scale-110'><UserIcon className='size-4'/></Link>
     </div>
   </div>
 ))
 
 const Friends = () => {
   return (
-    <div className=" basis-1/2 bg-[#0F0F0F]/75 rounded-[20px] p-3 h-1/2 flex flex-col">
+    <div className="flex-1 bg-[#0F0F0F]/75 rounded-[20px] p-3 h-1/2 flex flex-col">
       <p className='font-bold text-sm shrink-0'>Friends</p>
       <div className='flex flex-col gap-1 w-full mt-2 overflow-y-auto custom-scrollbar flex-1 min-h-0'>
         {renderFriends}

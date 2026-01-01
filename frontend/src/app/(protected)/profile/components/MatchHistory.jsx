@@ -40,7 +40,7 @@ const MatchHistory = ({height}) => {
   const {user} = useAuth();
 
   return (
-    <div className={`basis-1/2 bg-[#0F0F0F]/75 rounded-[20px] p-3 flex flex-col ${height}`}>
+    <div className={`flex-1 min-h-0 max-h-[350px] md:max-h-none bg-[#0F0F0F]/75 rounded-[20px] p-3 flex flex-col`}>
       <p className='font-bold text-sm shrink-0'>Match history</p>
       <div className='flex flex-col gap-1 w-full mt-2 overflow-y-auto custom-scrollbar flex-1 min-h-0'>
         {renderHistory}

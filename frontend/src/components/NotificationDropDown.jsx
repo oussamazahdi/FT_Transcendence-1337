@@ -86,9 +86,9 @@ const NotificationDropDown = () => {
   })
 
   return (
-    <div ref={ref} className="relative">
-      <button onClick={()=> setIsOpen(!isOpen)} className="border border-[#9D9D9D]/40 rounded-[10px] p-3 hover:bg-[#000000]/40 cursor-pointer hover:scale-105 active:scale-95">
-        <BellAlertIcon className="w-5 h-5 text-white/60" />
+    <div ref={ref} className="relative hidden md:block">
+      <button onClick={()=> setIsOpen(!isOpen)} className="md:border border-[#9D9D9D]/40 rounded-[10px] md:p-3 hover:bg-[#000000]/40 cursor-pointer hover:scale-105 active:scale-95">
+        <BellAlertIcon className="size-5 text-white/60" />
       </button>
       {isOpen && (
         <div className="absolute h-37 right-1 top-full mt-5 w-56 bg-[#000000]/70 rounded-[10px] flex flex-col justify-start items-center text-white p-1 z-10 gap-1 overflow-y-auto custom-scrollbar ">

@@ -79,10 +79,10 @@ const TwoFA = () => {
   
   return (
     <div className="min-h-screen flex justify-center items-center">
-      <div className="flex flex-row  justify-between bg-[#1A1A1A]/75 w-[800px] h-[480px] rounded-xl">
-        <div className='flex flex-col justify-center items-center w-[400px]'>
-          <p className='text-xl font-bold text-white'>Two-Factor Authentication</p>
-          <p className='text-xs text-[#A6A6A6]'>manually enter the code below.</p>
+      <div className="flex flex-col md:flex-row justify-center md:justify-between bg-[#1A1A1A]/75 w-full md:w-[800px] h-[480px] rounded-xl mx-4 md:mx-0">
+        <div className='flex flex-col items-center justify-center text-white w-full md:w-1/2 p-6 md:p-2'>
+          <p className='text-xl font-bold text-center'>Two-Factor Authentication</p>
+          <p className='text-xs text-[#A6A6A6] text-center'>manually enter the code below.</p>
           <div className="flex gap-2 my-3">
             {TwoFAcode.map((data, index) => (
               <input
@@ -104,12 +104,12 @@ const TwoFA = () => {
             type="submit"
             disabled={loading}
             onClick={()=>VerifyQrCode()}
-            className="px-30 py-2 mt-2 text-sm bg-[#0F2C34] text-white rounded hover:bg-green-500/40 disabled:bg-gray-500 transition-all cursor-pointer"
+            className="self-center w-auto px-10 md:px-20 py-1 bg-teal-950 rounded hover:bg-green-700 disabled:bg-gray-500 transition-all"
           >
             {loading ? "Verifing..." : "Verify"}
           </button>
         </div>      
-        <div className="relative overflow-hidden m-2 bg-white rounded-xl w-[400px]">
+        <div className="hidden md:block relative overflow-hidden m-2 bg-white rounded-xl w-[400px]">
           <Image
             src={assets.signIn_image}
             alt="logo"

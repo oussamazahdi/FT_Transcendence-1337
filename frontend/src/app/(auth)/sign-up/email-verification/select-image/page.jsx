@@ -5,6 +5,7 @@ import { assets } from "@/assets/data";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/authContext";
 import { AUTH_ERRORS } from "@/lib/utils";
+import { CloudArrowUpIcon } from "@heroicons/react/24/outline";
 
 const SelectImage = () => {
   const [imagePreview, setImagePreview] = useState(null);
@@ -145,17 +146,17 @@ const SelectImage = () => {
 
   return (
     <div className="min-h-screen flex justify-center items-center">
-      <div className="flex flex-row justify-between bg-[#1A1A1A]/75 w-[800px] h-[480px] rounded-4xl">
-        <div className="flex flex-col justify-center items-center w-[400px] mx-2 space-y-2">
-          <h1 className="text-white text-lg font-bold">
+      <div className="flex flex-col md:flex-row justify-center md:justify-between bg-[#1A1A1A]/75 w-full md:w-[800px] h-[480px] rounded-xl mx-4 md:mx-0">
+        <div className="flex flex-col items-center justify-center w-full md:w-1/2 p-6 md:p-2">
+          <h1 className="text-white text-lg font-bold px-2">
             Select Profile Avatar
           </h1>
 
-          <h2 className="text-[#A6A6A6] text-sm px-6 text-center">
+          <h2 className="text-[#A6A6A6] text-sm max-w-81 px-2 text-left md:text-center">
             Import an avatar or choose one of the available avatars
           </h2>
 
-          <div className="relative border rounded-lg w-81 h-30 text-white border-[#A6A6A6] border-dashed p-2 text-xs text-center">
+          <div className="relative border rounded-lg w-full max-w-81 h-30 text-white border-[#A6A6A6] border-dashed p-2 text-xs text-center line-clamp-2">
             <div className="flex justify-center items-center">
               <input
                 type="file"
@@ -181,25 +182,26 @@ const SelectImage = () => {
                   htmlFor="profile-image-input"
                   className="flex flex-col justify-center items-center w-16 h-16 rounded-lg cursor-pointer hover:bg-white/10 transition"
                 >
-                  <Image
+                  {/* <Image
                     src={assets.upload}
                     alt="Upload icon"
                     width={48}
                     height={48}
                     className="mb-2 invert"
-                  />
-                  <span className="text-xs text-gray-400">Upload</span>
+                  /> */}
+                  <CloudArrowUpIcon className="size-16 text-[#A5A5A5]"/>
+                  {/* <span className="text-xs text-gray-400">Upload</span> */}
                 </label>
               )}
             </div>
             <h4 className="mt-2 text-[#A6A6A6]">
-              Drag and drop your profile picture here
+              Click here to upload your profile or <br/>Drag and drop it here
             </h4>
           </div>
 
-          <h2 className="text-[#A6A6A6] text-sm">or choose avatar from here</h2>
+          <h2 className="text-[#A6A6A6] text-sm mb-2">or choose avatar from here</h2>
 
-          <div className="flex flex-row space-x-2">
+          <div className="flex flex-row space-x-2 overflow-y-scroll p-1">
             {avatars.map((a) => (
               <img
                 key={a.color}
@@ -221,13 +223,13 @@ const SelectImage = () => {
             type="submit"
             disabled={loading}
             onClick={handleSubmit}
-            className="w-81 mt-3 px-4 py-2 bg-teal-950 text-white text-xs rounded hover:bg-green-700 disabled:bg-gray-500 transition"
+            className=" w-full mt-3 max-w-81 px-4 py-2 bg-[#0F2C34] text-white text-xs rounded hover:bg-[#245664] disabled:bg-gray-500 transition"
           >
             {loading ? "Creating account..." : "Continue"}
           </button>
         </div>
 
-        <div className="relative overflow-hidden m-2 bg-white rounded-3xl w-[400px]">
+        <div className="hidden md:block relative overflow-hidden m-2 bg-white rounded-3xl w-[400px]">
           <Image
             src={assets.loginImg}
             alt="logo"

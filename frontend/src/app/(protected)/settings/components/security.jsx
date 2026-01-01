@@ -1,15 +1,14 @@
 "use client"
 import React, { useState } from "react";
-import Image from "next/image";
-import { assets } from "@/assets/data";
 import { useAuth } from "@/contexts/authContext";
 import TwoFA from "./TwoFA";
 import TwoFaSetup from "./TwoFaSetup";
 import { USER_ERROR } from "@/lib/utils";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 //check if data empty
 const PasswordInput = ({label, name, value, show, setShow, onChange}) => (
-  <div className="relative w-full flex justify-center items-center">
+  <div className="relative w-full">
     <input
       type={show ? "text" : "password"}
       name={name}
@@ -17,12 +16,13 @@ const PasswordInput = ({label, name, value, show, setShow, onChange}) => (
       placeholder={label}
       value={value}
       onChange={onChange}
-      className="bg-[#414141]/60 py-2 rounded-sm text-xs w-120 text-gray-200 focus:outline-none px-4 pr-10 placeholder-gray-500" 
+      className="w-full bg-[#414141]/60 rounded-sm text-xs md:max-w-120 text-gray-200 focus:outline-none px-4 pr-12 py-3 md:py-2 placeholder-gray-500" 
       />
-      <button onClick={()=>setShow(!show)} type="button" className="absolute right-3 top-1  text-[#ABABAB] hover:scale-105 transition-colors cursor-pointer">
+      <button onClick={()=>setShow(!show)} type="button" className="absolute right-3 top-1/2 -translate-y-1/2  text-[#ABABAB] hover:scale-105 transition-colors cursor-pointer">
         {show ? 
-        <Image src={assets.eye} alt="icon" width={20} style={{ display: "inline-block" }} />
-        : <Image src={assets.visible} alt="icon" height={20} style={{ display: "inline-block" }} />}
+        <EyeIcon className="w-4 h-4"/>
+        :
+        <EyeSlashIcon className="w-4 h-4" />}
       </button>
   </div>
 )
@@ -89,10 +89,10 @@ export default function Security() {
   };
 
   return (
-    <div className="h-full flex flex-col justify-center items-center gap-3">
-      <form onSubmit={handleSubmit} className="flex flex-col justify-end items-center gap-1 h-full basis-1/2">
-      <p className="font-bold ">Change Password</p>
-      <p className="text-xs text-gray-500">
+    <div className="h-full flex flex-col justify-start md:justify-center items-center gap-3 mt-6 md:mt-0">
+      <form onSubmit={handleSubmit} className="w-full flex md:flex-1 flex-col justify-start md:justify-end-safe items-center gap-2 px-4 sm:px-0 sm:max-w-[420px]">
+      <p className="text-white font-bold text-sm md:text-xsm">Change Password</p>
+      <p className="text-[#ABABAB] text-xs md:text-sm text-center">
         Update password for enhanced account security
       </p>
         <PasswordInput label="Current password" name="current" show={showCurr} setShow={setShowCurr} value={passwords.current} onChange={handleChange} />
@@ -103,12 +103,12 @@ export default function Security() {
         <button
           type="submit"
           disabled={loading}
-          className="w-60 h-8 text-xs rounded-sm mt-4 hover:bg-[#0F2C34]/40 border-[#414141]/60 border-1 bg-[#070707] text-white hover:text-white cursor-pointer">
+          className="w-full max-w-60 h-8 text-xs rounded-sm mt-4 hover:bg-[#0F2C34]/40 border-[#414141]/60 border-1 bg-[#070707] text-white hover:text-white cursor-pointer">
           {loading ? "changing password..." :"save change"}
         </button>
-        <div className="border-t border-[#FFFFFF]/23 h-1 w-120 mt-3"></div>
+        <div className="border-t border-[#FFFFFF]/23 h-1 w-full mt-3"></div>
       </form>
-      <div className="basis-1/2">
+      <div className="md:basis-1/2">
         {view === "status" ?
           <TwoFA isEnable={isEnable} setIsEnable={setIsEnable} setView={setView}/>
           :

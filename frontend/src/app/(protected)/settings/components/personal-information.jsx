@@ -4,16 +4,17 @@ import Image from "next/image";
 import { useAuth } from "@/contexts/authContext";
 import { assets } from "@/assets/data";
 import { USER_ERROR } from "@/lib/utils";
+import { ArrowUpTrayIcon, TrashIcon } from "@heroicons/react/24/outline";
 
 //check if data empty
 export default function Personal_information() {
   const { user, login } = useAuth();
   const [formData, setFormData] = useState({
-    firstname: user.firstname,
-    lastname: user.lastname,
-    username: user.username,
-    email: user.email,
-    avatar: user.avatar === "null" ? null : user.avatar,
+    firstname:  "",
+    lastname: "",
+    username: "",
+    email: "",
+    avatar: null,
   });
 
   useEffect(() => {
@@ -77,7 +78,6 @@ export default function Personal_information() {
         {
           method: "PUT",
           credentials: "include",
-          //can't send data like must create an new FormData type and append to it all the data from my formData
           body: userData,
         },
       );
@@ -102,13 +102,13 @@ export default function Personal_information() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="h-full flex flex-col justify-center items-center gap-1"
+      className="h-full flex flex-col justify-start mt-4 md:mt-0 md:justify-center items-center gap-1 px-4"
     >
-      <h1 className="text-white font-bold text-xsm">personal information</h1>
-      <h3 className="text-[#ABABAB] text-sm">
+      <h1 className="text-white font-bold text-sm md:text-xsm">personal information</h1>
+      <h3 className="text-[#ABABAB] text-xs md:text-sm text-center">
         Keep your player profile accurate for a better gaming experience.
       </h3>
-      <div className="w-32 h-32 flex justify-center items-center overflow-hidden">
+      <div className="w-20 h-20 md:w-32 md:h-32 flex justify-center items-center overflow-hidden">
         {imagePreview ? (
           <Image
             src={imagePreview}
@@ -136,8 +136,8 @@ export default function Personal_information() {
           className="hidden"
         />
         <label htmlFor="profile-image-input">
-          <div className="flex justify-center items-center gap-2 w-36 h-10 bg-[#414141]/60 rounded-sm text-xs cursor-pointer">
-            <img src={assets.uploadSettings.src} width={12} />
+          <div className="flex justify-center items-center gap-2 w-34 h-6 md:w-36 md:h-10 bg-[#414141]/60 rounded-sm text-xs/3 md:text-xs cursor-pointer">
+            <ArrowUpTrayIcon className="w-4 h-4"/>
             Upload image
           </div>
         </label>
@@ -147,20 +147,20 @@ export default function Personal_information() {
             setImagePreview(null);
             setFormData((prev) => ({ ...prev, avatar: null }));
           }}
-          className="flex justify-center items-center gap-2 w-36 h-10 bg-[#414141]/60 rounded-sm text-xs cursor-pointer"
+          className="flex justify-center gap-2 items-center w-34 h-6  md:w-36 md:h-10 bg-[#414141]/60 rounded-sm text-xs/3 md:text-xs cursor-pointer"
         >
-          <img src={assets.trash.src} width={12} />
+          <TrashIcon className="w-4 h-4"/>
           Remove image
         </button>
       </div>
-      <div className="flex gap-1">
+      <div className="flex flex-col md:flex-row justify-center gap-1 w-full">
         <input
           required
           type="text"
           onChange={(e) =>
             setFormData((prev) => ({ ...prev, firstname: e.target.value }))
           }
-          className="bg-[#414141]/60 rounded-sm p-2 text-sm w-52 focus:outline-none"
+          className="w-full md:w-52 p-2 h-8 rounded-sm bg-[#4D4D4D]/40 text-white text-sm placeholder-[#FFFFFF]/23 focus:outline-none"
           value={formData.firstname}
         />
         <input
@@ -169,7 +169,7 @@ export default function Personal_information() {
           onChange={(e) =>
             setFormData((prev) => ({ ...prev, lastname: e.target.value }))
           }
-          className="bg-[#414141]/60 rounded-sm p-2 text-sm w-52 focus:outline-none"
+          className="w-full md:w-52 p-2 h-8 rounded-sm bg-[#4D4D4D]/40 text-white text-sm placeholder-[#FFFFFF]/23 focus:outline-none"
           value={formData.lastname}
         />
       </div>
@@ -179,7 +179,7 @@ export default function Personal_information() {
         onChange={(e) =>
           setFormData((prev) => ({ ...prev, username: e.target.value }))
         }
-        className="bg-[#414141]/60 rounded-sm p-2 text-sm w-105 focus:outline-none"
+        className="w-full bg-[#414141]/60 rounded-sm p-2 text-sm md:w-105 focus:outline-none"
         value={formData.username}
       />
       <input
@@ -188,7 +188,7 @@ export default function Personal_information() {
         onChange={(e) =>
           setFormData((prev) => ({ ...prev, email: e.target.value }))
         }
-        className="bg-[#414141]/60 rounded-sm p-2 text-sm w-105 focus:outline-none"
+        className="w-full bg-[#414141]/60 rounded-sm p-2 text-sm md:w-105 focus:outline-none"
         value={formData.email}
       />
       {error && (<p className="text-red-600 text-xs text-center px-3 py-1 bg-red-300/20 border-1">{error}</p>)}

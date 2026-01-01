@@ -30,8 +30,8 @@ export default function TwoFA({isEnable, setView, setIsEnable}){
   
   return(
     <div className="flex flex-col justify-start items-center gap-2">
-      <p className="font-bold ">Two-Factor Authentication</p>
-      <p className="text-xs text-gray-500">
+      <p className="text-white font-bold text-sm md:text-xsm">Two-Factor Authentication</p>
+      <p className="text-[#ABABAB] text-xs md:text-sm text-center">
         Two-factor authentication adds an extra layer of security to your account.
       </p>
       {isEnable ?       
@@ -50,11 +50,11 @@ export default function TwoFA({isEnable, setView, setIsEnable}){
       </button>}
 
       {showConfirm &&
-      <div className=" fixed inset-0 z-50 flex items-center justify-center">
+      <div className=" fixed inset-0 z-50 flex items-center justify-center px-4">
         <div className="absolute inset-0 bg-black/60 backdrop-blur-xs" onClick={() => setShowconfirm(false)}></div>
-        <div className="relative z-10 bg-[#0f0f0f] border border-[#414141] p-6 rounded-lg shadow-2xl w-120 flex flex-col items-center gap-2">
-          <p className="font-bold text-sm">Disable Two-Factor Authentication</p>
-          <p className="text-xs text-gray-500">
+        <div className="relative z-10 bg-[#0f0f0f] border border-[#414141] p-6 rounded-lg shadow-2xl w-full max-w-120 flex flex-col items-center gap-2">
+          <p className="font-bold text-sm text-center">Disable Two-Factor Authentication</p>
+          <p className="text-xs text-gray-500 text-center">
             This will remove the extra security step when signing in.
           </p>
           <div className="flex justify-center items-center gap-4">

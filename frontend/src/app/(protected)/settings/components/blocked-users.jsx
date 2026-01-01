@@ -1,6 +1,7 @@
 import React from "react";
 import { assets } from "@/assets/data";
 import Image from "next/image";
+import { CheckCircleIcon, NoSymbolIcon} from '@heroicons/react/24/outline'
 const FriendData = [
   { id: "1", firstname: "soufiane", lastname: "arif", username: "soufiix", avatar: assets.soufiixPdp },
   { id: "2", firstname: "kamal", lastname: "alamai", username: "kael-ala", avatar: assets.kamalPdp },
@@ -17,35 +18,38 @@ const FriendData = [
 ];
 
 const FriendComponent = FriendData.map((user) => (
-  <div key={user.id} className="w-200 h-14 mx-4 rounded-[12px] bg-[#414141]/35 flex items-center gap-1 p-1 hover:bg-[#414141] cursor-pointer">
+  <div key={user.id} className="w-full mx-2 max-w-200 h-14 md:mx-4 rounded-sm bg-[#414141]/35 flex items-center gap-1 p-1 hover:bg-[#414141] cursor-pointer">
     <Image
       src={user.avatar}
       width={48}
       height={48}
       alt="avatar"
-      className="rounded-[10px]"
+      className="rounded-xs"
     />
-    <p className="font-bold ml-2">
-      {user.firstname} {user.lastname}
-    </p>
-    <p className="text-xs text-[#909090]">{`[@${user.username}]`}</p>
-    <button className="ml-auto mr-4 hover:scale-105 cursor-pointer transition-all duration-150">
-      <Image src={assets.deblock} width={72} height={72} alt="icon" />
+    <div className="flex flex-col md:flex-row gap-1 md:gap-2 md:mx-2">
+      <p className="text-xs md:text-sm font-bold">
+        {user.firstname} {user.lastname}
+      </p>
+      <p className="text-xs/3 md:text-xs text-[#909090]">{`[@${user.username}]`}</p>
+    </div>
+    <button className="ml-auto mr-1 md:mr-4 hover:scale-105 cursor-pointer transition-all duration-150 flex gap-1 rounded-full border-1 p-2">
+      <CheckCircleIcon className="w-4 h-4"/>
+      <p className="text-xs">deblock</p>
     </button>
   </div>
 ));
 
 export default function BlockedUsers() {
   return (
-    <div className="h-full flex flex-col justify-center items-center gap-4">
+    <div className="h-full flex flex-col justify-center items-center gap-4 mx-1">
       <div className="basis-1/4 flex flex-col justify-end-safe items-center">
-        <Image src={assets.blockUser} alt="icon" height={48} width={48} />
-        <h1 className="font-bold">Deblock users</h1>
-        <h3 className="text-xs text-gray-500">
+        <NoSymbolIcon className="size-12" />
+        <h1 className="text-white font-bold text-sm md:text-xsm">Deblock users</h1>
+        <h3 className="text-[#ABABAB] text-xs md:text-sm text-center">
           Remove blocks to let players return to the table and continue playing.
         </h3>
       </div>
-      <div className="basis-3/4 flex flex-col justify-items-start items-center gap-1 overflow-y-auto custom-scrollbar">
+      <div className="basis-3/4 w-full flex flex-col justify-items-start items-center gap-1 overflow-y-auto custom-scrollbar mx-1">
         {FriendComponent}
       </div>
     </div>

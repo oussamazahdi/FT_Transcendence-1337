@@ -8,7 +8,7 @@ const UserDropdown = () => {
 
   return (
     <div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center md:gap-3">
         <NotificationDropDown/>
         <ProfileDropDown user={user} />
       </div>

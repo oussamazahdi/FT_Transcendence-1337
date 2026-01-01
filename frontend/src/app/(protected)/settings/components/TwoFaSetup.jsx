@@ -97,8 +97,8 @@ export default function TwoFaSetup ({setEnable, setView}){
   };
   return (
     <div className="flex flex-col justify-start items-center gap-2">
-      <p className="font-bold ">Two-Factor Authentication</p>
-      <p className="text-xs text-gray-500">Scan the QR code with your authentication app or manually enter the code below.</p>
+      <p className="text-white font-bold text-sm md:text-xsm">Two-Factor Authentication</p>
+      <p className="text-[#ABABAB] text-xs md:text-sm text-center">Scan the QR code with your authentication app or manually enter the code below.</p>
       <div className="border-1 border-dashed w-24 h-24 p-[2px] rounded-[9px]">
         {!loading ? (<Image src={imagePreview} alt="icon to replace later" width={90} height={90} className="rounded-[6px]"/>)
         :
@@ -120,11 +120,12 @@ export default function TwoFaSetup ({setEnable, setView}){
           />
         ))}
       </div>
+      {/* add error andling here */}
       {error && <p>{error}</p>}
       <button
         type="submit"
         onClick={() => VerifyQrCode()}
-        className="w-60 h-8 text-xs rounded-sm mt-4 hover:bg-[#0F2C34]/40 border-[#414141]/60 border-1 bg-[#070707] text-white hover:text-white cursor-pointer">
+        className="w-full max-w-60 h-8 text-xs rounded-sm mt-4 hover:bg-[#0F2C34]/40 border-[#414141]/60 border-1 bg-[#070707] text-white hover:text-white cursor-pointer">
         Enable
       </button>
     </div>
