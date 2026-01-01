@@ -53,24 +53,22 @@ export function startGameLoop(io, roomId) {
 
 /*****************************************************************************/
 function matchFound(io, socket, playerData) {
-	if (!waitingPlayer) return;
-
 	const game = new GameSession();
 	game.roomId = randomUUID();
 
+	
 	Object.assign(game.player1, { ...waitingPlayer.playerData,
 		socketId: waitingPlayer.socketId,
 		roomId: game.roomId,
 		player: new Paddle(40),
 	});
-	
-	waitingPlayer = null;
 
 	Object.assign(game.player2, { ...playerData,
 		socketId: socket.id,
 		roomId: game.roomId,
 		player: new Paddle(1024 - 60),
 	});
+
 	game.state = "MATCHED";
 	io.to(game.player1.socketId).emit("match-found", game.player2);
 	io.to(game.player2.socketId).emit("match-found", game.player1);
@@ -78,21 +76,14 @@ function matchFound(io, socket, playerData) {
 	io.sockets.sockets.get(game.player1.socketId)?.join(game.roomId);
 	io.sockets.sockets.get(game.player2.socketId)?.join(game.roomId);
 
+	game.state = "PLAYING";
 	activeGames.set(game.roomId, game);
-	
-	setTimeout(()=>{
-		
-		const checkGame = activeGames.get(game.roomId)
-		if(!checkGame) return;
 
-		if (checkGame.state !== "MATCHED") return;
-		
-		game.state = "PLAYING";
-		io.to(game.roomId).emit("match-started", game.roomId)
-		startGameLoop(io, game.roomId);
-		io.to(game.roomId).emit("match-data", game);
-	
-	},3000)
+	setTimeout(()=>{
+		const checkGame = activeGames.get(game.roomId)
+		if(checkGame)
+			io.to(game.roomId).emit("match-started", game.roomId)
+	},10000)
 
 	return game;
 }
@@ -115,7 +106,10 @@ export function handleJoin(socket, io, playerData) {
 	if (waitingPlayer.playerData.username === playerData.username)
 		return;
 
-	const game = matchFound(io, socket, playerData); // check this
+	const game = matchFound(io, socket, playerData);
+	startGameLoop(io, game.roomId);
+	io.to(game.roomId).emit("match-data", game);
+	waitingPlayer = null;
 }
 
 function updateGame(io, roomId) {
@@ -152,11 +146,10 @@ function updateGame(io, roomId) {
 		ball.velocityX *= -1;
 		ball.speed = 2.5;
 	}
-	
+
 	if (game.player1.score === 10 || game.player2.score === 10) {
 		game.state = "FINISHED";
 		io.to(roomId).emit("game-state", game);
-		//dont forget to add the score to db
 		removeGame(game.roomId);
 	} else {
 		ball.x += ball.velocityX * ball.speed;
@@ -167,15 +160,15 @@ function updateGame(io, roomId) {
 
 export function handleUpdateData(socket, io, playerData) {
 	if (!playerData?.username) return;
-	
+
 	const game = getGameByUsername(playerData.username);
 	if (!game) return;
-	
+
 	const player = game.player1.username === playerData.username ? game.player1 : game.player2;
-	
+
 	player.socketId = socket.id;
 	socket.join(game.roomId);
-	
+
 	io.to(socket.id).emit("match-data", game);
 	console.log("🔄 Reconnected:", player.username); // remove
 }
@@ -183,10 +176,9 @@ export function handleUpdateData(socket, io, playerData) {
 export function handlePaddleMove(socket, io, paddle)
 {
 	const game = getGameBySocket(socket.id);
-	if (!game || game.state !== "PLAYING") return;
-
 	const player = socket.id === game.player1.socketId ? game.player1 : game.player2;
-
+	if (!game) return;
+	
 	if (paddle.direction === "up")
 		{
 			if (player.player.y - 14 <= 0)
@@ -207,27 +199,37 @@ export function handlePaddleMove(socket, io, paddle)
 
 export function handleDisconnect(socket, io) {
 	console.log("❌ Disconnected:", socket.id); // remove
-	
-	const game = getGameBySocket(socket.id);
-	if (!game) return;
 
 	if (waitingPlayer?.socketId === socket.id) {
 		waitingPlayer = null;
 		return;
 	}
 
-	if (game.state === "PLAYING")
-	{
-		game.state = "FINISHED";
-		const winner = socket.id === game.player1.socketId ? game.player2 : game.player1
-		winner.score = 10;
-		io.to(game.roomId).emit("game-state", game);
-		//dont forget to add the score to db
-	
-	} else if (game.state === "MATCHED") {
-		game.canceled = true;
-		const remaining = game.player1.socketId === socket.id ? game.player2 : game.player1;
-		io.to(remaining.socketId).emit("match-canceled");
-		removeGame(game.roomId);
+	const game = getGameBySocket(socket.id);
+	if (!game) return;
+
+	const remaining = game.player1.socketId === socket.id ? game.player2 : game.player1;
+	removeGame(game.roomId);
+	io.to(remaining.socketId).emit("match-canceled");
+}
+
+export function handleLeave(socket, io) {
+	// If player is waiting
+	if (waitingPlayer?.socketId === socket.id) {
+		waitingPlayer = null;
+		return;
 	}
+
+	const game = getGameBySocket(socket.id);
+	if (!game) return;
+
+	const remaining =
+		game.player1.socketId === socket.id
+			? game.player2
+			: game.player1;
+
+	removeGame(game.roomId);
+
+	// Notify opponent
+	io.to(remaining.socketId).emit("match-canceled");
 }

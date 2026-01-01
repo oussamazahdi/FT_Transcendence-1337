@@ -7,7 +7,7 @@ export const GAME_HEIGHT = 700;
 export class Ball {
 	constructor() {
 		const angle = Math.random() * Math.PI / 2 - Math.PI / 4;
-		const speed = 0.5;
+		const speed = 2.5;
 
 		this.x = GAME_WIDTH / 2;
 		this.y = GAME_HEIGHT / 2;
@@ -48,7 +48,6 @@ export class GameSession {
 		this.state = "WAITING"; // WAITING | PLAYING | FINISHED
 		this.gameType = "PingPong";
 		this.roomId = randomUUID();
-		this.canceled = false;
 		this.player1 = new Player();
 		this.player2 = new Player();
 		this.ball = new Ball();
