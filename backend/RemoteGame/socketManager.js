@@ -11,3 +11,5 @@ export default function initSocketManager(io) {
 		socket.on("leave-game", () => handleDisconnect(socket, io));
 	});
 }
+
+

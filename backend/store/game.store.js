@@ -39,6 +39,7 @@ export class Player {
 		this.score = 0;
 		this.roomId = "";
 		this.player = null;
+		this.ready = false;
 	}
 }
 
@@ -48,6 +49,8 @@ export class GameSession {
 		this.state = "WAITING"; // WAITING | PLAYING | FINISHED
 		this.gameType = "PingPong";
 		this.roomId = randomUUID();
+		this.startPlayingAt = 0;
+		this.matchTimeOut = 0;
 		this.player1 = new Player();
 		this.player2 = new Player();
 		this.ball = new Ball();

@@ -5,9 +5,18 @@ import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { useRouter } from "next/navigation";
 
+// const socket = io("http://localhost:3001", {
+// 	transports: ["websocket"],
+// 	autoConnect: false,
+// });
+
+
 const socket = io("http://localhost:3001", {
 	transports: ["websocket"],
 	autoConnect: false,
+	reconnection: true,
+	reconnectionAttempts: 5,
+	reconnectionDelay: 1000,
 });
 
 
@@ -29,8 +38,10 @@ export default function Matchmaking() {
 	const [player1, setPlayer1] = useState(emptyPlayer());
 	const [player2, setPlayer2] = useState(emptyPlayer());
 	const [canExit, setCanExit] = useState(true);
+	const [isReconnecting, setIsReconnecting] = useState(false);
 
 	const joinedRef = useRef(false);
+	const hasNavigatedRef = useRef(false)
 
 	useEffect(() => {
 		if (!user) return;
@@ -44,8 +55,11 @@ export default function Matchmaking() {
 	}, [user]);
 
 	const handleExit = () => {
+		if (!canExit) return;
+
 		socket.emit("leave-game");
 		joinedRef.current = false;
+		hasNavigatedRef.current = true;
 	
 		setPlayer2(emptyPlayer());
 		setStatus("You left the match");
@@ -56,14 +70,19 @@ export default function Matchmaking() {
 
 	useEffect(() => {
 		if (!user) return;
+		if (hasNavigatedRef.current) return;
+
 		if (!socket.connected) socket.connect();
 
 		function handleConnect() {
+			setIsReconnecting(false);
+
 			setPlayer1(prev => ({...prev,
 				socketId: socket.id,
 			}));
 
 			if (!joinedRef.current) {
+				console.log("🎮 Joining matchmaking...");
 				socket.emit("join-game", {
 					firstName: user.firstname,
 					lastName: user.lastname,
