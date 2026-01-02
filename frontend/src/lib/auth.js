@@ -9,20 +9,21 @@ export async function getCurrentUser() {
       return (null);
   
   try{
-    const response = await fetch(`${process.env.API_URL}/api/auth/me`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
       headers: {
-        'Cookie': `accessToken=${aToken}; refreshToken=${rToken}`
+        "Cookie": `accessToken=${aToken.value}; refreshToken=${rToken.value}`
       }
     });
 
-    if(!response.ok){
-      return null
-    }
     const data = await response.json();
 
-    return(data.UserData);
-  }catch(error){
+    if (!response.ok) {
+      return null;
+    }
+
+    return data.userData;
+  } catch (error) {
     console.error("Failed to fetch user:", error);
-    return null
+    return null;
   }
 }

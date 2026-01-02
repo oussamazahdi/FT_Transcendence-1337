@@ -82,7 +82,13 @@ function userRoutes(fastify)
             // },
             response: {
                 200: emptySuccessResponse,
-                400: errorResponse,
+                400: {
+                    type: 'object',
+                    properties: {
+                        error: {type: 'string'},
+                        fields: {type: 'string'}
+                    }
+                },
                 401: errorResponse,
                 500: errorResponse
             }

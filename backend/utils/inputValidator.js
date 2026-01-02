@@ -20,6 +20,7 @@ export function zErrorHandler(error) {
   const fieldList = zError[0].path[0];
   return {
     code: 400,
-    message: `Invalid inputs: ${fieldList}`
+    error: "INVALID_INPUT",
+    fields: fieldList
   };
 }

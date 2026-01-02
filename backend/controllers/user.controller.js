@@ -17,7 +17,9 @@ async function fileUpload(user, file)
 	const image = file.fileStream;
 	const filename = generateFileNameByUser(user.username, file.filename, file.mimetype);
 	const filePath = path.join(uploadDir, filename);
+	console.log("MDR");
 	await pipeline(image, fs.createWriteStream(filePath));
+	console.log("LOL");
 	const fileLink = `${process.env.API_URL}/uploads/${filename}`;
 	console.log(fileLink);
 	return (fileLink);
@@ -98,12 +100,13 @@ export class UserController
 			
 			userModels.updateUserById(db, request.params.id, userData);
 			
-			return reply.code(201).send({message: "SUCCESS"});
+			return reply.code(201).send({message: "SUCCESS", user:userData});
 		}
 		catch (error) {
 			const zError = zErrorHandler(error);
+			console.log(zError.fields);
 			if (zError !== null)
-				return reply.code(zError.code).send({error: zError.message});
+				return reply.code(zError.code).send({error: zError.error, fields: zError.fields});
 			if (error.code)
 				return reply.code(error.code).send({error: error.message});
 			else

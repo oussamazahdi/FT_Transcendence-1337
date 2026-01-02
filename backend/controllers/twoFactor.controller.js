@@ -25,7 +25,7 @@ export class TwoFactorController
         {
             if (error.code)
                 return reply.code(error.code).send({error: error.message});
-            return reply.code(500).send(error.message);
+            return reply.code(500).send({error: error.message});
         }
     }
 
@@ -60,6 +60,7 @@ export class TwoFactorController
 
         try {
             const token = request.body.token;
+            console.log(token)
             const secret = twoFactorModels.getUser2FASecret(db, request.user.userId);
             const result = request.server.totp.verify({ secret: secret, token: token, window: 0 });
 
@@ -81,7 +82,7 @@ export class TwoFactorController
         const db = request.server.db;
 
         try {
-            twoFactorModels.update2FAStatus(db, false, request.user.userId);
+            twoFactorModels.update2FAStatus(db, 0, request.user.userId);
             const user = authModels.findUserById(db, request.user.userId);
             updateTokenFlags(user, reply);
             return reply.code(200).send({message: "2FA_DISABLED_SUCCESSFULLY"});
@@ -90,7 +91,7 @@ export class TwoFactorController
         {
             if (error.code)
                 return reply.code(error.code).send({error: error.message});
-            return reply.code(500).send(error.message);
+            return reply.code(500).send({error: error.message});
         }
     }
 }

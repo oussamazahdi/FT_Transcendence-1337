@@ -37,11 +37,12 @@ export class AuthController {
                 httpOnly: true,
                 sameSite: 'strict',
                 path: '/',
-                maxAge: 15 * 60 * 1000
+                maxAge: 7 * 24 * 60 * 60 * 1000
             });
             return reply.code(200).send({message: "AUTHORIZED", userData: result});
         }
         catch (error) {
+            console.log(error);
                 if (error.code)
                     return reply.code(error.code).send({error: error.message});
                 else
@@ -74,12 +75,13 @@ export class AuthController {
                 httpOnly: true,
                 sameSite: 'strict',
                 path: '/',
-                maxAge: 15 * 60 * 1000
+                maxAge: 7 * 24 * 60 * 60 * 1000
             });
             return reply.code(201).send({message: "USER_CREATED_SUCCESSFULLY"});
         }
         catch (error)
         {
+            console.log(error);
             if (error.code)
                 return reply.code(error.code).send({error: error.message});
             else
@@ -100,7 +102,7 @@ export class AuthController {
                 const filename = generateFileNameByUser(request.user.username, image.filename, image.mimetype);
                 const filePath = path.join(uploadDir, filename);
                 await pipeline(image.file, fs.createWriteStream(filePath));
-                fileLink = `http://${process.env.API_URL}/uploads/${filename}`;
+                fileLink = `${process.env.API_URL}/uploads/${filename}`;
             }
             else 
             {
@@ -108,7 +110,7 @@ export class AuthController {
                 const availableAvatars = ["profile1", "profile2", "profile3", "profile4", "profile5", "profile6"];
                 if (!availableAvatars.includes(avatar))
                     return reply.code(400).send("INVALID_AVATAR");
-                fileLink = `http://${process.env.API_URL}/uploads/default/${avatar}.jpeg`;
+                fileLink = `${process.env.API_URL}/uploads/default/${avatar}.jpeg`;
             }
             authModels.updateUserAvatar(db, request.user.userId, fileLink);
             const user = authModels.findUserById(db, request.user.userId);
@@ -157,10 +159,12 @@ export class AuthController {
     {
         const db = request.server.db;
         try {
-            const user = authModels.findUserById(db, request.user.userId, ['firstname', 'lastname', 'username', 'email', 'avatar', 'isverified']);
+            const user = authModels.findUserById(db, request.user.userId);
+            console.log(user)
             return reply.code(200).send({message: "SUCCESS", userData: user});
         }
         catch (error) {
+            console.log(error);
             if (error.code)
                 return reply.code(error.code).send({error: error.message});
             else
@@ -240,7 +244,7 @@ export class AuthController {
             if (today > user.otpexpiration)
                 throw new Error("EXPIRED_OTP");
             if (code !== user.otp)
-                throw new Error("INCORRECT ");
+                throw new Error("INCORRECT");
             authModels.markEmailVerified(db, request.user.userId);
             const userflags = authModels.findUserById(db, request.user.userId);
             updateTokenFlags(userflags, reply);
