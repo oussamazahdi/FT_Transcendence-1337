@@ -24,39 +24,46 @@ export default function SignUp() {
     e.preventDefault();
     setError("");
 
-    // Validate passwords match
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
-
+    if (password.length < 8){
+      setError("Password must be at least 8 characters.")
+      return;
+    }
     setLoading(true);
 
     try {
-      const reply = await fetch(`http://localhost:3001/api/auth/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+
+      if (firstname.length < 3 || lastname.length < 3 || username.length < 3)
+        throw new Error(AUTH_ERRORS["INVALID_NAME_LENGTH"])
+      const reply = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            firstname,
+            lastname,
+            username,
+            email,
+            password,
+          }),
         },
-        credentials: "include",
-        body: JSON.stringify({
-          firstname,
-          lastname,
-          username,
-          email,
-          password,
-        }),
-      });
+      );
 
       if (!reply.ok) {
         const errorData = await reply.json();
-        const errorMessage =
-          AUTH_ERRORS[errorData.error] || AUTH_ERRORS["default"];
+        const errorMessage = AUTH_ERRORS[errorData.error] || AUTH_ERRORS["default"];
         throw new Error(errorMessage);
       }
 
       const data = await reply.json();
-      // console.log("Signup successful:", data);
+      console.log("Signup successful:", data);
       router.replace("/sign-up/email-verification");
     } catch (err) {
       setError(err.message);
@@ -67,35 +74,29 @@ export default function SignUp() {
 
   return (
     <div className="min-h-screen flex justify-center items-center">
-      <div className="flex flex-row  justify-between bg-[#0F0F0F]/75 w-[800px] h-[480px] rounded-4xl">
-        <div className="flex flex-col items-center justify-center">
+      <div className="flex flex-col md:flex-row justify-center md:justify-between bg-[#1A1A1A]/75 w-full md:w-[800px] h-[480px] rounded-xl mx-4 md:mx-0">
+        <div className="flex flex-col items-center justify-center w-full md:w-1/2 p-2 md:p-2">
           <form
             onSubmit={handleSubmit}
-            className="space-y-1 flex flex-col items-center text-white w-[400px] mx-2"
+            className="space-y-1 flex flex-col items-center justify-center text-white w-full px-10"
           >
-            <h1 className="text-2xl font-bold text-center ">
+            <h1 className="text-xl md:text-3xl font-bold text-center">
               Create an account
             </h1>
-            <p className="text-xs text-[#A6A6A6] text-center mb-6">
+            <p className="text-center text-[#A6A6A6] text-xs/3 md:text-xs mb-2 md:mb-6">
               Enter your personal data to create your account
             </p>
-            <div>
-              <input
-                type="text"
+            <div className="flex flex-col md:flex-row gap-1 w-full">
+              <Input
                 value={firstname}
                 onChange={(e) => setFirstname(e.target.value)}
                 placeholder="Firstname"
-                required
-                className="w-40 h-8 px-4 py-2 rounded bg-[#4D4D4D]/40 text-white text-xs placeholder-[#FFFFFF]/23 focus:outline-none"
-              />
-              <input
-                type="text"
+                />
+              <Input
                 value={lastname}
                 onChange={(e) => setLastname(e.target.value)}
                 placeholder="Lastname"
-                required
-                className="ml-1 w-40 h-8 px-4 py-2 rounded bg-[#4D4D4D]/40 text-white text-xs placeholder-[#FFFFFF]/23 focus:outline-none"
-              />
+                />
             </div>
             <Input
               value={username}
@@ -127,7 +128,7 @@ export default function SignUp() {
             <button
               type="submit"
               disabled={loading}
-              className=" w-81 mt-3 px-4 py-2 bg-[#0F2C34] text-white text-xs rounded hover:bg-[#245664] disabled:bg-gray-500 transition"
+              className=" w-full mt-3 px-4 py-2 bg-[#0F2C34] text-white text-xs rounded hover:bg-[#245664] disabled:bg-gray-500 transition"
             >
               {loading ? "Creating account..." : "Continue"}
             </button>
@@ -145,7 +146,7 @@ export default function SignUp() {
           <ConnectWith />
         </div>
 
-        <div className="relative overflow-hidden m-2 bg-white rounded-3xl w-[400px]">
+        <div className="hidden md:block relative overflow-hidden m-2 bg-white rounded-3xl w-[400px]">
           <Image
             src={assets.SignUp_image}
             alt="logo"

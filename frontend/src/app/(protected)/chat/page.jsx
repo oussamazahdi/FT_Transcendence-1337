@@ -15,7 +15,7 @@ export default function chat() {
         <div className="min-w-[250px] w-[40vh] max-w-[350px] mr-2 h-full flex flex-col">
           <SideBar />
         </div>
-        <div className="flex-1 bg-[#8D8D8D]/25 h-full rounded-lg">
+        <div className="flex-1 bg-[#8D8D8D]/25 h-full rounded-[12px]">
           <ChatPage />
         </div>
       </div>

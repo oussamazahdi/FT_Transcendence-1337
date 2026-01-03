@@ -1,55 +1,30 @@
-version: '3.8'
-
 services:
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: pingpong-frontend
-    restart: unless-stopped
-    networks:
-      - pingpong-network
-    environment:
-      - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=http://localhost/api
-      - NEXT_PUBLIC_SOCKET_URL=http://localhost
-
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: pingpong-backend
-    restart: unless-stopped
+    build: ./backend
     ports:
       - "3001:3001"
-    networks:
-      - pingpong-network
     volumes:
-      - ./backend/data:/app/data
-    environment:
-      - NODE_ENV=production
-      - PORT=3001
-      - DATABASE_PATH=/app/data/database.sqlite
+      - ./backend:/app
+      - /app/node_modules
+    env_file:
+      - .env
+    networks:
+      - transcendence
 
-  nginx:
-    image: nginx:alpine
-    container_name: pingpong-nginx
-    restart: unless-stopped
+  frontend:
+    build: ./frontend
     ports:
-      - "80:80"
-      - "443:443"
+      - "3000:3000"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/ssl:/etc/nginx/ssl:ro
-    networks:
-      - pingpong-network
+      - ./frontend:/app
+      - /app/node_modules
+    env_file:
+      - .env
     depends_on:
-      - frontend
       - backend
+    networks:
+      - transcendence
 
 networks:
-  pingpong-network:
+  transcendence:
     driver: bridge
-
-volumes:
-  backend-data:

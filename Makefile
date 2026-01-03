@@ -1,14 +1,14 @@
-CWD             := .
-DOTENV_PATH     := $(CWD)/.env
+CWD						 := .
+DOTENV_PATH		 := $(CWD)/.env
 
 DOCKER_COMPOSE	:= docker compose -f $(CWD)/docker-compose.yaml 
-RMDIR           := rm -fr
-MKDIR           := mkdir -p
+RMDIR					 := rm -fr
+MKDIR					 := mkdir -p
 
 setup:
 	@if [ ! -f $(DOTENV_PATH) ]; then \
-	    cp $(CWD)/.env.sample $(DOTENV_PATH) && \
-	    echo ".env file not found. Created .env from sample."; \
+			cp $(CWD)/.env.sample $(DOTENV_PATH) && \
+			echo ".env file not found. Created .env from sample."; \
 	fi
 
 up: setup

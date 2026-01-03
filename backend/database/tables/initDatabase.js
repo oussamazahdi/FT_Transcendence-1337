@@ -3,8 +3,8 @@ import { createTokenTable } from "./tokenTable.js"
 
 function initAllTables(db)
 {
-    createUserTable(db);
-    createTokenTable(db);
+		createUserTable(db);
+		createTokenTable(db);
 }
 
 export { initAllTables };

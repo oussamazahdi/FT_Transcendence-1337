@@ -1,9 +1,6 @@
 import { randomUUID } from "crypto";
+import { GAME_WIDTH, GAME_HEIGHT } from "../constants/game.constants.js"
 
-export const GAME_WIDTH = 1024;
-export const GAME_HEIGHT = 700;
-
-/* ================= BALL ================= */
 export class Ball {
 	constructor() {
 		const angle = Math.random() * Math.PI / 2 - Math.PI / 4;
@@ -18,7 +15,6 @@ export class Ball {
 	}
 }
 
-/* ================= PADDLE ================= */
 export class Paddle {
 	constructor(x) {
 		this.width = 15;
@@ -28,7 +24,6 @@ export class Paddle {
 	}
 }
 
-/* ================= PLAYER ================= */
 export class Player {
 	constructor() {
 		this.socketId = "";
@@ -43,7 +38,6 @@ export class Player {
 	}
 }
 
-/* ================= GAME ================= */
 export class GameSession {
 	constructor() {
 		this.state = "WAITING"; // WAITING | PLAYING | FINISHED

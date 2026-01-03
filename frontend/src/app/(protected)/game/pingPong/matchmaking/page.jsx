@@ -70,10 +70,12 @@ export default function Matchmaking() {
   };
 
   const handleTryAgain = () => {
-    if (!canTryAgain) return;
+		// router.refresh();
+		window.location.reload();
+    // if (!canTryAgain) return;
 
-    setPlayer2(emptyPlayer());
-    joinGame();
+    // setPlayer2(emptyPlayer());
+    // joinGame();
   };
 
   useEffect(() => {
@@ -119,7 +121,7 @@ export default function Matchmaking() {
   }, [user, router]);
 
   return (
-    <div className="w-full max-w-4xl rounded-3xl bg-[#0F0F0F]/65 p-6 sm:p-10 flex flex-col items-center gap-6">
+    <div className="w-full max-w-3xl rounded-3xl bg-[#0F0F0F]/65 p-6 sm:p-10 flex flex-col items-center gap-6 mx-8 my-2">
       <div className="text-center">
         <h3 className="text-2xl sm:text-3xl font-extrabold">Find Match</h3>
         <p className="mt-1 text-white/50">{status}</p>

@@ -1,8 +1,0 @@
-Case 1: Waiting player disconnects after opponent is found but before waitingPlayer = null
-Case 2: Player clicks Exit during the 3s countdown
-Case 3: Double join-game spam
-
-
-
-
-join-error

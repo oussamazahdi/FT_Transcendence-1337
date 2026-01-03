@@ -3,6 +3,7 @@ import React, { useRef, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { assets } from "@/assets/data";
 import { useRouter } from "next/navigation";
+import { AUTH_ERRORS } from "@/lib/utils";
 
 const EmailVerification = () => {
   const [otp, setOtp] = useState(new Array(6).fill(""));
@@ -22,7 +23,7 @@ const EmailVerification = () => {
   const sendVerificationCode = useCallback(async () => {
     try {
       const response = await fetch(
-        `http://localhost:3001/api/auth/resendCode`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/resendCode`,
         {
           method: "POST",
           credentials: "include",
@@ -30,11 +31,9 @@ const EmailVerification = () => {
       );
 
       const data = await response.json();
-      // console.log("==>", data);
 
       if (!response.ok) {
-        // const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
-        const errorMessage = data.error;
+        const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
         throw new Error(errorMessage);
       }
     } catch (err) {
@@ -71,7 +70,7 @@ const EmailVerification = () => {
     setIsVerifying(true);
     try {
       const response = await fetch(
-        `http://localhost:3001/api/auth/emailVerification`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/emailVerification`,
         {
           method: "POST",
           headers: {
@@ -85,10 +84,10 @@ const EmailVerification = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        // const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
-        throw new Error(data.error);
+        const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
+        throw new Error(errorMessage);
       }
-      router.replace("/sign-up/email-verification/selecte-image");
+      router.replace("/sign-up/email-verification/select-image");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -115,7 +114,8 @@ const EmailVerification = () => {
   };
 
   const handleChange = (element, index) => {
-    if (isNaN(element.value)) return;
+    if (isNaN(element.value))
+        return;
     const newOtp = [...otp];
     newOtp[index] = element.value;
     setOtp(newOtp);
@@ -150,8 +150,8 @@ const EmailVerification = () => {
 
   return (
     <div className="min-h-screen flex justify-center items-center">
-      <div className="flex flex-row justify-between bg-[#1A1A1A]/75 w-[800px] h-[480px] rounded-4xl">
-        <div className="flex flex-col justify-center items-center w-[400px] mx-2 space-y-2">
+      <div className="flex flex-col md:flex-row justify-center md:justify-between bg-[#1A1A1A]/75 w-full md:w-[800px] h-[480px] rounded-xl mx-4 md:mx-0">
+        <div className="flex flex-col items-center justify-center w-full md:w-1/2 p-6">
           <h1 className="text-white text-lg font-bold">Verify your identity</h1>
           <h2 className="text-[#A6A6A6] text-sm px-6 text-center">
             We've sent a 6-digit code to{" "}
@@ -190,20 +190,12 @@ const EmailVerification = () => {
           <button
             onClick={handleSubmite}
             disabled={isVerifying || otp.join("").length < 6}
-            className=" w-81 mt-1 px-4 py-2 bg-[#0F2C34] text-white text-xs rounded hover:bg-[#245664] disabled:bg-gray-500 transition"
+            className="self-center w-auto px-10 md:px-20 py-1 text-white bg-teal-950 rounded hover:bg-green-700 disabled:bg-gray-500 transition-all"
           >
             {isVerifying ? "Verifying..." : "Verify"}
           </button>
-          <button
-            onClick={() =>
-              router.replace("/sign-up/email-verification/selecte-image")
-            }
-            className="text-white text-sm cursor-pointer"
-          >
-            Not now
-          </button>
         </div>
-        <div className="relative overflow-hidden m-2 bg-white rounded-3xl w-[400px]">
+        <div className="hidden md:block relative overflow-hidden m-2 bg-white rounded-3xl w-[400px]">
           <Image
             src={assets.loginImg}
             alt="logo"
