@@ -4,182 +4,182 @@ import { useAuth } from "@/contexts/authContext";
 import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { useRouter } from "next/navigation";
-
-// const socket = io("http://localhost:3001", {
-// 	transports: ["websocket"],
-// 	autoConnect: false,
-// });
-
+import { DoorOpen, RotateCcw } from "lucide-react";
 
 const socket = io("http://localhost:3001", {
-	transports: ["websocket"],
-	autoConnect: false,
-	reconnection: true,
-	reconnectionAttempts: 5,
-	reconnectionDelay: 1000,
+  transports: ["websocket"],
+  autoConnect: false,
+  reconnection: true,
+  reconnectionAttempts: 5,
+  reconnectionDelay: 1000,
 });
 
-
 const emptyPlayer = () => ({
-	socketId: "",
-	firstName: "",
-	lastName: "",
-	username: "",
-	avatar: "",
-	score: 0,
-	roomId: "",
+  socketId: "",
+  firstName: "",
+  lastName: "",
+  username: "",
+  avatar: "",
+  score: 0,
+  roomId: "",
 });
 
 export default function Matchmaking() {
-	const { user } = useAuth();
-	const router = useRouter();
+  const { user } = useAuth();
+  const router = useRouter();
 
-	const [status, setStatus] = useState("Searching for opponent...");
-	const [player1, setPlayer1] = useState(emptyPlayer());
-	const [player2, setPlayer2] = useState(emptyPlayer());
-	const [canExit, setCanExit] = useState(true);
-	const [isReconnecting, setIsReconnecting] = useState(false);
+  const [status, setStatus] = useState("Searching for opponent...");
+  const [player1, setPlayer1] = useState(emptyPlayer());
+  const [player2, setPlayer2] = useState(emptyPlayer());
+  const [canExit, setCanExit] = useState(true);
+  const [canTryAgain, setCanTryAgain] = useState(false);
 
-	const joinedRef = useRef(false);
-	const hasNavigatedRef = useRef(false)
+  const joinedRef = useRef(false);
+  const navigatedRef = useRef(false);
 
-	useEffect(() => {
-		if (!user) return;
+  useEffect(() => {
+    if (!user) return;
 
-		setPlayer1({ ...emptyPlayer(),
-			firstName: user.firstname,
-			lastName: user.lastname,
-			username: user.username,
-			avatar: user.avatar,
-		});
-	}, [user]);
+    setPlayer1({ ...emptyPlayer(),
+      firstName: user.firstname,
+      lastName: user.lastname,
+      username: user.username,
+      avatar: user.avatar,
+    });
+  }, [user]);
 
-	const handleExit = () => {
-		if (!canExit) return;
+  const joinGame = () => {
+    socket.emit("join-game", {
+      firstName: user.firstname,
+      lastName: user.lastname,
+      username: user.username,
+      avatar: user.avatar,
+    });
+    joinedRef.current = true;
+    setStatus("Waiting for opponent...");
+    setCanTryAgain(false);
+  };
 
-		socket.emit("leave-game");
-		joinedRef.current = false;
-		hasNavigatedRef.current = true;
-	
-		setPlayer2(emptyPlayer());
-		setStatus("You left the match");
-	
-		socket.disconnect();
-		router.push("/game/pingPong");
-	};
+  const handleExit = () => {
+    if (!canExit) return;
 
-	useEffect(() => {
-		if (!user) return;
-		if (hasNavigatedRef.current) return;
+    navigatedRef.current = true;
+    socket.emit("leave-game");
+    socket.disconnect();
+    router.push("/game/pingPong");
+  };
 
-		if (!socket.connected) socket.connect();
+  const handleTryAgain = () => {
+    if (!canTryAgain) return;
 
-		function handleConnect() {
-			setIsReconnecting(false);
+    setPlayer2(emptyPlayer());
+    joinGame();
+  };
 
-			setPlayer1(prev => ({...prev,
-				socketId: socket.id,
-			}));
+  useEffect(() => {
+    if (!user || navigatedRef.current) return;
 
-			if (!joinedRef.current) {
-				console.log("🎮 Joining matchmaking...");
-				socket.emit("join-game", {
-					firstName: user.firstname,
-					lastName: user.lastname,
-					username: user.username,
-					avatar: user.avatar,
-				});
-				joinedRef.current = true;
-			}
+    if (!socket.connected) socket.connect();
 
-			setStatus("Waiting for opponent...");
-		};
-		
-		const handleMatchFound = opponent => {
-			setPlayer2(opponent);
-			setStatus("Match Found!");
-			setCanExit(false)
-		};
-		
-		const handleMatchCanceled = () => {
-			console.log("❌ Match canceled"); // remove
-			
-			setPlayer2(emptyPlayer());
-			setStatus("Opponent left. Searching again...");
-			setCanExit(true)
-			
-			joinedRef.current = false;
-			
-			socket.emit("join-game", {
-				firstName: user.firstname,
-				lastName: user.lastname,
-				username: user.username,
-				avatar: user.avatar,
-			});
-		};
+    const handleConnect = () => {
+      setPlayer1(prev => ({ ...prev, socketId: socket.id }));
+      if (!joinedRef.current) joinGame();
+    };
 
-		const handleMatchStarted = roomId => {
-			router.push(`/game/pingPong/${roomId}`);
-			router.refresh()
-		}
+    const handleMatchFound = opponent => {
+      setPlayer2(opponent);
+      setStatus("Match Found!");
+      setCanExit(false);
+    };
 
-		
-		
+    const handleMatchCanceled = () => {
+      setPlayer2(emptyPlayer());
+      setStatus("Opponent left. Try again.");
+      setCanExit(true);
+      setCanTryAgain(true);
+      joinedRef.current = false;
+    };
 
-		socket.on("connect", handleConnect);
-		socket.on("match-found", handleMatchFound);
-		socket.on("match-canceled", handleMatchCanceled);
-		socket.on("match-started", handleMatchStarted);
-		
-		return () => {
-			socket.off("connect", handleConnect);
-			socket.off("match-found", handleMatchFound);
-			socket.off("match-canceled", handleMatchCanceled);
-			socket.on("match-started", handleMatchStarted);
-		};
-	}, [user, router]);
-	
-	return (
-		<div className="flex flex-col items-center bg-[#0F0F0F]/65 p-10 rounded-3xl">
-			<h3 className="text-3xl font-extrabold">Find Match</h3>
-			<h3 className="mb-6 text-white/50">{status}</h3>
+    const handleMatchStarted = roomId => {
+      router.push(`/game/pingPong/${roomId}`);
+      router.refresh();
+    };
 
-			<div className="flex items-center justify-between gap-x-20">
-				<PlayerCard player={player1}/>
-				<span className="text-3xl font-extrabold">VS</span>
-				<PlayerCard player={player2}/>
+    socket.on("connect", handleConnect);
+    socket.on("match-found", handleMatchFound);
+    socket.on("match-canceled", handleMatchCanceled);
+    socket.on("match-started", handleMatchStarted);
 
-			</div>
-			<button onClick={canExit ? handleExit : undefined} className={`mt-6 rounded-md px-6 py-2 font-medium transition duration-100 ${
-			canExit ? "bg-[#442222] text-[#FF4848] hover:bg-[#3C1C1C] hover:text-[#BE3838]" : "bg-[#252525] text-[#717171] cursor-not-allowed"}`}>Exit</button>
+    return () => {
+      socket.off("connect", handleConnect);
+      socket.off("match-found", handleMatchFound);
+      socket.off("match-canceled", handleMatchCanceled);
+      socket.off("match-started", handleMatchStarted);
+    };
+  }, [user, router]);
 
-			{/* <button onClick={handleExit} className="mt-6 rounded-md bg-[#442222] px-6 py-2 font-medium text-[#FF4848] hover:bg-[#3C1C1C] hover:text-[#BE3838] transition duration-100">Exit</button> */}
-			{/* <button  className="mt-6 rounded-md bg-[#252525] px-6 py-2 font-medium text-[#717171]">Exit</button> */}
+  return (
+    <div className="w-full max-w-4xl rounded-3xl bg-[#0F0F0F]/65 p-6 sm:p-10 flex flex-col items-center gap-6">
+      <div className="text-center">
+        <h3 className="text-2xl sm:text-3xl font-extrabold">Find Match</h3>
+        <p className="mt-1 text-white/50">{status}</p>
+      </div>
 
-		</div>
-	);
+      <div className="flex w-full flex-col sm:flex-row items-center justify-center gap-6 sm:gap-16">
+        <PlayerCard player={player1} label="You" />
+        <span className="text-2xl sm:text-3xl font-extrabold">VS</span>
+        <PlayerCard player={player2} label="Opponent" />
+      </div>
+
+      <div className="mt-4 flex flex-col sm:flex-row gap-3">
+        <button
+          onClick={handleTryAgain}
+          disabled={!canTryAgain}
+          className={`flex items-center gap-2 rounded-md px-6 py-2 font-medium transition ${
+            canTryAgain
+              ? "bg-[#1E3A2F] text-[#4DFFB3] hover:bg-[#162A22]"
+              : "bg-[#252525] text-[#717171] cursor-not-allowed"
+          }`}
+        >
+          <RotateCcw size={18} />
+          Try Again
+        </button>
+
+        <button
+          onClick={handleExit}
+          disabled={!canExit}
+          className={`flex items-center gap-2 rounded-md px-6 py-2 font-medium transition ${
+            canExit
+              ? "bg-[#442222] text-[#FF4848] hover:bg-[#3C1C1C]"
+              : "bg-[#252525] text-[#717171] cursor-not-allowed"
+          }`}
+        >
+          <DoorOpen size={18} />
+          Exit
+        </button>
+      </div>
+    </div>
+  );
 }
 
-function PlayerCard({player}) {
-	return (
-		<div className="flex flex-col items-center">
-			<img
-				src={
-					player.socketId
-						? player.avatar
-						: "/gameAvatars/Empty.jpeg"
-				}
-				alt="profile"
-				className="h-36 w-36 rounded-xl"
-			/>
-			<h3 className="text-xl font-semibold">
-				{player.socketId
-					? `${player.firstName}.${player.lastName?.[0]}`
-					: "Player 2"}
-			</h3>
-			<h3 className="text-md font-medium text-[#6E6E6E]">
-				[{player.socketId ? player.username : "waiting"}]
-			</h3>
-		</div>
-	);
+function PlayerCard({ player, label }) {
+  const isActive = !!player.socketId;
+
+  return (
+    <div className="flex flex-col items-center text-center">
+      <img
+        src={isActive ? player.avatar : "/gameAvatars/Empty.jpeg"}
+        alt="profile"
+        className="h-28 w-28 sm:h-36 sm:w-36 rounded-xl object-cover"
+      />
+      <h3 className="mt-2 text-lg sm:text-xl font-semibold">
+        {isActive
+          ? `${player.firstName}.${player.lastName?.[0]}`
+          : label}
+      </h3>
+      <p className="text-sm font-medium text-[#6E6E6E]">
+        [{isActive ? player.username : "waiting"}]
+      </p>
+    </div>
+  );
 }

@@ -15,6 +15,7 @@ const WIN_SCORE = 10;
 let waitingPlayer = null;
 
 const loops = new Map();
+const playerMove = new Map();
 const activeGames = new Map();
 const socketToUsername = new Map();
 const usernameToSocket = new Map();
@@ -91,6 +92,16 @@ function startMatch(io, game) {
 		const current = activeGames.get(game.roomId);
 		if (!current || current.state !== "MATCHED") return;
 
+		const p1Socket = io.sockets.sockets.get(game.player1.socketId);
+		const p2Socket = io.sockets.sockets.get(game.player2.socketId);
+		if (!p1Socket || !p2Socket) {
+			if (p1Socket) io.to(game.player1.socketId).emit("match-canceled");
+			if (p2Socket) io.to(game.player2.socketId).emit("match-canceled");
+			cleanupPlayers(game);
+			removeGame(game);
+			return ;
+		}
+
 		game.state = "PLAYING";
 
 		io.sockets.sockets.get(game.player1.socketId)?.join(game.roomId);
@@ -103,6 +114,8 @@ function startMatch(io, game) {
 }
 
 export function handleJoin(socket, io, playerData) {
+	if (!isValidPlayerData(playerData)) return console.warn(`⚠️ Invalid player data from ${socket.id}`);
+
 	if (!playerData?.username) return;
 
 	rebindSocket(playerData.username, socket.id);
@@ -183,7 +196,15 @@ function resetBall(ball) {
 }
 
 function checkScore(game, io, roomId) {
+	if (game.player1.score < 0 || game.player2.score < 0) {
+		console.error(`❌ Invalid scores detected: ${game.player1.score} - ${game.player2.score}`);
+		game.player1.score = 0;
+		game.player2.score = 0;
+	}
 	if ( game.player1.score < WIN_SCORE && game.player2.score < WIN_SCORE)
+		return;
+
+	if (game.state !== "PLAYING")
 		return;
 
 	game.state = "FINISHED";
@@ -215,6 +236,14 @@ export function handleUpdateData(socket, io, playerData) {
 
 /*------------------------------------------------------------------------------------------ Update paddles */
 export function handlePaddleMove(socket, io, paddle) {
+	
+	if (!paddle || !isValidDirection(paddle.direction)) return;
+
+	const now = Date.now()
+	const lastMove = playerMove.get(socket.id) || 0;
+	if (now - lastMove < 16) return;
+	playerMove.set(socket.id, now);
+	
 	const game = getGameBySocket(socket.id);
 	if (!game || game.state !== "PLAYING") return;
 
@@ -232,6 +261,7 @@ export function handleDisconnect(socket, io) {
 	if (username) usernameToSocket.delete(username);
 	
 	socketToUsername.delete(socket.id);
+	playerMove.delete(socket.id);
 
 	if (waitingPlayer?.socketId === socket.id) {
 		waitingPlayer = null;
@@ -273,4 +303,14 @@ function cleanupPlayers(game) {
 	socketToUsername.delete(game.player2.socketId);
 	usernameToSocket.delete(game.player1.username);
 	usernameToSocket.delete(game.player2.username);
+}
+
+function isValidDirection(direction) {
+	return direction === "up" || direction === "down";
+}
+
+function isValidPlayerData(data) {
+	return data && typeof data.username === "string" && data.username.length > 0
+		&& data.username.length <= 20 && typeof data.firstName === "string"
+			&& typeof data.lastName === "string" && typeof data.avatar === "string";
 }
