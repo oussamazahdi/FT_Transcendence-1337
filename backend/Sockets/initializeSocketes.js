@@ -10,8 +10,5 @@ export function initializeSocketes(app) {
 		transports: ["websocket"]
 	})
 	app.decorate("io", io);
-	app.io.on("connection", socket => {
-		console.log("✅​ Socket connected:", socket.id);
-		initSocketManager(io)
-	});
+	initSocketManager(io)
 }

@@ -75,7 +75,7 @@ export default function PingPongGame() {
 			keys: { w: false, s: false, ArrowUp: false, ArrowDown: false },
 			scoreLimit: data.scoreLimit,
 		};
-		// console.log("game data=>", data);
+		// // console.log("game data=>", data);
 		setPlayers({
 			player1: {
 				nickName: data.player1NickName,

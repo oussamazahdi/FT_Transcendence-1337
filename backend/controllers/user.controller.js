@@ -17,11 +17,11 @@ async function fileUpload(user, file)
 	const image = file.fileStream;
 	const filename = generateFileNameByUser(user.username, file.filename, file.mimetype);
 	const filePath = path.join(uploadDir, filename);
-	console.log("MDR");
+	// // console.log("MDR");
 	await pipeline(image, fs.createWriteStream(filePath));
-	console.log("LOL");
+	// // console.log("LOL");
 	const fileLink = `${process.env.API_URL}/uploads/${filename}`;
-	console.log(fileLink);
+	// // console.log(fileLink);
 	return (fileLink);
 }
 
@@ -104,7 +104,7 @@ export class UserController
 		}
 		catch (error) {
 			const zError = zErrorHandler(error);
-			console.log(zError.fields);
+			// // console.log(zError.fields);
 			if (zError !== null)
 				return reply.code(zError.code).send({error: zError.error, fields: zError.fields});
 			if (error.code)
@@ -167,7 +167,7 @@ export class UserController
 			const db = request.server.db;
 			const { query } = request.query;
 	
-			console.log(query);
+			// // console.log(query);
 			if (!query || typeof query !== 'string'){
 				return reply.code(400).json({ error: 'QUERY_PARAMETER_REQUERED' });
 			}

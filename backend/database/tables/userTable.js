@@ -17,7 +17,7 @@ function createUserTable(db)
 						secret2fa TEXT,
 						createdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 						)`);
-				// console.log("Database initialized successfully!")
+				// // console.log("Database initialized successfully!")
 		}
 		catch (error) {
 				console.error("Database cannot be inited due to : " + error.message);

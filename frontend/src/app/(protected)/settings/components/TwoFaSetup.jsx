@@ -24,7 +24,7 @@ export default function TwoFaSetup ({setEnable, setView}){
 
         setImagePreview(data.qr)
       }catch(err){
-        console.log(err.message);
+        // console.log(err.message);
         setError(err.message);
       }finally{
         setLoading(false);
@@ -35,7 +35,7 @@ export default function TwoFaSetup ({setEnable, setView}){
 
   const VerifyQrCode = async () => {
     setError("");
-    console.log("hna tah rial")
+    // console.log("hna tah rial")
     try{
       const tokenString = TwoFAcode.join("");
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/2fa/enable`,{
@@ -51,12 +51,12 @@ export default function TwoFaSetup ({setEnable, setView}){
       if(!response.ok)
         throw new Error(data.error)
 
-      console.log("hna nla3bo 3lih")
+      // console.log("hna nla3bo 3lih")
 
       setEnable(true);
       setView("status");
     }catch(err){
-      console.log(err.message)
+      // console.log(err.message)
       setError(err.message)
     }
   }

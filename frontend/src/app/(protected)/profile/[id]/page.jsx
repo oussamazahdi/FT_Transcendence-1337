@@ -19,7 +19,7 @@ const FriendProfilePage = ({params}) => {
         const data = {id:"1", firstname:"Kamal", lastname:"EL Alami", username:"kael-ala", status:"Online", avatar:assets.kamalPdp}
         setFriendData(data);
       } catch (err) {
-        console.log("User not found");
+        // console.log("User not found");
       }
     };
     

@@ -2,15 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/authContext";
-import { io } from "socket.io-client";
 import { useSocket } from "@/contexts/socketContext";
 
 const GAME_WIDTH = 1024;
 const GAME_HEIGHT = 700;
 
-const socket = useSocket();
-
 export default function Page() {
+	const socket = useSocket();
 	const { user } = useAuth();
 
 	const canvasRef = useRef(null);
@@ -21,7 +19,7 @@ export default function Page() {
 	const [endGame, setEndGame] = useState(false);
 
 	useEffect(() => {
-		if (!user) return;
+		if (!user || !socket) return;
 
 		if (!socket.connected) socket.connect();
 
@@ -39,14 +37,12 @@ export default function Page() {
 			socket.off("match-data", setGame);
 			socket.off("game-state", setGame);
 		};
-	}, [user]);
+	}, [user, socket]);
 
 	useEffect(() => {
 		const resize = () => {
 			if (!wrapperRef.current) return;
-			setScale(
-				Math.min(wrapperRef.current.clientWidth / GAME_WIDTH, 1)
-			);
+			setScale(Math.min(wrapperRef.current.clientWidth / GAME_WIDTH, 1));
 		};
 
 		resize();
@@ -55,7 +51,9 @@ export default function Page() {
 	}, []);
 
 	useEffect(() => {
-		const handleKey = (e) => {
+		if (!socket) return;
+
+		const handleKey = e => {
 			if (e.key === "w" || e.key === "ArrowUp")
 				socket.emit("paddle-move", { direction: "up" });
 
@@ -65,10 +63,10 @@ export default function Page() {
 
 		window.addEventListener("keydown", handleKey);
 		return () => window.removeEventListener("keydown", handleKey);
-	}, []);
+	}, [socket]);
 
 	useEffect(() => {
-		if (!game) return;
+		if (!game || !socket) return;
 
 		if (game.state === "FINISHED") {
 			setEndGame(true);
@@ -91,7 +89,7 @@ export default function Page() {
 
 		render();
 		return () => cancelAnimationFrame(animationId);
-	}, [game]);
+	}, [game, socket]);
 
 	return (
 		<div className="flex flex-col items-center w-full overflow-hidden">
@@ -182,7 +180,10 @@ function PlayerCard({ player }) {
 }
 
 function GameResult({ game, width, height }) {
-	const winner = game.player1.score > game.player2.score ? game.player1 : game.player2;
+	const winner =
+		game.player1.score > game.player2.score
+			? game.player1
+			: game.player2;
 
 	return (
 		<div

@@ -4,6 +4,7 @@ import { PaddleMove } from "../services/PaddleMove.service.js"
 import { Disconnection } from "../services/Disconnection.service.js"
 
 export function onJoinGame(socket, io, player) {
+	console.log("🔸​​ Socket Join Game:", socket.id)
 	joinGame(socket, io, player)
 }
 
@@ -16,5 +17,6 @@ export function onPaddleMove(socket, io, paddle) {
 }
 
 export function onDisconnect(socket, io) {
+	console.log("🔻​ Socket Disconnected:", socket.id)
 	Disconnection(socket, io);
 }

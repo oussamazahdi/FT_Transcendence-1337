@@ -60,7 +60,7 @@ export class TwoFactorController
 
 				try {
 						const token = request.body.token;
-						console.log(token)
+						// console.log(token)
 						const secret = twoFactorModels.getUser2FASecret(db, request.user.userId);
 						const result = request.server.totp.verify({ secret: secret, token: token, window: 0 });
 

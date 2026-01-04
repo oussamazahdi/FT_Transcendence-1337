@@ -92,9 +92,9 @@ export default function Personal_information() {
 
       const newUser = data.user;
       login({...user, ...newUser});
-      console.log("user update successfully :)");
+      // console.log("user update successfully :)");
     } catch (err) {
-      console.log("failed to updare user :( ", err.message);
+      // console.log("failed to updare user :( ", err.message);
       setError(err.message);
     }
   }

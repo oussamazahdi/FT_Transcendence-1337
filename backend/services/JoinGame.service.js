@@ -72,6 +72,7 @@ function startMatch(io, game) {
 }
 
 export function joinGame(socket, io, player) {
+	console.log("waiting player [1] :", waitingPlayer);
 	if (!player || !isValidPlayerData(player)) return;
 
 	rebindSocket(player.username, socket.id);
@@ -84,6 +85,7 @@ export function joinGame(socket, io, player) {
 
 	if (!waitingPlayer.value) {
 		waitingPlayer.value = { socketId: socket.id, player };
+		console.log("waiting player [2] :", waitingPlayer);
 		return;
 	}
 

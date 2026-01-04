@@ -4,6 +4,8 @@ import { onJoinGame, onDisconnect, onUpdateData, onPaddleMove
 export function initSocketManager(io) {
 	io.on("connection", socket => {
 
+		console.log("✅​ Socket connected:", socket.id);
+
 		socket.on("join-game", data => onJoinGame(socket, io, data));
 
 		socket.on("update-data", data => onUpdateData(socket, io, data));

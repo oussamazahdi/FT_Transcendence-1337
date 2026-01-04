@@ -165,7 +165,7 @@ export default function SideBar() {
 
         setConversation(friendsData);
 
-        // console.log(conversations);
+        // // console.log(conversations);
 
         const formatedData = conversations.map((user) => ({
           playerPdp: user.playerPdp,
@@ -180,7 +180,7 @@ export default function SideBar() {
 
         setDisplayData(formatedData);
       } catch (err) {
-        console.log("Failed to fetch conversations", err);
+        // console.log("Failed to fetch conversations", err);
         setDisplayData([
           {
             playerPdp: assets.noChatFound,
@@ -207,7 +207,7 @@ export default function SideBar() {
     }
 
     const delayDebounceFn = setTimeout(async () => {
-      console.log(searchQuery);
+      // console.log(searchQuery);
       setLoading(true);
       try {
         const response = await fetch(
@@ -230,7 +230,7 @@ export default function SideBar() {
         if (!formatedData[0]) throw new Error("no user found");
         setDisplayData(formatedData);
       } catch (err) {
-        console.log("Failed to fetch users", err);
+        // console.log("Failed to fetch users", err);
 
         setDisplayData([
           {

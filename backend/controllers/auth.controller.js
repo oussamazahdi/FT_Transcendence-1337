@@ -42,7 +42,7 @@ export class AuthController {
 						return reply.code(200).send({message: "AUTHORIZED", userData: result});
 				}
 				catch (error) {
-						console.log(error);
+						// // console.log(error);
 								if (error.code)
 										return reply.code(error.code).send({error: error.message});
 								else
@@ -81,7 +81,7 @@ export class AuthController {
 				}
 				catch (error)
 				{
-						console.log(error);
+						// // console.log(error);
 						if (error.code)
 								return reply.code(error.code).send({error: error.message});
 						else
@@ -160,11 +160,11 @@ export class AuthController {
 				const db = request.server.db;
 				try {
 						const user = authModels.findUserById(db, request.user.userId);
-						console.log(user)
+						// // console.log(user)
 						return reply.code(200).send({message: "SUCCESS", userData: user});
 				}
 				catch (error) {
-						console.log(error);
+						// // console.log(error);
 						if (error.code)
 								return reply.code(error.code).send({error: error.message});
 						else

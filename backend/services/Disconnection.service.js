@@ -5,17 +5,24 @@ import { WIN_SCORE } from "../constants/game.constants.js";
 export function Disconnection (socket, io) {
 	const username = socketToUsername.get(socket.id);
 	if (username) usernameToSocket.delete(username);
+	else return;
+	console.log("**** game:")
 
 	socketToUsername.delete(socket.id);
 	playerMove.delete(socket.id);
+	
 
-	if (waitingPlayer?.socketId === socket.id) {
-		waitingPlayer = null;
+	console.log("🎌 waitingPlayer?.socketId:",waitingPlayer.value?.socketId)
+	console.log("🎌 socket.id:",socket.id)
+	if (waitingPlayer.value?.socketId === socket.id) {
+		waitingPlayer.value = null;
+		console.log("**** game:2")
 		return;
 	}
 
 	const game = getGameBySocket(socket.id);
 	if (!game) return;
+	console.log("**** game:",game)
 
 	const p1 = game.player1;
 	const p2 = game.player2;

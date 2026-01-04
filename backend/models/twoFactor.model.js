@@ -7,7 +7,6 @@ export class TwoFactorModels
 		setUser2FASecret(db, secret, userId)
 		{
 				try{
-						console.log("=========================>", secret, "id = ", userId);
 						db.prepare(`UPDATE users SET secret2fa = ? WHERE id = ?`).run(secret, userId);
 				}
 				catch (error) {

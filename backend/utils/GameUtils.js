@@ -57,8 +57,8 @@ export function rebindSocket(username, newSocketId) {
 
 	socketToUsername.delete(oldSocketId);
 
-	if (waitingPlayer?.playerData.username === username) {
-		waitingPlayer.socketId = newSocketId;
+	if (waitingPlayer.value?.player.username === username) {
+		waitingPlayer.value.socketId = newSocketId;
 	}
 }
 
@@ -74,8 +74,7 @@ export function isValidDirection(direction) {
 }
 
 export function isValidPlayerData(data) {
-	return (
-		data &&
+	return ( data &&
 		typeof data.username === "string" &&
 		data.username.length > 0 &&
 		data.username.length <= 20 &&

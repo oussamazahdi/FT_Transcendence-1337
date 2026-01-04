@@ -38,7 +38,7 @@ export async function middleware(request) {
 	//		 if (error.code === "ERR_JWT_EXPIRED" || error.message.includes("exp")) {
 	//			 isAccessTokenExpired = true;
 	//		 }
-	//		 console.log("Access token invalid:", error.message);
+	//		 // console.log("Access token invalid:", error.message);
 	//	 }
 	// }
 
@@ -63,10 +63,10 @@ export async function middleware(request) {
 	//				 response.headers.set("Set-Cookie", setCookieHeaders);
 	//			 }
 
-	//			 console.log("✅ Token refreshed successfully via Middleware");
+	//			 // console.log("✅ Token refreshed successfully via Middleware");
 	//			 return response;
 	//		 } else {
-	//			 console.log(
+	//			 // console.log(
 	//				 "❌ Refresh attempt failed - Status:",
 	//				 refreshResponse.status,
 	//			 );
@@ -112,7 +112,7 @@ export async function middleware(request) {
 	// }
 
 	// if (!isPublicRoute && !isValidAccess) {
-	//	 console.log("HERE 2", isValidAccess);
+	//	 // console.log("HERE 2", isValidAccess);
 	//	 const loginUrl = new URL("/sign-in", request.url);
 	//	 const response = NextResponse.redirect(loginUrl);
 
