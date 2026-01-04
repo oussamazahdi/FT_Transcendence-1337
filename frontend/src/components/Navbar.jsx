@@ -38,7 +38,7 @@ export default function Navbar() {
 
   return (
     <header className="relative mt-4 mx-4 md:mx-10">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between ">
 
         {/* Logo */}
         <button onClick={() => hardNavigate("/dashboard")}>

@@ -2,17 +2,9 @@
 
 import { useAuth } from "@/contexts/authContext";
 import { useEffect, useRef, useState } from "react";
-import { io } from "socket.io-client";
 import { useRouter } from "next/navigation";
 import { DoorOpen, RotateCcw } from "lucide-react";
-
-const socket = io("http://localhost:3001", {
-  transports: ["websocket"],
-  autoConnect: false,
-  reconnection: true,
-  reconnectionAttempts: 5,
-  reconnectionDelay: 1000,
-});
+import { useSocket } from "@/contexts/socketContext";
 
 const emptyPlayer = () => ({
   socketId: "",
@@ -27,6 +19,7 @@ const emptyPlayer = () => ({
 export default function Matchmaking() {
   const { user } = useAuth();
   const router = useRouter();
+  const socket = useSocket();
 
   const [status, setStatus] = useState("Searching for opponent...");
   const [player1, setPlayer1] = useState(emptyPlayer());
@@ -39,8 +32,8 @@ export default function Matchmaking() {
 
   useEffect(() => {
     if (!user) return;
-
-    setPlayer1({ ...emptyPlayer(),
+    setPlayer1({
+      ...emptyPlayer(),
       firstName: user.firstname,
       lastName: user.lastname,
       username: user.username,
@@ -49,6 +42,7 @@ export default function Matchmaking() {
   }, [user]);
 
   const joinGame = () => {
+    if (!socket || !socket.connected) return;
     socket.emit("join-game", {
       firstName: user.firstname,
       lastName: user.lastname,
@@ -61,8 +55,7 @@ export default function Matchmaking() {
   };
 
   const handleExit = () => {
-    if (!canExit) return;
-
+    if (!socket || !canExit) return;
     navigatedRef.current = true;
     socket.emit("leave-game");
     socket.disconnect();
@@ -70,16 +63,11 @@ export default function Matchmaking() {
   };
 
   const handleTryAgain = () => {
-		// router.refresh();
-		window.location.reload();
-    // if (!canTryAgain) return;
-
-    // setPlayer2(emptyPlayer());
-    // joinGame();
+    window.location.reload();
   };
 
   useEffect(() => {
-    if (!user || navigatedRef.current) return;
+    if (!user || !socket || navigatedRef.current) return;
 
     if (!socket.connected) socket.connect();
 
@@ -118,7 +106,7 @@ export default function Matchmaking() {
       socket.off("match-canceled", handleMatchCanceled);
       socket.off("match-started", handleMatchStarted);
     };
-  }, [user, router]);
+  }, [user, socket, router]);
 
   return (
     <div className="w-full max-w-3xl rounded-3xl bg-[#0F0F0F]/65 p-6 sm:p-10 flex flex-col items-center gap-6 mx-8 my-2">
@@ -175,9 +163,7 @@ function PlayerCard({ player, label }) {
         className="h-28 w-28 sm:h-36 sm:w-36 rounded-xl object-cover"
       />
       <h3 className="mt-2 text-lg sm:text-xl font-semibold">
-        {isActive
-          ? `${player.firstName}.${player.lastName?.[0]}`
-          : label}
+        {isActive ? `${player.firstName}.${player.lastName?.[0]}` : label}
       </h3>
       <p className="text-sm font-medium text-[#6E6E6E]">
         [{isActive ? player.username : "waiting"}]

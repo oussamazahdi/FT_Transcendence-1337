@@ -11,7 +11,7 @@ export function initializeSocketes(app) {
 	})
 	app.decorate("io", io);
 	app.io.on("connection", socket => {
-		console.log("🔌 Socket connected:", socket.id);
+		console.log("✅​ Socket connected:", socket.id);
 		initSocketManager(io)
 	});
 }

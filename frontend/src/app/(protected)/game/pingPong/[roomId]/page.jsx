@@ -3,14 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/authContext";
 import { io } from "socket.io-client";
+import { useSocket } from "@/contexts/socketContext";
 
 const GAME_WIDTH = 1024;
 const GAME_HEIGHT = 700;
 
-const socket = io("http://localhost:3001", {
-	transports: ["websocket"],
-	autoConnect: false,
-});
+const socket = useSocket();
 
 export default function Page() {
 	const { user } = useAuth();
