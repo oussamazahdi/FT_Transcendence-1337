@@ -63,7 +63,7 @@ const ProfileDropDown = ({user}) => {
 						<Link
 							onClick={() => {setIsOpen(!isOpen)}}
 							href="/profile"
-							className="h-8 md:h-10 w-full max-w-52 flex justify-start items-center gap-3 rounded-[8px] hover:bg-[#414141]/70 cursor-pointer transition-colors"
+							className="h-8 md:h-10 w-full max-w-52 flex justify-start items-center gap-3 rounded-[8px] hover:bg-[#414141]/70 px-15 cursor-pointer transition-colors"
 						>
 							<UserIcon className='size-4 md:size-6'/>
 							<p>Profile</p>
@@ -71,14 +71,14 @@ const ProfileDropDown = ({user}) => {
 						<Link
 							onClick={() => setIsOpen(!isOpen)}
 							href="/settings"
-							className="h-8 md:h-10	w-full max-w-52 flex justify-start items-center gap-3 rounded-[8px] hover:bg-[#414141]/70 cursor-pointer transition-colors"
+							className="h-8 md:h-10	w-full max-w-52 flex justify-start items-center gap-3 rounded-[8px] hover:bg-[#414141]/70 cursor-pointer transition-colors px-13"
 						>
 							<Cog6ToothIcon className='size-4 md:size-6' />
 							<p>Settings</p>
 						</Link>
 						<div
 							onClick={() => handleSignOut()}
-							className="h-8 md:h-10	w-full max-w-52 flex justify-start items-center gap-3 rounded-[8px] hover:bg-[#414141]/70 cursor-pointer transition-colors"
+							className="h-8 md:h-10	w-full max-w-52 flex justify-start items-center gap-3 rounded-[8px] hover:bg-[#414141]/70 cursor-pointer transition-colors px-12"
 						>
 							<ArrowRightStartOnRectangleIcon className='size-4 md:size-6 text-[#DD4949]'/>
 							<p className="text-[#DD4949]">Sign out</p>
