@@ -4,7 +4,7 @@ import { GAME_WIDTH, GAME_HEIGHT } from "../constants/game.constants.js"
 export class Ball {
 	constructor() {
 		const angle = Math.random() * Math.PI / 2 - Math.PI / 4;
-		const speed = 2.5;
+		const speed = 0.5;
 
 		this.x = GAME_WIDTH / 2;
 		this.y = GAME_HEIGHT / 2;

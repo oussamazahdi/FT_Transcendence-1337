@@ -1,9 +1,14 @@
+// import GameInvitationPopup from "@/components/Game Invite/GameInvite";
+
 import React from "react";
+import { useAuth } from "@/contexts/authContext";
 
 const dashboard = () => {
+	const {user} = useAuth();
   return (
-    <div className="flex w-full min-w-100 mx-3 lg:w-4/5 min-h-[80vh] rounded-lg overflow-hidden">
-      <h1>This is dashboard</h1>
+    <div className="flex flex-col">
+      <h1 className="mb-10">This is dashboard</h1>
+			<button className="bg-red-600/30 px-5 py-2 rounded-md transition-all duration-150 hover:bg-red-700/30" >Game Invitation</button>
     </div>
   );
 };
