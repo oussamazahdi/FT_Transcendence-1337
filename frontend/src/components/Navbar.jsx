@@ -61,7 +61,7 @@ export default function Navbar() {
         </div>
 
         <button className="md:hidden p-2 text-white/60 hover:bg-black/20 rounded-full">
-          <Image src={assets.searchIcon} className="size-8 mr-4" />
+          <Image src={assets.searchIcon} alt="icon" className="size-8 mr-4" />
         </button>
         <UserDropdown />
       </div>

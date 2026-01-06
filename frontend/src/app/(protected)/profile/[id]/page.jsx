@@ -37,7 +37,7 @@ const FriendProfilePage = ({params}) => {
         </div>
       </div>
       <div className="basis-3/10  flex flex-col gap-4">
-        <MatchHistory height="h-full flex-1"/>
+        <MatchHistory classname="md:max-h-none"/>
       </div>
     </div>
   )

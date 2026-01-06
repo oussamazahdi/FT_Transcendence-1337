@@ -3,7 +3,7 @@ import { NoSymbolIcon, UserIcon, LockClosedIcon, WrenchScrewdriverIcon } from "@
 
 export default function Sidebar({ ActiveTab, setActiveTab }) {
   const menuItems = [
-    {id: "personal-information", label: "Personal information",icon: UserIcon},
+    { id: "personal-information", label: "Personal information",icon: UserIcon},
     { id: "blocked-users", label: "Bolcked users", icon: NoSymbolIcon },
     { id: "security", label: "Security", icon: LockClosedIcon },
     { id: "Game-setiings", label: "Game setting", icon: WrenchScrewdriverIcon },

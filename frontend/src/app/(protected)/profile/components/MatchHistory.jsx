@@ -36,11 +36,11 @@ const renderHistory = MatchHistoryData.map((match) => (
   </div>
 ))
 
-const MatchHistory = ({height}) => {
+const MatchHistory = ({classname}) => {
   const {user} = useAuth();
 
   return (
-    <div className={`flex-1 min-h-0 max-h-[350px] md:max-h-none bg-[#0F0F0F]/75 rounded-[20px] p-3 flex flex-col`}>
+    <div className={`flex-1 min-h-0 max-h-[350px] bg-[#0F0F0F]/75 rounded-[20px] p-3 flex flex-col ${classname}`}>
       <p className='font-bold text-sm shrink-0'>Match history</p>
       <div className='flex flex-col gap-1 w-full mt-2 overflow-y-auto custom-scrollbar flex-1 min-h-0'>
         {renderHistory}
