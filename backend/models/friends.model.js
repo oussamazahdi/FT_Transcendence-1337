@@ -1,0 +1,190 @@
+import { handleDatabaseError } from '../utils/dbErrorHandler.js';
+
+export class FriendsModels
+{
+    getFriendsList(db, userId)
+    {
+        try {
+            const friends = db.prepare(`
+                SELECT u.id, u.username, u.avatar, u.firstname, u.lastname
+                FROM friends f
+                JOIN users u ON u.id = CASE 
+                    WHEN f.sender_id = :me THEN f.receiver_id
+                    ELSE f.sender_id
+                END
+                WHERE ((f.sender_id = :me OR f.receiver_id = :me) AND f.status = 'accepted')
+                `).all({me : userId});
+            return (friends);
+        }
+        catch (error) {
+            const dbError = handleDatabaseError(error, 'getFriendsList');
+            throw dbError;
+        }
+    }
+
+    getRequestsList(db, userId)
+    {
+        try {
+            const requests = db.prepare(`
+                SELECT u.id, u.username, u.avatar, u.firstname, u.lastname
+                FROM friends f
+                JOIN users u ON u.id = f.sender_id
+                WHERE f.receiver_id = :me AND f.status = 'pending'
+                `).all({me : userId});
+            return (requests);
+        }
+        catch (error) {
+            const dbError = handleDatabaseError(error, 'getRequestsList');
+            throw dbError;
+        }
+    }
+
+    getBlockedUsersList(db, userId)
+    {
+        try {
+            const blockedList = db.prepare( `
+                SELECT u.id, u.username, u.avatar, u.firstname, u.lastname 
+                FROM friends f JOIN users u 
+                ON u.id = CASE 
+                WHEN f.sender_id = :me THEN f.receiver_id 
+                ELSE f.sender_id 
+                END 
+                WHERE f.blocked_by = :me AND f.status = 'blocked' `).all({me : userId}); 
+                return (blockedList);
+            } 
+            catch (error) {
+                const dbError = handleDatabaseError(error, 'getBlockedUsersList');
+                throw dbError; 
+            }
+    }
+
+    newFriendRequest(db, senderId, receiverId)
+    {
+        try {
+            const result = db.prepare(`
+                INSERT INTO friends
+                (sender_id, receiver_id, status)
+                VALUES (?, ?, ?)`).run(senderId, receiverId, 'pending');
+            return (result);
+
+        }
+        catch (error) 
+        {
+            const dbError = handleDatabaseError(error, 'newFriendRequest');
+            throw dbError; 
+        }
+    }
+
+    acceptFriendRequest(db, sender_id, receiver_id)
+    {
+        try {
+            const result = db.prepare(`
+                UPDATE friends SET status = 'accepted' 
+                WHERE (sender_id = :other AND receiver_id = :me AND status = 'pending')`).run({me: receiver_id, other: sender_id});
+            return (result);
+        }
+        catch (error) 
+        {
+            const dbError = handleDatabaseError(error, 'acceptFriendRequest');
+            throw dbError; 
+        }
+    }
+
+    blockFriend(db, blocker, blocked)
+    {
+        try {
+            const result = db.prepare(`
+                UPDATE friends SET status = 'blocked', blocked_by = :me
+                WHERE (
+                (receiver_id = :me AND sender_id = :other) 
+                OR
+                (receiver_id = :other AND sender_id = :me))
+                AND blocked_by != 'blocked'`).run({me: blocker, other: blocked});
+            return (result);
+        }
+        catch (error) 
+        {
+            const dbError = handleDatabaseError(error, 'blockFriend');
+            throw dbError; 
+        }
+    }
+
+    unblockFriend(db, blocker, blocked)
+    {
+        try {
+            const result = db.prepare(`
+                UPDATE friends SET status = 'accepted', blocked_by = NULL
+                WHERE (
+                (receiver_id = :me AND sender_id = :other) 
+                OR
+                (receiver_id = :other AND sender_id = :me))
+                AND blocked_by = :me`).run({me: blocker, other: blocked});
+            return (result);
+        }
+        catch (error) 
+        {
+            const dbError = handleDatabaseError(error, 'unblockFriend');
+            throw dbError; 
+        }
+    }
+
+    removeFriendRequest(db, sender, receiver)
+    {
+        try {
+            const result = db.prepare(`
+                DELETE FROM friends 
+                WHERE (
+                (sender_id = :me AND receiver_id = :other)
+                OR
+                (sender_id = :other AND receiver_id = :me))
+                AND status = 'pending'`).run({me: sender, other: receiver});
+            return (result);
+        }
+        catch (error) 
+        {
+            const dbError = handleDatabaseError(error, 'removeFriendRequest');
+            throw dbError; 
+        }
+    }
+    
+    removeFromFriendList(db, sender, receiver)
+    {
+        try {
+            const result = db.prepare(`
+                DELETE FROM friends 
+                WHERE (
+                (sender_id = :me AND receiver_id = :other)
+                OR
+                (sender_id = :other AND receiver_id = :me))
+                AND status = 'accepted'`).run({me: sender, other: receiver});
+            return (result);
+        }
+        catch (error) 
+        {
+            const dbError = handleDatabaseError(error, 'removeFromFriendList');
+            throw dbError; 
+        }
+    }
+
+    isBlockedByUser(db, blocker, blocked)
+    {
+        try {
+            const status = db.prepare(`
+                SELECT status, blocked_by FROM friends
+                WHERE (
+                (sender_id = :me AND receiver_id = :other)
+                OR
+                (sender_id = :other AND receiver_id = :me))
+                AND status = 'blocked'`).get({me: blocker, other: blocked});
+            return (status);
+        }
+        catch (error) 
+        {
+            const dbError = handleDatabaseError(error, 'isBlockedByUser');
+            throw dbError; 
+        }
+    }
+
+    
+    }
+export const friendsModels = new FriendsModels();

@@ -4,18 +4,15 @@ import fastify from "fastify";
 
 function friendsRoutes(fastify)
 {
-    // friends
-    // fastify.get("/", friendsController.getAllFriends);
-    // fastify.delete("/:id", friendsController.unfriend);
-    // // requests
-    // fastify.post("/requests/:id", friendsController.sendFriendRequest);
-    // fastify.delete("/requests/:id", friendsController.cancelFriendRequest);
-    // fastify.post("/requests/:id/accept", friendsController.acceptFriendRequest);
-    // fastify.get("/requests", friendsController.getAllFriendRequests);
-    // //blockes
-    // fastify.get("/blocks", friendsController.getAllBlocked);
+    fastify.get("/", friendsController.getAllFriends);
+    fastify.get("/requests", friendsController.getAllFriendRequests);
+    fastify.post("/requests/:id", friendsController.sendFriendRequest);
+    fastify.post("/requests/:id/accept", friendsController.acceptFriendRequest);
+    fastify.get("/blocks", friendsController.getAllBlocked);
+    fastify.post("/blocks/:id", friendsController.block);
     // fastify.delete("/blocks/:id", friendsController.unblock);
-    // fastify.post("/blocks/:id", friendsController.block);
+    // fastify.delete("/:id", friendsController.unfriend);
+    // fastify.delete("/requests/:id", friendsController.cancelFriendRequest);
 
 }
 
