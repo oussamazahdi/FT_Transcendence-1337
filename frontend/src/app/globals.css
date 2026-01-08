@@ -43,3 +43,18 @@ html, body {
 .animate-exit {
 	animation: fade-out 0.2s ease-out forwards;
 }
+
+
+
+/* Hide Scrollbar but Keep Scrolling Functionality */
+.custom-scrollbar {
+  /* Firefox */
+  scrollbar-width: none;
+  /* IE and Edge */
+  -ms-overflow-style: none;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+.custom-scrollbar::-webkit-scrollbar {
+  display: none;
+}

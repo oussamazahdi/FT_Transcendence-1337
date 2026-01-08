@@ -43,3 +43,32 @@ export const nestedObjectSuccessResponse = {
 				}
 		}
 }
+
+export const notificationSchema = {
+	type: "object",
+	properties: {
+		id: { type: "integer" },
+		sender_id: { type: "integer" },
+		receiver_id: { type: "integer" },
+		type: { type: "string" },
+		title: { type: "string" },
+		message: { type: "string" },
+		payload: { type: ["object", "null"] },
+		status: { type: "string" },
+		is_read: { type: "integer" },
+		expires_at: { type: ["string", "null"] },
+		created_at: { type: "string" }
+	}
+};
+
+export const notificationsSuccessResponse = {
+  type: "object",
+  properties: {
+    message: { type: "string" },
+    userData: {
+      type: "array",
+      items: notificationSchema
+    }
+  }
+};
+

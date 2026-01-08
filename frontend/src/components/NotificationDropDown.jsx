@@ -123,7 +123,7 @@ const NotificationDropDown = () => {
   });
 
   return (
-    <div ref={ref} className="relative hidden md:block">
+    <div ref={ref} className="relative hidden md:block ">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="md:border border-[#9D9D9D]/40 rounded-[10px] md:p-3 hover:bg-[#000000]/40 cursor-pointer hover:scale-105 active:scale-95 transition"
@@ -137,7 +137,7 @@ const NotificationDropDown = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2   max-h-[300px] bg-[#0F0F0F]/75 rounded-[10px] flex flex-col gap-1 p-2 overflow-y-auto z-50 custom-scrollbar">
+        <div className="absolute right-0 top-full mt-2   max-h-[256px] bg-[#0F0F0F]/75 rounded-[10px] flex flex-col gap-1 p-2 overflow-y-auto z-50 custom-scrollbar ">
           {notifications.length > 0 ? (
             renderNotifications
           ) : (
