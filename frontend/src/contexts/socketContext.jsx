@@ -14,7 +14,10 @@ export function SocketProvider({ children }) {
     if (!user) return;
 
     const s = io("http://localhost:3001", {
-      transports: ["websocket"],
+      auth:{
+				
+			},
+			transports: ["websocket"],
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
