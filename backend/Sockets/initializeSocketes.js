@@ -7,7 +7,7 @@ import { tokenModels } from "../models/token.model.js";
 export function initializeSocketes(app) {
   const io = new Server(app.server, {
     cors: {
-      origin: process.env.FRONTEND_URL,
+      origin: "http://localhost:3000",
       methods: ["GET", "POST"],
       credentials: true,
     },
@@ -15,7 +15,7 @@ export function initializeSocketes(app) {
   });
 
   io.use((socket, next) => {
-    socket.db = app.sqlite;
+    socket.db = app.db;
     next();
   });
 
@@ -27,6 +27,8 @@ export function initializeSocketes(app) {
       const cookies = cookie.parse(rawCookie);
       const accessToken = cookies.accessToken;
       const refreshToken = cookies.refreshToken;
+			// console.log("accessToken:", accessToken);
+			// console.log("refreshToken:", refreshToken);
 
       if (!accessToken) return next(new Error("Unauthorized"));
 
@@ -36,6 +38,7 @@ export function initializeSocketes(app) {
       }
 
       const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
+			console.log("--- decoded:", decoded);
 
       socket.user = decoded;
 

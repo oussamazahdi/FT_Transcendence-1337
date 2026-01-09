@@ -1,5 +1,6 @@
 import { NotificationRules } from "../rules/notifications.rules.js";
 import { NotifModel } from "../models/notif.model.js";
+import { NOTIFICATION_TYPES } from "../rules/notifications.rules.js";
 
 const model = new NotifModel();
 

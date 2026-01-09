@@ -7,7 +7,6 @@ export const NOTIFICATION_TYPES = {
 	SYSTEM: "system",
 };
 
-export const GAME_TYPES = ["pingpong", "tic_tac_toe"];
 
 export const NotificationRules = {
   game_invite: {
@@ -17,7 +16,7 @@ export const NotificationRules = {
     allowedActions: ["accept", "reject"],
     validTransitions: ["accepted", "rejected", "expired"],
     requiredPayload: ["roomId", "gameType"],
-    allowedGameTypes: GAME_TYPES,
+    allowedGameTypes: ["pingpong", "tic_tac_toe"],
   },
 
   game_accept: {
