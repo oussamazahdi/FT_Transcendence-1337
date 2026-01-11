@@ -9,9 +9,12 @@ async function authMiddleware(request, reply)
     try {
         if (!accessToken)
             throw new Error("UNAUTHORIZED_NO_ACCESS_TOKEN");
-        const blacklisted = tokenModels.isTokenRevoked(db, refreshToken);
-        if (blacklisted)
-            throw new Error("TOKEN_REVOKED");
+        if (refreshToken)
+        {
+            const blacklisted = tokenModels.isTokenRevoked(db, refreshToken);
+            if (blacklisted)
+                throw new Error("TOKEN_REVOKED");
+        }
         const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
         console.log(decoded);
         request.user = decoded;

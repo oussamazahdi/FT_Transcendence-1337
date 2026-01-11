@@ -93,13 +93,20 @@ export class FriendsModels
     blockFriend(db, blocker, blocked)
     {
         try {
-            const result = db.prepare(`
+            let result = db.prepare(`
                 UPDATE friends SET status = 'blocked', blocked_by = :me
                 WHERE (
                 (receiver_id = :me AND sender_id = :other) 
                 OR
                 (receiver_id = :other AND sender_id = :me))
-                AND blocked_by != 'blocked'`).run({me: blocker, other: blocked});
+                AND status != 'blocked'`).run({me: blocker, other: blocked});
+            if (result.changes === 0)
+            {
+                result = db.prepare(`
+                INSERT INTO friends
+                (sender_id, receiver_id, status, blocked_by)
+                VALUES (?, ?, ?, ?)`).run(blocker, blocked, 'blocked', blocker);
+            }
             return (result);
         }
         catch (error) 
@@ -113,7 +120,7 @@ export class FriendsModels
     {
         try {
             const result = db.prepare(`
-                UPDATE friends SET status = 'accepted', blocked_by = NULL
+                DELETE FROM friends
                 WHERE (
                 (receiver_id = :me AND sender_id = :other) 
                 OR
@@ -177,6 +184,24 @@ export class FriendsModels
                 (sender_id = :other AND receiver_id = :me))
                 AND status = 'blocked'`).get({me: blocker, other: blocked});
             return (status);
+        }
+        catch (error) 
+        {
+            const dbError = handleDatabaseError(error, 'isBlockedByUser');
+            throw dbError; 
+        }
+    }
+
+    isFriendshipExists(db, sender, receiver)
+    {
+        try {
+            const result = db.prepare(`SELECT status FROM friends
+                WHERE (sender_id = :me AND receiver_id = :other)
+                OR
+                (sender_id = :other AND receiver_id = :me)`).get({me: sender, other: receiver});
+            if (result === undefined)
+                return (false);
+            return (true);
         }
         catch (error) 
         {

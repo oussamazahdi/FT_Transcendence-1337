@@ -15,7 +15,7 @@ function createFriendshipTable(db)
             UNIQUE(sender_id, receiver_id)
             )`)
     }
-    catch {
+    catch (error) {
         console.error("Database cannot be inited due to : " + error.message);
         process.exit(1);
     }
