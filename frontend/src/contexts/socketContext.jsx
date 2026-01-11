@@ -39,7 +39,7 @@ export function SocketProvider({ children }) {
 		setSocket(socketHolder);
 
 		return () => {
-			socketHolder.off("notification:new", onNewNotification);
+			// socketHolder.off("notification:new", onNewNotification);
 			socketHolder.disconnect();
 			setSocket(null);
 		};

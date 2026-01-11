@@ -68,17 +68,19 @@ export async function notifRoutes(fastify, opts) {
 			return res.code(200).send({message:"SUCCESS", userData: read});
 		
 		} catch(error) {
+			console.log("there is and error here -----------------------------------");
 			if (error?.code) return res.code(error.code).send({error: error.message});
 			return res.code(500).send({error: error.message});
 		}
 	})
 
 
-	fastify.patch("/unread-count",{ preHandler: authMiddleware }, async (req, res)=>{
+	fastify.get("/unread-count",{ preHandler: authMiddleware }, async (req, res)=>{
 		try {
 			const db = req.server.db;
 			const userId = req.user.userId;
-			const id = Number(req.params.id);
+			const id = Number(userId);
+			console.log("************************************************************ Id:", id);
 			if (!Number.isInteger(id)) return res.code(400).send({ error: "Invalid notification id" });
 			
 			const notifications = await service.getForUser(db, userId);
