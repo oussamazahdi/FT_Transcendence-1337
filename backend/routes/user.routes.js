@@ -52,34 +52,6 @@ function userRoutes(fastify)
 								},
 								required: ['id']
 						},
-						// body: {
-						//		 type: 'object',
-						//		 properties: {
-						//						 firstname: {
-						//								 type: 'string',
-						//								 minLength: 3,
-						//								 maxLength: 15,
-						//						 },
-						//						 lastname: {
-						//								 type: 'string',
-						//								 minLength: 3,
-						//								 maxLength: 15,
-						//						 },
-						//						 username: {
-						//								 type: 'string',
-						//								 minLength: 3,
-						//								 maxLength: 15,
-						//						 },
-						//						 email: {
-						//								 type: 'string',
-						//								 format: 'email'
-						//						 },
-						//						 password: {
-						//								 type: 'string',
-						//								 minLength: 8,
-						//						 },
-						//		 },
-						// },
 						response: {
 								200: emptySuccessResponse,
 								400: {

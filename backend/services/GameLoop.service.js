@@ -54,7 +54,7 @@ export function resetBall(ball) {
 	ball.x = GAME_WIDTH / 2;
 	ball.y = GAME_HEIGHT / 2;
 	ball.velocityX *= -1;
-	ball.speed = 2.5;
+	ball.speed = 5;
 }
 
 export function checkScore(game, io, roomId) {

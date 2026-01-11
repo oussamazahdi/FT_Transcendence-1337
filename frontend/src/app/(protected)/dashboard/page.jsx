@@ -1,10 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { use } from "react";
 import { useSocket } from "@/contexts/socketContext";
 import { useAuth } from "@/contexts/authContext";
+import { api } from "@/lib/api";
+import { useEffect } from "react";
 
-const Dashboard = () => {
+const  Dashboard = () => {
   const socket = useSocket();
   const { user } = useAuth();
 
@@ -33,6 +35,7 @@ const Dashboard = () => {
       }
     );
   };
+
 
   return (
     <div className="flex flex-col">

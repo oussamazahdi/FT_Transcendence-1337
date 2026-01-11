@@ -29,12 +29,12 @@ export function SocketProvider({ children }) {
 			reconnectionDelay: 1000,
 		});
 		
-		function onNewNotification(notif){
-			console.log("**** notif:", notif);
-			setNotifications((prev)=> [notif, ...prev])
-		}
+		// function onNewNotification(notif){
+		// 	console.log("**** notif:", notif);
+		// 	setNotifications((prev)=> [notif, ...prev])
+		// }
 
-		socketHolder.on("notification:new", onNewNotification);
+		// socketHolder.on("notification:new", onNewNotification);
 
 		setSocket(socketHolder);
 
