@@ -22,7 +22,9 @@ const Friends = (props) => {
       <div className="ml-2 flex-1 flex items-start justify-between min-w-0">
         <div className="flex-1 min-w-0 pr-4">
           <h4 className="text-white text-xs font-semibold">{props.name}</h4>
-          <h2 className="text-gray-300 text-[12px] truncate">{props.lastmsg}</h2>
+          <h2 className="text-gray-300 text-[12px] truncate">
+            {props.lastmsg}
+          </h2>
         </div>
         <div className="flex-shrink-0">
           <span className="text-gray-400 text-[10px] mr-2">{props.time}</span>

@@ -105,7 +105,8 @@ const SelectImage = () => {
         data = await reply.json();
 
         if (!reply.ok) {
-          const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
+          const errorMessage =
+            AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
           throw new Error(errorMessage);
         }
 
@@ -127,7 +128,8 @@ const SelectImage = () => {
         data = await reply.json();
 
         if (!reply.ok) {
-          const errorMessage = AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
+          const errorMessage =
+            AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
           throw new Error(errorMessage);
         }
 
@@ -189,17 +191,20 @@ const SelectImage = () => {
                     height={48}
                     className="mb-2 invert"
                   /> */}
-                  <CloudArrowUpIcon className="size-16 text-[#A5A5A5]"/>
+                  <CloudArrowUpIcon className="size-16 text-[#A5A5A5]" />
                   {/* <span className="text-xs text-gray-400">Upload</span> */}
                 </label>
               )}
             </div>
             <h4 className="mt-2 text-[#A6A6A6]">
-              Click here to upload your profile or <br/>Drag and drop it here
+              Click here to upload your profile or <br />
+              Drag and drop it here
             </h4>
           </div>
 
-          <h2 className="text-[#A6A6A6] text-sm mb-2">or choose avatar from here</h2>
+          <h2 className="text-[#A6A6A6] text-sm mb-2">
+            or choose avatar from here
+          </h2>
 
           <div className="flex flex-row space-x-2 overflow-y-scroll p-1">
             {avatars.map((a) => (

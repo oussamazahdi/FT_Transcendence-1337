@@ -8,7 +8,11 @@ export default function ChatPage() {
   const { selectedFriend } = useContext(SelectedFriendContext);
   return (
     <div className="h-full">
-      {selectedFriend ? <ChatWindow selectedFriend={selectedFriend}/> : <WelcomeScreen />}
+      {selectedFriend ? (
+        <ChatWindow selectedFriend={selectedFriend} />
+      ) : (
+        <WelcomeScreen />
+      )}
     </div>
   );
 }

@@ -28,16 +28,15 @@ export default function SignUp() {
       setError("Passwords do not match");
       return;
     }
-    if (password.length < 8){
-      setError("Password must be at least 8 characters.")
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters.");
       return;
     }
     setLoading(true);
 
     try {
-
       if (firstname.length < 3 || lastname.length < 3 || username.length < 3)
-        throw new Error(AUTH_ERRORS["INVALID_NAME_LENGTH"])
+        throw new Error(AUTH_ERRORS["INVALID_NAME_LENGTH"]);
       const reply = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`,
         {
@@ -58,7 +57,8 @@ export default function SignUp() {
 
       if (!reply.ok) {
         const errorData = await reply.json();
-        const errorMessage = AUTH_ERRORS[errorData.error] || AUTH_ERRORS["default"];
+        const errorMessage =
+          AUTH_ERRORS[errorData.error] || AUTH_ERRORS["default"];
         throw new Error(errorMessage);
       }
 
@@ -91,12 +91,12 @@ export default function SignUp() {
                 value={firstname}
                 onChange={(e) => setFirstname(e.target.value)}
                 placeholder="Firstname"
-                />
+              />
               <Input
                 value={lastname}
                 onChange={(e) => setLastname(e.target.value)}
                 placeholder="Lastname"
-                />
+              />
             </div>
             <Input
               value={username}

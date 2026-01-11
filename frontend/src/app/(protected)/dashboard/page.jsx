@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React from "react";
 import Friends from "../profile/components/Friends";
 import Profile from "../profile/components/Profile";
@@ -8,23 +8,22 @@ import WinRate from "../profile/components/WinRate";
 import Games from "./components/Games";
 
 const dashboard = () => {
-  const {user} = useAuth();
+  const { user } = useAuth();
   return (
-    <div className="flex w-full max-w-7xl mx-3 flex-col md:flex-row gap-4 h-[86vh]">
-      <div className="flex flex-col basis-2/3 gap-4">
-        <div className="flex flex-col md:flex-row gap-4">
-          <Profile user={user} />
-          <MatchHistory classname="md:max-h-[310px]"/>
+    <div className="flex w-full max-w-7xl flex-col md:flex-row gap-4 h-[86vh]">
+      <div className="flex flex-col md:w-7/10 gap-4">
+        <div className="flex h-1/2 flex-col md:flex-row gap-4">
+          <Profile user={user} className="md:w-6/10"/>
+          <MatchHistory classname="max-h-[360px] md:w-4/10" />
         </div>
-        <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex h-1/2 flex-col md:flex-row gap-4">
           <WinRate />
           <Games />
         </div>
       </div>
-      <div className="flex-1">
-        <Friends classname="md:max-h-[86vh]"/>
+      <div className="md:w-3/10">
+        <Friends classname="max-h-[360px] md:max-h-[86vh]" />
       </div>
-
     </div>
   );
 };

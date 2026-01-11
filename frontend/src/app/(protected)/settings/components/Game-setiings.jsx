@@ -1,7 +1,5 @@
 import React from "react";
 
-export default function GameSettings(){
-  return(
-    <div>Game Settings</div>
-  )
+export default function GameSettings() {
+  return <div>Game Settings</div>;
 }

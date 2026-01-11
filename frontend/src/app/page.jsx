@@ -56,7 +56,8 @@ export default function Home() {
         Game on. Anytime. Anywhere.
       </h1>
       <h2 className="text-l md:text-xl  md:w-120 text-center text-gray-400">
-        Play ping pong or tic-tac-toe with friends, join tournaments, and chat all in one spot. Start your next match now.
+        Play ping pong or tic-tac-toe with friends, join tournaments, and chat
+        all in one spot. Start your next match now.
       </h2>
 
       <div className="space-x-4">

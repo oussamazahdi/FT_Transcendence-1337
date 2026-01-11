@@ -34,7 +34,7 @@ export default function SideBar() {
           lastname: user.lastname,
           lastMessage: user.lastMessage,
           timeOfLastMsg: user.timeOfLastMsg,
-          status:user.status,
+          status: user.status,
           id: user.id,
         }));
 
@@ -63,9 +63,7 @@ export default function SideBar() {
 
   const renderList = () => {
     if (loading) {
-      return (
-        <div>Loading...</div>
-      );
+      return <div>Loading...</div>;
     }
     return displayData.map((friend) => (
       <Friends
@@ -103,52 +101,52 @@ export default function SideBar() {
 }
 
 //---------------------Search Chat------------------------------------------
-  // useEffect(() => {
-  //   if (!searchQuery.trim()) {
-  //     setDisplayData(conversations);
-  //     setLoading(false);
-  //     return;
-  //   }
+// useEffect(() => {
+//   if (!searchQuery.trim()) {
+//     setDisplayData(conversations);
+//     setLoading(false);
+//     return;
+//   }
 
-  //   const delayDebounceFn = setTimeout(async () => {
-  //     console.log(searchQuery);
-  //     setLoading(true);
-  //     try {
-  //       const response = await fetch(
-  //         `${process.env.NEXT_PUBLIC_API_URL}/api/users/search?query=${searchQuery}`,
-  //         {
-  //           method: "GET",
-  //           credentials: "include",
-  //         },
-  //       );
-  //       if (!response.ok) throw new Error("Network response was not ok");
-  //       const data = await response.json();
-  //       const formatedData = data.map((user) => ({
-  //         playerPdp: assets.kamalPdp,
-  //         firstname: user.firstname,
-  //         lastname: user.lastname,
-  //         lastMessage: "user found via search",
-  //         timeOfLastMsg: "",
-  //         id: user.id,
-  //       }));
-  //       if (!formatedData[0]) throw new Error("no user found");
-  //       setDisplayData(formatedData);
-  //     } catch (err) {
-  //       console.log("Failed to fetch users", err);
+//   const delayDebounceFn = setTimeout(async () => {
+//     console.log(searchQuery);
+//     setLoading(true);
+//     try {
+//       const response = await fetch(
+//         `${process.env.NEXT_PUBLIC_API_URL}/api/users/search?query=${searchQuery}`,
+//         {
+//           method: "GET",
+//           credentials: "include",
+//         },
+//       );
+//       if (!response.ok) throw new Error("Network response was not ok");
+//       const data = await response.json();
+//       const formatedData = data.map((user) => ({
+//         playerPdp: assets.kamalPdp,
+//         firstname: user.firstname,
+//         lastname: user.lastname,
+//         lastMessage: "user found via search",
+//         timeOfLastMsg: "",
+//         id: user.id,
+//       }));
+//       if (!formatedData[0]) throw new Error("no user found");
+//       setDisplayData(formatedData);
+//     } catch (err) {
+//       console.log("Failed to fetch users", err);
 
-  //       setDisplayData([
-  //         {
-  //           playerPdp: assets.noUserFound,
-  //           firstname: "No user Found",
-  //           lastname: "",
-  //           lastMessage: `${err}`,
-  //           timeOfLastMsg: "now",
-  //           id: "no-id",
-  //         },
-  //       ]);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   }, 500);
-  //   return () => clearTimeout(delayDebounceFn);
-  // }, [searchQuery]);
+//       setDisplayData([
+//         {
+//           playerPdp: assets.noUserFound,
+//           firstname: "No user Found",
+//           lastname: "",
+//           lastMessage: `${err}`,
+//           timeOfLastMsg: "now",
+//           id: "no-id",
+//         },
+//       ]);
+//     } finally {
+//       setLoading(false);
+//     }
+//   }, 500);
+//   return () => clearTimeout(delayDebounceFn);
+// }, [searchQuery]);

@@ -10,7 +10,7 @@ export default function SettingsPanel({ ActiveTab }) {
       {ActiveTab === "personal-information" && <Personal_information />}
       {ActiveTab === "blocked-users" && <BlockedUsers />}
       {ActiveTab === "security" && <Security />}
-      {ActiveTab === "Game-setiings" && <GameSettings/>}
+      {ActiveTab === "Game-setiings" && <GameSettings />}
     </div>
   );
 }

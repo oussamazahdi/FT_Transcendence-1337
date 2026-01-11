@@ -15,7 +15,11 @@ export default function Navbar() {
     { href: "/dashboard", label: "dashboard", icon: assets.dashboardIcon },
     { href: "/chat", label: "Chat", icon: assets.chatIcon },
     { href: "/game", label: "Game", icon: assets.pingPongIcon },
-    { href: "/leaderboard", label: "Leaderboard", icon: assets.leaderboardIcon },
+    {
+      href: "/leaderboard",
+      label: "Leaderboard",
+      icon: assets.leaderboardIcon,
+    },
   ];
   const [search, setSearch] = useState("");
 
@@ -27,7 +31,13 @@ export default function Navbar() {
         href={item.href}
         className={`mx-2 text-[#BEBEBE] p-1 focus:border-b-2 focus:border-white md:border md:border-[#BEBEBE] hover:text-white hover:bg-[#000000]/40 md:focus:bg-[#000000]/40 md:rounded-full cursor-pointer md:py-2 md:px-4 ${isActive ? "md:bg-[#000000]/40" : ""}`}
       >
-        <Image src={item.icon} alt="icon" width={32} height={32} className="block md:hidden"/>
+        <Image
+          src={item.icon}
+          alt="icon"
+          width={32}
+          height={32}
+          className="block md:hidden"
+        />
         <p className="hidden md:block">{item.label}</p>
       </Link>
     );
@@ -43,12 +53,12 @@ export default function Navbar() {
             width={52}
             height={52}
             className="object-cover size-12 md:size-14 rounded-[10px] hover:scale-105"
-            />
+          />
         </Link>
         <div className="flex items-center justify-evenly flex-1 md:justify-center md:flex-none">
           {navBareMap}
         </div>
-          
+
         <div className="hidden md:flex items-center md:my-2 md:border border-[#9D9D9D]/65 md:py-2 md:pl-4 text-white/60 rounded-full">
           <input
             type="text"

@@ -11,8 +11,8 @@ export default function chat() {
     <SelectedFriendContext.Provider
       value={{ selectedFriend, setSelectedFriend }}
     >
-      <div className="flex w-full mx-3 lg:w-4/5 h-[80vh] rounded-lg overflow-hidden">
-        <div className="min-w-[250px] w-[40vh] max-w-[350px] mr-2 h-full flex flex-col">
+      <div className="flex w-full max-w-7xl mx-3 h-[80vh] rounded-lg overflow-hidden">
+        <div className="max-w-1/4 mr-2 h-full flex flex-col">
           <SideBar />
         </div>
         <div className="flex-1 h-full rounded-[12px]">
