@@ -8,22 +8,58 @@ export async function getCurrentUser() {
   if (!rToken || !aToken) return null;
 
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`,
-      {
-        headers: {
-          Cookie: `accessToken=${aToken.value}; refreshToken=${rToken.value}`,
-        },
-      },
-    );
 
-    const data = await response.json();
+    const headers = {Cookie: `accessToken=${aToken.value}; refreshToken=${rToken.value}`}
 
-    if (!response.ok) {
+    const userPromise = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`,{headers});
+    const friendsPromise = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/`,{headers})
+    const blockedPromise = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks`,{headers})
+    const pendingReqPromise = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/sent`,{headers})
+    const incomingReqPromise = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests`,{headers})
+
+    const [userRes, friendsRes, blockedRes, pendingReqRes, incomingReqRes] = await Promise.all([userPromise, friendsPromise, blockedPromise, pendingReqPromise, incomingReqPromise])
+
+    if (!userRes.ok) 
       return null;
+
+    const user = await userRes.json();
+
+    let friendsList = [];
+    if (friendsRes.ok){
+      const friendsData = await friendsRes.json();
+      friendsList = friendsData.friendList || [];
     }
 
-    return data.userData;
+    let blockedList = []
+    if (blockedRes.ok){
+      const blockedData = await blockedRes.json();
+      blockedList = blockedData.blockedUsers || [];
+    }
+
+    let pendingReqList = []
+    if (pendingReqRes.ok){
+      const pendingReqData = await pendingReqRes.json();
+      pendingReqList = pendingReqData.Requests || [];
+    }
+
+    let incomingReqList = []
+    if(incomingReqRes.ok){
+      const incomingReqData = await incomingReqRes.json()
+      incomingReqList = incomingReqData.requestsList || []
+    }
+
+    console.log("user", user.userData);
+    console.log("Friends", friendsList);
+    console.log("Blocked" ,blockedList);
+    console.log("pendingRequest", pendingReqList);
+    console.log("incomingRequest", incomingReqList);
+    return {
+      userData: user.userData,
+      friends: friendsList,
+      blocked: blockedList,
+      pendingRequests: pendingReqList,
+      incomingRequests: incomingReqList,
+    };
   } catch (error) {
     console.error("Failed to fetch user:", error);
     return null;

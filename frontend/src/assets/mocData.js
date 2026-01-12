@@ -3,7 +3,7 @@ import { assets } from "@/assets/data";
 export const messages = [
   {
     id: 1,
-    senderId: "1", // This matches YOUR profile ID
+    senderId: "2007", // This matches YOUR profile ID
     type: "text",
     text: "Hello! How are you?",
     timestamp: "10:00 AM",
@@ -11,7 +11,7 @@ export const messages = [
   },
   {
     id: 2,
-    senderId: "1",
+    senderId: "2007",
     type: "text",
     text: "I am good, thanks! Did you finish the design?",
     timestamp: "10:02 AM",
@@ -19,7 +19,7 @@ export const messages = [
   },
   {
     id: 3,
-    senderId: "1",
+    senderId: "2007",
     type: "text",
     text: "Yes, I am working on the frontend noddflkdshfkd;lkjsl;kdhlksadjglkjadshflkdshjalkafjahslkdjfhdsalkfjhbasdlkjfhasdlkjfhasldkjhflkjasdhlkfjdshAKJAGSDKJHGFADSKJHGDWSAKJGHADSKJGHDSKHGFDSKJGHDSKJHGFKJDSHGDSKJHGDFSKmnbdmsvfmdsnvfmndsbvmnfbdsmnfbdsmn.",
     timestamp: "10:05 AM",
@@ -35,7 +35,7 @@ export const messages = [
   },
   {
     id: 5,
-    senderId: "1",
+    senderId: "2007",
     type: "text",
     text: "Sure, send me an invite!",
     timestamp: "10:01 AM",
@@ -63,7 +63,7 @@ export const messages = [
   },
   {
     id: 8,
-    senderId: "1",
+    senderId: "2007",
     type: "text",
     text: "3ayeeeeee9ti",
     status: "rejected",
@@ -72,7 +72,7 @@ export const messages = [
   },
   {
     id: 9,
-    senderId: "1", // This matches YOUR profile ID
+    senderId: "2007", // This matches YOUR profile ID
     type: "text",
     text: "Hello! How are you?",
     timestamp: "10:00 AM",
@@ -80,7 +80,7 @@ export const messages = [
   },
   {
     id: 10,
-    senderId: "1",
+    senderId: "2007",
     type: "text",
     text: "I am good, thanks! Did you finish the design?",
     timestamp: "10:02 AM",
@@ -88,7 +88,7 @@ export const messages = [
   },
   {
     id: 11,
-    senderId: "1",
+    senderId: "2007",
     type: "text",
     text: "Yes, I am working on the frontend noddflkdshfkd;lkjsl;kdhlksadjglkjadshflkdshjalkafjahslkdjfhdsalkfjhbasdlkjfhasdlkjfhasldkjhflkjasdhlkfjdshAKJAGSDKJHGFADSKJHGDWSAKJGHADSKJGHDSKHGFDSKJGHDSKJHGFKJDSHGDSKJHGDFSKmnbdmsvfmdsnvfmndsbvmnfbdsmnfbdsmn.",
     timestamp: "10:05 AM",
@@ -104,7 +104,7 @@ export const messages = [
   },
   {
     id: 13,
-    senderId: "1",
+    senderId: "2007",
     type: "text",
     text: "Sure, send me an invite!",
     timestamp: "10:01 AM",
@@ -132,7 +132,7 @@ export const messages = [
   },
   {
     id: 16,
-    senderId: "1",
+    senderId: "2007",
     type: "text",
     text: "3ayeeeeee9ti",
     status: "rejected",
@@ -143,7 +143,7 @@ export const messages = [
 
 export const friendsData = [
   {
-    playerPdp: assets.mohcinePdp,
+    avatar: assets.mohcinePdp,
     firstname: "Mohcine",
     lastname: "Ghanami",
     lastMessage: "Lorem ipsum is simply bla bla hhhhhhhhhhhhhhh",
@@ -152,7 +152,7 @@ export const friendsData = [
     id: "1",
   },
   {
-    playerPdp: assets.soufiixPdp,
+    avatar: assets.soufiixPdp,
     firstname: "Soufiane",
     lastname: "arif",
     lastMessage: "Lorem ipsum is simply bla bla",
@@ -161,7 +161,7 @@ export const friendsData = [
     id: "2",
   },
   {
-    playerPdp: assets.kamalPdp,
+    avatar: assets.kamalPdp,
     firstname: "Kamal",
     lastname: "El Alami",
     lastMessage: "Lorem ipsum is simply bla bla",
@@ -170,7 +170,7 @@ export const friendsData = [
     id: "3",
   },
   {
-    playerPdp: assets.mohcinePdp,
+    avatar: assets.mohcinePdp,
     firstname: "Mohcine",
     lastname: "Ghanami",
     lastMessage: "Lorem ipsum is simply bla bla hhhhhhhhhhhhhhh",
@@ -179,7 +179,7 @@ export const friendsData = [
     id: "4",
   },
   {
-    playerPdp: assets.soufiixPdp,
+    avatar: assets.soufiixPdp,
     firstname: "Soufiane",
     lastname: "arif",
     lastMessage: "Lorem ipsum is simply bla bla",
@@ -188,7 +188,7 @@ export const friendsData = [
     id: "5",
   },
   {
-    playerPdp: assets.kamalPdp,
+    avatar: assets.kamalPdp,
     firstname: "Kamal",
     lastname: "El Alami",
     lastMessage: "Lorem ipsum is simply bla bla",
@@ -197,7 +197,7 @@ export const friendsData = [
     id: "6",
   },
   {
-    playerPdp: assets.mohcinePdp,
+    avatar: assets.mohcinePdp,
     firstname: "Mohcine",
     lastname: "Ghanami",
     lastMessage: "Lorem ipsum is simply bla bla hhhhhhhhhhhhhhh",
@@ -206,7 +206,7 @@ export const friendsData = [
     id: "7",
   },
   {
-    playerPdp: assets.soufiixPdp,
+    avatar: assets.soufiixPdp,
     firstname: "Soufiane",
     lastname: "arif",
     lastMessage: "Lorem ipsum is simply bla bla",
@@ -215,7 +215,7 @@ export const friendsData = [
     id: "8",
   },
   {
-    playerPdp: assets.kamalPdp,
+    avatar: assets.kamalPdp,
     firstname: "Kamal",
     lastname: "El Alami",
     lastMessage: "Lorem ipsum is simply bla bla",
@@ -224,7 +224,7 @@ export const friendsData = [
     id: "9",
   },
   {
-    playerPdp: assets.mohcinePdp,
+    avatar: assets.mohcinePdp,
     firstname: "Mohcine",
     lastname: "Ghanami",
     lastMessage: "Lorem ipsum is simply bla bla hhhhhhhhhhhhhhh",
@@ -233,7 +233,7 @@ export const friendsData = [
     id: "10",
   },
   {
-    playerPdp: assets.soufiixPdp,
+    avatar: assets.soufiixPdp,
     firstname: "Soufiane",
     lastname: "arif",
     lastMessage: "Lorem ipsum is simply bla bla",
@@ -242,7 +242,7 @@ export const friendsData = [
     id: "11",
   },
   {
-    playerPdp: assets.kamalPdp,
+    avatar: assets.kamalPdp,
     firstname: "Kamal",
     lastname: "El Alami",
     lastMessage: "Lorem ipsum is simply bla bla",
@@ -251,7 +251,7 @@ export const friendsData = [
     id: "12",
   },
   {
-    playerPdp: assets.mohcinePdp,
+    avatar: assets.mohcinePdp,
     firstname: "Mohcine",
     lastname: "Ghanami",
     lastMessage: "Lorem ipsum is simply bla bla hhhhhhhhhhhhhhh",
@@ -260,7 +260,7 @@ export const friendsData = [
     id: "13",
   },
   {
-    playerPdp: assets.soufiixPdp,
+    avatar: assets.soufiixPdp,
     firstname: "Soufiane",
     lastname: "arif",
     lastMessage: "Lorem ipsum is simply bla bla",
@@ -269,7 +269,7 @@ export const friendsData = [
     id: "14",
   },
   {
-    playerPdp: assets.kamalPdp,
+    avatar: assets.kamalPdp,
     firstname: "Kamal",
     lastname: "El Alami",
     lastMessage: "Lorem ipsum is simply bla bla",

@@ -5,6 +5,7 @@ import { UserProvider } from "@/contexts/authContext";
 import { getCurrentUser } from "@/lib/auth";
 
 import "./globals.css";
+import GlobalErrorToast from "@/components/GlobalErrorToast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,6 +31,7 @@ export default async function RootLayout({ children }) {
         className={`${poppins.className} ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <UserProvider initialUser={user}>
+          <GlobalErrorToast />
           <Background>{children}</Background>
         </UserProvider>
       </body>

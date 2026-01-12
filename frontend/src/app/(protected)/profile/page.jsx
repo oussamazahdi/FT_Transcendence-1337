@@ -19,7 +19,7 @@ export default function ProfilePage() {
         </div>
       </div>
       <div className="basis-3/10  flex flex-col gap-4 h-full">
-        <Friends classname="h-1/2" />
+        <Friends classname="md:min-h-1/2" />
         <MatchHistory />
       </div>
     </div>

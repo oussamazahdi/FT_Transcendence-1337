@@ -3,9 +3,11 @@ import Friends from "./Friends";
 import { assets } from "@/assets/data";
 import { useState } from "react";
 import { friendsData } from "@/assets/mocData";
+import { useAuth } from "@/contexts/authContext";
 
 export default function SideBar() {
-  const [conversations, setConversation] = useState(friendsData);
+  const {friends} = useAuth();
+  const [conversations, setConversation] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [displayData, setDisplayData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -14,27 +16,26 @@ export default function SideBar() {
     const fetchconversation = async () => {
       setLoading(true);
       try {
-        // const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/conversations`,{
-        //   method:"GET",
-        //   credentials: "include",
-        // })
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/`,{
+          method:"GET",
+          credentials: "include",
+        })
 
-        // if(!response.ok)
-        //   throw new Error("Network response was not ok");
+        const data = await response.json();
+        if(!response.ok)
+          throw new Error(data.error);
 
-        // const data = await response.json();
-        // const formatedData = data.map((user) => ({
-        // await new Promise((resolve) => setTimeout(resolve, 900));
+        setConversation(friends)
 
-        // console.log(conversations);
-
-        const formatedData = conversations.map((user) => ({
-          avatar: user.playerPdp,
+        const rawList = friends || [];
+        const formatedData = rawList.map((user) => ({
+          avatar: user.avatar,
           firstname: user.firstname,
           lastname: user.lastname,
-          lastMessage: user.lastMessage,
-          timeOfLastMsg: user.timeOfLastMsg,
-          status: user.status,
+          username: user.username,
+          lastMessage: user.lastMessage || "last message bla bla bla hhhhhhhhhhhhhhhhhhhhh",
+          timeOfLastMsg: user.timeOfLastMsg || "00:00",
+          status: user.status || false,
           id: user.id,
         }));
 
@@ -59,7 +60,7 @@ export default function SideBar() {
     };
 
     fetchconversation();
-  }, [conversations]);
+  }, []);
 
   const renderList = () => {
     if (loading) {
@@ -70,7 +71,9 @@ export default function SideBar() {
         id={friend.id}
         key={friend.id}
         avatar={friend.avatar}
-        name={friend.firstname + " " + friend.lastname}
+        firstname={friend.firstname}
+        lastname={friend.lastname}
+        username={friend.username}
         lastmsg={friend.lastMessage}
         status={friend.status}
         time={friend.timeOfLastMsg}

@@ -9,6 +9,10 @@ export function handleDatabaseError(error, context = '') {
         if (error.message.includes('users.username'))
             return { code: 409, message: 'USERNAME_ALREADY_TAKEN' };
 
+        // ✅ (optional but useful) friendships duplicate mapping
+        if (error.message.includes('friendships.requester_id') || error.message.includes('friendships.addressee_id'))
+            return { code: 409, message: 'FRIENDSHIP_ALREADY_EXISTS' };
+
         return { code: 409, message: 'DUPLICATE_ENTRY' };
     }
 
@@ -25,6 +29,9 @@ export function handleDatabaseError(error, context = '') {
 
     if (error.message.includes('FOREIGN KEY constraint failed'))
         return { code: 400, message: 'INVALID_REFERENCE' };
+
+    if (error.message.includes('CHECK constraint failed'))
+        return { code: 400, message: 'INVALID_DATA' };
 
     if (error.code === 'SQLITE_BUSY' || error.message.includes('database is locked'))
         return { code: 503, message: 'DATABASE_BUSY' };

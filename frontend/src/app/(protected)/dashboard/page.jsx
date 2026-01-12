@@ -22,7 +22,7 @@ const dashboard = () => {
         </div>
       </div>
       <div className="md:w-3/10">
-        <Friends classname="max-h-[360px] md:max-h-[86vh]" />
+        <Friends classname="md:h-1/1 max-h-[360px] md:max-h-[86vh]" />
       </div>
     </div>
   );

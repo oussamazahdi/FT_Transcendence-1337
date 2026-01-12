@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { useAuth } from "@/contexts/authContext";
+import { assets } from "@/assets/data";
 
 const MessageBubble = (props) => {
   const { user } = useAuth();
@@ -10,7 +11,7 @@ const MessageBubble = (props) => {
     >
       {props.showAvatar ? (
         <Image
-          src={`${props.isMe ? user.avatar : props.friendAvatar.src}`}
+          src={`${props.isMe ? (user.avatar || assets.defaultProfile.src) :( props.friendAvatar || assets.defaultProfile.src)}`}
           alt="avatar"
           width={40}
           height={40}

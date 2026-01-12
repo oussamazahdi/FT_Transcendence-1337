@@ -9,8 +9,6 @@ import MessageList from "./MessageList";
 export default function ChatWindow({ selectedFriend }) {
   const Friend = selectedFriend;
   const [messages, setMessages] = useState(initialMessages);
-  const { user } = useAuth();
-  const bottomRef = useRef(null);
 
   return (
     <div className="w-full flex flex-col flex-1 gap-2 rounded-lg h-full">

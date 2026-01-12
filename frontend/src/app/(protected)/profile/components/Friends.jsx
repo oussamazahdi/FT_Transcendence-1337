@@ -1,51 +1,41 @@
-import React from "react";
-import { assets } from "@/assets/data";
-import Image from "next/image";
-import Link from "next/link";
-import { UserIcon } from "@heroicons/react/24/outline";
-import { Gamepad2 } from "lucide-react";
-import { friendsData2 } from "@/assets/mocData";
+import React, { useEffect, useState } from "react";
+import FriendCard from "./FriendCard";
+import { useAuth } from "@/contexts/authContext";
 
-const renderFriends = friendsData2.map((user) => (
-  <div
-    key={user.id}
-    className="flex items-center w-full bg-[#414141]/60 rounded-lg p-1 pr-2"
-  >
-    <Image
-      src={user.avatar}
-      alt="icon"
-      width={40}
-      height={40}
-      className="rounded-md mr-1"
-    />
-    <div>
-      <p className="text-xs font-bold">
-        {user.firstname} [{user.username}]
-      </p>
-      <div className="flex items-center text-[9px] text-gray-500">
-        <div
-          className={`w-1.5 h-1.5 rounded-full mr-1 shrink-0 ${
-            user.status === "Online" ? "bg-[#42A78A]" : "bg-[#B23B3B]"
-          }`}
-        />
-        <p>{user.status}</p>
-      </div>
-    </div>
-    <div className="ml-auto flex items-center gap-1">
-      <button className="w-12 h-7 bg-[#151515]/70 flex justify-center items-center rounded-lg cursor-pointer hover:brightness-150 hover:scale-110">
-        <Gamepad2 strokeWidth={1.5} className="size-4" />{" "}
-      </button>
-      <Link
-        href={`/profile/${user.id}`}
-        className="w-12 h-7 bg-[#151515]/70 flex justify-center items-center rounded-lg cursor-pointer hover:brightness-150 hover:scale-110"
-      >
-        <UserIcon className="size-4" />
-      </Link>
-    </div>
-  </div>
-));
 
 const Friends = ({ classname }) => {
+  const {friends} = useAuth();
+  // const [FriendsData, setFriendsData] = useState([]);
+  // const [error, setError] = useState("");
+
+  // useEffect(() => {
+
+  //   setError("");
+
+  //   const fetchFriends = async () => {
+  //     try{
+  //       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/`,{
+  //         method:"GET",
+  //         credentials:"include"
+  //       })
+
+  //       const data = await response.json()
+  //       if (!response.ok){
+  //         throw new Error (data.error);
+  //       }
+  //       setFriendsData(data.friendList);
+  //     }catch(err){
+  //       setError(err.message);
+  //       console.log(err.message)
+  //     }
+  //   }
+  //   fetchFriends();
+  // },[])
+
+  const renderFriends = friends.map((user) => (
+    <FriendCard user={user} key={user.id}/>
+  ));
+
   return (
     <div
       className={`flex-1 bg-[#0F0F0F]/75 rounded-[20px] p-3 flex flex-col ${classname}`}

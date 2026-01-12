@@ -33,11 +33,11 @@ export default function Personal_information() {
   const [error, setError] = useState(null);
   const [imagePreview, setImagePreview] = useState(formData.avatar);
   const isChanged =
-    formData.firstname !== (user.firstname || "") ||
-    formData.lastname !== (user.lastname || "") ||
-    formData.username !== (user.username || "") ||
-    formData.email !== (user.email || "") ||
-    formData.avatar !== user.avatar;
+    formData.firstname !== (user?.firstname || "") ||
+    formData.lastname !== (user?.lastname || "") ||
+    formData.username !== (user?.username || "") ||
+    formData.email !== (user?.email || "") ||
+    formData.avatar !== user?.avatar;
 
   function handleUpload(e) {
     const file = e.target.files?.[0];

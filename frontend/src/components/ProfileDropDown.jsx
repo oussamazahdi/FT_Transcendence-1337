@@ -9,6 +9,7 @@ import {
   ArrowRightStartOnRectangleIcon,
   Cog6ToothIcon,
   UserIcon,
+  UsersIcon,
 } from "@heroicons/react/24/outline";
 
 const ProfileDropDown = ({ user }) => {
@@ -75,22 +76,31 @@ const ProfileDropDown = ({ user }) => {
                 setIsOpen(!isOpen);
               }}
               href="/profile"
-              className="h-8 md:h-10  flex justify-center items-center gap-3 rounded-[8px] hover:bg-[#414141]/70 cursor-pointer transition-colors"
+              className="h-8 md:h-10  flex justify-start items-center gap-3 rounded-[8px] hover:bg-[#414141]/70 cursor-pointer transition-colors"
             >
               <UserIcon className="size-4 md:size-6" />
               <p>Profile</p>
             </Link>
+            <Link 
+              onClick={() => {
+                setIsOpen(!isOpen);
+              }}
+              href="/friendsRequests"
+              className="h-8 md:h-10  flex justify-start items-center gap-3 rounded-[8px] hover:bg-[#414141]/70 cursor-pointer transition-colors">
+                <UsersIcon className="size-4 md:size-6" />
+                <p>Friends Requests</p>
+            </Link>
             <Link
               onClick={() => setIsOpen(!isOpen)}
               href="/settings"
-              className="h-8 md:h-10  w-full max-w-52 flex justify-center items-center gap-3 rounded-[8px] hover:bg-[#414141]/70 cursor-pointer transition-colors"
+              className="h-8 md:h-10  w-full max-w-52 flex justify-start items-center gap-3 rounded-[8px] hover:bg-[#414141]/70 cursor-pointer transition-colors"
             >
               <Cog6ToothIcon className="size-4 md:size-6" />
               <p>Settings</p>
             </Link>
             <div
               onClick={() => handleSignOut()}
-              className="h-8 md:h-10  w-full max-w-52 flex justify-center items-center gap-3 rounded-[8px] hover:bg-[#414141]/70 cursor-pointer transition-colors"
+              className="h-8 md:h-10  w-full max-w-52 flex justify-start items-center gap-3 rounded-[8px] hover:bg-[#414141]/70 cursor-pointer transition-colors"
             >
               <ArrowRightStartOnRectangleIcon className="size-4 md:size-6 text-[#DD4949]" />
               <p className="text-[#DD4949]">Sign out</p>

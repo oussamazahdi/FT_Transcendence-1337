@@ -1,6 +1,7 @@
 import Image from "next/image";
 import React, { useContext } from "react";
 import { SelectedFriendContext } from "@/contexts/userContexts";
+import { assets } from "@/assets/data";
 
 const Friends = (props) => {
   const { setSelectedFriend } = useContext(SelectedFriendContext);
@@ -12,7 +13,7 @@ const Friends = (props) => {
     >
       <div className="m-[1px] flex items-center rounded-lg cursor-pointer overflow-hidden">
         <Image
-          src={props.avatar}
+          src={props.avatar || assets.defaultProfile}
           alt=""
           width={50}
           height={50}
@@ -21,7 +22,7 @@ const Friends = (props) => {
       </div>
       <div className="ml-2 flex-1 flex items-start justify-between min-w-0">
         <div className="flex-1 min-w-0 pr-4">
-          <h4 className="text-white text-xs font-semibold">{props.name}</h4>
+          <h4 className="text-white text-xs font-semibold">{props.firstname} {props.lastname}</h4>
           <h2 className="text-gray-300 text-[12px] truncate">
             {props.lastmsg}
           </h2>

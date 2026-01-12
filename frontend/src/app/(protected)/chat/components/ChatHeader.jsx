@@ -4,6 +4,7 @@ import Image from "next/image";
 import { UserIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import BlockUserPopUp from "./BlockUserPopUp";
+import { assets } from "@/assets/data";
 
 const ChatHeader = ({ user }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,14 +27,14 @@ const ChatHeader = ({ user }) => {
   return (
     <div className="relative bg-[#0F0F0F]/65 flex items-center p-2 rounded-lg gap-1">
       <Image
-        src={user.avatar}
+        src={user.avatar || assets.defaultProfile}
         alt="avatar"
         width={40}
         height={40}
         className="rounded-sm"
       />
       <div className="flex flex-col">
-        <p className="font-bold">{user.name}</p>
+        <p className="font-bold">{user.firstname} {user.lastname}</p>
         <div className="flex items-center text-[9px] text-gray-500">
           <div
             className={`w-1.5 h-1.5 rounded-full mr-1 shrink-0 ${
