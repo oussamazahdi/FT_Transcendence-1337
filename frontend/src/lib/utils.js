@@ -33,12 +33,18 @@ export const AUTH_ERRORS = {
 
 export const USER_ERROR = {
   USER_NOT_FOUND: "We couldn't find a user with that information.",
-  NEW_PASSWORDS_DO_NOT_MATCH:
-    "The new passwords do not match. Please try again.",
-  NEW_PASSWORD_MATCHS_OLD_PASSWORD:
-    "Your new password must be different from your current password.",
-  CURRENT_PASSWORD_IS_INCORRECT:
-    "The current password you entered is incorrect.",
+  NEW_PASSWORDS_DO_NOT_MATCH:"The new passwords do not match. Please try again.",
+  NEW_PASSWORD_MATCHS_OLD_PASSWORD:"Your new password must be different from your current password.",
+  CURRENT_PASSWORD_IS_INCORRECT:"The current password you entered is incorrect.",
+  USER_IS_BLOCKED: "You cannot perform this action because this user is blocked.",
+  FRIENDSHIP_AREADY_EXISTS: "You are already friends with this user!",
+  REQUEST_ALREADY_SENT: "You've already sent a friend request to this person.",
+  REQUEST_SENT_SUCCESSFULLY: "Friend request sent successfully!",
+  REQUEST_NOT_FOUND: "This friend request no longer exists or has already been handled.",
+  USER_ALREADY_BLOCKED: "This user is already in your blocked list.",
+  USER_ALREADY_UNBLOCKED: "This user is not currently blocked.",
+  REQUEST_ALREADY_CANCELED: "This request has already been canceled.",
+  USER_ALREADY_UNFRIENDED: "You are no longer friends with this user.",
   default: "An unexpected error occurred. Please try again.",
 };
 

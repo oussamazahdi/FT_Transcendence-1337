@@ -11,11 +11,11 @@ export async function getCurrentUser() {
 
     const headers = {Cookie: `accessToken=${aToken.value}; refreshToken=${rToken.value}`}
 
-    const userPromise = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`,{headers});
-    const friendsPromise = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/`,{headers})
-    const blockedPromise = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks`,{headers})
-    const pendingReqPromise = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/sent`,{headers})
-    const incomingReqPromise = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests`,{headers})
+    const userPromise = fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`,{headers});
+    const friendsPromise = fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/`,{headers})
+    const blockedPromise = fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks`,{headers})
+    const pendingReqPromise = fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/sent`,{headers})
+    const incomingReqPromise = fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests`,{headers})
 
     const [userRes, friendsRes, blockedRes, pendingReqRes, incomingReqRes] = await Promise.all([userPromise, friendsPromise, blockedPromise, pendingReqPromise, incomingReqPromise])
 
