@@ -4,16 +4,16 @@ import ProfileDropDown from "./ProfileDropDown";
 import NotificationDropDown from "./NotificationDropDown";
 
 const UserDropdown = () => {
-	const { user } = useAuth();
+  const { user } = useAuth();
 
-	return (
-		<div>
-			<div className="flex items-center md:gap-3">
-				<NotificationDropDown/>
-				<ProfileDropDown user={user} />
-			</div>
-		</div>
-	);
+  return (
+    <div>
+      <div className="flex items-center md:gap-3">
+        <NotificationDropDown/>
+        <ProfileDropDown user={user} />
+      </div>
+    </div>
+  );
 };
 
 export default UserDropdown;

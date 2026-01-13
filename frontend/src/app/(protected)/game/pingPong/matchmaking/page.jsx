@@ -49,7 +49,7 @@ export default function Matchmaking() {
       username: user.username,
       avatar: user.avatar,
     });
-		// console.log("============> i emit join-game event to server")
+    console.log("============> i emit join-game event to server")
     joinedRef.current = true;
     setStatus("Waiting for opponent...");
     setCanTryAgain(false);
@@ -68,37 +68,37 @@ export default function Matchmaking() {
   };
 
   useEffect(() => {
-		console.log("********> before checking socket")
+    console.log("********> before checking socket")
     if (!user || !socket || navigatedRef.current) return;
-		
-		
+    
+    
     // if (!socket.connected) socket.connect();
-		
+    
     // const handleConnect = () => {
-			setPlayer1(prev => ({ ...prev, socketId: socket.id }));
+      setPlayer1(prev => ({ ...prev, socketId: socket.id }));
       if (!joinedRef.current) joinGame();
     // };
-		
+    
     const handleMatchFound = opponent => {
-			setPlayer2(opponent);
+      setPlayer2(opponent);
       setStatus("Match Found!");
       setCanExit(false);
     };
-		
+    
     const handleMatchCanceled = () => {
-			setPlayer2(emptyPlayer());
+      setPlayer2(emptyPlayer());
       setStatus("Opponent left. Try again.");
       setCanExit(true);
       setCanTryAgain(true);
       joinedRef.current = false;
     };
-		
+    
     const handleMatchStarted = roomId => {
-			router.push(`/game/pingPong/${roomId}`);
+      router.push(`/game/pingPong/${roomId}`);
       router.refresh();
     };
-		
-		console.log("********> after checking socket")
+    
+    console.log("********> after checking socket")
     // socket.on("connect", handleConnect);
     socket.on("match-found", handleMatchFound);
     socket.on("match-canceled", handleMatchCanceled);

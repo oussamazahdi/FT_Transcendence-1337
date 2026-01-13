@@ -16,12 +16,12 @@ export default function Sidebar({ ActiveTab, setActiveTab }) {
         {menuItems.map((item) => (
           <div key={item.id} onClick={() => setActiveTab(item.id)}
             className={`flex items-center justify-center md:justify-start gap-2 p-2 hover:bg-[#414141]/60 rounded-lg w-20 md:w-full h-full md:h-12 cursor-pointer
-						${
+            ${
               ActiveTab === item.id
                 ? "bg-[#414141] text-white font-sans md:font-bold"
                 : "hover:bg-[#414141]/60 text-gray-400 font-sans"
             }
-						`}
+            `}
           >
             <item.icon
               className={`${ActiveTab === item.id ? "brightness-150" : "brightness-60"} w-5 md:w-4`}

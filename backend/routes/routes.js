@@ -6,11 +6,11 @@ import { notifRoutes } from "./notif.routes.js";
 
 function initializeRoutes(fastify)
 {
-		fastify.register(authRoutes, { prefix: '/api/auth' });
-		fastify.register(userRoutes, { prefix: '/api/users' });
-		fastify.register(oauthRoutes, { prefix: '/api/oauth' });
-		fastify.register(twoFactorAuthRoutes, {prefix: '/api/2fa/'});
-		fastify.register(notifRoutes, {prefix: "/api/notifications"})
+    fastify.register(authRoutes, { prefix: '/api/auth' });
+    fastify.register(userRoutes, { prefix: '/api/users' });
+    fastify.register(oauthRoutes, { prefix: '/api/oauth' });
+    fastify.register(twoFactorAuthRoutes, {prefix: '/api/2fa/'});
+    fastify.register(notifRoutes, {prefix: "/api/notifications"})
 }
 
 export { initializeRoutes };

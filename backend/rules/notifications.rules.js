@@ -1,10 +1,10 @@
 export const NOTIFICATION_TYPES = {
-	GAME_INVITE: "game_invite",
-	GAME_ACCEPT: "game_accept",
-	GAME_REJECT: "game_reject",
-	FRIEND_REQUEST: "friend_request",
-	FRIEND_ACCEPT: "friend_accept",
-	SYSTEM: "system",
+  GAME_INVITE: "game_invite",
+  GAME_ACCEPT: "game_accept",
+  GAME_REJECT: "game_reject",
+  FRIEND_REQUEST: "friend_request",
+  FRIEND_ACCEPT: "friend_accept",
+  SYSTEM: "system",
 };
 
 

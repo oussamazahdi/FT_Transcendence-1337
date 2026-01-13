@@ -19,11 +19,11 @@ export default function TwoFA({isEnable, setView, setIsEnable}){
       if (!response.ok)
         throw new Error(data.error);
 
-      // console.log("TwoFA disabled successfuly");
+      console.log("TwoFA disabled successfuly");
       setIsEnable(false);
       setShowconfirm(false);
     }catch(err){
-      // console.log(err.message);
+      console.log(err.message);
       setError(err.message);
     }
   }

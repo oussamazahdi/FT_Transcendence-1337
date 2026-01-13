@@ -35,14 +35,14 @@ const TwoFA = () => {
       router.push('/dashboard');
     }catch(err){
       setError(err.message);
-      // console.log(err.message);
+      console.log(err.message);
     }finally{
       setLoading(false)
     }
   }
 
   const handleChange = (element, index) => {
-    // console.log(element);
+    console.log(element);
     if (isNaN(element.value)) 
       return;
     const newTwoFAcode = [...TwoFAcode];

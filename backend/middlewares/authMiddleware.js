@@ -13,7 +13,7 @@ async function authMiddleware(request, reply)
 				if (blacklisted)
 						throw new Error("TOKEN_REVOKED");
 				const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
-				// // console.log(decoded);
+				// console.log(decoded);
 				request.user = decoded;
 		}
 		catch (error) {

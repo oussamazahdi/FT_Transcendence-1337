@@ -48,7 +48,7 @@ const LocalGame = () => {
         <p className="pb-3 text-[#D5D5D5]">{localGameItems[0].description}</p>
         <button
           className=" bg-[#333333]/60 hover:bg-[#333333]/40 mb-3 py-2 w-full rounded-lg \
-				cursor-pointer shadow-md font-medium"
+        cursor-pointer shadow-md font-medium"
           onClick={() => setIsModalVisible(true)}
         >
           {localGameItems[0].button}
@@ -91,7 +91,7 @@ const LocalGame = () => {
         <p className="pb-3 text-[#D5D5D5]">{localGameItems[2].description}</p>
         <button
           className=" bg-[#333333]/60 hover:bg-[#333333]/40 mb-3 py-2 w-full rounded-lg \
-				cursor-pointer shadow-md font-medium"
+        cursor-pointer shadow-md font-medium"
           onClick={() => router.push("/game/pingPong/matchmaking")}
         >
           {localGameItems[2].button}
