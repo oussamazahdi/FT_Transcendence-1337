@@ -16,7 +16,6 @@ async function authMiddleware(request, reply)
                 throw new Error("TOKEN_REVOKED");
         }
         const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
-        console.log(decoded);
         request.user = decoded;
     }
     catch (error) {
