@@ -47,13 +47,13 @@ export const USER_ERROR = {
   default: "An unexpected error occurred. Please try again.",
 };
 
-export const USER_ERROR = {
-  USER_NOT_FOUND:"We couldn't find a user with that information.",
-  NEW_PASSWORDS_DO_NOT_MATCH:"The new passwords do not match. Please try again.",
-  NEW_PASSWORD_MATCHS_OLD_PASSWORD:"Your new password must be different from your current password.",
-  CURRENT_PASSWORD_IS_INCORRECT:"The current password you entered is incorrect.",
-  default:"An unexpected error occurred. Please try again.",
-}
+// export const USER_ERROR = {
+//   USER_NOT_FOUND:"We couldn't find a user with that information.",
+//   NEW_PASSWORDS_DO_NOT_MATCH:"The new passwords do not match. Please try again.",
+//   NEW_PASSWORD_MATCHS_OLD_PASSWORD:"Your new password must be different from your current password.",
+//   CURRENT_PASSWORD_IS_INCORRECT:"The current password you entered is incorrect.",
+//   default:"An unexpected error occurred. Please try again.",
+// }
 
 export const SEARCH_ERROR = {
   QUERY_PARAMETER_REQUERED: "Please enter a keyword to search.",
