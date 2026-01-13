@@ -1,7 +1,7 @@
 import React from "react";
-import Personal_information from "./personal-information";
-import BlockedUsers from "./blocked-users";
-import Security from "./security";
+import Personal_information from "./Personal-information";
+import BlockedUsers from "./Blocked-users";
+import Security from "./Security";
 import GameSettings from "./Game-setiings";
 
 export default function SettingsPanel({ ActiveTab }) {
@@ -10,7 +10,7 @@ export default function SettingsPanel({ ActiveTab }) {
       {ActiveTab === "personal-information" && <Personal_information />}
       {ActiveTab === "blocked-users" && <BlockedUsers />}
       {ActiveTab === "security" && <Security />}
-      {ActiveTab === "Game-setiings" && <GameSettings/>}
+      {ActiveTab === "Game-setiings" && <GameSettings />}
     </div>
   );
 }

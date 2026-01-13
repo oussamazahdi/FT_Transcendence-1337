@@ -8,44 +8,6 @@ html, body {
   /* overflow: hidden; */
 }
 
-@keyframes invite-enter {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.animate-invite {
-  animation: invite-enter 0.50s ease-out;
-}
-
-
-@keyframes soft-pulse {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
-  }
-}
-
-.animate-invite {
-  animation:
-    invite-enter 0.25s ease-out,
-    soft-pulse 2s ease-in-out 1s infinite;
-}
-
-
-.animate-exit {
-  animation: fade-out 0.2s ease-out forwards;
-}
-
-
-
 /* Hide Scrollbar but Keep Scrolling Functionality */
 .custom-scrollbar {
   /* Firefox */
