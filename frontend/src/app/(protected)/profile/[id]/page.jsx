@@ -1,28 +1,37 @@
-"use client"
-import React, { use, useState, useEffect } from 'react'
-import { assets } from '@/assets/data';
-import FriendsProfile from './components/FriendsProfile';
-import MatchPlayed from '../components/MatchPlayed';
-import WinRate from '../components/WinRate';
-import MatchHistory from '../components/MatchHistory';
+"use client";
+import React, { use, useState, useEffect } from "react";
+import { assets } from "@/assets/data";
+import FriendsProfile from "./components/FriendsProfile";
+import MatchPlayed from "../components/MatchPlayed";
+import WinRate from "../components/WinRate";
+import MatchHistory from "../components/MatchHistory";
 
 //handle go back
-const FriendProfilePage = ({params}) => {
-  const {id} = use(params)
+const FriendProfilePage = ({ params }) => {
+  const { id } = use(params);
   const [friendData, setFriendData] = useState(null);
+  const [error, setError] = useState("")
 
   useEffect(() => {
+    setError("")
     const fetchFriend = async () => {
       try {
-        // const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`);
-        // const data = await res.json();
-        const data = {id:"1", firstname:"Kamal", lastname:"EL Alami", username:"kael-ala", status:"Online", avatar:assets.kamalPdp}
-        setFriendData(data);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`,{
+          method:"GET",
+          credentials:"include"
+        });
+        const data = await response.json();
+
+        if (!response.ok){
+          throw new Error(data.err)
+        }
+        setFriendData(data.userData);
       } catch (err) {
-        // console.log("User not found");
+        console.log(err.message);
+        setError(err.message)
       }
     };
-    
+
     if (id) fetchFriend();
   }, [id]);
 
@@ -30,17 +39,17 @@ const FriendProfilePage = ({params}) => {
   return (
     <div className="flex w-full max-w-7xl mx-3 flex-col md:flex-row gap-4 h-[86vh]">
       <div className="flex flex-1 flex-col w-full basis-7/10 gap-4">
-        <FriendsProfile user={friendData}/>
+        <FriendsProfile userPage={friendData} />
         <div className="flex flex-1 flex-col md:flex-row justify-between gap-4">
-          <MatchPlayed/>
-          <WinRate/>
+          <MatchPlayed classname="max-h-[360px]"/>
+          <WinRate />
         </div>
       </div>
       <div className="basis-3/10  flex flex-col gap-4">
-        <MatchHistory height="h-full flex-1"/>
+        <MatchHistory classname="md:max-h-none" />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default FriendProfilePage
+export default FriendProfilePage;

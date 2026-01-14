@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken"
 import { tokenModels } from "../models/token.model.js";
+// import { tokenModels } from "../models/token.model.js";
 
 async function authMiddleware(request, reply)
 {
@@ -13,7 +14,7 @@ async function authMiddleware(request, reply)
 				if (blacklisted)
 						throw new Error("TOKEN_REVOKED");
 				const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
-				// // console.log(decoded);
+				// console.log(decoded);
 				request.user = decoded;
 		}
 		catch (error) {

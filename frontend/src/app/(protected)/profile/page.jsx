@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React from "react";
 import Friends from "./components/Friends";
 import MatchPlayed from "./components/MatchPlayed";
@@ -12,15 +12,15 @@ export default function ProfilePage() {
   return (
     <div className="flex w-full max-w-7xl mx-3 flex-col md:flex-row gap-4 h-[86vh]">
       <div className="flex flex-1 flex-col w-full basis-7/10 gap-4">
-        <Profile user={user}/>
+        <Profile user={user} />
         <div className="flex flex-1 flex-col md:flex-row justify-between gap-4">
-          <MatchPlayed/>
-          <WinRate/>
+          <MatchPlayed />
+          <WinRate />
         </div>
       </div>
       <div className="basis-3/10  flex flex-col gap-4 h-full">
-        <Friends />
-        <MatchHistory/>
+        <Friends classname="md:min-h-1/2" />
+        <MatchHistory />
       </div>
     </div>
   );

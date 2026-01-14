@@ -1,5 +1,5 @@
 export const waitingPlayer = {
-	value: null
+  value: null
 };
 
 export const loops = new Map();

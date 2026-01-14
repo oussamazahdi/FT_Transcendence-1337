@@ -146,11 +146,11 @@ export class NotifServices {
     return this.act(db, { id, userId, action });
   }
 
-	async createGameInvitation(db, { senderId, receiverId, roomId, gameType }){
-		return await this.create(db, { senderId, receiverId,
-			type:"game_invite",
-			title: "Game invite",
-    	message: "You received a game invite",
-    	payload: { roomId, gameType }, });
-	}
+  async createGameInvitation(db, { senderId, receiverId, roomId, gameType }){
+    return await this.create(db, { senderId, receiverId,
+      type:"game_invite",
+      title: "Game invite",
+      message: "You received a game invite",
+      payload: { roomId, gameType }, });
+  }
 }

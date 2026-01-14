@@ -10,7 +10,7 @@ import { ArrowUpTrayIcon, TrashIcon } from "@heroicons/react/24/outline";
 export default function Personal_information() {
   const { user, login } = useAuth();
   const [formData, setFormData] = useState({
-    firstname:  "",
+    firstname: "",
     lastname: "",
     username: "",
     email: "",
@@ -33,11 +33,11 @@ export default function Personal_information() {
   const [error, setError] = useState(null);
   const [imagePreview, setImagePreview] = useState(formData.avatar);
   const isChanged =
-    formData.firstname !== (user.firstname || "") ||
-    formData.lastname !== (user.lastname || "") ||
-    formData.username !== (user.username || "") ||
-    formData.email !== (user.email || "") ||
-    formData.avatar !== user.avatar;
+    formData.firstname !== (user?.firstname || "") ||
+    formData.lastname !== (user?.lastname || "") ||
+    formData.username !== (user?.username || "") ||
+    formData.email !== (user?.email || "") ||
+    formData.avatar !== user?.avatar;
 
   function handleUpload(e) {
     const file = e.target.files?.[0];
@@ -62,7 +62,7 @@ export default function Personal_information() {
     e.preventDefault();
     setError("");
 
-    const userData = new FormData()
+    const userData = new FormData();
 
     userData.append("firstname", formData.firstname);
     userData.append("lastname", formData.lastname);
@@ -84,17 +84,17 @@ export default function Personal_information() {
 
       const data = await response.json();
 
-      if (!response.ok){
-        if (data.error === 'INVALID_INPUT')
-          throw new Error(`invalid ${data.fields}`)
+      if (!response.ok) {
+        if (data.error === "INVALID_INPUT")
+          throw new Error(`invalid ${data.fields}`);
         throw new Error(USER_ERROR[data.error] || USER_ERROR["default"]);
       }
 
       const newUser = data.user;
-      login({...user, ...newUser});
-      // console.log("user update successfully :)");
+      login({ ...user, ...newUser });
+      console.log("user update successfully :)");
     } catch (err) {
-      // console.log("failed to updare user :( ", err.message);
+      console.log("failed to updare user :( ", err.message);
       setError(err.message);
     }
   }
@@ -104,7 +104,9 @@ export default function Personal_information() {
       onSubmit={handleSubmit}
       className="h-full flex flex-col justify-start mt-4 md:mt-0 md:justify-center items-center gap-1 px-4"
     >
-      <h1 className="text-white font-bold text-sm md:text-xsm">personal information</h1>
+      <h1 className="text-white font-bold text-sm md:text-xsm">
+        personal information
+      </h1>
       <h3 className="text-[#ABABAB] text-xs md:text-sm text-center">
         Keep your player profile accurate for a better gaming experience.
       </h3>
@@ -137,7 +139,7 @@ export default function Personal_information() {
         />
         <label htmlFor="profile-image-input">
           <div className="flex justify-center items-center gap-2 w-34 h-6 md:w-36 md:h-10 bg-[#414141]/60 rounded-sm text-xs/3 md:text-xs cursor-pointer">
-            <ArrowUpTrayIcon className="w-4 h-4"/>
+            <ArrowUpTrayIcon className="w-4 h-4" />
             Upload image
           </div>
         </label>
@@ -149,7 +151,7 @@ export default function Personal_information() {
           }}
           className="flex justify-center gap-2 items-center w-34 h-6  md:w-36 md:h-10 bg-[#414141]/60 rounded-sm text-xs/3 md:text-xs cursor-pointer"
         >
-          <TrashIcon className="w-4 h-4"/>
+          <TrashIcon className="w-4 h-4" />
           Remove image
         </button>
       </div>
@@ -191,7 +193,11 @@ export default function Personal_information() {
         className="w-full bg-[#414141]/60 rounded-sm p-2 text-sm md:w-105 focus:outline-none"
         value={formData.email}
       />
-      {error && (<p className="text-red-600 text-xs text-center px-3 py-1 bg-red-300/20 border-1">{error}</p>)}
+      {error && (
+        <p className="text-red-600 text-xs text-center px-3 py-1 bg-red-300/20 border-1">
+          {error}
+        </p>
+      )}
       <button
         disabled={!isChanged}
         type="submit"

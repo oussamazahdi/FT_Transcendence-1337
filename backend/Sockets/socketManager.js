@@ -15,7 +15,7 @@ export async function onGameInvite(socket, io, data, ack) {
     }
 		
     const userId = socket.user?.userId;
-		// console.log("receve game invite :", data);
+		console.log("receve game invite :", data);
     if (!userId) {
 			throw httpError(401, "Unauthorized");
     }
