@@ -26,6 +26,7 @@ export class Paddle {
 
 export class Player {
   constructor() {
+		this.id = 0;
     this.socketId = "";
     this.firstName = "";
     this.lastName = "";

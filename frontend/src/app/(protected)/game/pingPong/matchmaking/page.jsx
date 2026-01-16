@@ -7,7 +7,8 @@ import { DoorOpen, RotateCcw } from "lucide-react";
 import { useSocket } from "@/contexts/socketContext";
 
 const emptyPlayer = () => ({
-  socketId: "",
+  id: 0,
+	socketId: "",
   firstName: "",
   lastName: "",
   username: "",
@@ -38,6 +39,7 @@ export default function Matchmaking() {
       lastName: user.lastname,
       username: user.username,
       avatar: user.avatar,
+			id : user.id,
     });
   }, [user]);
 
@@ -48,6 +50,7 @@ export default function Matchmaking() {
       lastName: user.lastname,
       username: user.username,
       avatar: user.avatar,
+			id : user.id,
     });
 		// console.log("============> i emit join-game event to server")
     joinedRef.current = true;

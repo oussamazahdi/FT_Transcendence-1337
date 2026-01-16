@@ -70,7 +70,7 @@ export default function Page() {
 
     if (game.state === "FINISHED") {
       setEndGame(true);
-      socket.disconnect();
+      // socket.disconnect();
       return;
     }
 

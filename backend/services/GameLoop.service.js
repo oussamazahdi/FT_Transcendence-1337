@@ -1,7 +1,10 @@
 import { activeGames } from "../store/memory.store.js"
 import { GAME_HEIGHT, GAME_WIDTH, WIN_SCORE } from "../constants/game.constants.js"
 import { removeGame, cleanupPlayers } from "../utils/GameUtils.js"
+import { MatchController } from "../controllers/game.controller.js";
 
+
+const controller = new MatchController();
 
 export function updateGame(io, roomId) {
   const game = activeGames.get(roomId);
@@ -65,13 +68,33 @@ export function checkScore(game, io, roomId) {
   }
   if ( game.player1.score < WIN_SCORE && game.player2.score < WIN_SCORE)
     return;
-
-  if (game.state !== "PLAYING")
+  
+	if (game.state !== "PLAYING")
     return;
 
   game.state = "FINISHED";
   io.to(roomId).emit("game-state", game);
+	// store data here
 
+	const db = io.db;
+
+	console.log("game:", game);
+  const player1Id = game.player1.id;
+  const player2Id = game.player2.id;
+
+  const winner =
+    game.player1.score > game.player2.score
+      ? player1Id
+      : player2Id;
+
+  controller.createMatchHistory(db, {
+    player1: player1Id,
+    player2: player2Id,
+    score1: game.player1.score,
+    score2: game.player2.score,
+    winner,
+    status: "finished",
+  });
   cleanupPlayers(game);
   removeGame(roomId);
 }

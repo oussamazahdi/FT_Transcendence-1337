@@ -22,7 +22,8 @@ const MessageList = ({ messages }) => {
       [&::-webkit-scrollbar-track]:rounded-full
       [&::-webkit-scrollbar-track]:bg-gray-500
       [&::-webkit-scrollbar-thumb]:rounded-full
-      [&::-webkit-scrollbar-thumb]:bg-[#0F0F0FA6]"
+      [&::-webkit-scrollbar-thumb]:bg-[#0F0F0FA6]
+			custom-scrollbar"
     >
       {messages.map((msg, index) => {
         const isFirstInSequence =

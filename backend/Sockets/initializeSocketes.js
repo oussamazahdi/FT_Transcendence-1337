@@ -14,6 +14,8 @@ export function initializeSocketes(app) {
     transports: ["websocket"],
   });
 
+	io.db = app.db;
+
   io.use((socket, next) => {
     socket.db = app.db;
     next();

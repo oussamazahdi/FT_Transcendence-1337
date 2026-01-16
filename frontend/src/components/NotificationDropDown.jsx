@@ -35,31 +35,19 @@ const FriendInvite = ({ notif, onAccept, onReject }) => {
     <div className="bg-[#414141]/60 p-2 flex gap-2 rounded-[8px] cursor-pointer hover:bg-[#414141] transition">
       <SafeAvatar src={avatar} alt="avatar" />
       <div className="flex flex-col flex-1 items-start">
-        <p className="text-[9px] truncate text-white">
-          {username} sent you a friend invitation
-        </p>
+        <p className="text-[9px] truncate text-white">{username} sent you a friend invitation</p>
 
         <div className="flex mt-1 gap-2">
-          <button
-            onClick={(e) => {
+          <button onClick={(e) => {
               e.stopPropagation();
               onReject?.(notif.id);
-            }}
-            className="bg-[#442222] text-[#FF4848] hover:bg-[#3C1C1C] text-[8px] px-2 py-[2px] rounded"
-          >
-            Reject
-          </button>
+            }} className="bg-[#442222] text-[#FF4848] hover:bg-[#3C1C1C] text-[8px] px-2 py-[2px] rounded">Reject</button>
 
-          <button
-            onClick={(e) => {
+          <button onClick={(e) => {
               e.stopPropagation();
               onAccept?.(notif.id);
-            }}
-            className="bg-[#1E3A2F] text-[#4DFFB3] hover:bg-[#162A22] text-[8px] px-2 py-[2px] rounded"
-          >
-            Accept
-          </button>
-        </div>
+            }} className="bg-[#1E3A2F] text-[#4DFFB3] hover:bg-[#162A22] text-[8px] px-2 py-[2px] rounded" > Accept </button>
+				</div>
       </div>
     </div>
   );
@@ -119,16 +107,17 @@ export async function fetchUnreadNotificationsCount() {
 }
 
 export default function NotificationDropDown() {
-  const ref = useRef(null);
-
-  const [isOpen, setIsOpen] = useState(false);
+	
+	const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [usersById, setUsersById] = useState({});
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState([]);
-
+	
+  const ref = useRef(null);
   const socket = useSocket();
 
+	/**********************************************************************************/
   useEffect(() => {
     if (!socket) return;
 
@@ -143,6 +132,22 @@ export default function NotificationDropDown() {
     };
   }, [socket]);
 
+	/**********************************************************************************/
+	useEffect(() => {
+		function handleClickOutside(event) {
+			if (isOpen && ref.current && !ref.current.contains(event.target)) {
+				setIsOpen(false);
+			}			
+		}
+	
+		document.addEventListener("mousedown", handleClickOutside);
+	
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, []);
+
+	/**********************************************************************************/
   const renderNotifications = useMemo(() => {
     return notifications.map((notif) => {
         const SpecificComponent = NOTIFICATION_COMPONENTS[notif.type];
@@ -151,6 +156,7 @@ export default function NotificationDropDown() {
       }).filter(Boolean);
   }, [notifications]);
 
+	/**********************************************************************************/
   const fetchUserById = useCallback(async (id) => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`, { credentials: "include" });
     if (!res.ok) return null;
@@ -161,12 +167,14 @@ export default function NotificationDropDown() {
     return user ?? null;
   }, []);
 
+	/**********************************************************************************/
   const normalizeBackendNotif = useCallback((raw, senderUser) => {
     return { ...raw,
       user: senderUser ?? null,
     };
   }, []);
 
+	/**********************************************************************************/
   const fetchNotifications = useCallback(async () => {
     setUnreadCount(0);
     
@@ -182,6 +190,7 @@ export default function NotificationDropDown() {
     return Array.isArray(data?.userData) ? data.userData : [];
   }, []);
 
+	/**********************************************************************************/
   const loadUnreadCount = useCallback(async () => {
     try {
       const count = await fetchUnreadNotificationsCount();
@@ -190,12 +199,13 @@ export default function NotificationDropDown() {
       console.error(error);
     }
   }, []);
-  // setUnreadCount()
 
+	/**********************************************************************************/
   useEffect(() => {
     loadUnreadCount();
   }, [loadUnreadCount]);
 
+	/**********************************************************************************/
   const onBellClick = useCallback(async () => {
     setLoading(true);
     setUnreadCount(0)
@@ -211,6 +221,7 @@ export default function NotificationDropDown() {
 
       if (missing.length > 0) {
         const results = await Promise.all(missing.map((id) => fetchUserById(id)));
+				console.log("result :",results);
 
         nextUsersById = { ...usersById };
         missing.forEach((id, idx) => {
@@ -235,6 +246,7 @@ export default function NotificationDropDown() {
     }
   }, [fetchNotifications, fetchUserById, normalizeBackendNotif, usersById, unreadCount]);
 
+	/**********************************************************************************/
   return (
     <div ref={ref} className="relative hidden md:block">
       <button onClick={onBellClick} className="md:border border-[#9D9D9D]/40 rounded-[10px] md:p-3 hover:bg-[#000000]/40 cursor-pointer hover:scale-105 active:scale-95 transition relative">

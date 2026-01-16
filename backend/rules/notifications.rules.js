@@ -11,7 +11,7 @@ export const NOTIFICATION_TYPES = {
 export const NotificationRules = {
   game_invite: {
     actionable: true,
-    expiresInSeconds: 20,
+    expiresInSeconds: 60,
     initialStatus: "pending",
     allowedActions: ["accept", "reject"],
     validTransitions: ["accepted", "rejected", "expired"],

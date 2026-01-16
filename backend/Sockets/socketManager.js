@@ -8,10 +8,10 @@ const service = new NotifServices();
 
 export async function onGameInvite(socket, io, data, ack) {
   try {
-		const { toUserId, roomId, gameType } = data ?? {};
+		const { user, roomId, gameType } = data ?? {};
 		
-    if (!toUserId || !roomId || !gameType) {
-			throw httpError(400, "toUserId, roomId, gameType are required");
+    if (!user || !roomId || !gameType) {
+			throw httpError(400, "user, roomId, gameType are required");
     }
 		
     const userId = socket.user?.userId;
@@ -20,22 +20,22 @@ export async function onGameInvite(socket, io, data, ack) {
 			throw httpError(401, "Unauthorized");
     }
 		
-    if (toUserId === userId) {
+    if (user === userId) {
 			throw httpError(400, "You cannot invite yourself");
     }
 		
     const notif = await service.create(socket.db, {
 			senderId: userId,
-      receiverId: toUserId,
+      receiverId: user,
       type: "game_invite",
       title: "Game invite",
       message: "You received a game invite",
       payload: { roomId, gameType },
     });
 		
-    io.to(`user:${toUserId}`).emit("notification:new", notif);
+    io.to(`user:${user}`).emit("notification:new", notif);
 		
-		console.log("***********> touserId: ", toUserId)
+		console.log("***********> user: ", user)
     ack?.({ ok: true, notification: notif });
   } catch (error) {
 		ack?.({

@@ -26,6 +26,10 @@ export class NotifModel {
     return db.prepare(`UPDATE notifications SET is_read = 1 WHERE id = ?`).run(id);
   }
 
+  async markAsExpired(db, id) {
+    return db.prepare(`UPDATE notifications SET is_expired = 1 WHERE id = ?`).run(id);
+  }
+
   async getForUser(db, userId) {
     return db.prepare(`SELECT * FROM notifications WHERE receiver_id = ? ORDER BY created_at DESC`).all(userId);
   }
