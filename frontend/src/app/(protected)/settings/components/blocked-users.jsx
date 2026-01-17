@@ -15,7 +15,7 @@ export default function BlockedUsers() {
       <div className="md:basis-2/10 flex flex-col md:justify-end-safe items-center">
         <NoSymbolIcon className="size-12" />
         <h1 className="text-white font-bold text-sm md:text-xsm">
-          Deblock users
+          Unblock users
         </h1>
         <h3 className="text-[#ABABAB] text-xs md:text-sm text-center">
           Remove blocks to let players return to the table and continue playing.

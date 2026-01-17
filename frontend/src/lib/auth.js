@@ -48,11 +48,11 @@ export async function getCurrentUser() {
       incomingReqList = incomingReqData.requestsList || []
     }
 
-    console.log("user", user.userData);
-    console.log("Friends", friendsList);
-    console.log("Blocked" ,blockedList);
-    console.log("pendingRequest", pendingReqList);
-    console.log("incomingRequest", incomingReqList);
+    // console.log("user", user.userData);
+    // console.log("Friends", friendsList);
+    // console.log("Blocked" ,blockedList);
+    // console.log("pendingRequest", pendingReqList);
+    // console.log("incomingRequest", incomingReqList);
     return {
       userData: user.userData,
       friends: friendsList,

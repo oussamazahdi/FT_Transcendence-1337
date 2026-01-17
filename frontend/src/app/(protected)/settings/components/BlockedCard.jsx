@@ -24,7 +24,7 @@ const BlockedCard = ({user, blocked, setblocked}) => {
       </div>
       <button onClick={() => deblockUser(user)} className="ml-auto mr-1 md:mr-4 hover:scale-105 cursor-pointer transition-all duration-150 flex gap-1 rounded-full border-1 p-2">
         <CheckCircleIcon className="w-4 h-4" />
-        <p className="text-xs">deblock</p>
+        <p className="text-xs">Unblock</p>
       </button>
     </div>
   )

@@ -19,11 +19,11 @@ export default function Sidebar({ ActiveTab, setActiveTab }) {
   ];
 
   return (
-    <div className="w-full md:w-80 shrink-0 bg-[#0F0F0F]/75 rounded-[12px] p-2 flex flex-col md:gap-2 overflow-x-auto md:overflow-visible scrollbar-hide">
+    <div className="w-full md:w-80 shrink-0 bg-[#0F0F0F]/75 rounded-[12px] p-2 flex flex-col gap-2 overflow-x-auto md:overflow-visible scrollbar-hide">
       <h1 className="text-white text-xsm text-center md:text-left font-bold md:p-4">
         Settings
       </h1>
-      <div className="flex flex-row md:flex-col justify-between md:justify-start md:gap-2 w-full h-full px-6 md:p-4 text-xs font-bold text-[#B3B3B3]">
+      <div className="flex flex-row md:flex-col justify-between md:justify-start md:gap-2 w-full h-full text-xs font-bold text-[#B3B3B3]">
         {menuItems.map((item) => (
           <div
             key={item.id}

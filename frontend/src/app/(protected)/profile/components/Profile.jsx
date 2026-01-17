@@ -3,7 +3,7 @@ import { assets } from "@/assets/data";
 import Image from "next/image";
 
 const Profile = ({ user, className }) => {
-  const rawLevel = 15.33
+  const rawLevel = 15.99
   const progressPercent = Math.round((rawLevel % 1) * 100);
 
   return (
@@ -50,7 +50,7 @@ const Profile = ({ user, className }) => {
         </div>
         <div className="w-full bg-[#000000] rounded-full h-2.5">
             <div 
-                className="bg-[#D9D9D9] h-2.5 rounded-full transition-all duration-500" 
+                className="bg-linear-to-r from-blue-200 via-blue-400 to-blue-600 h-2.5 rounded-full transition-all duration-500" 
                 style={{ width: `${progressPercent}%` }}
             ></div>
         </div>
