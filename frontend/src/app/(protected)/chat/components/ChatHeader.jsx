@@ -9,20 +9,6 @@ import { assets } from "@/assets/data";
 const ChatHeader = ({ user }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showConfirm, setShowconfirm] = useState(false);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (ref.current && !ref.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   return (
     <div className="relative bg-[#0F0F0F]/65 flex items-center p-2 rounded-lg gap-1">
@@ -44,7 +30,7 @@ const ChatHeader = ({ user }) => {
           {user.status ? <p>Online</p> : <p>Offline</p>}
         </div>
       </div>
-      <div ref={ref} className="ml-auto">
+      <div className="ml-auto">
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="cursor-pointer hover:scale-105"

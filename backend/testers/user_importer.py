@@ -8,7 +8,7 @@ import os
 
 
 DB_PATH = "../database/transcendence.db"
-password = '00000000'
+password = '123456789'
 salt = bcrypt.gensalt(rounds=12);
 bytes = password.encode('utf-8')
 hashed = bcrypt.hashpw(bytes, salt)
@@ -47,9 +47,8 @@ def make_unique_user(used_usernames: set, used_emails: set):
         last = random.choice(LAST_NAMES)
         suffix = rand_suffix(6)
 
-        username = f"{first[0].upper()}{last.lower()}"
-        email = f"{first.lower()}.{last.lower()}@gmail.com"
-
+        username = f"{first.lower()}.{last.lower()}_{suffix}"
+        email = f"{username}@test.local"
 
         if username not in used_usernames and email not in used_emails:
             used_usernames.add(username)

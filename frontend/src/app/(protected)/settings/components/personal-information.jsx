@@ -6,7 +6,6 @@ import { assets } from "@/assets/data";
 import { USER_ERROR } from "@/lib/utils";
 import { ArrowUpTrayIcon, TrashIcon } from "@heroicons/react/24/outline";
 
-//check if data empty
 export default function Personal_information() {
   const { user, login } = useAuth();
   const [formData, setFormData] = useState({
@@ -102,9 +101,9 @@ export default function Personal_information() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="h-full flex flex-col justify-start mt-4 md:mt-0 md:justify-center items-center gap-1 px-4"
+      className="h-full flex flex-col justify-start mt-4 md:mt-0 md:justify-center items-center px-4"
     >
-      <h1 className="text-white font-bold text-sm md:text-xsm">
+      <h1 className="text-white font-bold text-sm md:text-xl">
         personal information
       </h1>
       <h3 className="text-[#ABABAB] text-xs md:text-sm text-center">
@@ -156,43 +155,55 @@ export default function Personal_information() {
         </button>
       </div>
       <div className="flex flex-col md:flex-row justify-center gap-1 w-full">
+        <div>
+          <p className="text-[10px] text-gray-500">Firstname</p>
+          <input
+            required
+            type="text"
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, firstname: e.target.value }))
+            }
+            className="w-full md:w-52 p-2 h-8 rounded-sm bg-[#4D4D4D]/40 text-white text-sm placeholder-[#FFFFFF]/23 focus:outline-none"
+            value={formData.firstname}
+            />
+        </div>
+        <div>
+          <p className="text-[10px] text-gray-500">Lastname</p>
+          <input
+            required
+            type="text"
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, lastname: e.target.value }))
+            }
+            className="w-full md:w-52 p-2 h-8 rounded-sm bg-[#4D4D4D]/40 text-white text-sm placeholder-[#FFFFFF]/23 focus:outline-none"
+            value={formData.lastname}
+          />
+        </div>
+      </div>
+      <div className="w-full flex flex-col items-center">
+        <p className="text-[10px] text-gray-500">Username</p>
         <input
           required
           type="text"
           onChange={(e) =>
-            setFormData((prev) => ({ ...prev, firstname: e.target.value }))
+            setFormData((prev) => ({ ...prev, username: e.target.value }))
           }
-          className="w-full md:w-52 p-2 h-8 rounded-sm bg-[#4D4D4D]/40 text-white text-sm placeholder-[#FFFFFF]/23 focus:outline-none"
-          value={formData.firstname}
-        />
-        <input
-          required
-          type="text"
-          onChange={(e) =>
-            setFormData((prev) => ({ ...prev, lastname: e.target.value }))
-          }
-          className="w-full md:w-52 p-2 h-8 rounded-sm bg-[#4D4D4D]/40 text-white text-sm placeholder-[#FFFFFF]/23 focus:outline-none"
-          value={formData.lastname}
+          className="w-full bg-[#414141]/60 rounded-sm p-2 text-sm md:w-105 focus:outline-none"
+          value={formData.username}
         />
       </div>
-      <input
-        required
-        type="text"
-        onChange={(e) =>
-          setFormData((prev) => ({ ...prev, username: e.target.value }))
-        }
-        className="w-full bg-[#414141]/60 rounded-sm p-2 text-sm md:w-105 focus:outline-none"
-        value={formData.username}
-      />
-      <input
-        required
-        type="text"
-        onChange={(e) =>
-          setFormData((prev) => ({ ...prev, email: e.target.value }))
-        }
-        className="w-full bg-[#414141]/60 rounded-sm p-2 text-sm md:w-105 focus:outline-none"
-        value={formData.email}
-      />
+      <div className="w-full flex flex-col items-center ">
+        <p className="text-[10px] text-gray-500">Email</p>
+        <input
+          required
+          type="text"
+          onChange={(e) =>
+            setFormData((prev) => ({ ...prev, email: e.target.value }))
+          }
+          className="w-full bg-[#414141]/60 rounded-sm p-2 text-sm md:w-105 focus:outline-none"
+          value={formData.email}
+        />
+      </div>
       {error && (
         <p className="text-red-600 text-xs text-center px-3 py-1 bg-red-300/20 border-1">
           {error}

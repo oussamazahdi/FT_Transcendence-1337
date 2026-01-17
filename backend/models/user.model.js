@@ -33,7 +33,7 @@ export class UserModels
     {
         try {
             const result = db.prepare('UPDATE users SET firstname = ?, lastname = ?, username = ?, email = ?, avatar = ? WHERE id = ?')
-      .run(userData.firstname, userData.lastname, userData.username, userData.email, userData.avatar, userId);
+			.run(userData.firstname, userData.lastname, userData.username, userData.email, userData.avatar, userId);
             return (result);
         }
         catch (error) {
@@ -45,29 +45,29 @@ export class UserModels
 
     getPassword(db, userId)
     {
-  			try
-				{
-						const result = db.prepare('SELECT password FROm users WHERE id = ?').get(userId);
-						return (result.password);
-				}
-				catch (error) {
-						const dbError = handleDatabaseError(error, 'getPassword');
-						throw dbError;
-				}
-		}
+        try
+        {
+            const result = db.prepare('SELECT password FROm users WHERE id = ?').get(userId);
+            return (result.password);
+        }
+        catch (error) {
+            const dbError = handleDatabaseError(error, 'getPassword');
+            throw dbError;
+        }
+    }
 
-		async setNewPassword(db, userId, newPassword)
-		{
-				try
-				{
-						let cryptedPass = await bcrypt.hash(newPassword, 12);
-						const resut = db.prepare("UPDATE users SET password = ? WHERE id = ?").run(cryptedPass, userId);
-				}
-				catch (error) {
-						const dbError = handleDatabaseError(error, 'setNewPassword');
-						throw dbError;
-				}
-		}
+    async setNewPassword(db, userId, newPassword)
+    {
+        try
+        {
+            let cryptedPass = await bcrypt.hash(newPassword, 12);
+            const resut = db.prepare("UPDATE users SET password = ? WHERE id = ?").run(cryptedPass, userId);
+        }
+        catch (error) {
+            const dbError = handleDatabaseError(error, 'setNewPassword');
+            throw dbError;
+        }
+    }
 
 }
 

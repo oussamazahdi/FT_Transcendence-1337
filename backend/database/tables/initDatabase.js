@@ -7,11 +7,11 @@ import { createMatchHistoryTable } from "./matchHistoryTable.js";
 
 function initAllTables(db)
 {
-		createUserTable(db);
-		createTokenTable(db);
+    createUserTable(db);
+    createTokenTable(db);
     createFriendshipTable(db);
-		createNotificationsTable(db);
-		createMatchHistoryTable(db);
+    createNotificationsTable(db);
+    createMatchHistoryTable(db);
 }
 
 export { initAllTables };

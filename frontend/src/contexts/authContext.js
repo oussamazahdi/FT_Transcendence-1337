@@ -155,6 +155,7 @@ export function UserProvider({ children, initialUser }) {
       console.log("user Deblocked succefully");
   
       setBlocked(blocked.filter(items => items.id !== user.id));
+      setFriends(friends.filter(items => items.id !== user.id));
     }catch(err){
       triggerError(USER_ERROR[err.message] || USER_ERROR['default'])
     }
@@ -169,13 +170,11 @@ export function UserProvider({ children, initialUser }) {
 
       if (incomreqRes.ok) {
           const data = await incomreqRes.json();
-          console.log("---->",data);
           setIncomingRequests(data.requestsList || []);
       }
       
       if (pendReqRes.ok) {
           const data = await pendReqRes.json();
-          console.log("====>", data);
           setPendingRequests(data.Requests || []);
       }
 

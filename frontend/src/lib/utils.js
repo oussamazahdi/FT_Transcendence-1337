@@ -8,7 +8,8 @@ export function cn(...inputs) {
 export const AUTH_ERRORS = {
   USER_NOT_FOUND: "Invalid email or password.",
   INVALID_PASSWORD: "Invalid email or password.",
-  USER_IS_ALREADY_EXIST: "An account with this email already exists. Try logging in instead.",
+  USER_IS_ALREADY_EXIST:
+    "An account with this email already exists. Try logging in instead.",
   MISSING_FIELD: "Please complete all required fields.",
   UNAUTHORIZED_NO_TOKEN: "You must be logged in to view this page.",
   INVALID_TOKEN: "Your session has expired. Please log in again.",
@@ -47,17 +48,10 @@ export const USER_ERROR = {
   default: "An unexpected error occurred. Please try again.",
 };
 
-// export const USER_ERROR = {
-//   USER_NOT_FOUND:"We couldn't find a user with that information.",
-//   NEW_PASSWORDS_DO_NOT_MATCH:"The new passwords do not match. Please try again.",
-//   NEW_PASSWORD_MATCHS_OLD_PASSWORD:"Your new password must be different from your current password.",
-//   CURRENT_PASSWORD_IS_INCORRECT:"The current password you entered is incorrect.",
-//   default:"An unexpected error occurred. Please try again.",
-// }
-
 export const SEARCH_ERROR = {
   QUERY_PARAMETER_REQUERED: "Please enter a keyword to search.",
-  QUERY_TOO_SHORT: "Search term is too short. Please use at least 3 characters.",
+  QUERY_TOO_SHORT:
+    "Search term is too short. Please use at least 3 characters.",
   QUERY_TOO_LONG: "Search term is too long. Please shorten your query.",
   default: "Search failed. Please try again.",
 };

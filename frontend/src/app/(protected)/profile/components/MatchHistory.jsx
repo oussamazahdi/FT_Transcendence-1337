@@ -280,14 +280,11 @@ import { useAuth } from "@/contexts/authContext";
 
 const SafeAvatar = ({ src }) => {
   const safeSrc = src && src !== "null" ? src : assets.defaultProfile;
+
   return (
-    <Image
-      src={safeSrc}
-      alt="avatar"
-      width={40}
-      height={40}
-      className="rounded-md shrink-0 object-cover"
-    />
+    <div className="relative w-10 h-10 shrink-0 overflow-hidden rounded-md">
+      <Image src={safeSrc} alt="avatar" fill sizes="56px" className="object-cover"/>
+    </div>
   );
 };
 

@@ -4,29 +4,8 @@ import Link from "next/link";
 import { UserIcon } from "@heroicons/react/24/outline";
 import { Gamepad2 } from "lucide-react";
 import { assets } from '@/assets/data';
-import { useSocket } from '@/contexts/socketContext';
 
 const FriendCard = ({user}) => {
-
-	const socket = useSocket();
-
-		const sendInvite = ()=>{
-			if(!socket) {
-				console.log("❌ socket not connected");
-	      return;
-			}
-
-			socket.emit("game:invite",{
-				user: user.id,
-				roomId: "test-room-1",
-				gameType: "pingpong",
-			},
-
-			(res) => { if (!res.ok) console.error("Invite failed:", res.message);
-        else console.log("✅ Invite sent:", res.notification);})
-		}
-
-
   return (
     <div
       key={user.id}
@@ -44,12 +23,16 @@ const FriendCard = ({user}) => {
           {user.firstname} {user.lastname}
         </p>
         <div className="flex items-center text-[9px] text-gray-500">
-          <div className={`w-1.5 h-1.5 rounded-full mr-1 shrink-0 ${user.status === "Online" ? "bg-[#42A78A]" : "bg-[#B23B3B]"}`}/>
-          <p>{user.status ?? "Ofline"}</p>
+          <div
+            className={`w-1.5 h-1.5 rounded-full mr-1 shrink-0 ${
+              user.status === "Online" ? "bg-[#42A78A]" : "bg-[#B23B3B]"
+            }`}
+          />
+          <p>{user.status}</p>
         </div>
       </div>
       <div className="ml-auto flex items-center gap-1">
-        <button onClick={sendInvite} className="w-12 h-7 bg-[#151515]/70 flex justify-center items-center rounded-lg cursor-pointer hover:brightness-150 hover:scale-110">
+        <button className="w-12 h-7 bg-[#151515]/70 flex justify-center items-center rounded-lg cursor-pointer hover:brightness-150 hover:scale-110">
           <Gamepad2 className="size-4" />{" "}
         </button>
         <Link

@@ -44,7 +44,6 @@ const TwoFA = () => {
   };
 
   const handleChange = (element, index) => {
-    console.log(element);
     if (isNaN(element.value)) return;
     const newTwoFAcode = [...TwoFAcode];
     newTwoFAcode[index] = element.value;
