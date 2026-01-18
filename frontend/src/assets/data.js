@@ -19,16 +19,16 @@ import leaderboardIcon from "./winner.png";
 import searchIcon from "./SearchIcon.png";
 import pingPongL from "./pingPongL.png";
 import pingPongR from "./pingPongR.png";
-import ticTactoeL from "./ticTactoeL.png";
-import ticTactoeR from "./ticTactoeR.png";
+import ticTacToeL from "./ticTacToeL.png";
+import ticTacToeR from "./ticTacToeR.png";
 import noUserFound from "./noUserfound.png";
 
 export const assets = {
   noUserFound,
   pingPongL,
   pingPongR,
-  ticTactoeL,
-  ticTactoeR,
+  ticTacToeL,
+  ticTacToeR,
   searchIcon,
   chatIcon,
   dashboardIcon,

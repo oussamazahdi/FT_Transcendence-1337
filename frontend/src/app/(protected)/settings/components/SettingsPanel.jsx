@@ -1,7 +1,7 @@
 import React from "react";
-import Personal_information from "./Personal-information";
-import BlockedUsers from "./Blocked-users";
-import Security from "./Security";
+import Personal_information from "./personal-information";
+import BlockedUsers from "./blocked-users";
+import Security from "./security";
 import GameSettings from "./Game-setiings";
 
 export default function SettingsPanel({ ActiveTab }) {

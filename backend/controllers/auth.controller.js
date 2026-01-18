@@ -6,7 +6,9 @@ import { authModels } from "../models/auth.model.js";
 import { generateFileNameByUser, generateToken, updateTokenFlags } from "../utils/authUtils.js";
 import { tokenModels } from "../models/token.model.js";
 import { getEmailLetter } from "../templates/emailLetter.js";
+import { MatchController } from "./game.controller.js";
 
+const match = new MatchController();
 
 export class AuthController {
 
@@ -57,6 +59,7 @@ export class AuthController {
         const db = request.server.db;
         try {
             const user = await authModels.addNewUser(db, firstname, lastname, username, email, password);
+						match.addNewGameSettings(request.server.db, user.id);
             const params = {
                 isVerified: !!user.isverified,
                 hasAvatar: !!user.avatar,

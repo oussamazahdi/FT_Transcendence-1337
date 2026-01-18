@@ -40,7 +40,6 @@ export function initializeSocketes(app) {
       }
 
       const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
-			console.log("--- decoded:", decoded);
 
       socket.user = decoded;
 

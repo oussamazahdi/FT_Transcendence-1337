@@ -3,6 +3,7 @@ import { createTokenTable } from "./tokenTable.js"
 import { createFriendshipTable } from "./friendsTable.js"
 import { createNotificationsTable } from "./notificationsTable.js";
 import { createMatchHistoryTable } from "./matchHistoryTable.js";
+import { createGameSettingTable } from "./gameSettingTable.js";
 
 
 function initAllTables(db)
@@ -12,6 +13,7 @@ function initAllTables(db)
     createFriendshipTable(db);
     createNotificationsTable(db);
     createMatchHistoryTable(db);
+		createGameSettingTable(db);
 }
 
 export { initAllTables };
