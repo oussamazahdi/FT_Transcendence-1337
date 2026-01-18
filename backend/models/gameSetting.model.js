@@ -27,20 +27,42 @@ export class GameSetting {
     }
   }
 
-  async updateUserSettings(db,{ userId, player_xp, player_level, game_mode, ball_speed, score_limit, paddle_size,}) {
+  updateUserSettings(db, { userId, player_xp, player_level, game_mode, ball_speed, score_limit, paddle_size }) {
 		try {
-			const result = db.prepare(`UPDATE game_settings SET player_xp = ?, player_level = ?, game_mode = ?, ball_speed = ?, score_limit = ?, paddle_size = ? WHERE player_id = ?`)
-				.run( player_xp, player_level, game_mode, ball_speed, score_limit, paddle_size, userId);
+			const toNull = (v) => (v === undefined ? null : v);
+	
+			const prepared = db.prepare(`
+				UPDATE game_settings SET
+					player_xp    = COALESCE(?, player_xp),
+					player_level = COALESCE(?, player_level),
+					game_mode    = COALESCE(?, game_mode),
+					ball_speed   = COALESCE(?, ball_speed),
+					score_limit  = COALESCE(?, score_limit),
+					paddle_size  = COALESCE(?, paddle_size),
+					updated_at   = CURRENT_TIMESTAMP
+				WHERE player_id = ?;
+			`);
+	
+			const result = prepared.run(
+				toNull(player_xp),
+				toNull(player_level),
+				toNull(game_mode),
+				toNull(ball_speed),
+				toNull(score_limit),
+				toNull(paddle_size),
+				userId
+			);
 	
 			if (result.changes === 0) {
-				throw { code: 404, message: "USER_SETTINGS_NOT_FOUND" };
+				const exists = db.prepare(`SELECT 1 FROM game_settings WHERE player_id = ?`).get(userId);
+				if (!exists) throw { code: 404, message: "USER_SETTINGS_NOT_FOUND" };
 			}
 	
 			return { success: true };
 		} catch (error) {
 			if (error?.code === 404) throw error;
-			const dbError = handleDatabaseError(error, "updateUserSettings");
-			throw dbError;
+			throw handleDatabaseError(error, "updateUserSettings");
 		}
 	}
+	
 }

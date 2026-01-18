@@ -10,6 +10,7 @@ export function createGameSettingTable(db) {
         ball_speed INTEGER NOT NULL,
         score_limit INTEGER NOT NULL,
         paddle_size INTEGER NOT NULL,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (player_id) REFERENCES users(id) ON DELETE RESTRICT ON UPDATE CASCADE
       );
