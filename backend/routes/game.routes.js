@@ -12,9 +12,10 @@ export async function gameRoutes(fastify) {
 			if (!Number.isInteger(userId)) {
 				return res.code(400).send({ error: "Invalid user id" });
 			}
-
-			const data = await match.getMatchHistoryByUserId(db, userId, { page, pageSize });
-
+			
+			const data = await match.getMatchHistoryByUserId(db, userId);
+			
+			console.log("***********************************> we are in fastify.get history");
 			return res.code(200).send({ message: "SUCCESS", data });
 		} catch (error) {
 			if (error?.code) return res.code(error.code).send({ error: error.message });

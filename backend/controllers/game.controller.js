@@ -51,10 +51,14 @@ export class MatchController {
     }
   }
 
-  updateUserSettings(db, {userId,player_xp,player_level,game_mode,ball_speed,score_limit,paddle_size}) {
-		return this.gameSetting.updateUserSettings(db, { userId, player_xp, player_level, game_mode, ball_speed, score_limit, paddle_size });
-	}
-	
-	
+  async updateUserSettings( db, { userId, player_xp, player_level, game_mode, ball_speed, score_limit, paddle_size, }) {
+    try {
+      const result = await this.gameSetting.updateUserSettings(db, { userId, player_xp, player_level, game_mode, ball_speed, score_limit, paddle_size,});
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
 	
 }
