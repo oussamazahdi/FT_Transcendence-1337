@@ -40,7 +40,7 @@ const Games = () => {
         <div className="flex flex-row gap-4">
           <div className="relative">
             <Image
-              src={assets.ticTactoeL}
+              src={assets.ticTacToeL}
               width={140}
               height={140}
               alt="icon"
@@ -54,7 +54,7 @@ const Games = () => {
           </div>
           <div className="relative">
             <Image
-              src={assets.ticTactoeR}
+              src={assets.ticTacToeR}
               width={140}
               height={140}
               alt="icon"

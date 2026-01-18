@@ -12,6 +12,7 @@ export function UserProvider({ children, initialUser }) {
   const [pendingRequests, setPendingRequests] = useState(initialUser?.pendingRequests || []);
   const [incomingRequest, setIncomingRequests] = useState(initialUser?.incomingRequests || []);
   const [globalError, setGlobalError] = useState(null);
+	const [gameSetting, setGameSetting] = useState(initialUser?.gameSetting || [])
   
   const router = useRouter();
 
@@ -21,6 +22,7 @@ export function UserProvider({ children, initialUser }) {
     setBlocked(initialUser?.blocked || []);
     setPendingRequests(initialUser?.pendingRequests || []);
     setIncomingRequests(initialUser?.incomingRequest || [])
+		setGameSetting(initialUser?.gameSetting || [])
   };
 
   const logout = async () => {
@@ -183,6 +185,58 @@ export function UserProvider({ children, initialUser }) {
     }
   };
 
+	const updateGameSettings = async (data) => {
+		try {
+			// console.log("*******************************************************> ", data);
+	
+			const payload = {};
+			const allowedKeys = new Set([
+				"player_xp",
+				"player_level",
+				"game_mode",
+				"ball_speed",
+				"score_limit",
+				"paddle_size",
+			]);
+	
+			for (const [key, value] of Object.entries(data ?? {})) {
+				if (!allowedKeys.has(key)) continue;
+				if (value === undefined) continue;
+				payload[key] = value;
+			}
+	
+			if (Object.keys(payload).length === 0) {
+				return { ok: false, status: 400, error: "NO_FIELDS_TO_UPDATE" };
+			}
+	
+			const res = await fetch(
+				`${process.env.NEXT_PUBLIC_API_URL}/api/game/update-settings`,
+				{
+					method: "PATCH",
+					credentials: "include",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(payload),
+				}
+			);
+	
+			const json = await res.json().catch(() => ({}));
+	
+			if (!res.ok) {
+				return {
+					ok: false,
+					status: res.status,
+					error: json?.message || json?.error || "UPDATE_FAILED",
+					details: json,
+				};
+			}
+	
+			return { ok: true, status: res.status, data: json };
+		} catch (err) {
+			return { ok: false, status: 0, error: err?.message || "NETWORK_ERROR" };
+		}
+	};
+	
+
   const triggerError = (message) => {
     setGlobalError(message);
 
@@ -192,7 +246,7 @@ export function UserProvider({ children, initialUser }) {
   };
 
   return (
-    <UserContext.Provider value={{ globalError, user, friends, pendingRequests, incomingRequest, blocked, triggerError, login, logout, updateUser, sendFriendRequest, cancelRequest, acceptRequest, removeFriend, setFriends, blockUser, deblockUser, refreshFriendReq }}>
+    <UserContext.Provider value={{ globalError, user, friends, pendingRequests, incomingRequest, blocked, triggerError, login, logout, updateUser, sendFriendRequest, cancelRequest, acceptRequest, removeFriend, setFriends, blockUser, deblockUser, refreshFriendReq, gameSetting, updateGameSettings }}>
       {children}
     </UserContext.Provider>
   );
