@@ -8,7 +8,10 @@ export const userSchema = {
         lastname: { type: 'string' },
         avatar: { type: ['string', 'null'] },
         isverified: { type: 'integer'},
-        status2fa: { type: 'integer'}
+        status2fa: { type: 'integer'},
+        player_xp: {type: 'integer'},
+        player_level: {type: 'float'},
+        game_mode: {type: 'game_mode'}
     }
 };
 export const errorResponse = {
