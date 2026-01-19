@@ -1,12 +1,16 @@
-import React from "react";
-import Personal_information from "./Personal-information";
-import BlockedUsers from "./Blocked-users";
-import Security from "./Security";
+import React, { useContext } from "react";
+import Personal_information from "./personal-information";
+import BlockedUsers from "./blocked-users";
+import Security from "./security";
 import GameSettings from "./Game-setiings";
+import { ActiveTabContext } from "@/contexts/userContexts";
+import { ArrowLeftIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
 
-export default function SettingsPanel({ ActiveTab }) {
+export default function SettingsPanel() {
+  const {ActiveTab, setActiveTab} = useContext(ActiveTabContext);
   return (
-    <div className="flex-1 bg-[#0F0F0F]/75 rounded-[12px] overflow-hidden">
+    <div className="h-full flex-1 bg-[#0F0F0F]/75 rounded-[12px] overflow-hidden">
+      <ArrowLeftIcon onClick={() => setActiveTab(null)} className="size-6 m-4 block md:hidden text-[#BABABA]"/>
       {ActiveTab === "personal-information" && <Personal_information />}
       {ActiveTab === "blocked-users" && <BlockedUsers />}
       {ActiveTab === "security" && <Security />}

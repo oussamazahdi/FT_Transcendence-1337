@@ -6,7 +6,9 @@ import { authModels } from "../models/auth.model.js";
 import { generateFileNameByUser, generateToken, updateTokenFlags } from "../utils/authUtils.js";
 import { tokenModels } from "../models/token.model.js";
 import { getEmailLetter } from "../templates/emailLetter.js";
+import { MatchController } from "./game.controller.js";
 
+const match = new MatchController();
 
 export class AuthController {
 
@@ -37,12 +39,12 @@ export class AuthController {
                 httpOnly: true,
                 sameSite: 'strict',
                 path: '/',
-                maxAge: 15 * 60 * 1000
+                maxAge: 7 * 24 * 60 * 60 * 1000
             });
             return reply.code(200).send({message: "AUTHORIZED", userData: result});
         }
         catch (error) {
-            console.log(error);
+            // console.log(error);
                 if (error.code)
                     return reply.code(error.code).send({error: error.message});
                 else
@@ -57,6 +59,7 @@ export class AuthController {
         const db = request.server.db;
         try {
             const user = await authModels.addNewUser(db, firstname, lastname, username, email, password);
+						match.addNewGameSettings(request.server.db, user.id);
             const params = {
                 isVerified: !!user.isverified,
                 hasAvatar: !!user.avatar,
@@ -75,13 +78,13 @@ export class AuthController {
                 httpOnly: true,
                 sameSite: 'strict',
                 path: '/',
-                maxAge: 15 * 60 * 1000
+                maxAge: 7 * 24 * 60 * 60 * 1000
             });
             return reply.code(201).send({message: "USER_CREATED_SUCCESSFULLY"});
         }
         catch (error)
         {
-            console.log(error);
+            // console.log(error);
             if (error.code)
                 return reply.code(error.code).send({error: error.message});
             else
@@ -160,11 +163,11 @@ export class AuthController {
         const db = request.server.db;
         try {
             const user = authModels.findUserById(db, request.user.userId);
-            console.log(user)
+            // console.log(user)
             return reply.code(200).send({message: "SUCCESS", userData: user});
         }
         catch (error) {
-            console.log(error);
+            // console.log(error);
             if (error.code)
                 return reply.code(error.code).send({error: error.message});
             else

@@ -3,6 +3,7 @@ import { createEmailTransporter } from '../config/email.config.js';
 
 export function registerDecorators(fastify) {
     const db = createDatabase();
+		db.exec("PRAGMA foreign_keys = ON;");
     fastify.decorate('db', db);
     
     const transporter = createEmailTransporter();

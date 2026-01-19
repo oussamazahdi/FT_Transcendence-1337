@@ -1,11 +1,11 @@
 FROM node:20-alpine
 
 RUN apk add --no-cache \
-    python3 \
-    make \
-    g++ \
-    sqlite \
-    sqlite-dev
+		python3 \
+		make \
+		g++ \
+		sqlite \
+		sqlite-dev
 
 WORKDIR /app
 

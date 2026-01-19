@@ -42,8 +42,7 @@ const SignIn = () => {
 
       if (!reply.ok) {
         const errorData = await reply.json();
-        const errorMessage =
-          AUTH_ERRORS[errorData.error] || AUTH_ERRORS["default"];
+        const errorMessage = AUTH_ERRORS[errorData.error] || AUTH_ERRORS["default"];
         throw new Error(errorMessage);
       }
 
@@ -53,7 +52,8 @@ const SignIn = () => {
 
       router.push("/dashboard");
     } catch (err) {
-      if (err instanceof Error) setError(err.message);
+      if (err instanceof Error) 
+        setError(err.message);
       else setError("An unknown error occurred");
     } finally {
       setLoading(false);

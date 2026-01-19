@@ -1,5 +1,5 @@
 export function handleDatabaseError(error, context = '') {
-    console.error(`[DB ERROR in ${context}]:`, error.message);
+		console.error(`[DB ERROR in ${context}]:`, error.message);
 
     if (error.message.includes('UNIQUE constraint failed'))
     {
@@ -42,5 +42,5 @@ export function handleDatabaseError(error, context = '') {
         return { code: 500, message: 'INTERNAL_SERVER_ERROR' };
     }
 
-    return { code: 500, message: 'DATABASE_ERROR' };
+		return { code: 500, message: 'DATABASE_ERROR' };
 }

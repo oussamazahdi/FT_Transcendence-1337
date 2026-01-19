@@ -10,20 +10,21 @@ import Games from "./components/Games";
 const dashboard = () => {
   const { user } = useAuth();
   return (
-    <div className="flex w-full max-w-7xl flex-col md:flex-row gap-4 h-[86vh]">
-      <div className="flex flex-col md:w-7/10 gap-4">
-        <div className="flex h-1/2 flex-col md:flex-row gap-4">
-          <Profile user={user} className="md:w-6/10"/>
-          <MatchHistory classname="max-h-[360px] md:w-4/10" />
+    <div className="flex w-full max-w-7xl flex-col md:flex-row gap-4 h-auto md:h-[86vh]">
+      <div className="flex flex-col w-full md:w-7/10 gap-4">
+        <div className="flex flex-col md:flex-row gap-4 h-auto md:flex-1">
+          <Profile user={user} className="w-full md:w-6/10"/>
+          <MatchHistory classname="w-full md:w-4/10 max-h-[360px] md:max-h-full" />
         </div>
-        <div className="flex h-1/2 flex-col md:flex-row gap-4">
-          <WinRate />
-          <Games />
+        <div className="flex flex-col md:flex-row gap-4 h-auto md:flex-1">
+          <WinRate className="w-full md:w-1/2" />
+          <Games className="w-full md:w-1/2" />
         </div>
       </div>
-      <div className="md:w-3/10">
-        <Friends classname="md:h-1/1 max-h-[360px] md:max-h-[86vh]" />
+      <div className="w-full md:w-3/10">
+        <Friends classname="w-full h-[400px] md:h-full" />
       </div>
+      
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { EllipsisVertical } from "lucide-react";
 import Image from "next/image";
-import { ArrowLeftIcon, ChevronLeftIcon, UserIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import { ChevronLeftIcon, UserIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import BlockUserPopUp from "./BlockUserPopUp";
 import { assets } from "@/assets/data";
