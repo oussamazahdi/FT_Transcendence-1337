@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Image from "next/image";
 import { assets } from "@/assets/data";
 import { useAuth } from "@/contexts/authContext";
+import Link from "next/link";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -134,7 +135,7 @@ export default function MatchHistory({ classname = "" }) {
       const normalized = list
         .map((m) => normalizeMatch(m, mergedUsers[m.player1_id], mergedUsers[m.player2_id]))
         .filter(Boolean);
-
+			console.log("normalized:", normalized);
       setMatches(normalized);
     } catch (err) {
       console.error("Failed to load match history:", err);
@@ -155,20 +156,26 @@ export default function MatchHistory({ classname = "" }) {
         className="flex justify-between items-center w-full h-12 bg-[#414141]/60 rounded-lg p-1 hover:bg-[#414141] transition"
       >
         <div className="flex items-center flex-1 gap-2 min-w-0 justify-start">
-          <SafeAvatar src={match.player1.avatar} alt={`${match.player1.username} avatar`} />
-          <p className="text-xs font-bold truncate">{match.player1.username}</p>
+					<Link href={`/profile/${match.player1.id}`}>
+          	<SafeAvatar src={match.player1.avatar} alt={`${match.player1.username} avatar`} />
+					</Link>
+					<Link href={`/profile/${match.player1.id}`}>
+          	<p className="text-xs font-bold truncate">{match.player1.username}</p>
+					</Link>
         </div>
 
         <div className="flex flex-col justify-center items-center w-24 shrink-0">
-          <p className="text-sm font-bold whitespace-nowrap">
-            {match.player1.score} - {match.player2.score}
-          </p>
+          <p className="text-sm font-bold whitespace-nowrap">{match.player1.score} - {match.player2.score}</p>
           <p className="text-[10px] text-gray-400 whitespace-nowrap">{match.createdAt}</p>
         </div>
 
         <div className="flex items-center justify-end flex-1 gap-2 min-w-0">
-          <p className="text-xs font-bold truncate">{match.player2.username}</p>
-          <SafeAvatar src={match.player2.avatar} alt={`${match.player2.username} avatar`} />
+					<Link href={`/profile/${match.player2.id}`}>
+          	<p className="text-xs font-bold truncate">{match.player2.username}</p>
+					</Link>
+					<Link href={`/profile/${match.player2.id}`}>
+          	<SafeAvatar src={match.player2.avatar} alt={`${match.player2.username} avatar`} />
+					</Link>
         </div>
       </div>
     ));

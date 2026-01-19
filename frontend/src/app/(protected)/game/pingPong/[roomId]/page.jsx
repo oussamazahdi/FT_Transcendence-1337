@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/contexts/authContext";
 import { useSocket } from "@/contexts/socketContext";
 
@@ -9,34 +9,58 @@ const GAME_HEIGHT = 700;
 
 
 const MAPS = [
-  { id: "desert", label: "DESERT", image: "/maps/desert.png" },
-  { id: "hell", label: "HELL", image: "/maps/hell.png" },
-  { id: "ocean", label: "OCÉAN", image: "/maps/water.png" },
-  { id: "forest", label: "FOREST", image: "/maps/forest.jpeg" },
-  { id: "snow", label: "SNOW", image: "/maps/snow.jpeg" },
-  { id: "space", label: "SPACE", image: "/maps/space.png" },
+  { id: "desert", label: "DESERT", image: "/GameMaps/desert.png" },
+  { id: "hell", label: "HELL", image: "/GameMaps/hell.png" },
+  { id: "ocean", label: "OCÉAN", image: "/GameMaps/water.png" },
+  { id: "forest", label: "FOREST", image: "/GameMaps/forest.jpeg" },
+  { id: "snow", label: "SNOW", image: "/GameMaps/snow.jpeg" },
+  { id: "space", label: "SPACE", image: "/GameMaps/space.png" },
 ];
 
 
 
 const GAME_MODE = {
 	desert:{
-		label: "DESERT", image: "/maps/desert.png"
+		label: "DESERT",
+		image: "/GameMaps/desert.png",
+		ball: "#ffffff",
+		ballGlow: "#ffffff",
+		paddle: "#ffffff",
 	},
 	hell:{
-		label: "HELL", image: "/maps/hell.png"
+		label: "HELL",
+		image: "/maps/hell.png",
+		ball: "#ffffff",
+		ballGlow: "#ffffff",
+		paddle: "#ffffff",
 	},
 	ocean:{
-		label: "OCÉAN", image: "/maps/water.png"
+		label: "OCÉAN",
+		image: "/maps/water.png",
+		ball: "#ffffff",
+		ballGlow: "#ffffff",
+		paddle: "#ffffff",
 	},
 	forest:{
-		label: "FOREST", image: "/maps/forest.jpeg"
+		label: "FOREST",
+		image: "/GameMaps/forest.png",
+		ball: "#ffffff",
+		ballGlow: "#ffffff",
+		paddle: "#008BFF",
 	},
 	snow:{
-		label: "SNOW", image: "/maps/snow.jpeg"
+		label: "SNOW",
+		image: "/GameMaps/snow.png",
+		ball: "#ffffff",
+		ballGlow: "#ffffff",
+		paddle: "#ffffff",
 	},
 	space:{
-		label: "SPACE", image: "/maps/space.png"
+		label: "SPACE",
+		image: "/GameMaps/space.png",
+		ball: "#ffffff",
+		ballGlow: "#ffffff",
+		paddle: "#ffffff",
 	}
 }
 
@@ -53,7 +77,11 @@ export default function GamePage() {
   const [scale, setScale] = useState(1);
   const [endGame, setEndGame] = useState(false);
 
-	const gameData = GAME_MODE[gameSetting.game_mode];
+	const gameMode = GAME_MODE[gameSetting.game_mode];
+
+	const randerImage = useMemo(()=>{
+		preloadBackground(gameMode.image);
+	}, [])
 
 
   useEffect(() => {
@@ -61,7 +89,6 @@ export default function GamePage() {
 
     if (!socket.connected) socket.connect();
 
-		preloadBackground(gameData.image);
 
     socket.emit("update-data", {
       username: user.username,
@@ -124,7 +151,7 @@ export default function GamePage() {
 
 
     const render = () => {
-      drawFrame(ctx, game);
+      drawFrame(ctx, game, gameMode);
       animationId = requestAnimationFrame(render);
     };
 
@@ -211,13 +238,15 @@ export function preloadBackground(image) {
   };
 }
 
-export function drawFrame(ctx, game) {
+export function drawFrame(ctx, game, gameMode) {
   // clear every frame (sync)
   ctx.clearRect(0, 0, 1024, 700);
 
   // draw background if ready
   if (bgReady && bgImg) {
     ctx.drawImage(bgImg, 0, 0, 1024, 700);
+    ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+    ctx.fillRect(0, 0, 1024, 700);
   } else {
     // optional fallback to avoid black flicker
     ctx.fillStyle = "#000";
@@ -233,18 +262,18 @@ export function drawFrame(ctx, game) {
   ctx.stroke();
 
   ctx.setLineDash([]);
-  ctx.fillStyle = "white";
+  ctx.fillStyle = gameMode.ball;
   ctx.beginPath();
   ctx.arc(game.ball.x, game.ball.y, game.ball.radius, 0, Math.PI * 2);
   ctx.fill();
 
-  drawPaddle(ctx, game.player1.player);
-  drawPaddle(ctx, game.player2.player);
+  drawPaddle(ctx, game.player1.player, gameMode);
+  drawPaddle(ctx, game.player2.player, gameMode);
 }
 
 
-function drawPaddle(ctx, paddle) {
-  ctx.fillStyle = "white";
+function drawPaddle(ctx, paddle, gameMode) {
+  ctx.fillStyle = gameMode.paddle;
   ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
 }
 

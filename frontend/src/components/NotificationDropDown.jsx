@@ -7,7 +7,7 @@ import { useSocket } from "@/contexts/socketContext";
 
 const SafeAvatar = ({ src, alt }) => {
   const safeSrc = src && src !== "null" ? src : assets.defaultProfile;
-  return (<Image src={safeSrc} alt={alt || "avatar"} width={36} height={36} className="rounded-[6px] object-cover"/>);
+  return (<Image src={safeSrc} alt={alt || "avatar"} width={36} height={36} className="rounded-[6px] object-cover" style={{ width: 36, height: 36 }}/>);
 };
 
 
