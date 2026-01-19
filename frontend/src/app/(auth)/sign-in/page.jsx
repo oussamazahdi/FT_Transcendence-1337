@@ -24,7 +24,7 @@ const SignIn = () => {
 
     try {
       if (password.length < 8)
-        throw new Error("Password must be at least 8 characters")
+        throw new Error("Password must be at least 8 characters");
       const reply = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
         {
@@ -48,6 +48,7 @@ const SignIn = () => {
 
       const data = await reply.json();
       login(data.userData);
+      console.log("tloga meziane");
 
       router.push("/dashboard");
     } catch (err) {
@@ -69,7 +70,10 @@ const SignIn = () => {
             <br />
             and chat with your friends{" "}
           </p>
-          <form onSubmit={handleSubmit} className="space-y-1 mt-6 w-full max-w-xs">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-1 mt-6 w-full max-w-xs"
+          >
             <div>
               <Input
                 type="email"
@@ -87,7 +91,11 @@ const SignIn = () => {
                 placeholder="your password"
               />
             </div>
-            {error && (<p className="text-red-600 text-xs text-center px-3 py-1 bg-red-300/20 border-1">{error}</p>)}
+            {error && (
+              <p className="text-red-600 text-xs text-center px-3 py-1 bg-red-300/20 border-1">
+                {error}
+              </p>
+            )}
             <button
               type="submit"
               disabled={loading}

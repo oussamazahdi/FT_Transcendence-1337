@@ -5,6 +5,7 @@ import { UserProvider } from "@/contexts/authContext";
 import { getCurrentUser } from "@/lib/auth";
 
 import "./globals.css";
+import GlobalErrorToast from "@/components/GlobalErrorToast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,8 +18,8 @@ const geistMono = Geist_Mono({
 });
 
 const poppins = Poppins({
-  subsets: ["latin"], // required
-  weight: ["400", "500", "700"], // optional: choose the weights you need
+  subsets: ["latin"],
+  weight: ["100", "200", "300","400", "500","600", "700", "800", "900"],
 });
 
 export default async function RootLayout({ children }) {
@@ -30,6 +31,7 @@ export default async function RootLayout({ children }) {
         className={`${poppins.className} ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <UserProvider initialUser={user}>
+          <GlobalErrorToast />
           <Background>{children}</Background>
         </UserProvider>
       </body>

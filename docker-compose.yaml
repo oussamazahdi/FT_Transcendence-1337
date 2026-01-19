@@ -12,18 +12,16 @@ services:
       - transcendence
 
   frontend:
-    build: ./frontend
+    frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ft_frontend
     ports:
       - "3000:3000"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    env_file:
-      - .env
-    depends_on:
-      - backend
-    networks:
-      - transcendence
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
 
 networks:
   transcendence:

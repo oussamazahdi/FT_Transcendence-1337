@@ -1,70 +1,154 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
-import { assets } from "@/assets/data";
 import { usePathname } from "next/navigation";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import {
+  Bars3Icon,
+  XMarkIcon,
+  MagnifyingGlassIcon,
+  HomeIcon,
+  ChatBubbleOvalLeftIcon,
+  TrophyIcon,
+  ChartBarIcon,
+  UserIcon,
+  Cog6ToothIcon,
+  ArrowRightOnRectangleIcon,
+} from "@heroicons/react/24/outline";
 import UserDropdown from "./UserDropdown";
 
 export default function Navbar() {
   const pathname = usePathname();
-
-  const navItems = [
-    { href: "/dashboard", label: "dashboard", icon: assets.dashboardIcon },
-    { href: "/chat", label: "Chat", icon: assets.chatIcon },
-    { href: "/game", label: "Game", icon: assets.pingPongIcon },
-    { href: "/leaderboard", label: "Leaderboard", icon: assets.leaderboardIcon },
-  ];
+  const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
 
-  const navBareMap = navItems.map((item) => {
-    const isActive = pathname.startsWith(item.href);
-    return (
-      <Link
-        key={item.href}
-        href={item.href}
-        className={`mx-2 text-[#BEBEBE] p-1 focus:border-b-2 focus:border-white md:border md:border-[#BEBEBE] hover:text-white hover:bg-[#000000]/40 md:focus:bg-[#000000]/40 md:rounded-full cursor-pointer md:py-2 md:px-4 ${isActive ? "md:bg-[#000000]/40" : ""}`}
-      >
-        <Image src={item.icon} alt="icon" width={32} height={32} className="block md:hidden"/>
-        <p className="hidden md:block">{item.label}</p>
-      </Link>
-    );
-  });
+  const navItems = [
+    { href: "/dashboard", label: "Dashboard", icon: HomeIcon },
+    { href: "/chat", label: "Chat", icon: ChatBubbleOvalLeftIcon },
+    { href: "/game", label: "Game", icon: TrophyIcon },
+    { href: "/leaderboard", label: "Leaderboard", icon: ChartBarIcon },
+  ];
+
+  // ✅ Hard reload navigation
+  const hardNavigate = (href) => {
+    if (pathname !== href) {
+      window.location.href = href;
+    }
+  };
 
   return (
-    <div className="relative ml-2 mt-2 md:mt-8 md:mx-10 lg:mx-35 flex justify-between">
-      <div className="w-full flex items-center justify-between">
-        <Link href="/dashboard" className="hidden md:block shrink-0">
+    <header className="relative mt-4 mx-4 md:mx-10">
+      <div className="flex items-center justify-between ">
+
+        {/* Logo */}
+        <button onClick={() => hardNavigate("/dashboard")}>
           <Image
             src="/logo.png"
             alt="logo"
             width={52}
             height={52}
-            className="object-cover size-12 md:size-14 rounded-[10px] hover:scale-105"
-            />
-        </Link>
-        <div className="flex items-center justify-evenly flex-1 md:justify-center md:flex-none">
-          {navBareMap}
-        </div>
-          
-        <div className="hidden md:flex items-center md:my-2 md:border border-[#9D9D9D]/65 md:py-2 md:pl-4 text-white/60 rounded-full">
+            className="rounded-lg hover:opacity-90"
+          />
+        </button>
+
+        {/* Desktop Nav */}
+        <nav className="hidden md:flex items-center gap-3">
+          {navItems.map((item) => {
+            const isActive = pathname.startsWith(item.href);
+            return (
+              <button
+                key={item.href}
+                onClick={() => hardNavigate(item.href)}
+                className={`px-4 py-2 rounded-full border border-[#BEBEBE] text-sm
+                  hover:bg-black/40 hover:text-white
+                  ${isActive ? "bg-black/60 text-white" : "text-[#BEBEBE]"}`}
+              >
+                {item.label}
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* Desktop Search */}
+        <div className="hidden md:flex items-center border border-[#9D9D9D]/60 rounded-full px-4 py-2">
           <input
-            type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search"
-            className="border-none bg-transparent focus:outline-none text-white/80 placeholder-white/40"
+            className="bg-transparent outline-none text-white placeholder-white/40"
           />
-          <MagnifyingGlassIcon className="size-6 md:w-6 md:h-6 md:mx-3 text-white/60" />
+          <MagnifyingGlassIcon className="w-5 h-5 ml-2 text-white/60" />
         </div>
 
-        <button className="md:hidden p-2 text-white/60 hover:bg-black/20 rounded-full">
-          <Image src={assets.searchIcon} className="size-8 mr-4" />
+        {/* Desktop User */}
+        <div className="hidden md:block">
+          <UserDropdown />
+        </div>
+
+        {/* Mobile Burger */}
+        <button
+          onClick={() => setOpen(true)}
+          className="md:hidden p-2 rounded-full hover:bg-black/20"
+        >
+          <Bars3Icon className="w-8 h-8 text-white" />
         </button>
-        <UserDropdown />
       </div>
-    </div>
+
+      {/* Mobile Menu */}
+      {open && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm">
+          <div className="absolute top-0 right-0 w-72 h-full bg-[#0f0f0f] p-6 flex flex-col">
+
+            {/* Close */}
+            <button
+              onClick={() => setOpen(false)}
+              className="self-end mb-6"
+            >
+              <XMarkIcon className="w-7 h-7 text-white" />
+            </button>
+
+            {/* Nav Links */}
+            <div className="flex flex-col gap-4">
+              {navItems.map((item) => (
+                <button
+                  key={item.href}
+                  onClick={() => hardNavigate(item.href)}
+                  className="flex items-center gap-3 text-white/80 hover:text-white"
+                >
+                  <item.icon className="w-5 h-5" />
+                  {item.label}
+                </button>
+              ))}
+            </div>
+
+            <hr className="my-6 border-white/10" />
+
+            {/* User Actions (NO IMAGE) */}
+            <div className="flex flex-col gap-4 mt-auto">
+              <button
+                onClick={() => hardNavigate("/profile")}
+                className="flex gap-3 text-white/70"
+              >
+                <UserIcon className="w-5 h-5" />
+                Profile
+              </button>
+
+              <button
+                onClick={() => hardNavigate("/settings")}
+                className="flex gap-3 text-white/70"
+              >
+                <Cog6ToothIcon className="w-5 h-5" />
+                Settings
+              </button>
+
+              <button className="flex gap-3 text-red-400">
+                <ArrowRightOnRectangleIcon className="w-5 h-5" />
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </header>
   );
 }

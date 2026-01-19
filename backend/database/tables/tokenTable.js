@@ -1,4 +1,4 @@
-import { handleDatabaseError } from '../utils/dbErrorHandler.js';
+import { handleDatabaseError } from '../../utils/dbErrorHandler.js';
 
 function createTokenTable(db)
 {
@@ -18,8 +18,7 @@ function createTokenTable(db)
             )`);
     }
     catch (error) {
-        const dbError = handleDatabaseError(error, 'createTokenTable');
-        console.error(dbError);
+        console.error("Database cannot be inited due to : " + error.message);
         process.exit(1);
     }
 }

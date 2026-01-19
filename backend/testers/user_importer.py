@@ -3,10 +3,11 @@ import random
 import string
 import sys
 import bcrypt
+import os
 
 
 
-DB_PATH = "./database/transcendence.db"
+DB_PATH = "../database/transcendence.db"
 password = '123456789'
 salt = bcrypt.gensalt(rounds=12);
 bytes = password.encode('utf-8')
@@ -55,9 +56,12 @@ def make_unique_user(used_usernames: set, used_emails: set):
             return (username, email, PASSWORD, first, last, None)
 
 def main():
-    total = 10000
+    total = 1000
     if len(sys.argv) >= 2:
         total = int(sys.argv[1])
+
+    seed_email = "abdelhak.elhajji_igpi6a@test.local"
+    seed_username = "seed.user"
 
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
@@ -70,6 +74,18 @@ def main():
 
     # cur.execute("BEGIN")
 
+    # cur.execute("BEGIN")
+
+    # Insert SEED USER specifically
+    try:
+        cur.execute("""
+            INSERT INTO users (username, email, password, firstname, lastname, avatar)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (seed_username, seed_email, PASSWORD, "Seed", "User", None))
+        print(f"✅ Inserted Seed User: {seed_email}")
+    except sqlite3.IntegrityError:
+        print(f"⚠️ Seed user {seed_email} already exists or conflict.")
+    
     inserted = 0
     for _ in range(total):
         user_row = make_unique_user(used_usernames, used_emails)

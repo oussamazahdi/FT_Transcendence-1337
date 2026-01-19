@@ -12,11 +12,11 @@ FRIENDS = f"{HOST}/api/friends"
 DEFAULT_PASSWORD = "123456789"
 LOGIN_ID_KEY = "email"
 
-SEED_EMAIL = "hicham.elhajji_wmtyeq@test.local"
+SEED_EMAIL = "abdelhak.elhajji_igpi6a@test.local"
 
-MAX_USERS = 10
-THREADS = 50
-OPS_PER_USER = 50
+MAX_USERS = 100
+THREADS = 500
+OPS_PER_USER = 500
 TIMEOUT = 10
 
 

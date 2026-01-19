@@ -2,146 +2,11 @@ import React, { useEffect } from "react";
 import Friends from "./Friends";
 import { assets } from "@/assets/data";
 import { useState } from "react";
-
-const friendsData = [
-  {
-    playerPdp: assets.mohcinePdp,
-    firstname: "Mohcine",
-    lastname: "Ghanami",
-    lastMessage: "Lorem ipsum is simply bla bla hhhhhhhhhhhhhhh",
-    timeOfLastMsg: "11:08",
-    status: true,
-    key: "id1",
-  },
-  {
-    playerPdp: assets.soufiixPdp,
-    firstname: "Soufiane",
-    lastname: "arif",
-    lastMessage: "Lorem ipsum is simply bla bla",
-    timeOfLastMsg: "20/09/2025",
-    status: true,
-    key: "id2",
-  },
-  {
-    playerPdp: assets.kamalPdp,
-    firstname: "Kamal",
-    lastname: "El Alami",
-    lastMessage: "Lorem ipsum is simply bla bla",
-    timeOfLastMsg: "20/09/2025",
-    status: true,
-    key: "id3",
-  },
-  {
-    playerPdp: assets.mohcinePdp,
-    firstname: "Mohcine",
-    lastname: "Ghanami",
-    lastMessage: "Lorem ipsum is simply bla bla hhhhhhhhhhhhhhh",
-    timeOfLastMsg: "11:08",
-    status: true,
-    key: "id4",
-  },
-  {
-    playerPdp: assets.soufiixPdp,
-    firstname: "Soufiane",
-    lastname: "arif",
-    lastMessage: "Lorem ipsum is simply bla bla",
-    timeOfLastMsg: "20/09/2025",
-    status: true,
-    key: "id5",
-  },
-  {
-    playerPdp: assets.kamalPdp,
-    firstname: "Kamal",
-    lastname: "El Alami",
-    lastMessage: "Lorem ipsum is simply bla bla",
-    timeOfLastMsg: "20/09/2025",
-    status: true,
-    key: "id6",
-  },
-  {
-    playerPdp: assets.mohcinePdp,
-    firstname: "Mohcine",
-    lastname: "Ghanami",
-    lastMessage: "Lorem ipsum is simply bla bla hhhhhhhhhhhhhhh",
-    timeOfLastMsg: "11:08",
-    status: true,
-    key: "id7",
-  },
-  {
-    playerPdp: assets.soufiixPdp,
-    firstname: "Soufiane",
-    lastname: "arif",
-    lastMessage: "Lorem ipsum is simply bla bla",
-    timeOfLastMsg: "20/09/2025",
-    status: true,
-    key: "id8",
-  },
-  {
-    playerPdp: assets.kamalPdp,
-    firstname: "Kamal",
-    lastname: "El Alami",
-    lastMessage: "Lorem ipsum is simply bla bla",
-    timeOfLastMsg: "20/09/2025",
-    status: true,
-    key: "id9",
-  },
-  {
-    playerPdp: assets.mohcinePdp,
-    firstname: "Mohcine",
-    lastname: "Ghanami",
-    lastMessage: "Lorem ipsum is simply bla bla hhhhhhhhhhhhhhh",
-    timeOfLastMsg: "11:08",
-    status: true,
-    key: "id10",
-  },
-  {
-    playerPdp: assets.soufiixPdp,
-    firstname: "Soufiane",
-    lastname: "arif",
-    lastMessage: "Lorem ipsum is simply bla bla",
-    timeOfLastMsg: "20/09/2025",
-    status: true,
-    key: "id11",
-  },
-  {
-    playerPdp: assets.kamalPdp,
-    firstname: "Kamal",
-    lastname: "El Alami",
-    lastMessage: "Lorem ipsum is simply bla bla",
-    timeOfLastMsg: "20/09/2025",
-    status: true,
-    key: "id12",
-  },
-  {
-    playerPdp: assets.mohcinePdp,
-    firstname: "Mohcine",
-    lastname: "Ghanami",
-    lastMessage: "Lorem ipsum is simply bla bla hhhhhhhhhhhhhhh",
-    timeOfLastMsg: "11:08",
-    status: true,
-    key: "id13",
-  },
-  {
-    playerPdp: assets.soufiixPdp,
-    firstname: "Soufiane",
-    lastname: "arif",
-    lastMessage: "Lorem ipsum is simply bla bla",
-    timeOfLastMsg: "20/09/2025",
-    status: true,
-    key: "id14",
-  },
-  {
-    playerPdp: assets.kamalPdp,
-    firstname: "Kamal",
-    lastname: "El Alami",
-    lastMessage: "Lorem ipsum is simply bla bla",
-    timeOfLastMsg: "20/09/2025",
-    status: true,
-    key: "id15",
-  },
-];
+import { friendsData } from "@/assets/mocData";
+import { useAuth } from "@/contexts/authContext";
 
 export default function SideBar() {
+  const {friends} = useAuth();
   const [conversations, setConversation] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [displayData, setDisplayData] = useState([]);
@@ -151,29 +16,27 @@ export default function SideBar() {
     const fetchconversation = async () => {
       setLoading(true);
       try {
-        // const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/conversations`,{
-        //   method:"GET",
-        //   credentials: "include",
-        // })
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/`,{
+          method:"GET",
+          credentials: "include",
+        })
 
-        // if(!response.ok)
-        //   throw new Error("Network response was not ok");
+        const data = await response.json();
+        if(!response.ok)
+          throw new Error(data.error);
 
-        // const data = await response.json();
-        // const formatedData = data.map((user) => ({
-        await new Promise((resolve) => setTimeout(resolve, 900));
+        setConversation(friends)
 
-        setConversation(friendsData);
-
-        // console.log(conversations);
-
-        const formatedData = conversations.map((user) => ({
-          playerPdp: user.playerPdp,
+        const rawList = friends || [];
+        const formatedData = rawList.map((user) => ({
+          avatar: user.avatar,
           firstname: user.firstname,
           lastname: user.lastname,
-          lastMessage: user.lastMessage,
-          timeOfLastMsg: user.timeOfLastMsg,
-          key: user.id,
+          username: user.username,
+          lastMessage: user.lastMessage || "last message bla bla bla hhhhhhhhhhhhhhhhhhhhh",
+          timeOfLastMsg: user.timeOfLastMsg || "00:00",
+          status: user.status || false,
+          id: user.id,
         }));
 
         if (!formatedData[0]) throw new Error("No conversation found");
@@ -183,12 +46,12 @@ export default function SideBar() {
         console.log("Failed to fetch conversations", err);
         setDisplayData([
           {
-            playerPdp: assets.noChatFound,
-            firstname: "No char Found",
+            avatar: assets.noUserFound,
+            firstname: "No chat Found",
             lastname: "",
             lastMessage: `${err}`,
             timeOfLastMsg: "now",
-            key: "no-id",
+            id: "no-id",
           },
         ]);
       } finally {
@@ -197,130 +60,23 @@ export default function SideBar() {
     };
 
     fetchconversation();
-  }, [conversations]);
-
-  useEffect(() => {
-    if (!searchQuery.trim()) {
-      setDisplayData(conversations);
-      setLoading(false);
-      return;
-    }
-
-    const delayDebounceFn = setTimeout(async () => {
-      console.log(searchQuery);
-      setLoading(true);
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/users/search?query=${searchQuery}`,
-          {
-            method: "GET",
-            credentials: "include",
-          },
-        );
-        if (!response.ok) throw new Error("Network response was not ok");
-        const data = await response.json();
-        const formatedData = data.map((user) => ({
-          playerPdp: assets.kamalPdp,
-          firstname: user.firstname,
-          lastname: user.lastname,
-          lastMessage: "user found via search",
-          timeOfLastMsg: "",
-          key: user.key,
-        }));
-        if (!formatedData[0]) throw new Error("no user found");
-        setDisplayData(formatedData);
-      } catch (err) {
-        console.log("Failed to fetch users", err);
-
-        setDisplayData([
-          {
-            playerPdp: assets.noUserFound,
-            firstname: "No user Found",
-            lastname: "",
-            lastMessage: `${err}`,
-            timeOfLastMsg: "now",
-            key: "no-id",
-          },
-        ]);
-      } finally {
-        setLoading(false);
-      }
-    }, 500);
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery]);
+  }, []);
 
   const renderList = () => {
     if (loading) {
-      return (
-        <svg
-          className="w-full h-13 flex justify-center"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 200 200"
-        >
-          <circle
-            fill="#DEDEDE"
-            stroke="#DEDEDE"
-            strokeWidth="15"
-            r="15"
-            cx="40"
-            cy="65"
-          >
-            <animate
-              attributeName="cy"
-              calcMode="spline"
-              dur="2"
-              values="65;135;65;"
-              keySplines=".5 0 .5 1;.5 0 .5 1"
-              repeatCount="indefinite"
-              begin="-.4"
-            ></animate>
-          </circle>
-          <circle
-            fill="#DEDEDE"
-            stroke="#DEDEDE"
-            strokeWidth="15"
-            r="15"
-            cx="100"
-            cy="65"
-          >
-            <animate
-              attributeName="cy"
-              calcMode="spline"
-              dur="2"
-              values="65;135;65;"
-              keySplines=".5 0 .5 1;.5 0 .5 1"
-              repeatCount="indefinite"
-              begin="-.2"
-            ></animate>
-          </circle>
-          <circle
-            fill="#DEDEDE"
-            stroke="#DEDEDE"
-            strokeWidth="15"
-            r="15"
-            cx="160"
-            cy="65"
-          >
-            <animate
-              attributeName="cy"
-              calcMode="spline"
-              dur="2"
-              values="65;135;65;"
-              keySplines=".5 0 .5 1;.5 0 .5 1"
-              repeatCount="indefinite"
-              begin="0"
-            ></animate>
-          </circle>
-        </svg>
-      );
+      return <div>Loading...</div>;
     }
     return displayData.map((friend) => (
       <Friends
-        pdp={friend.playerPdp}
-        name={friend.firstname + " " + friend.lastname}
+        id={friend.id}
+        key={friend.id}
+        avatar={friend.avatar}
+        firstname={friend.firstname}
+        lastname={friend.lastname}
+        username={friend.username}
         lastmsg={friend.lastMessage}
+        status={friend.status}
         time={friend.timeOfLastMsg}
-        key={friend.key}
       />
     ));
   };
@@ -346,3 +102,54 @@ export default function SideBar() {
     </div>
   );
 }
+
+//---------------------Search Chat------------------------------------------
+// useEffect(() => {
+//   if (!searchQuery.trim()) {
+//     setDisplayData(conversations);
+//     setLoading(false);
+//     return;
+//   }
+
+//   const delayDebounceFn = setTimeout(async () => {
+//     console.log(searchQuery);
+//     setLoading(true);
+//     try {
+//       const response = await fetch(
+//         `${process.env.NEXT_PUBLIC_API_URL}/api/users/search?query=${searchQuery}`,
+//         {
+//           method: "GET",
+//           credentials: "include",
+//         },
+//       );
+//       if (!response.ok) throw new Error("Network response was not ok");
+//       const data = await response.json();
+//       const formatedData = data.map((user) => ({
+//         playerPdp: assets.kamalPdp,
+//         firstname: user.firstname,
+//         lastname: user.lastname,
+//         lastMessage: "user found via search",
+//         timeOfLastMsg: "",
+//         id: user.id,
+//       }));
+//       if (!formatedData[0]) throw new Error("no user found");
+//       setDisplayData(formatedData);
+//     } catch (err) {
+//       console.log("Failed to fetch users", err);
+
+//       setDisplayData([
+//         {
+//           playerPdp: assets.noUserFound,
+//           firstname: "No user Found",
+//           lastname: "",
+//           lastMessage: `${err}`,
+//           timeOfLastMsg: "now",
+//           id: "no-id",
+//         },
+//       ]);
+//     } finally {
+//       setLoading(false);
+//     }
+//   }, 500);
+//   return () => clearTimeout(delayDebounceFn);
+// }, [searchQuery]);

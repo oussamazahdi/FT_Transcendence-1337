@@ -166,6 +166,22 @@ export class FriendsController {
         }
     }
 
+    async getSentRequests(request, reply)
+    {
+        const db = request.server.db;
+
+        try {
+            const sentRequests = friendsModels.getSentRequestsList(db, request.user.userId);
+            return reply.code(200).send({message: "SUCCESS", Requests: sentRequests});
+        }
+        catch (error) {
+            if (error.code)
+                return reply.code(error.code).send({error: error.message});
+            else
+                return reply.code(500).send({error: error.message});
+        }
+    }
+
 }
 
 export const friendsController = new FriendsController();

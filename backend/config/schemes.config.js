@@ -9,9 +9,6 @@ export const userSchema = {
         avatar: { type: ['string', 'null'] },
         isverified: { type: 'integer'},
         status2fa: { type: 'integer'},
-        player_xp: {type: 'integer'},
-        player_level: {type: 'float'},
-        game_mode: {type: 'game_mode'}
     }
 };
 export const errorResponse = {
@@ -87,6 +84,13 @@ export const friendRequestsResponse = {
     }
 };
 
+export const sentFriendRequestsResponse = {
+    type: 'object',
+    properties: {
+        message: { type: 'string' },
+        Requests: userArraySchema
+    }
+};
 export const blockedUsersResponse = {
     type: 'object',
     properties: {
@@ -102,3 +106,32 @@ export const idParamSchema = {
         id: { type: 'integer', minimum: 1 }
     }
 };
+
+export const notificationSchema = {
+	type: "object",
+	properties: {
+		id: { type: "integer" },
+		sender_id: { type: "integer" },
+		receiver_id: { type: "integer" },
+		type: { type: "string" },
+		title: { type: "string" },
+		message: { type: "string" },
+		payload: { type: ["object", "null"] },
+		status: { type: "string" },
+		is_read: { type: "integer" },
+		expires_at: { type: ["string", "null"] },
+		created_at: { type: "string" }
+	}
+};
+
+export const notificationsSuccessResponse = {
+  type: "object",
+  properties: {
+    message: { type: "string" },
+    userData: {
+      type: "array",
+      items: notificationSchema
+    }
+  }
+};
+

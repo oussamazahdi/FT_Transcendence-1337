@@ -1,4 +1,4 @@
-import { handleDatabaseError } from '../utils/dbErrorHandler.js';
+import { handleDatabaseError } from '../../utils/dbErrorHandler.js';
 
 function createFriendshipTable(db)
 {

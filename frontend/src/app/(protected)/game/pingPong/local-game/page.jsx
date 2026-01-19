@@ -46,10 +46,6 @@ export default function PingPongGame() {
     const paddleHeight = 90 + 15 * data.paddleSize;
     const width = 1024;
     const height = 700;
-    // const angle = (Math.random() * Math.PI) / 2 - Math.PI / 4
-    // const direction = Math.random() > 0.5 ? 1 : -1
-    // state.ball.dx = Math.cos(angle) * settings.ballSpeed * direction
-    // state.ball.dy = Math.sin(angle) * settings.ballSpeed
 
     const angle = (Math.random() * Math.PI) / 2 - Math.PI / 4;
     const direction = Math.random() > 0.5 ? 1 : -1;
@@ -111,7 +107,7 @@ export default function PingPongGame() {
       if (e.key === "s") state.keys.s = true;
       if (e.key === "ArrowUp") state.keys.ArrowUp = true;
       if (e.key === "ArrowDown") state.keys.ArrowDown = true;
-      if (e.key === " ") togglePause(); // spacebar toggles pause too
+      if (e.key === " ") togglePause();
     };
 
     const keyUpHandler = (e) => {
@@ -163,7 +159,6 @@ export default function PingPongGame() {
         state.ball.velocityX *= -1;
         state.ball.velocityY =
           (state.ball.y - state.player2.y) / state.player2.height - 0.5;
-        // console.log("ball x: ", state.ball.x, " ball y: ", state.ball.y, " player 2 x : ", state.player2.x ," player 2 y : ", state.player2.y)
       }
       if (
         state.ball.x - state.ball.radius <
@@ -223,7 +218,6 @@ export default function PingPongGame() {
       );
       context.fillStyle = players.ballColor;
       context.fill();
-      // console.log("ball color : ", players.ballColor, " paddle color : ", players.player1.color)
 
       animationRef.current = requestAnimationFrame(gameLoop);
     };

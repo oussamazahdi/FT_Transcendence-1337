@@ -9,7 +9,7 @@ const UserDropdown = () => {
   return (
     <div>
       <div className="flex items-center md:gap-3">
-        <NotificationDropDown/>
+        <NotificationDropDown />
         <ProfileDropDown user={user} />
       </div>
     </div>

@@ -5,6 +5,7 @@ import { errorResponse,
     emptySuccessResponse,
     friendsListResponse,
     friendRequestsResponse,
+    sentFriendRequestsResponse,
     blockedUsersResponse,
     idParamSchema
 } from "../config/schemes.config.js";
@@ -37,6 +38,19 @@ function friendsRoutes(fastify)
         }
     }, friendsController.getAllFriendRequests);
     
+    fastify.get("/requests/sent", {
+        preHandler: authMiddleware,
+        // schema: {
+        //     description: "Get outgoing friend requests",
+        //     tags: ['Friends'],
+        //     response: {
+        //         200: sentFriendRequestsResponse,
+        //         401: errorResponse,
+        //         500: errorResponse
+        //     }
+        // }
+    }, friendsController.getSentRequests);
+
     fastify.post("/requests/:id", {
         preHandler: authMiddleware,
         schema: {

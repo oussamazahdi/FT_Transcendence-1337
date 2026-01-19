@@ -8,7 +8,6 @@ export default function Background({ children }) {
           alt="Background"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-black/10" />
       </div>
       <div className="relative z-10">{children}</div>
     </div>

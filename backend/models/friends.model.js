@@ -39,6 +39,23 @@ export class FriendsModels
         }
     }
 
+    getSentRequestsList(db, userId)
+    {
+        try {
+            const requests = db.prepare(`
+                SELECT u.id, u.username, u.avatar, u.firstname, u.lastname
+                FROM friends f
+                JOIN users u ON u.id = f.receiver_id
+                WHERE f.sender_id = :me AND f.status = 'pending'
+                `).all({me : userId});
+            return (requests);
+        }
+        catch (error) {
+            const dbError = handleDatabaseError(error, 'getSentRequestsList');
+            throw dbError;
+        }
+    }
+
     getBlockedUsersList(db, userId)
     {
         try {
