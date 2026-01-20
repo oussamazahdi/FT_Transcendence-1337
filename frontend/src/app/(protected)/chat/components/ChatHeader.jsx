@@ -1,17 +1,21 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { EllipsisVertical } from "lucide-react";
 import Image from "next/image";
-import { UserIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import { ChevronLeftIcon, UserIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import BlockUserPopUp from "./BlockUserPopUp";
 import { assets } from "@/assets/data";
+import { SelectedFriendContext } from "@/contexts/userContexts";
+
 
 const ChatHeader = ({ user }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showConfirm, setShowconfirm] = useState(false);
+  const {setSelectedFriend} = useContext(SelectedFriendContext);
 
   return (
-    <div className="relative bg-[#0F0F0F]/65 flex items-center p-2 rounded-lg gap-1">
+    <div className="relative bg-[#0F0F0F]/65 flex items-center p-1 rounded-lg gap-1">
+      <ChevronLeftIcon onClick={() => setSelectedFriend(null)} className="size-6 block md:hidden text-[#BABABA]"/>
       <Image
         src={user.avatar || assets.defaultProfile}
         alt="avatar"
@@ -33,9 +37,9 @@ const ChatHeader = ({ user }) => {
       <div className="ml-auto">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="cursor-pointer hover:scale-105"
+          className="cursor-pointer hover:scale-105 mt-2"
         >
-          <EllipsisVertical className="size-6" />
+          <EllipsisVertical className="size-6 text-[#BABABA]" />
         </button>
         {isOpen && (
           <div className="absolute z-10 right-0 top-full mt-2 rounded-lg w-48 bg-[#0F0F0F]/90 flex flex-col justify-center items-center gap-1 p-2 text-xs">

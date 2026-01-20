@@ -23,7 +23,7 @@ const ChatInput = ({ messages, setMessages }) => {
   const pingPongInvite = () => {
     const newMessage = {
       id: messages.length + 1,
-      senderId: "2007",
+      senderId: "3007",
       type: "game_invite",
       gameType: "ping_pong",
       timestamp: new Date().toLocaleDateString([], {
@@ -38,7 +38,7 @@ const ChatInput = ({ messages, setMessages }) => {
   const ticTacToeInvite = () => {
     const newMessage = {
       id: messages.length + 1,
-      senderId: "2007",
+      senderId: "3007",
       type: "game_invite",
       gameType: "tic_tac_toe",
       timestamp: new Date().toLocaleDateString([], {
@@ -56,7 +56,7 @@ const ChatInput = ({ messages, setMessages }) => {
     const newMsg = {
       id: messages.length + 1,
       type: "text",
-      senderId: "2007",
+      senderId: "3007",
       text: inputValue,
       timestamp: new Date().toLocaleDateString([], {
         hour: "2-digit",

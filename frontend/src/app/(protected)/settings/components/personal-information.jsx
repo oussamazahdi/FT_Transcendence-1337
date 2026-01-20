@@ -128,7 +128,7 @@ export default function Personal_information() {
           />
         )}
       </div>
-      <div className="flex gap-2 my-4">
+      <div className="flex md:flex-row flex-col gap-2 my-4">
         <input
           type="file"
           id="profile-image-input"
@@ -180,29 +180,31 @@ export default function Personal_information() {
           />
         </div>
       </div>
-      <div className="w-full flex flex-col items-center">
-        <p className="text-[10px] text-gray-500">Username</p>
-        <input
-          required
-          type="text"
-          onChange={(e) =>
-            setFormData((prev) => ({ ...prev, username: e.target.value }))
-          }
-          className="w-full bg-[#414141]/60 rounded-sm p-2 text-sm md:w-105 focus:outline-none"
-          value={formData.username}
-        />
-      </div>
-      <div className="w-full flex flex-col items-center ">
-        <p className="text-[10px] text-gray-500">Email</p>
-        <input
-          required
-          type="text"
-          onChange={(e) =>
-            setFormData((prev) => ({ ...prev, email: e.target.value }))
-          }
-          className="w-full bg-[#414141]/60 rounded-sm p-2 text-sm md:w-105 focus:outline-none"
-          value={formData.email}
-        />
+      <div className="w-full flex flex-col justify-center md:items-center">
+        <div>
+          <p className="text-[10px] text-gray-500">Username</p>
+          <input
+            required
+            type="text"
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, username: e.target.value }))
+            }
+            className="w-full md:w-105 p-2 h-8 rounded-sm bg-[#4D4D4D]/40 text-white text-sm placeholder-[#FFFFFF]/23 focus:outline-none"
+            value={formData.username}
+          />
+        </div>
+        <div>
+          <p className="text-[10px] text-gray-500">Email</p>
+          <input
+            required
+            type="text"
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, email: e.target.value }))
+            }
+            className="w-full md:w-105 p-2 h-8 rounded-sm bg-[#4D4D4D]/40 text-white text-sm placeholder-[#FFFFFF]/23 focus:outline-none"
+            value={formData.email}
+          />
+        </div>
       </div>
       {error && (
         <p className="text-red-600 text-xs text-center px-3 py-1 bg-red-300/20 border-1">

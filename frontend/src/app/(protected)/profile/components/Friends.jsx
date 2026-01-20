@@ -5,36 +5,15 @@ import { useAuth } from "@/contexts/authContext";
 
 const Friends = ({ classname }) => {
   const {friends} = useAuth();
-  // const [FriendsData, setFriendsData] = useState([]);
-  // const [error, setError] = useState("");
 
-  // useEffect(() => {
 
-  //   setError("");
-
-  //   const fetchFriends = async () => {
-  //     try{
-  //       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/`,{
-  //         method:"GET",
-  //         credentials:"include"
-  //       })
-
-  //       const data = await response.json()
-  //       if (!response.ok){
-  //         throw new Error (data.error);
-  //       }
-  //       setFriendsData(data.friendList);
-  //     }catch(err){
-  //       setError(err.message);
-  //       console.log(err.message)
-  //     }
-  //   }
-  //   fetchFriends();
-  // },[])
-
-  const renderFriends = friends.map((user) => (
-    <FriendCard user={user} key={user.id}/>
-  ));
+  const renderFriends = () => {
+    if (!friends || friends.length === 0)
+      return(<div className="text-sm text-center text-white/60 mt-4">No friends </div>)
+    return(
+      friends.map((user) => (<FriendCard user={user} key={user.id}/>)))
+  }
+    
 
   return (
     <div
@@ -42,7 +21,7 @@ const Friends = ({ classname }) => {
     >
       <p className="font-bold text-sm shrink-0">Friends</p>
       <div className="flex flex-col gap-1 w-full mt-2 overflow-y-auto custom-scrollbar flex-1 min-h-0">
-        {renderFriends}
+        {renderFriends()}
       </div>
     </div>
   );

@@ -3,21 +3,21 @@ import { assets } from "@/assets/data";
 import Image from "next/image";
 
 const Profile = ({ user, className }) => {
-  const rawLevel = 15.99
+  const rawLevel = 15.99;
   const progressPercent = Math.round((rawLevel % 1) * 100);
 
   return (
-    <div className={`relative bg-[#0F0F0F]/75 rounded-[20px] flex flex-col pb-4 overflow-hidden p-3 ${className} `}>
-      <div className="relative w-full h-32 md:h-48 overflow-hidden">
+    <div className={`relative bg-[#0F0F0F]/75 rounded-[20px] flex flex-col pb-4 overflow-hidden p-3 shrink-0 ${className} `}>
+      <div className="relative w-full h-36 md:h-48 overflow-hidden rounded-lg shrink-0">
         <Image
           src={assets.coverPicture}
           alt="cover"
           fill
-          className="object-cover rounded-lg"
+          className="object-cover"
         />
       </div>
-      <div className="flex flex-col items-center -mt-12 md:-mt-20 z-5">
-        <div className="relative rounded-[10px]">
+      <div className="flex flex-col items-center -mt-12 md:-mt-20 z-10 relative">
+        <div className="relative rounded-[10px]"> 
             {user?.avatar && user?.avatar !== "null" ? (
             <Image
                 src={user.avatar}
@@ -43,7 +43,8 @@ const Profile = ({ user, className }) => {
           </span>
         </p>
       </div>
-      <div className="w-full mt-4">
+      
+      <div className="w-full mt-4 px-1">
         <div className="flex justify-between text-xs md:text-sm mb-1">
             <span className="font-bold ">Level: {rawLevel}</span>
             <span >1950/3000</span>

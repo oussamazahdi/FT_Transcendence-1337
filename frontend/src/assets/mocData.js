@@ -3,7 +3,7 @@ import { assets } from "@/assets/data";
 export const messages = [
   {
     id: 1,
-    senderId: "2007", // This matches YOUR profile ID
+    senderId: "3007", // This matches YOUR profile ID
     type: "text",
     text: "Hello! How are you?",
     timestamp: "10:00 AM",
@@ -11,7 +11,7 @@ export const messages = [
   },
   {
     id: 2,
-    senderId: "2007",
+    senderId: "3007",
     type: "text",
     text: "I am good, thanks! Did you finish the design?",
     timestamp: "10:02 AM",
@@ -19,7 +19,7 @@ export const messages = [
   },
   {
     id: 3,
-    senderId: "2007",
+    senderId: "3007",
     type: "text",
     text: "Yes, I am working on the frontend noddflkdshfkd;lkjsl;kdhlksadjglkjadshflkdshjalkafjahslkdjfhdsalkfjhbasdlkjfhasdlkjfhasldkjhflkjasdhlkfjdshAKJAGSDKJHGFADSKJHGDWSAKJGHADSKJGHDSKHGFDSKJGHDSKJHGFKJDSHGDSKJHGDFSKmnbdmsvfmdsnvfmndsbvmnfbdsmnfbdsmn.",
     timestamp: "10:05 AM",
@@ -35,7 +35,7 @@ export const messages = [
   },
   {
     id: 5,
-    senderId: "2007",
+    senderId: "3007",
     type: "text",
     text: "Sure, send me an invite!",
     timestamp: "10:01 AM",
@@ -63,7 +63,7 @@ export const messages = [
   },
   {
     id: 8,
-    senderId: "2007",
+    senderId: "3007",
     type: "text",
     text: "3ayeeeeee9ti",
     status: "rejected",
@@ -72,7 +72,7 @@ export const messages = [
   },
   {
     id: 9,
-    senderId: "2007", // This matches YOUR profile ID
+    senderId: "3007", // This matches YOUR profile ID
     type: "text",
     text: "Hello! How are you?",
     timestamp: "10:00 AM",
@@ -80,7 +80,7 @@ export const messages = [
   },
   {
     id: 10,
-    senderId: "2007",
+    senderId: "3007",
     type: "text",
     text: "I am good, thanks! Did you finish the design?",
     timestamp: "10:02 AM",
@@ -88,7 +88,7 @@ export const messages = [
   },
   {
     id: 11,
-    senderId: "2007",
+    senderId: "3007",
     type: "text",
     text: "Yes, I am working on the frontend noddflkdshfkd;lkjsl;kdhlksadjglkjadshflkdshjalkafjahslkdjfhdsalkfjhbasdlkjfhasdlkjfhasldkjhflkjasdhlkfjdshAKJAGSDKJHGFADSKJHGDWSAKJGHADSKJGHDSKHGFDSKJGHDSKJHGFKJDSHGDSKJHGDFSKmnbdmsvfmdsnvfmndsbvmnfbdsmnfbdsmn.",
     timestamp: "10:05 AM",
@@ -104,7 +104,7 @@ export const messages = [
   },
   {
     id: 13,
-    senderId: "2007",
+    senderId: "3007",
     type: "text",
     text: "Sure, send me an invite!",
     timestamp: "10:01 AM",
@@ -132,7 +132,7 @@ export const messages = [
   },
   {
     id: 16,
-    senderId: "2007",
+    senderId: "3007",
     type: "text",
     text: "3ayeeeeee9ti",
     status: "rejected",
