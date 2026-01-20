@@ -3,68 +3,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/contexts/authContext";
 import { useSocket } from "@/contexts/socketContext";
+import {GAME_MODE, MAPS, GAME_WIDTH, GAME_HEIGHT} from "@/components/ui/GameMode"
 
-const GAME_WIDTH = 1024;
-const GAME_HEIGHT = 700;
-
-
-const MAPS = [
-  { id: "desert", label: "DESERT", image: "/GameMaps/desert.png" },
-  { id: "hell", label: "HELL", image: "/GameMaps/hell.png" },
-  { id: "ocean", label: "OCÉAN", image: "/GameMaps/water.png" },
-  { id: "forest", label: "FOREST", image: "/GameMaps/forest.jpeg" },
-  { id: "snow", label: "SNOW", image: "/GameMaps/snow.jpeg" },
-  { id: "space", label: "SPACE", image: "/GameMaps/space.png" },
-];
-
-
-
-const GAME_MODE = {
-	desert:{
-		label: "DESERT",
-		image: "/GameMaps/desert.png",
-		ball: "#ffffff",
-		ballGlow: "#ffffff",
-		paddle: "#ffffff",
-	},
-	hell:{
-		label: "HELL",
-		image: "/maps/hell.png",
-		ball: "#ffffff",
-		ballGlow: "#ffffff",
-		paddle: "#ffffff",
-	},
-	ocean:{
-		label: "OCÉAN",
-		image: "/maps/water.png",
-		ball: "#ffffff",
-		ballGlow: "#ffffff",
-		paddle: "#ffffff",
-	},
-	forest:{
-		label: "FOREST",
-		image: "/GameMaps/forest.png",
-		ball: "#ffffff",
-		ballGlow: "#ffffff",
-		paddle: "#008BFF",
-	},
-	snow:{
-		label: "SNOW",
-		image: "/GameMaps/snow.png",
-		ball: "#ffffff",
-		ballGlow: "#ffffff",
-		paddle: "#ffffff",
-	},
-	space:{
-		label: "SPACE",
-		image: "/GameMaps/space.png",
-		ball: "#ffffff",
-		ballGlow: "#ffffff",
-		paddle: "#ffffff",
-	}
-}
-
-
+let bgImg = null;
+let bgReady = false;
 
 export default function GamePage() {
   const socket = useSocket();
@@ -137,7 +79,6 @@ export default function GamePage() {
 
     if (game.state === "FINISHED") {
       setEndGame(true);
-      // socket.disconnect();
       return;
     }
 
@@ -193,38 +134,7 @@ export default function GamePage() {
   );
 }
 
-// function drawFrame(ctx, game) {
 
-// 	const img = new Image();
-// 	img.src = MAPS[0].image; // MUST be in /public
-
-// 	img.onload = () => {
-// 		ctx.clearRect(0, 0, 1024, 700);
-// 		ctx.drawImage(img, 0, 0, 1024, 700);
-// 	};
-
-
-//   ctx.setLineDash([15, 8]);
-//   ctx.beginPath();
-//   ctx.moveTo(GAME_WIDTH / 2, 0);
-//   ctx.lineTo(GAME_WIDTH / 2, GAME_HEIGHT);
-//   ctx.strokeStyle = "#fff";
-//   ctx.stroke();
-
-//   ctx.setLineDash([]);
-//   ctx.fillStyle = "white";
-//   ctx.beginPath();
-//   ctx.arc(game.ball.x, game.ball.y, game.ball.radius, 0, Math.PI * 2);
-//   ctx.fill();
-
-//   drawPaddle(ctx, game.player1.player);
-//   drawPaddle(ctx, game.player2.player);
-// }
-
-
-
-let bgImg = null;
-let bgReady = false;
 
 export function preloadBackground(image) {
   if (bgImg) return;
@@ -239,21 +149,17 @@ export function preloadBackground(image) {
 }
 
 export function drawFrame(ctx, game, gameMode) {
-  // clear every frame (sync)
   ctx.clearRect(0, 0, 1024, 700);
 
-  // draw background if ready
   if (bgReady && bgImg) {
     ctx.drawImage(bgImg, 0, 0, 1024, 700);
     ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
     ctx.fillRect(0, 0, 1024, 700);
   } else {
-    // optional fallback to avoid black flicker
     ctx.fillStyle = "#000";
     ctx.fillRect(0, 0, 1024, 700);
   }
 
-  // now draw game elements
   ctx.setLineDash([15, 8]);
   ctx.beginPath();
   ctx.moveTo(GAME_WIDTH / 2, 0);
