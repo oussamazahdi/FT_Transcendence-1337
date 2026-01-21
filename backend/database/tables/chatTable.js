@@ -5,8 +5,8 @@ function createChatTable(db)
     try {
         db.exec(`CREATE TABLE IF NOT EXISTS conversations (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            friend_id INTEGER,
+            user_id INTEGER NOT NULL,
+            friend_id INTEGER NOT NULL,
             last_message TEXT,
             updatedate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             creationdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
