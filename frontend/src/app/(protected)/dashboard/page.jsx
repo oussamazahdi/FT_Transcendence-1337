@@ -14,7 +14,7 @@ const dashboard = () => {
       <div className="flex flex-col w-full md:w-7/10 gap-4">
         <div className="flex flex-col md:flex-row gap-4 h-auto md:flex-1">
           <Profile user={user} className="w-full md:w-6/10"/>
-          <MatchHistory classname="w-full md:w-4/10 max-h-[360px] md:max-h-full" />
+          <MatchHistory classname="w-full md:w-4/10 max-h-[360px] md:max-h-150" />
         </div>
         <div className="flex flex-col md:flex-row gap-4 h-auto md:flex-1">
           <WinRate className="w-full md:w-1/2" />

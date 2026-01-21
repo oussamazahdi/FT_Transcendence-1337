@@ -33,4 +33,13 @@ export class NotifModel {
   async getForUser(db, userId) {
     return db.prepare(`SELECT * FROM notifications WHERE receiver_id = ? ORDER BY created_at DESC`).all(userId);
   }
+
+	updateNotificationStatus(db, { notifId, status, isRead = 1 }) {
+		const prepared = db.prepare(`UPDATE notifications SET status = ?, is_read = ? WHERE id = ?`);
+		return prepared.run(status, isRead, notifId);
+	}
+
+	getNotificationById(db, notifId) {
+		return db.prepare(`SELECT * FROM notifications WHERE id = ?`).get(notifId);
+	}
 }

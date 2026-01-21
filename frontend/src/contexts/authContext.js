@@ -12,7 +12,8 @@ export function UserProvider({ children, initialUser }) {
   const [pendingRequests, setPendingRequests] = useState(initialUser?.pendingRequests || []);
   const [incomingRequest, setIncomingRequests] = useState(initialUser?.incomingRequests || []);
   const [globalError, setGlobalError] = useState(null);
-	const [gameSetting, setGameSetting] = useState(initialUser?.gameSetting || [])
+	const [gameSetting, setGameSetting] = useState(initialUser?.gameSetting || []);
+	const [notification, setNotification] = useState(initialUser?.notification || []);
   
   const router = useRouter();
 
@@ -246,7 +247,7 @@ export function UserProvider({ children, initialUser }) {
   };
 
   return (
-    <UserContext.Provider value={{ globalError, user, friends, pendingRequests, incomingRequest, blocked, triggerError, login, logout, updateUser, sendFriendRequest, cancelRequest, acceptRequest, removeFriend, setFriends, blockUser, deblockUser, refreshFriendReq, gameSetting, updateGameSettings }}>
+    <UserContext.Provider value={{ globalError, user, friends, pendingRequests, incomingRequest, blocked, triggerError, login, logout, updateUser, sendFriendRequest, cancelRequest, acceptRequest, removeFriend, setFriends, blockUser, deblockUser, refreshFriendReq, gameSetting, updateGameSettings, notification }}>
       {children}
     </UserContext.Provider>
   );

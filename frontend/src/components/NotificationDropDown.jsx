@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { BellAlertIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { useSocket } from "@/contexts/socketContext";
+import { useAuth } from "@/contexts/authContext";
 
 const SafeAvatar = ({ src, alt }) => {
   const safeSrc = src && src !== "null" ? src : assets.defaultProfile;
@@ -56,33 +57,33 @@ const FriendInvite = ({ notif, onAccept, onReject }) => {
 const GameInvite = ({ notif, onAccept, onReject }) => {
   const username = notif?.user?.username || "Unknown";
   const avatar = notif?.user?.avatar;
+	console.log(notif)
 
   return (
-    <div className="bg-[#262626]/60 p-2 flex gap-2 rounded-[8px] cursor-pointer hover:bg-[#303030]/60 transition">
-      <div className="flex-shrink-0"><SafeAvatar src={avatar} alt="avatar" /></div>
+    <div className="bg-[#262626]/60 p-2 flex gap-2 rounded-3 hover:bg-[#303030]/60 transition pointer-events-none">
+      <div className="shrink-0">
+        <SafeAvatar src={avatar} alt="avatar" />
+      </div>
 
       <div className="flex flex-col flex-1 items-start">
-        <p className="text-[9px] text-white">{username} invited you to Ping Pong game</p>
+        <p className="text-[9px] text-white">
+          {username} invited you to a Ping Pong game
+        </p>
 
-        <div className="flex mt-1 gap-2">
-          <button
-            // onClick={(e) => {
-            //   e.stopPropagation();
-            //   onReject?.(notif.id);
-            // }}
-            className="bg-[#442222] text-[#FF4848] hover:bg-[#3C1C1C] text-[8px] px-2 py-[2px] rounded">Reject</button>
+        {notif?.status === "pending" ? (
+          <div className="flex mt-1 gap-2">
+            <button onClick={() => {onReject?.(notif.id);}}
+              className="pointer-events-auto bg-[#442222] text-[#FF4848] hover:bg-[#3C1C1C] text-[8px] px-2 py-1 rounded">Reject</button>
 
-          <button
-            // onClick={(e) => {
-            //   e.stopPropagation();
-            //   onAccept?.(notif.id);
-            // }}
-            className="bg-[#1E3A2F] text-[#4DFFB3] hover:bg-[#162A22] text-[8px] px-2 py-[2px] rounded">Accept</button>
-        </div>
+            <button onClick={() => {onAccept?.(notif.id);}}
+              className="pointer-events-auto bg-[#1E3A2F] text-[#4DFFB3] hover:bg-[#162A22] text-[8px] px-2 py-1 rounded">Accept</button>
+          </div>) : (<span className="mt-1 text-[8px] text-white/40">Invitation expired</span>)}
       </div>
     </div>
   );
 };
+
+
 
 const NOTIFICATION_COMPONENTS = {
   game_invite: GameInvite,
@@ -116,6 +117,8 @@ export default function NotificationDropDown() {
 	
   const ref = useRef(null);
   const socket = useSocket();
+
+	const {notification} = useAuth();
 
 	/**********************************************************************************/
   useEffect(() => {
@@ -211,7 +214,9 @@ export default function NotificationDropDown() {
     setUnreadCount(0)
     
     try {
-      const list = await fetchNotifications();
+      const list = notification;
+      // const list = await fetchNotifications();
+			
       if (!list) return;
 
       const senderIds = [...new Set(list.map((n) => n.sender_id).filter(Boolean))];
