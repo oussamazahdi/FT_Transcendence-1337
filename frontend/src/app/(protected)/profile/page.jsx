@@ -10,7 +10,7 @@ import MatchHistory from "./components/MatchHistory";
 export default function ProfilePage() {
   const { user } = useAuth();
   return (
-    <div className="flex w-full max-w-7xl flex-col md:flex-row gap-4 h-auto md:h-[86vh]">
+    <div className="flex w-full max-w-7xl flex-col md:flex-row gap-4 h-auto md:h-[86vh] overflow-y-auto">
       <div className="flex flex-col w-full md:flex-1 md:basis-7/10 gap-4">
         <Profile user={user} />
         <div className="flex flex-col md:flex-row flex-1 justify-between gap-4 w-full">

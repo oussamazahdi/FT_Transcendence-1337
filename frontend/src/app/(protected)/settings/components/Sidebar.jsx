@@ -21,7 +21,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <div className="h-full shrink-0 bg-[#0F0F0F]/75 rounded-[12px] p-2 flex flex-col gap-2">
+    <div className="h-full min-h-[90vh] shrink-0 bg-[#0F0F0F]/75 rounded-[12px] p-2 flex flex-col gap-2 overflow-y-auto">
       <h1 className="text-white text-xsm text-left font-bold md:p-4">
         Settings
       </h1>

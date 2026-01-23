@@ -15,9 +15,9 @@ const LeaderboardCard = ({name, avatar, level, rank}) => {
           alt='avatar'
           className='rounded-sm w-12 h-12'
           />
-        <p className='font-bold text-xs md:text-sm'>{name}</p>
+        <p className='font-bold truncate text-xs md:text-sm'>{name}</p>
       </div>
-      <div className='flex flex-col min-w-30 justify-center items-center'>
+      <div className='flex flex-col w-16 md:min-w-30 justify-center items-center'>
         <div className='pr-4'>{level}</div>
         <div className="w-full bg-[#000000] rounded-full h-2.5">
             <div 

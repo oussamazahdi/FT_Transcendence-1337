@@ -1,8 +1,6 @@
 import React, { useEffect } from "react";
 import Friends from "./Friends";
-import { assets } from "@/assets/data";
 import { useState } from "react";
-import { friendsData } from "@/assets/mocData";
 import { useAuth } from "@/contexts/authContext";
 
 export default function SideBar() {
@@ -44,16 +42,6 @@ export default function SideBar() {
         setDisplayData(formatedData);
       } catch (err) {
         console.log("Failed to fetch conversations", err);
-        setDisplayData([
-          {
-            avatar: assets.noUserFound,
-            firstname: "No chat Found",
-            lastname: "",
-            lastMessage: `${err}`,
-            timeOfLastMsg: "now",
-            id: "no-id",
-          },
-        ]);
       } finally {
         setLoading(false);
       }
@@ -66,6 +54,8 @@ export default function SideBar() {
     if (loading) {
       return <div>Loading...</div>;
     }
+    if (!displayData || displayData.length == 0)
+      return(<div className="text-sm text-center text-white/60 mt-4">No conversations </div>)
     return displayData.map((friend) => (
       <Friends
         id={friend.id}

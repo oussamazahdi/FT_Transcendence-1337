@@ -51,7 +51,7 @@ export default function Home() {
   });
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center text-white gap-6 mt-6">
+    <div className="h-full flex flex-col items-center justify-center text-white gap-6 mt-6">
       <h1 className="text-3xl md:text-5xl text-center font-bold">
         Game on. Anytime. Anywhere.
       </h1>
@@ -60,7 +60,7 @@ export default function Home() {
         all in one spot. Start your next match now.
       </h2>
 
-      <div className="space-x-4">
+      <div className="flex md:flex-row flex-col justify-center items-center gap-2">
         <Link
           href="/sign-up"
           className={`inline-block w-40 text-center py-2 rounded border border-gray-600  hover:bg-gray-600`}

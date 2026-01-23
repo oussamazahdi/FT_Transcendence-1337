@@ -16,7 +16,7 @@ const PasswordInput = ({ label, name, value, show, setShow, onChange }) => (
       placeholder={label}
       value={value}
       onChange={onChange}
-      className="w-full bg-[#414141]/60 rounded-sm text-xs md:max-w-120 text-gray-200 focus:outline-none px-4 pr-12 py-3 md:py-2 placeholder-gray-500"
+      className="w-full h-12 bg-[#414141]/60 rounded-xl text-xs md:max-w-120 text-gray-200 focus:outline-none px-4 pr-12 placeholder-gray-500"
     />
     <button
       onClick={() => setShow(!show)}
@@ -100,7 +100,7 @@ export default function Security() {
   };
 
   return (
-    <div className="h-full flex flex-col justify-start md:justify-center items-center gap-3 mt-6 md:mt-0">
+    <div className="h-full flex flex-col justify-start items-center gap-3 mt-6 md:mt-0 overflow-y-auto">
       <form
         onSubmit={handleSubmit}
         className="w-full flex md:flex-1 flex-col justify-start md:justify-end-safe items-center gap-2 px-4 sm:px-0 sm:max-w-[420px]"

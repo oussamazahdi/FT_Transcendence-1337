@@ -8,24 +8,18 @@ export function cn(...inputs) {
 export const AUTH_ERRORS = {
   USER_NOT_FOUND: "Invalid email or password.",
   INVALID_PASSWORD: "Invalid email or password.",
-  USER_IS_ALREADY_EXIST:
-    "An account with this email already exists. Try logging in instead.",
+  USER_IS_ALREADY_EXIST:"An account with this email already exists. Try logging in instead.",
   MISSING_FIELD: "Please complete all required fields.",
   UNAUTHORIZED_NO_TOKEN: "You must be logged in to view this page.",
   INVALID_TOKEN: "Your session has expired. Please log in again.",
   TOKEN_REVOKED: "Your session has been logged out. Please log in again.",
   NO_TOKEN_PROVIDED: "Authentication required. Please log in.",
-  INVALID_AVATAR:
-    "The uploaded image format is not supported. Please use JPG or PNG.",
-  EMAIL_IS_ALREADY_VERIFIED:
-    "This email is already verified. You can proceed to login.",
-  INVALID_2FA_TOKEN:
-    "The code you entered is incorrect or expired. Please try again.",
+  INVALID_AVATAR:"The uploaded image format is not supported. Please use JPG or PNG.",
+  EMAIL_IS_ALREADY_VERIFIED:"This email is already verified. You can proceed to login.",
+  INVALID_2FA_TOKEN:"The code you entered is incorrect or expired. Please try again.",
   UNAUTHORIZED_NO_ACCESS_TOKEN: "Access denied. Please log in to continue.",
-  INVALID_NAME_LENGTH:
-    "First name, last name, and username must be at least 3 characters long.",
-  EMAIL_IS_ALREADY_VERIFIED:
-    "This email is already verified. You can proceed to login.",
+  INVALID_NAME_LENGTH:"First name, last name, and username must be at least 3 characters long.",
+  EMAIL_IS_ALREADY_VERIFIED:"This email is already verified. You can proceed to login.",
   EXPIRED_OTP: "The verification code has expired. Please request a new one.",
   INCORRECT: "The verification code is incorrect.",
   default: "An unexpected error occurred. Please try again.",

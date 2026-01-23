@@ -14,6 +14,7 @@ import {
   UserIcon,
   Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
+  UsersIcon,
 } from "@heroicons/react/24/outline";
 import UserDropdown from "./UserDropdown";
 
@@ -131,6 +132,14 @@ export default function Navbar() {
               >
                 <UserIcon className="w-5 h-5" />
                 Profile
+              </button>
+
+              <button
+                onClick={() => hardNavigate("/friendsRequests")}
+                className="flex gap-3 text-white/70"
+              >
+                <UsersIcon className="w-5 h-5" />
+                Friends requests
               </button>
 
               <button
