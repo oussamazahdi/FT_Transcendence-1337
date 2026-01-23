@@ -1,7 +1,9 @@
 import { chatModels } from "../models/chat.model.js";
+import { friendsModels } from "../models/friends.model.js";
+import { userModels } from "../models/user.model.js";
 
 
-export class chatController 
+export class ChatController 
 {
     async searchConversations(request, reply)
     {
@@ -66,4 +68,49 @@ export class chatController
                 return reply.code(500).send({error: error.message});
         }
     }
+
+    sendMessage(socket, server, data)
+    {
+        /**
+         * Payload must be : 
+         * {
+         *      receiverId : 5,
+         *      content : "Hello There"
+         * }
+         */
+        const senderId = socket.user.userId;
+        const db = server.db;
+        try {
+            if (!data.receiverId)
+                socket.emit("chat:error", {message: "NO_RECEIVER_PROVIDED"});
+            if (data.content.length > 500 || !data.content)
+                socket.emit("chat:error", {message: "SOMETHING_WRONG_WITH_MESSAGE"});
+            const receiverId = data.receiverId;
+            const friendshipStatus = friendsModels.isFriendshipExists(db, senderId, receiverId);
+            const blocked = friendsModels.isBlockedByUser(db, senderId, receiverId);
+            if (!friendshipStatus || blocked.status)
+                socket.emit("chat:error", {message: "NOT_ALLOWED_TO_CONTACT_USER"});
+            const convId = chatModels.getOrCreateConversationId(db, senderId, receiverId);
+            chatModels.createNewMessage(db, convId, senderId, data.content);
+            chatModels.UpdateLastMessage(db, senderId, receiverId);
+            const conversation = chatModels.getConversationById(db, senderId, convId);
+            const payload = {
+                senderId: senderId,
+                avatar: conversation.avatar,
+                content: conversation.last_message,
+                sentAt: conversation.updatedate
+            }
+            socket.to(`chat:${receiverId}`).emit("chat:receiver", payload);
+
+        }
+        catch {
+            if (error.code)
+                return reply.code(error.code).send({error: error.message});
+            else
+                return reply.code(500).send({error: error.message});
+        }
+        console.log(senderId, data.content);
+    }
 }
+
+export const chatController = new ChatController();

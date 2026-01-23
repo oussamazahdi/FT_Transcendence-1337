@@ -120,21 +120,25 @@ export class ChatModels
         }
     }
 
-    createConversation(db, userId, friendId)
-    {
-        try {
-            const result = db.prepare(`
-                INSERT INTO conversations
-                (user_id, friend_id)
-                VALUES (?, ?)`).run(userId, friendId);
-            return (result);
+    getOrCreateConversationId(db, userId, friendId) {
+    try {
+        const a = Math.min(userId, friendId);
+        const b = Math.max(userId, friendId);
 
-        }
-        catch (error) 
-        {
-            const dbError = handleDatabaseError(error, 'createConversation');
-            throw dbError; 
-        }
+        db.prepare(`
+        INSERT OR IGNORE INTO conversations (user_id, friend_id)
+        VALUES (?, ?)
+        `).run(a, b);
+
+        const row = db.prepare(`
+        SELECT id FROM conversations
+        WHERE user_id = ? AND friend_id = ?
+        `).get(a, b);
+        return row.id;
+    } catch (error) {
+        const dbError = handleDatabaseError(error, 'getOrCreateConversationId');
+        throw dbError;
+    }
     }
     
     UpdateLastMessage(db, userId, friendId)
