@@ -7,3 +7,5 @@ function chatRoutes(fastify)
     fastify.get("/conversations", {preHandler: authMiddleware}, chatController.searchConversations);
     fastify.get("/messages", {preHandler: authMiddleware}, chatController.getAllMessages);
 }
+
+export { chatRoutes }
