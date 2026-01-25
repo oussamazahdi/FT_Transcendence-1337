@@ -13,7 +13,6 @@ export function UserProvider({ children, initialUser }) {
   const [incomingRequest, setIncomingRequests] = useState(initialUser?.incomingRequests || []);
   const [globalError, setGlobalError] = useState(null);
 	const [gameSetting, setGameSetting] = useState(initialUser?.gameSetting || [])
-  
   const router = useRouter();
 
   const login = (userData) => {

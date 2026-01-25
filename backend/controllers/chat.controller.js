@@ -86,10 +86,11 @@ export class ChatController
             if (data.content.length > 500 || !data.content)
                 socket.emit("chat:error", {message: "SOMETHING_WRONG_WITH_MESSAGE"});
             const receiverId = data.receiverId;
-            // const friendshipStatus = friendsModels.isFriendshipExists(db, senderId, receiverId);
-            // const blocked = friendsModels.isBlockedByUser(db, senderId, receiverId);
-            // if (!friendshipStatus || blocked.status)
-            //     socket.emit("chat:error", {message: "NOT_ALLOWED_TO_CONTACT_USER"});
+            const friendshipStatus = friendsModels.isFriendshipExists(db, senderId, receiverId);
+            const blocked = friendsModels.isBlockedByUser(db, senderId, receiverId);
+            console.log("HERE ====>", friendshipStatus);
+            if (!friendshipStatus || blocked.status)
+                socket.emit("chat:error", {message: "NOT_ALLOWED_TO_CONTACT_USER"});
             const convId = chatModels.getOrCreateConversationId(db, senderId, receiverId);
             chatModels.createNewMessage(db, convId, senderId, data.content);
             chatModels.UpdateLastMessage(db, senderId, receiverId);

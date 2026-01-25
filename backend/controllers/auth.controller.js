@@ -20,7 +20,8 @@ export class AuthController {
             const result = await authModels.loginUser(db, email, password);
             const params = {
                 isVerified: !!result.isverified,
-                status2fa: !!result.status2fa
+                status2fa: !!result.status2fa,
+                hasAvatar: !!result.avatar
             }
             if (result.message && result.message.includes("USER_NOT_FOUND"))
                 return reply.code(404).send({error: "USER_NOT_FOUND"});

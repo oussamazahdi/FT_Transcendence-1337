@@ -9,9 +9,9 @@ function createChatTable(db)
             friend_id INTEGER NOT NULL,
             last_message TEXT,
             updatedate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            creationdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            creationdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(user_id, friend_id)
-            )`)
+        )`);
 
         db.exec(`CREATE TABLE IF NOT EXISTS messages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -19,10 +19,11 @@ function createChatTable(db)
             sender_id INTEGER NOT NULL,
             content TEXT NOT NULL,
             sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            creationdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            FOREIGN KEY conversation_id REFERENCES conversations(id),
-            FOREIGN KEY sender_id REFERENCES users(id),
-            )`)
+            creationdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (conversation_id) REFERENCES conversations(id),
+            FOREIGN KEY (sender_id) REFERENCES users(id)
+        )`);
+
     }
     catch (error) {
         const dbError = handleDatabaseError(error, 'createChatTable');
@@ -31,4 +32,4 @@ function createChatTable(db)
     }
 }
 
-export {createFriendshipTable}
+export {createChatTable}

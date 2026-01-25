@@ -26,7 +26,8 @@ const ProfileDropDown = ({ user }) => {
           credentials: "include",
         },
       );
-      if (response.ok) router.push("/");
+      if (response.ok) 
+        router.push("/");
     } catch (error) {
       console.log(error.error);
     }
