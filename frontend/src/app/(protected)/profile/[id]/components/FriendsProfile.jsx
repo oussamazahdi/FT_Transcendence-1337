@@ -23,6 +23,7 @@ const FriendsProfile = ({ userPage }) => {
   const [showConfirmBlock, setShowconfirmBlock] = useState(false);
   const rawLevel = 15.65
   const progressPercent = Math.round((rawLevel % 1) * 100);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!userPage) 
@@ -41,7 +42,7 @@ const FriendsProfile = ({ userPage }) => {
     } else {
       setIsPending(false);
     }
-
+    setLoading(false);
   }, [friends, pendingRequests, userPage]);
 
   return (
@@ -80,6 +81,7 @@ const FriendsProfile = ({ userPage }) => {
             [@{userPage.username}]
           </span>
         </p>
+        {loading ? <p>loading...</p> : (
         <div className="flex gap-2 mt-1">
           {isFriend && (
             <button onClick={() => setShowconfirmRemove(!showConfirmRemove)} className="flex items-center gap-1 bg-red-500/60 hover:bg-red-700/60 text-white px-3 py-1 rounded-sm text-[9px] transition-colors cursor-pointer hover:scale-105">
@@ -112,6 +114,7 @@ const FriendsProfile = ({ userPage }) => {
             <NoSymbolIcon strokeWidth={1.5} className="size-4 brightness-150 text-[#D92F2F]" />
           </button>
         </div>
+          )}
           <div className="w-full mt-4">
             <div className="flex justify-between text-xs md:text-sm mb-1">
                 <span className="font-bold ">Level: {rawLevel}</span>

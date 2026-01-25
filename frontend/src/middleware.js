@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
 export async function middleware(request) {
-  console.log(request.url);
   const accessToken = request.cookies.get("accessToken")?.value;
   const refreshToken = request.cookies.get("refreshToken")?.value;
 
@@ -35,7 +34,7 @@ const onboardingSteps = {
     try {
       const secret = new TextEncoder().encode(process.env.JWT_SECRET);
       const { payload } = await jwtVerify(accessToken, secret);
-      console.log("Payload" ,payload);
+      console.log(payload);
 
       userState.isValid = true;
       userState.isVerified = !!payload.isVerified;

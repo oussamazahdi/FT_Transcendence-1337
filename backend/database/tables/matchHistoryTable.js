@@ -1,3 +1,5 @@
+import { handleDatabaseError } from '../../utils/dbErrorHandler.js';
+
 export function createMatchHistoryTable(db) {
 	try {
 		db.exec(`

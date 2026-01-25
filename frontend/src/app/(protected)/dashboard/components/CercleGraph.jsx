@@ -18,9 +18,9 @@ const CercleGraph = () => {
       series={[
         {
           data: data,
-          innerRadius: 30,
+          innerRadius: 80,
           outerRadius: 100,
-          paddingAngle: 5,
+          paddingAngle: 3,
           cornerRadius: 5,
           startAngle: 0,
           endAngle: 360,

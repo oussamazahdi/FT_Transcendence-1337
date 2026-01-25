@@ -7,9 +7,44 @@ import { useSocket } from "@/contexts/socketContext";
 const GAME_WIDTH = 1024;
 const GAME_HEIGHT = 700;
 
-export default function Page() {
+
+const MAPS = [
+  { id: "desert", label: "DESERT", image: "/maps/desert.png" },
+  { id: "hell", label: "HELL", image: "/maps/hell.png" },
+  { id: "ocean", label: "OCÉAN", image: "/maps/water.png" },
+  { id: "forest", label: "FOREST", image: "/maps/forest.jpeg" },
+  { id: "snow", label: "SNOW", image: "/maps/snow.jpeg" },
+  { id: "space", label: "SPACE", image: "/maps/space.png" },
+];
+
+
+
+const GAME_MODE = {
+	desert:{
+		label: "DESERT", image: "/maps/desert.png"
+	},
+	hell:{
+		label: "HELL", image: "/maps/hell.png"
+	},
+	ocean:{
+		label: "OCÉAN", image: "/maps/water.png"
+	},
+	forest:{
+		label: "FOREST", image: "/maps/forest.jpeg"
+	},
+	snow:{
+		label: "SNOW", image: "/maps/snow.jpeg"
+	},
+	space:{
+		label: "SPACE", image: "/maps/space.png"
+	}
+}
+
+
+
+export default function GamePage() {
   const socket = useSocket();
-  const { user } = useAuth();
+  const { user, gameSetting } = useAuth();
 
   const canvasRef = useRef(null);
   const wrapperRef = useRef(null);
@@ -18,10 +53,15 @@ export default function Page() {
   const [scale, setScale] = useState(1);
   const [endGame, setEndGame] = useState(false);
 
+	const gameData = GAME_MODE[gameSetting.game_mode];
+
+
   useEffect(() => {
     if (!user || !socket) return;
 
     if (!socket.connected) socket.connect();
+
+		preloadBackground(gameData.image);
 
     socket.emit("update-data", {
       username: user.username,
@@ -82,6 +122,7 @@ export default function Page() {
 
     let animationId;
 
+
     const render = () => {
       drawFrame(ctx, game);
       animationId = requestAnimationFrame(render);
@@ -125,9 +166,65 @@ export default function Page() {
   );
 }
 
-function drawFrame(ctx, game) {
-  ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+// function drawFrame(ctx, game) {
 
+// 	const img = new Image();
+// 	img.src = MAPS[0].image; // MUST be in /public
+
+// 	img.onload = () => {
+// 		ctx.clearRect(0, 0, 1024, 700);
+// 		ctx.drawImage(img, 0, 0, 1024, 700);
+// 	};
+
+
+//   ctx.setLineDash([15, 8]);
+//   ctx.beginPath();
+//   ctx.moveTo(GAME_WIDTH / 2, 0);
+//   ctx.lineTo(GAME_WIDTH / 2, GAME_HEIGHT);
+//   ctx.strokeStyle = "#fff";
+//   ctx.stroke();
+
+//   ctx.setLineDash([]);
+//   ctx.fillStyle = "white";
+//   ctx.beginPath();
+//   ctx.arc(game.ball.x, game.ball.y, game.ball.radius, 0, Math.PI * 2);
+//   ctx.fill();
+
+//   drawPaddle(ctx, game.player1.player);
+//   drawPaddle(ctx, game.player2.player);
+// }
+
+
+
+let bgImg = null;
+let bgReady = false;
+
+export function preloadBackground(image) {
+  if (bgImg) return;
+  bgImg = new Image();
+  bgImg.src = image;
+  bgImg.onload = () => {
+    bgReady = true;
+  };
+  bgImg.onerror = () => {
+    bgReady = false;
+  };
+}
+
+export function drawFrame(ctx, game) {
+  // clear every frame (sync)
+  ctx.clearRect(0, 0, 1024, 700);
+
+  // draw background if ready
+  if (bgReady && bgImg) {
+    ctx.drawImage(bgImg, 0, 0, 1024, 700);
+  } else {
+    // optional fallback to avoid black flicker
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, 1024, 700);
+  }
+
+  // now draw game elements
   ctx.setLineDash([15, 8]);
   ctx.beginPath();
   ctx.moveTo(GAME_WIDTH / 2, 0);
@@ -144,6 +241,7 @@ function drawFrame(ctx, game) {
   drawPaddle(ctx, game.player1.player);
   drawPaddle(ctx, game.player2.player);
 }
+
 
 function drawPaddle(ctx, paddle) {
   ctx.fillStyle = "white";

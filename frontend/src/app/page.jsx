@@ -51,7 +51,7 @@ export default function Home() {
   });
 
   return (
-    <div className="h-full flex flex-col items-center justify-center text-white gap-6 mt-6">
+    <div className="md:h-screen flex flex-col items-center justify-center text-white gap-6 mt-6">
       <h1 className="text-3xl md:text-5xl text-center font-bold">
         Game on. Anytime. Anywhere.
       </h1>

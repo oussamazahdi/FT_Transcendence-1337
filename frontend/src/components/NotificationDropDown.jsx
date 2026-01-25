@@ -92,18 +92,18 @@ const NOTIFICATION_COMPONENTS = {
 };
 
 export async function fetchUnreadNotificationsCount() {
-  const res = await fetch("http://localhost:3001/api/notifications/unread-count", {
-    method: "GET",
-    credentials: "include",
-  });
+  // const res = await fetch("http://localhost:3001/api/notifications/unread-count", {
+  //   method: "GET",
+  //   credentials: "include",
+  // });
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    return (err);
-  }
+  // if (!res.ok) {
+  //   const err = await res.json().catch(() => ({}));
+  //   return (err);
+  // }
 
-  const data = await res.json().catch(() => ({}));
-  return Number(data?.unreadCount ?? 0);
+  // const data = await res.json().catch(() => ({}));
+  // return Number(data?.unreadCount ?? 0);
 }
 
 export default function NotificationDropDown() {

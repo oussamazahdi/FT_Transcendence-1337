@@ -33,7 +33,7 @@ const MessageList = ({ messages }) => {
             message={msg}
             isMe={user.id == msg.senderId}
             showAvatar={isFirstInSequence}
-            friendAvatar={selectedFriend.avatar}
+            friendAvatar={msg.avatar}
           />
         );
       })}

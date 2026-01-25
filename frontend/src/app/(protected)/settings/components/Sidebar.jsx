@@ -30,7 +30,7 @@ export default function Sidebar() {
           <div
             key={item.id}
             onClick={() => setActiveTab(item.id)}
-            className={`flex items-center justify-start gap-2 p-2 bg-[#414141]/60 hover:bg-[#414141] rounded-lg w-full h-12 cursor-pointer
+            className={`flex items-center justify-start gap-2 p-2  hover:bg-[#414141] rounded-lg w-full h-12 cursor-pointer
 						${
               ActiveTab === item.id
                 ? "bg-[#414141]/60 text-white font-sans md:font-bold"

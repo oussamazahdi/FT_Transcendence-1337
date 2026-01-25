@@ -1,3 +1,5 @@
+import { handleDatabaseError } from '../../utils/dbErrorHandler.js';
+
 export function createNotificationsTable(db) {
 	try {
 		db.exec(`CREATE TABLE IF NOT EXISTS notifications (

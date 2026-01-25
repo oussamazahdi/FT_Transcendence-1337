@@ -8,7 +8,7 @@ export const userSchema = {
         lastname: { type: 'string' },
         avatar: { type: ['string', 'null'] },
         isverified: { type: 'integer'},
-        status2fa: { type: 'integer'}
+        status2fa: { type: 'integer'},
     }
 };
 export const errorResponse = {

@@ -1,3 +1,5 @@
+import { handleDatabaseError } from '../../utils/dbErrorHandler.js';
+
 function createUserTable(db)
 {
     try {
@@ -20,7 +22,8 @@ function createUserTable(db)
         // console.log("Database initialized successfully!")
     }
     catch (error) {
-        console.error("Database cannot be inited due to : " + error.message);
+        const dbError = handleDatabaseError(error, 'createUserTable');
+        console.error(dbError);
         process.exit(1);
     }
 }

@@ -43,7 +43,6 @@ const Games = () => {
             <span className="text-gray-400 text-xs font-normal">1 vs 1</span>
           </p>
         </div>
-
       </div>
     </div>
   );
