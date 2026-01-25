@@ -16,13 +16,15 @@ const ChatHeader = ({ user }) => {
   return (
     <div className="relative bg-[#0F0F0F]/65 flex items-center p-1 rounded-lg gap-1">
       <ChevronLeftIcon onClick={() => setSelectedFriend(null)} className="size-6 block md:hidden text-[#BABABA]"/>
-      <Image
-        src={user.avatar || assets.defaultProfile}
-        alt="avatar"
-        width={40}
-        height={40}
-        className="rounded-sm"
-      />
+      <div className="size-10 flex items-center overflow-hidden rounded-sm">
+        <Image
+          src={user.avatar || assets.defaultProfile}
+          alt="avatar"
+          width={40}
+          height={40}
+          className="object-cover"
+          />
+      </div>
       <div className="flex flex-col">
         <p className="font-bold">{user.firstname} {user.lastname}</p>
         <div className="flex items-center text-[9px] text-gray-500">

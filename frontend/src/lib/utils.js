@@ -8,7 +8,8 @@ export function cn(...inputs) {
 export const AUTH_ERRORS = {
   USER_NOT_FOUND: "Invalid email or password.",
   INVALID_PASSWORD: "Invalid email or password.",
-  USER_IS_ALREADY_EXIST:"An account with this email already exists. Try logging in instead.",
+  USER_IS_ALREADY_EXIST:"An account with this user already exists. Try login instead.",
+  EMAIL_ALREADY_EXISTS: "An account with this email already exists. Try login instead.",
   MISSING_FIELD: "Please complete all required fields.",
   UNAUTHORIZED_NO_TOKEN: "You must be logged in to view this page.",
   INVALID_TOKEN: "Your session has expired. Please log in again.",
@@ -31,7 +32,7 @@ export const USER_ERROR = {
   NEW_PASSWORD_MATCHS_OLD_PASSWORD:"Your new password must be different from your current password.",
   CURRENT_PASSWORD_IS_INCORRECT:"The current password you entered is incorrect.",
   USER_IS_BLOCKED: "You cannot perform this action because this user is blocked.",
-  FRIENDSHIP_AREADY_EXISTS: "You are already friends with this user!",
+  FRIENDSHIP_ALREADY_EXISTS: "You are already friends with this user!",
   REQUEST_ALREADY_SENT: "You've already sent a friend request to this person.",
   REQUEST_SENT_SUCCESSFULLY: "Friend request sent successfully!",
   REQUEST_NOT_FOUND: "This friend request no longer exists or has already been handled.",

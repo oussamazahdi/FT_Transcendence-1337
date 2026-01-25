@@ -25,7 +25,14 @@ export class ChatModels
     {
         try {
             const result = db.prepare(`
-                SELECT u.firstname, u.lastname, u.avatar, c.last_message, c.updatedate 
+                SELECT 
+                    u.id AS userid,
+                    c.id AS convid,
+                    u.firstname, 
+                    u.lastname, 
+                    u.avatar, 
+                    c.last_message, 
+                    c.updatedate
                 FROM conversations c
                 JOIN users u ON u.id = CASE 
                     WHEN c.user_id = :me THEN c.friend_id
@@ -50,10 +57,10 @@ export class ChatModels
                 SELECT u.firstname, u.lastname, u.avatar, c.last_message, c.updatedate 
                 FROM conversations c
                 JOIN users u ON u.id = CASE 
-                    WHEN c.user_id = :me THEN c.friend_id
+                    WHEN c.user_id != :me THEN c.friend_id
                     ELSE c.user_id
                 END
-                WHERE (id = :convid) AND (c.user_id = :me OR c.friend_id = :me)
+                WHERE (c.id = :convid) AND (c.user_id = :me OR c.friend_id = :me)
                 `).get({me: userId, convid: convId});
             return (result);
         }
@@ -212,7 +219,7 @@ export class ChatModels
                 INSERT INTO messages
                 (conversation_id, sender_id, content)
                 VALUES (?, ?, ?)`).run(convId, senderId, content);
-            return (result);
+            return (result.lastInsertRowid);
 
         }
         catch (error) 

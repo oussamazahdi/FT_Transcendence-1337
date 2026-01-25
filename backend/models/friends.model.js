@@ -193,14 +193,16 @@ export class FriendsModels
     isBlockedByUser(db, blocker, blocked)
     {
         try {
-            const status = db.prepare(`
+            const relation = db.prepare(`
                 SELECT status, blocked_by FROM friends
                 WHERE (
                 (sender_id = :me AND receiver_id = :other)
                 OR
                 (sender_id = :other AND receiver_id = :me))
-                AND status = 'blocked'`).get({me: blocker, other: blocked});
-            return (status);
+                `).get({me: blocker, other: blocked});
+            if (relation.status === 'blocked')
+                return (true);
+            return (false);
         }
         catch (error) 
         {

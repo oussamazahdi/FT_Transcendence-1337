@@ -4,6 +4,7 @@ import Image from "next/image";
 import { assets } from "@/assets/data";
 import { useRouter } from "next/navigation";
 import { AUTH_ERRORS } from "@/lib/utils";
+import { useAuth } from "@/contexts/authContext";
 
 const EmailVerification = () => {
   const [otp, setOtp] = useState(new Array(6).fill(""));
@@ -17,6 +18,7 @@ const EmailVerification = () => {
   const [canResend, setCanResend] = useState(false);
 
   const hasFetchedRef = useRef(false);
+  const {user} = useAuth();
 
   const router = useRouter();
 
@@ -155,7 +157,7 @@ const EmailVerification = () => {
           <h1 className="text-white text-lg font-bold">Verify your identity</h1>
           <h2 className="text-[#A6A6A6] text-sm px-6 text-center">
             We've sent a 6-digit code to{" "}
-            <span className="text-white">You@Exemple.com</span>
+            <span className="text-white">{user.email}</span>
           </h2>
           <div className="flex gap-2 mb-1">
             {otp.map((data, index) => (

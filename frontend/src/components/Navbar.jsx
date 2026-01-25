@@ -17,11 +17,13 @@ import {
   UsersIcon,
 } from "@heroicons/react/24/outline";
 import UserDropdown from "./UserDropdown";
+import { useAuth } from "@/contexts/authContext";
 
 export default function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const {logout} = useAuth();
 
   const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: HomeIcon },
@@ -128,7 +130,7 @@ export default function Navbar() {
             <div className="flex flex-col gap-4 mt-auto">
               <button
                 onClick={() => hardNavigate("/profile")}
-                className="flex gap-3 text-white/70"
+                className="flex gap-3 text-white/70  cursor-pointer cursor-pointer"
               >
                 <UserIcon className="w-5 h-5" />
                 Profile
@@ -136,7 +138,7 @@ export default function Navbar() {
 
               <button
                 onClick={() => hardNavigate("/friendsRequests")}
-                className="flex gap-3 text-white/70"
+                className="flex gap-3 text-white/70  cursor-pointer"
               >
                 <UsersIcon className="w-5 h-5" />
                 Friends requests
@@ -144,13 +146,13 @@ export default function Navbar() {
 
               <button
                 onClick={() => hardNavigate("/settings")}
-                className="flex gap-3 text-white/70"
+                className="flex gap-3 text-white/70  cursor-pointer"
               >
                 <Cog6ToothIcon className="w-5 h-5" />
                 Settings
               </button>
 
-              <button className="flex gap-3 text-red-400">
+              <button onClick={() => logout()} className="flex gap-3 text-red-400  cursor-pointer">
                 <ArrowRightOnRectangleIcon className="w-5 h-5" />
                 Logout
               </button>

@@ -38,7 +38,7 @@ const Profile = ({ user, className }) => {
         </div>
         <p className="text-white font-bold mt-2 text-sm md:text-lg">
           {user.firstname} {user.lastname}{" "}
-          <span className="text-[#727272] font-thin text-xs md:text-sm inline">
+          <span className="text-[#909090] font-light text-xs md:text-sm inline">
             [@{user.username}]
           </span>
         </p>

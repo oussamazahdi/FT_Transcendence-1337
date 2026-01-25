@@ -1,20 +1,40 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import Friends from "./Friends";
 import { useState } from "react";
 import { useAuth } from "@/contexts/authContext";
 
 export default function SideBar() {
-  const {friends} = useAuth();
-  const [conversations, setConversation] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  
   const [displayData, setDisplayData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+
+  const observer = useRef();
+
+  const lastElementObs = useCallback((node) => {
+    if (loading)
+      return
+    if (observer.current)
+      observer.current.disconnect()
+
+    observer.current = new IntersectionObserver((entries) => {
+      if (entries[0]?.isIntersecting && hasMore)
+        setPage((prev) => prev + 1)
+    })
+
+    if(node)
+      observer.current.observe(node);
+
+  }, [loading, hasMore])
 
   useEffect(() => {
     const fetchconversation = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/`,{
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/conversations/all?page=${page}`,{
           method:"GET",
           credentials: "include",
         })
@@ -23,23 +43,22 @@ export default function SideBar() {
         if(!response.ok)
           throw new Error(data.error);
 
-        setConversation(friends)
+        const newConversation = data.conversations || []
 
-        const rawList = friends || [];
-        const formatedData = rawList.map((user) => ({
-          avatar: user.avatar,
-          firstname: user.firstname,
-          lastname: user.lastname,
-          username: user.username,
-          lastMessage: user.lastMessage || "last message bla bla bla hhhhhhhhhhhhhhhhhhhhh",
-          timeOfLastMsg: user.timeOfLastMsg || "00:00",
-          status: user.status || false,
-          id: user.id,
+        const formatedData = newConversation.map((conversation) => ({
+          avatar: conversation.avatar,
+          firstname: conversation.firstname,
+          lastname: conversation.lastname,
+          lastMessage: conversation.last_message || "no message yet.",
+          timeOfLastMsg: conversation.updatedate || "00:00",
+          status: conversation.status || false,
+          userid: conversation.userid,
+          id: conversation.convid,
+          userid: conversation.userid
         }));
-
-        if (!formatedData[0]) throw new Error("No conversation found");
-
-        setDisplayData(formatedData);
+        if (formatedData.length < 10)
+          setHasMore(false);
+        setDisplayData((prev) => [...prev, ...formatedData]);
       } catch (err) {
         console.log("Failed to fetch conversations", err);
       } finally {
@@ -48,27 +67,46 @@ export default function SideBar() {
     };
 
     fetchconversation();
-  }, []);
+  }, [page]);
 
   const renderList = () => {
-    if (loading) {
-      return <div>Loading...</div>;
-    }
-    if (!displayData || displayData.length == 0)
+    if (!displayData || displayData.length == 0){
+      if (loading)
+        return <div>Loading...</div>;
       return(<div className="text-sm text-center text-white/60 mt-4">No conversations </div>)
-    return displayData.map((friend) => (
-      <Friends
-        id={friend.id}
-        key={friend.id}
-        avatar={friend.avatar}
-        firstname={friend.firstname}
-        lastname={friend.lastname}
-        username={friend.username}
-        lastmsg={friend.lastMessage}
-        status={friend.status}
-        time={friend.timeOfLastMsg}
-      />
-    ));
+    }
+    return displayData.map((conversation, index) => {
+      if (displayData.length === index + 1){
+        return (
+          <div ref={lastElementObs} key={conversation.id}> 
+            <Friends
+              id={conversation.id}
+              avatar={conversation.avatar}
+              firstname={conversation.firstname}
+              lastname={conversation.lastname}
+              lastmsg={conversation.lastMessage}
+              status={conversation.status}
+              time={conversation.timeOfLastMsg}
+              userid={conversation.userid}
+            />
+          </div>
+          );
+          } else {
+            return (
+              <div key={conversation.id}>
+                <Friends
+                  id={conversation.id}
+                  avatar={conversation.avatar}
+                  firstname={conversation.firstname}
+                  lastname={conversation.lastname}
+                  lastmsg={conversation.lastMessage}
+                  status={conversation.status}
+                  time={conversation.timeOfLastMsg}
+                  userid={conversation.userid}
+                />
+              </div>
+          );
+      }})
   };
 
   return (
@@ -87,6 +125,7 @@ export default function SideBar() {
         </h1>
         <div className="flex-1 overflow-y-auto custom-scrollbar">
           {renderList()}
+          {loading && <div className="text-center text-xs text-gray-500 py-2">Loading more...</div>}
         </div>
       </div>
     </div>

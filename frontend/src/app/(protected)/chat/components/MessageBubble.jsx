@@ -9,17 +9,19 @@ const MessageBubble = (props) => {
     <div
       className={`flex gap-2 w-full mb-1 items-center ${props.isMe ? "flex-row-reverse" : "justify-start"}`}
     >
-      {props.showAvatar ? (
-        <Image
+      <div className="size-10 overflow-hidden rounded-sm">
+        {props.showAvatar ? (
+          <Image
           src={`${props.isMe ? (user.avatar || assets.defaultProfile.src) :( props.friendAvatar || assets.defaultProfile.src)}`}
           alt="avatar"
           width={40}
           height={40}
-          className="rounded-sm flex-none self-start"
-        />
-      ) : (
-        <div className="w-10 flex-none" />
-      )}
+          className="object-cover"
+          />
+        ) : (
+          <div className="w-10 flex-none" />
+        )}
+      </div>
       {props.message.type === "text" ? (
         <div
           className={`flex gap-3 max-w-[70%] p-2 rounded-xl text-xs ${

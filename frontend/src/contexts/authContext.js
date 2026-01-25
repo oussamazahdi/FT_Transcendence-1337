@@ -26,15 +26,15 @@ export function UserProvider({ children, initialUser }) {
 
   const logout = async () => {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
         method: "POST",
+        credentials: "include",
       });
-      setUser(null);
-      setFriends(null);
-      setBlocked(null);
 
-      router.push("/sign-in");
-      router.refresh();
+      if(response.ok){
+        router.push("/");
+        router.refresh();
+      }
     } catch (error) {
       triggerError(USER_ERROR[err.message] || USER_ERROR['default'])
     }

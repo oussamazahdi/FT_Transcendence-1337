@@ -11,7 +11,7 @@ const Friends = (props) => {
       className="p-[2px] flex items-center rounded-xl bg-[#8D8D8D]/25 hover:bg-[#8D8D8D]/50 cursor-pointer mb-1"
       onClick={() => setSelectedFriend(props)}
     >
-      <div className="m-[1px] flex items-center rounded-lg cursor-pointer overflow-hidden">
+      <div className="m-[1px] size-12 flex items-center rounded-lg cursor-pointer overflow-hidden">
         <Image
           src={props.avatar || assets.defaultProfile}
           alt=""

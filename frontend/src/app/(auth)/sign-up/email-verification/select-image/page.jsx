@@ -144,8 +144,6 @@ const SelectImage = () => {
     }
   };
 
-  // if (isLoading) return <div className="text-white text-center mt-20">Loading...</div>;
-
   return (
     <div className="min-h-screen flex justify-center items-center">
       <div className="flex flex-col md:flex-row justify-center md:justify-between bg-[#1A1A1A]/75 w-full md:w-[800px] h-[480px] rounded-xl mx-4 md:mx-0">
@@ -184,15 +182,7 @@ const SelectImage = () => {
                   htmlFor="profile-image-input"
                   className="flex flex-col justify-center items-center w-16 h-16 rounded-lg cursor-pointer hover:bg-white/10 transition"
                 >
-                  {/* <Image
-                    src={assets.upload}
-                    alt="Upload icon"
-                    width={48}
-                    height={48}
-                    className="mb-2 invert"
-                  /> */}
                   <CloudArrowUpIcon className="size-16 text-[#A5A5A5]" />
-                  {/* <span className="text-xs text-gray-400">Upload</span> */}
                 </label>
               )}
             </div>
