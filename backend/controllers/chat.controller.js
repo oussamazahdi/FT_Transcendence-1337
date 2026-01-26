@@ -47,7 +47,7 @@ export class ChatController
         const db = request.server.db;
         const { page = 1, friendId } = request.query;
         const pageNum = Math.max(1, Number(page));
-        const limit = 10;
+        const limit = 30;
         const offset = (pageNum - 1) * limit;
 
         try {

@@ -196,7 +196,7 @@ export class ChatModels
             JOIN conversations c ON c.id = m.conversation_id
             WHERE m.conversation_id = :convid
                 AND (:me = c.user_id OR :me = c.friend_id)
-            ORDER BY m.creationdate ASC
+            ORDER BY m.creationdate DESC
             LIMIT :limit
             OFFSET :offset
             `).all({ convid: convId, me: userId, limit, offset });
