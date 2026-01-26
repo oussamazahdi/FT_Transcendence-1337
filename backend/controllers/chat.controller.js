@@ -29,14 +29,10 @@ export class ChatController
     async getAllConversations(request, reply)
     {
         const db = request.server.db;
-        const { page = 1 } = request.query;
-        const pageNum = Math.max(1, Number(page));
-        const limit = 10;
-        const offset = (pageNum - 1) * limit;
 
         try {
-            const conversations = chatModels.getAllConversations(db, request.user.userId, limit, offset);
-            return reply.code(200).send({message: "SUCCESS", page: pageNum, limit: limit, conversations: conversations});
+            const conversations = chatModels.getAllConversations(db, request.user.userId);
+            return reply.code(200).send({message: "SUCCESS", conversations: conversations});
         }
         catch (error) {
             if (error.code)

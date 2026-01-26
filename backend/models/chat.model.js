@@ -21,7 +21,7 @@ export class ChatModels
             throw dbError;
         }
     }
-    getAllConversations(db, userId, limit, offset)
+    getAllConversations(db, userId)
     {
         try {
             const result = db.prepare(`
@@ -39,9 +39,7 @@ export class ChatModels
                     ELSE c.user_id
                 END
                 WHERE (user_id = :me OR friend_id = :me)
-                LIMIT :limit
-                OFFSET :offset
-                `).all({me: userId, limit: limit, offset: offset});
+                `).all({me: userId});
             return (result);
         }
         catch (error) {
