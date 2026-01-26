@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useRef } from "react";
 import Friends from "./Friends";
 import { useState } from "react";
-import { useAuth } from "@/contexts/authContext";
 
 export default function SideBar() {
   
@@ -14,21 +13,21 @@ export default function SideBar() {
 
   const observer = useRef();
 
-  const lastElementObs = useCallback((node) => {
-    if (loading)
-      return
-    if (observer.current)
-      observer.current.disconnect()
+  // const lastElementObs = useCallback((node) => {
+  //   if (loading)
+  //     return
+  //   if (observer.current)
+  //     observer.current.disconnect()
 
-    observer.current = new IntersectionObserver((entries) => {
-      if (entries[0]?.isIntersecting && hasMore)
-        setPage((prev) => prev + 1)
-    })
+  //   observer.current = new IntersectionObserver((entries) => {
+  //     if (entries[0]?.isIntersecting && hasMore)
+  //       setPage((prev) => prev + 1)
+  //   })
 
-    if(node)
-      observer.current.observe(node);
+  //   if(node)
+  //     observer.current.observe(node);
 
-  }, [loading, hasMore])
+  // }, [loading, hasMore])
 
   useEffect(() => {
     const fetchconversation = async () => {
@@ -44,7 +43,7 @@ export default function SideBar() {
           throw new Error(data.error);
 
         const newConversation = data.conversations || []
-
+        console.log(newConversation);
         const formatedData = newConversation.map((conversation) => ({
           avatar: conversation.avatar,
           firstname: conversation.firstname,
@@ -56,8 +55,9 @@ export default function SideBar() {
           id: conversation.convid,
           userid: conversation.userid
         }));
-        if (formatedData.length < 10)
-          setHasMore(false);
+
+        // if (formatedData.length < 10)
+        //   setHasMore(false);
         setDisplayData((prev) => [...prev, ...formatedData]);
       } catch (err) {
         console.log("Failed to fetch conversations", err);
@@ -78,7 +78,7 @@ export default function SideBar() {
     return displayData.map((conversation, index) => {
       if (displayData.length === index + 1){
         return (
-          <div ref={lastElementObs} key={conversation.id}> 
+          <div /*ref={lastElementObs}*/ key={conversation.id}> 
             <Friends
               id={conversation.id}
               avatar={conversation.avatar}
@@ -134,48 +134,37 @@ export default function SideBar() {
 
 //---------------------Search Chat------------------------------------------
 // useEffect(() => {
-//   if (!searchQuery.trim()) {
-//     setDisplayData(conversations);
-//     setLoading(false);
+//   if (!searchQuery.trim())
 //     return;
-//   }
 
 //   const delayDebounceFn = setTimeout(async () => {
 //     console.log(searchQuery);
 //     setLoading(true);
 //     try {
-//       const response = await fetch(
-//         `${process.env.NEXT_PUBLIC_API_URL}/api/users/search?query=${searchQuery}`,
-//         {
+//       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/conversations?q=${searchQuery}&page=${1}`,{
 //           method: "GET",
 //           credentials: "include",
 //         },
 //       );
-//       if (!response.ok) throw new Error("Network response was not ok");
 //       const data = await response.json();
-//       const formatedData = data.map((user) => ({
-//         playerPdp: assets.kamalPdp,
+//       if (!response.ok) 
+//          throw new Error("data.error");
+      
+//       const search = data.conversations || []
+//       console.log(search) 
+//       const formatedData = search.map((user) => ({
+//         id: user.conversation_id,
+//         avatar: user.avatar,
 //         firstname: user.firstname,
 //         lastname: user.lastname,
-//         lastMessage: "user found via search",
-//         timeOfLastMsg: "",
-//         id: user.id,
+//         lastmsg: user.lastmessage || "no message yet",
+//         status: user.status || false, // to delete later
+//         time: user.updatedate,
+//         userid: user.friend_id,
 //       }));
-//       if (!formatedData[0]) throw new Error("no user found");
 //       setDisplayData(formatedData);
 //     } catch (err) {
 //       console.log("Failed to fetch users", err);
-
-//       setDisplayData([
-//         {
-//           playerPdp: assets.noUserFound,
-//           firstname: "No user Found",
-//           lastname: "",
-//           lastMessage: `${err}`,
-//           timeOfLastMsg: "now",
-//           id: "no-id",
-//         },
-//       ]);
 //     } finally {
 //       setLoading(false);
 //     }

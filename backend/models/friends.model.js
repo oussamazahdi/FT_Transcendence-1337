@@ -200,7 +200,7 @@ export class FriendsModels
                 OR
                 (sender_id = :other AND receiver_id = :me))
                 `).get({me: blocker, other: blocked});
-            if (relation.status === 'blocked')
+            if (relation === 'blocked')
                 return (true);
             return (false);
         }

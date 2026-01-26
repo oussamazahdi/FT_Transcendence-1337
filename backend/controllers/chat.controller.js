@@ -87,12 +87,12 @@ export class ChatController
                 socket.emit("chat:error", {message: "SOMETHING_WRONG_WITH_MESSAGE"});
             const receiverId = data.receiverId;
             const friendshipStatus = friendsModels.isFriendshipExists(db, senderId, receiverId);
+            console.log("*************> heeere is the is 1")
             const blocked = friendsModels.isBlockedByUser(db, senderId, receiverId);
             if (!friendshipStatus || blocked.status)
                 socket.emit("chat:error", {message: "NOT_ALLOWED_TO_CONTACT_USER"});
             const convId = chatModels.getOrCreateConversationId(db, senderId, receiverId);
             const msgId = chatModels.createNewMessage(db, convId, senderId, data.content);
-            // console.log("heeere is the is", msgId)
             chatModels.UpdateLastMessage(db, senderId, receiverId);
             const conversation = chatModels.getConversationById(db, senderId, convId);
             const payload = {
@@ -102,6 +102,7 @@ export class ChatController
                 content: conversation.last_message,
                 sentAt: conversation.updatedate
             }
+            console.log("*************> heeere is the is 2", receiverId, senderId)
             socket.to(`chat:${receiverId}`).emit("chat:receiver", payload);
         }
         catch(error) {

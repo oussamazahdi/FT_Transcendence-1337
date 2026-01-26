@@ -6,10 +6,8 @@ import { assets } from "@/assets/data";
 const MessageBubble = (props) => {
   const { user } = useAuth();
   return (
-    <div
-      className={`flex gap-2 w-full mb-1 items-center ${props.isMe ? "flex-row-reverse" : "justify-start"}`}
-    >
-      <div className="size-10 overflow-hidden rounded-sm">
+    <div className={`flex gap-2 w-full items-center ${props.isMe ? "flex-row-reverse" : "justify-start"}`}>
+      <div className="size-9 overflow-hidden rounded-sm">
         {props.showAvatar ? (
           <Image
           src={`${props.isMe ? (user.avatar || assets.defaultProfile.src) :( props.friendAvatar || assets.defaultProfile.src)}`}

@@ -23,7 +23,9 @@ export function initSocketManager(io) {
     socket.on("user:online", (data) => connectionController.onUserOnline(socket, data));
     socket.on("game:invite", (data, ack) => connectionController.onGameInvite(socket, io, data, ack));
     // chat 
-    socket.on("chat:send", (data) => chatController.sendMessage(socket, io, data));
+    socket.on("chat:send", (data) => {
+      console.log("888!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+      chatController.sendMessage(socket, io, data)});
     socket.on("chat:error", (error) => {
       console.error(error.message);
     })
