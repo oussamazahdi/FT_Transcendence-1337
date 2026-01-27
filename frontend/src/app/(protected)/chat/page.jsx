@@ -71,7 +71,7 @@ export default function chat() {
     <SelectedFriendContext.Provider value={{ selectedFriend, setSelectedFriend }}>
       <div className="flex w-full max-w-7xl h-[90vh] md:h-[86vh] rounded-lg overflow-hidden">
         <div className={`w-full md:max-w-1/4 mr-2 h-full flex flex-col ${selectedFriend ? "hidden md:block" : "block"}`}>
-          <SideBar displayData={displayData} loading={loading} />
+          <SideBar displayData={displayData} setDisplayData={setDisplayData} loading={loading} setLoading={setLoading} />
         </div>
         <div className={`flex-1 h-full rounded-[12px] ${selectedFriend ? "block" : "hidden md:block"}`}>
           <ChatPage updateLastMessage={updateLastMessage} />

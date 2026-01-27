@@ -27,6 +27,17 @@ export class TwoFactorModels
         }
     }
 
+    update2FASessionStatus(db, status,userId)
+    {
+        try{
+            db.prepare(`UPDATE users SET session2fa = ? WHERE id = ?`).run(status, userId);
+        }
+        catch (error) {
+            const dbError = handleDatabaseError(error, 'update2FAStatus');
+            throw dbError;
+        }
+    }
+
     getUser2FASecret(db, userId)
     {
         try {

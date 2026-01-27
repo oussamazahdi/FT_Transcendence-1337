@@ -1,11 +1,124 @@
 import React, { useEffect } from "react";
 import Friends from "./Friends";
 import { useState } from "react";
+import SearchCard from "./SearchCard";
 
-export default function SideBar({displayData, loading}) {
+export default function SideBar({displayData,loading}) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchData, setSearchData] = useState([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+  if (!searchQuery.trim()){
+    setIsOpen(false);
+    setSearchData([]);
+    // setSearchQuery("")
+    return;
+  }
+
+  const delayDebounceFn = setTimeout(async () => {
+    console.log("Query", searchQuery);
+    setSearchLoading(true);
+    setIsOpen(true);
+    try {
+      // const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/search?q=${searchQuery}&page=${1}`,{
+      //     method: "GET",
+      //     credentials: "include",
+      //   },
+      // );
+      // const data = await response.json();
+      // if (!response.ok) 
+      //    throw new Error("data.error");
+      
+      //   console.log("response array",data) 
+      // const search = data.conversations || []
+      // if (search.length < 10)
+      //   setHasMore(false)
+      const search = [
+        {
+          id:1,
+          avatar:"http://localhost:3001/uploads/default/profile3.jpeg",
+          firstname:"flan",
+          lastname:"fertlan",
+          username: "Username",
+        },
+        {
+          id:2,
+          avatar:"http://localhost:3001/uploads/default/profile3.jpeg",
+          firstname:"tage3a",
+          lastname:"bouchaib",
+          username: "Username",
+        },
+        {
+          id:3,
+          avatar:"http://localhost:3001/uploads/default/profile3.jpeg",
+          firstname:"s7iri",
+          lastname:"miri",
+          username: "Username"       
+        },
+        {
+          id:4,
+          avatar:"http://localhost:3001/uploads/default/profile3.jpeg",
+          firstname:"krama",
+          lastname:"mrigel",
+          username: "Username"
+        },
+        {
+          id:5,
+          avatar:"http://localhost:3001/uploads/default/profile3.jpeg",
+          firstname:"stoph",
+          lastname:"lvista",
+          username: "Username"
+        },
+      ]
+      const formatedData = search.map((user) => ({
+        id: user.id,
+        avatar: user.avatar,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        username: user.username,
+      }));
+      setSearchData(formatedData);
+    } catch (err) {
+      console.log("Failed to fetch users", err);
+    } finally {
+      setSearchLoading(false);
+    }
+  }, 500);
+  return () => clearTimeout(delayDebounceFn);
+}, [searchQuery]);
+
 
   const renderList = () => {
+
+    if(isOpen){
+      return (
+        <div className="flex flex-col h-full">
+        {searchData.map((user) => (
+          <SearchCard key={user.id}
+            id={user.id}
+            avatar={user.avatar}
+            firstname={user.firstname}
+            lastname={user.lastname}
+            username={user.username}
+            setIsOpen={setIsOpen}
+            setSearchQuery={setSearchQuery}
+          />))}
+        {hasMore && (
+          <div className='w-full flex justify-center py-2 shrink-0'>
+            <button 
+              // onClick={onLoadMore}
+              disabled={searchLoading}
+              className='text-xs border border-gray-400 rounded-sm px-3 py-1 text-gray-300 hover:bg-gray-700 hover:text-white transition disabled:opacity-50'
+            >
+              {searchLoading ? "Loading history..." : "Load more users"}
+            </button>
+          </div>)}
+        </div>
+    )}
+    
     if (!displayData || displayData.length == 0){
       if (loading)
         return <div>Loading...</div>;
@@ -48,42 +161,3 @@ export default function SideBar({displayData, loading}) {
   );
 }
 
-//---------------------Search Chat------------------------------------------
-// useEffect(() => {
-//   if (!searchQuery.trim())
-//     return;
-
-//   const delayDebounceFn = setTimeout(async () => {
-//     console.log(searchQuery);
-//     setLoading(true);
-//     try {
-//       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/conversations?q=${searchQuery}&page=${1}`,{
-//           method: "GET",
-//           credentials: "include",
-//         },
-//       );
-//       const data = await response.json();
-//       if (!response.ok) 
-//          throw new Error("data.error");
-      
-//       const search = data.conversations || []
-//       console.log(search) 
-//       const formatedData = search.map((user) => ({
-//         id: user.conversation_id,
-//         avatar: user.avatar,
-//         firstname: user.firstname,
-//         lastname: user.lastname,
-//         lastmsg: user.lastmessage || "no message yet",
-//         status: user.status || false, // to delete later
-//         time: user.updatedate,
-//         userid: user.friend_id,
-//       }));
-//       setDisplayData(formatedData);
-//     } catch (err) {
-//       console.log("Failed to fetch users", err);
-//     } finally {
-//       setLoading(false);
-//     }
-//   }, 500);
-//   return () => clearTimeout(delayDebounceFn);
-// }, [searchQuery]);

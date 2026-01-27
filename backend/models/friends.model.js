@@ -22,6 +22,40 @@ export class FriendsModels
         }
     }
 
+    searchFriends(db, userId, query, limit, offset)
+    {
+        try {
+            const result = db.prepare(`
+                SELECT u.id, u.username, u.avatar, u.firstname, u.lastname
+                FROM friends f
+                
+                WHERE
+                    (
+                        (f.sender_id = :me
+                        OR f.receiver_id = :me)
+                        AND f.status = 'accepted'
+                    )
+                    OR firstname LIKE '%' || :query || '%'
+                    OR lastname LIKE '%' || :query || '%'
+                    OR username LIKE '%' || :query || '%'
+                ORDER BY
+                    CASE 
+                        WHEN firstname LIKE '%' || :query || '%' THEN 1
+                        WHEN lastname LIKE '%' || :query || '%' THEN 2
+                        WHEN username LIKE '%' || :query || '%' THEN 3
+                    END
+                LIMIT :limit
+                OFFSET :offset
+                `).all({me: userId, query: query, limit: limit, offset: offset});
+            return (result)
+        }
+        catch (error)
+        {
+            const dbError = handleDatabaseError(error, 'searchUsers');
+            throw dbError;
+        }
+    }
+
     getRequestsList(db, userId)
     {
         try {

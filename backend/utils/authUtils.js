@@ -1,5 +1,6 @@
 import path from "path";
 import jwt from "jsonwebtoken"
+import { Session } from "inspector";
 
 function randomPasswordGenerator(length)
 {
@@ -36,7 +37,8 @@ function generateToken(userId, Username, secret, expiration, params, type)
             username: Username,
             isVerified: params.isVerified,
             hasAvatar: params.hasAvatar,
-            status2fa: params.status2fa
+            status2fa: params.status2fa,
+            session2FA:params.session2FA
         };
     }
     else

@@ -17,7 +17,8 @@ const TwoFA = () => {
     setError("");
     try {
       const twofaToken = TwoFAcode.join("");
-      if (!twofaToken) throw new Error("enter the code firstly");
+      if (!twofaToken) 
+        throw new Error("enter the code firstly");
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/2fa/verify`,
         {

@@ -13,7 +13,7 @@ export async function middleware(request) {
 const onboardingSteps = {
     verifyEmail: "/sign-up/email-verification",
     selectImage: "/sign-up/email-verification/select-image",
-    twoFA: "/sign-up/twoFA"
+    twoFA: "/sign-in/twoFA"
   };
   const isOnboardingRoute = Object.values(onboardingSteps).some(route => pathname.startsWith(route))
   const isPublicRoute = publicRoutes.includes(pathname);
@@ -23,8 +23,8 @@ const onboardingSteps = {
     isValid: false,
     isVerified: false,
     hasAvatar: false,
-    // is2faEnabled: false,
-    // is2faVerified: false,
+    is2faEnabled: false,
+    is2faVerified: false,
   }
 
   let isTokenExpired = false;
@@ -34,13 +34,13 @@ const onboardingSteps = {
     try {
       const secret = new TextEncoder().encode(process.env.JWT_SECRET);
       const { payload } = await jwtVerify(accessToken, secret);
-      // console.log(payload);
+      console.log(payload);
 
       userState.isValid = true;
       userState.isVerified = !!payload.isVerified;
       userState.hasAvatar = !!payload.hasAvatar;
-      // userState.is2faEnabled = !!payload.isTwoFaEnabled;
-      // userState.is2faVerified = !!payload.isTwoFaAuthenticated;
+      userState.is2faEnabled = !!payload.status2fa;
+      userState.is2faVerified = !!payload.session2FA;
     } catch (error) {
       if (error.code === "ERR_JWT_EXPIRED" || error.message.includes("exp")) {
         isTokenExpired = true;
@@ -94,12 +94,12 @@ const onboardingSteps = {
        return NextResponse.next();
     }
 
-    // if (userState.is2faEnabled && !userState.is2faVerified) {
-    //     if (pathname !== onboardingSteps.twoFactor) {
-    //         return NextResponse.redirect(new URL(onboardingSteps.twoFactor, request.url));
-    //     }
-    //     return NextResponse.next();
-    // }
+    if (userState.is2faEnabled && userState.is2faVerified) {
+        if (pathname !== onboardingSteps.twoFA) {
+            return NextResponse.redirect(new URL(onboardingSteps.twoFA, request.url));
+        }
+        return NextResponse.next();
+    }
 
     if (!userState.hasAvatar) {
        if (pathname !== onboardingSteps.selectImage) {

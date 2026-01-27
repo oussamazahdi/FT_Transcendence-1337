@@ -1,5 +1,5 @@
 import { authMiddleware } from "../middlewares/authMiddleware.js";
-import { friendsController } from "../controllers/friends.controller.js"
+import { FriendsController, friendsController } from "../controllers/friends.controller.js"
 import fastify from "fastify";
 import { errorResponse,
     emptySuccessResponse,
@@ -9,6 +9,7 @@ import { errorResponse,
     blockedUsersResponse,
     idParamSchema
 } from "../config/schemes.config.js";
+import { FriendsModels } from "../models/friends.model.js";
 
 function friendsRoutes(fastify)
 {
@@ -24,6 +25,8 @@ function friendsRoutes(fastify)
             }
         }
     }, friendsController.getAllFriends);
+
+    fastify.get("/search", {preHandler: authMiddleware}, friendsController.searchFriends)
     
     fastify.get("/requests", {
         preHandler: authMiddleware,
