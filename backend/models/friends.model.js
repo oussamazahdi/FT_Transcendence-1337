@@ -28,7 +28,9 @@ export class FriendsModels
             const result = db.prepare(`
                 SELECT u.id, u.username, u.avatar, u.firstname, u.lastname
                 FROM friends f
-                
+                JOIN users u ON CASE
+                    WHEN f.sender_id = :me THEN f.receiver_id
+                    ELSE f.sender_id
                 WHERE
                     (
                         (f.sender_id = :me
