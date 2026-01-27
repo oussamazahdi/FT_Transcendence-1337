@@ -26,7 +26,7 @@ function friendsRoutes(fastify)
         }
     }, friendsController.getAllFriends);
 
-    fastify.post("/search", {preHandler: authMiddleware,}, FriendsController.searchFriends)
+    fastify.post("/search", {preHandler: authMiddleware}, friendsController.searchFriends)
     
     fastify.get("/requests", {
         preHandler: authMiddleware,
