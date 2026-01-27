@@ -86,6 +86,8 @@ export class ChatController
             const blocked = friendsModels.isBlockedByUser(db, senderId, receiverId);
             if (!friendshipStatus || blocked.status)
                 socket.emit("chat:error", {message: "NOT_ALLOWED_TO_CONTACT_USER"});
+            if (senderId === receiverId)
+                socket.emit("chat:error", {message: "NOT_ALLOWED_TO_CONTACT_YOURSELF"});
             const convId = chatModels.getOrCreateConversationId(db, senderId, receiverId);
             const msgId = chatModels.createNewMessage(db, convId, senderId, data.content);
             // console.log("heeere is the is", msgId)

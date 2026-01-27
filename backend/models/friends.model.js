@@ -22,7 +22,7 @@ export class FriendsModels
         }
     }
 
-    searchFriends(db, userId, query)
+    searchFriends(db, userId, query, limit, offset)
     {
         try {
             const result = db.prepare(`
@@ -30,7 +30,12 @@ export class FriendsModels
                 FROM friends f
                 
                 WHERE
-                    firstname LIKE '%' || :query || '%'
+                    (
+                        (f.sender_id = :me
+                        OR f.receiver_id = :me)
+                        AND f.status = 'accepted'
+                    )
+                    OR firstname LIKE '%' || :query || '%'
                     OR lastname LIKE '%' || :query || '%'
                     OR username LIKE '%' || :query || '%'
                 ORDER BY
@@ -41,7 +46,8 @@ export class FriendsModels
                     END
                 LIMIT :limit
                 OFFSET :offset
-                `).all({query: query, limit: limit, offset: offset});
+                `).all({me: userId, query: query, limit: limit, offset: offset});
+            return (result)
         }
         catch (error)
         {

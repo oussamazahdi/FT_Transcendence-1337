@@ -33,13 +33,32 @@ export class FriendsController {
                 return reply.code(500).send({error: error.message});
         }
     }
-    
-    // check if blocked
+
+    async searchFriends(request, reply)
+    {
+        const db = request.server.db;
+        const { q = "", page = 1 } = request.query;
+        const limit = 10;
+        const pageNum = Math.max(1, Number(page))
+        const offset = (pageNum - 1) * limit;
+        try {
+            const result = friendsModels.searchFriends(db, request.userId, q, limit, offset);
+            return reply.code(200).send({message: "SUCCESS", page: pageNum, limit: limit, friends: result });
+        }
+        catch (error) {
+            if (error.code)
+                return reply.code(error.code).send({error: error.message});
+            else
+                return reply.code(500).send({error: error.message});
+        }
+    }
     async sendFriendRequest(request, reply)
     {
         const db = request.server.db;
 
         try {
+            if (request.user.userId === request.params.id)
+                return reply.code(401).send({ error: "CANT_FRIEND_OR_UNFRIEND_YOURSELF" });
             const hasFriendship = friendsModels.isFriendshipExists(db, request.user.userId, request.params.id);
             const isBlocked = friendsModels.isBlockedByUser(db, request.user.userId, request.params.id);
             if (isBlocked && isBlocked.status === 'blocked')
@@ -98,6 +117,8 @@ export class FriendsController {
         const db = request.server.db;
 
         try {
+            if (request.user.userId === request.params.id)
+                return reply.code(401).send({ error: "CANT_BLOCK_OR_UNBLOCK_YOURSELF" });
             const result = friendsModels.blockFriend(db, request.user.userId, request.params.id);
             if (result.changes === 0)
                 return reply.code(409).send({ error: "USER_ALREADY_BLOCKED" });
@@ -116,6 +137,8 @@ export class FriendsController {
         const db = request.server.db;
 
         try {
+            if (request.user.userId === request.params.id)
+                return reply.code(401).send({ error: "CANT_BLOCK_OR_UNBLOCK_YOURSELF" });
             const result = friendsModels.unblockFriend(db, request.user.userId, request.params.id);
             if (result.changes === 0)
                 return reply.code(409).send({ error: "USER_ALREADY_UNBLOCKED" });
@@ -134,6 +157,8 @@ export class FriendsController {
          const db = request.server.db;
 
         try {
+                if (request.user.userId === request.params.id)
+                    return reply.code(401).send({ error: "CANT_SEND_OR_REMOVE_REQUEST_TO_YOURSELF" });
             const result = friendsModels.removeFriendRequest(db, request.user.userId, request.params.id);
             if (result.changes === 0)
                 return reply.code(409).send({ error: "REQUEST_ALREADY_CANCELED" });
@@ -153,6 +178,8 @@ export class FriendsController {
         const db = request.server.db;
 
         try {
+                if (request.user.userId === request.params.id)
+                    return reply.code(401).send({ error: "CANT_FRIEND_OR_UNFRIEND_YOURSELF" });
             const result = friendsModels.removeFromFriendList(db, request.user.userId, request.params.id);
             if (result.changes === 0)
                 return reply.code(409).send({ error: "USER_ALREADY_UNFRIENDED" });
