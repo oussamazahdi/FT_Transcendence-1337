@@ -23,7 +23,6 @@ export class ChatController
             else
                 return reply.code(500).send({error: error.message});
         }
-
     }
 
     async getAllConversations(request, reply)
