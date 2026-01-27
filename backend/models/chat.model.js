@@ -107,9 +107,9 @@ export class ChatModels
                 )
             ORDER BY
                 CASE
-                WHEN u.username  LIKE '%' || :query || '%' THEN 1
-                WHEN u.firstname LIKE '%' || :query || '%' THEN 2
-                WHEN u.lastname  LIKE '%' || :query || '%' THEN 3
+                    WHEN u.username  LIKE '%' || :query || '%' THEN 1
+                    WHEN u.firstname LIKE '%' || :query || '%' THEN 2
+                    WHEN u.lastname  LIKE '%' || :query || '%' THEN 3
                 ELSE 4
                 END,
                 c.updatedate DESC

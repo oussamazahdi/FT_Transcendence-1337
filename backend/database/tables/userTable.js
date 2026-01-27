@@ -16,10 +16,10 @@ function createUserTable(db)
             otp TEXT,
             otpexpiration TIMESTAMP,
             status2fa BOOLEAN DEFAULT false,
+            session2fa BOOLEAN DEFAULT false,
             secret2fa TEXT,
             createdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )`);
-        // console.log("Database initialized successfully!")
     }
     catch (error) {
         const dbError = handleDatabaseError(error, 'createUserTable');

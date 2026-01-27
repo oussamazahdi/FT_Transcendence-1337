@@ -22,6 +22,34 @@ export class FriendsModels
         }
     }
 
+    searchFriends(db, userId, query)
+    {
+        try {
+            const result = db.prepare(`
+                SELECT u.id, u.username, u.avatar, u.firstname, u.lastname
+                FROM friends f
+                
+                WHERE
+                    firstname LIKE '%' || :query || '%'
+                    OR lastname LIKE '%' || :query || '%'
+                    OR username LIKE '%' || :query || '%'
+                ORDER BY
+                    CASE 
+                        WHEN firstname LIKE '%' || :query || '%' THEN 1
+                        WHEN lastname LIKE '%' || :query || '%' THEN 2
+                        WHEN username LIKE '%' || :query || '%' THEN 3
+                    END
+                LIMIT :limit
+                OFFSET :offset
+                `).all({query: query, limit: limit, offset: offset});
+        }
+        catch (error)
+        {
+            const dbError = handleDatabaseError(error, 'searchUsers');
+            throw dbError;
+        }
+    }
+
     getRequestsList(db, userId)
     {
         try {

@@ -3,8 +3,9 @@ import fs from "fs"
 import path from "path";
 import { pipeline } from 'stream/promises';
 import { authModels } from "../models/auth.model.js";
-import { generateFileNameByUser, generateToken, updateTokenFlags } from "../utils/authUtils.js";
 import { tokenModels } from "../models/token.model.js";
+import { twoFactorModels } from "../models/twoFactor.model.js";
+import { generateFileNameByUser, generateToken, updateTokenFlags } from "../utils/authUtils.js";
 import { getEmailLetter } from "../templates/emailLetter.js";
 import { MatchController } from "./game.controller.js";
 
@@ -20,13 +21,16 @@ export class AuthController {
             const result = await authModels.loginUser(db, email, password);
             const params = {
                 isVerified: !!result.isverified,
+                hasAvatar: !!result.avatar,
                 status2fa: !!result.status2fa,
-                hasAvatar: !!result.avatar
+                session2FA: !!result.status2fa
             }
+            console.log(params);
             if (result.message && result.message.includes("USER_NOT_FOUND"))
                 return reply.code(404).send({error: "USER_NOT_FOUND"});
             if (result.message && result.message.includes("INVALID_PASSWORD"))
                 return reply.code(403).send({error: "INVALID_PASSWORD"});
+            twoFactorModels.update2FASessionStatus(db, result.status2fa, result.id);
             const accessToken = generateToken(result.id, result.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION, params, "access");
             const refreshToken = generateToken(result.id, result.username, process.env.JWT_REFRESH_SECRET, process.env.JWT_REFRESH_EXPIRATION, null, "refresh");
             authModels.addNewToken(db, result.id, refreshToken);
