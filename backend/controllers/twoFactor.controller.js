@@ -9,8 +9,10 @@ export class TwoFactorController
         const db = request.server.db;
 
         try {
-            const secret = request.server.totp.generateSecret();
+            if (request.user.status2fa)
+                reply.code(401).send({error: "2FA_ALREADY_ENABLED"});
 
+            const secret = request.server.totp.generateSecret();
             const qrcode = await request.server.totp.generateQRCode({ 
                 secret: secret.ascii,
                 issuer: 'ft_transcendence',
@@ -95,6 +97,8 @@ export class TwoFactorController
         const db = request.server.db;
 
         try {
+            if (!request.user.status2fa)
+                reply.code(401).send({error: "2FA_ALREADY_DISABLED"});
             twoFactorModels.update2FAStatus(db, 0, request.user.userId);
             const user = authModels.findUserById(db, request.user.userId);
             updateTokenFlags(user, reply);
