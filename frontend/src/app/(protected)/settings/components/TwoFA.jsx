@@ -1,9 +1,11 @@
 "use client";
+import { useAuth } from "@/contexts/authContext";
 import React, { useState } from "react";
 
 export default function TwoFA({ isEnable, setView, setIsEnable }) {
   const [showConfirm, setShowconfirm] = useState(false);
   const [error, setError] = useState("");
+  const {updateUser} = useAuth()
 
   const disableTwoFA = async () => {
     setError("");
@@ -21,6 +23,7 @@ export default function TwoFA({ isEnable, setView, setIsEnable }) {
 
       console.log("TwoFA disabled successfuly");
       setIsEnable(false);
+      updateUser({status2fa:false})
       setShowconfirm(false);
     } catch (err) {
       console.log(err.message);

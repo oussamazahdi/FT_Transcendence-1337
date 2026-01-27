@@ -162,69 +162,21 @@ export class UserController
 				return reply.code(500).send({error: error.message});
         }
 	}
-	searchUsers(request, reply){
-		try{
-			const db = request.server.db;
-			const { query } = request.query;
-	
-			console.log(query);
-			if (!query || typeof query !== 'string'){
-				return reply.code(400).json({ error: 'QUERY_PARAMETER_REQUERED' });
-			}
-	
-			const searchUser = query.trim();
-	
-			if (trimmedQuery.length < 2) {
-				return reply.code(400).json({ error: 'QUERY_TOO_SHORT' });
-			}
-	
-			if (trimmedQuery.length > 20) {
-		  return reply.code(400).json({ error: 'QUERY_TOO_LONG' });
-		}
-	
-			const searchPattern = `%${searchUser}%`;
-			const startsWithPattern = `${searchUser}%`;
-	
-			// add AND id != the userId later 
-			const statement = db.prepare(`
-	
-				SELECT id, firstname, lastname, username, email, avatar
-				FROM users
-				WHERE (
-					firstname LIKE ? OR
-					lastname LIKE ? OR
-					username LIKE ?
-				)
-				ORDER BY
-					CASE
-					WHEN firstname LIKE ? THEN 1
-					WHEN lastname LIKE ? THEN 2
-					WHEN username LIKE ? THEN 3
-					ELSE 4
-					END,
-					firstname ASC
-				LIMIT ?
-			`);
-	
-			const results = statement.all(
-			searchPattern,
-			searchPattern,
-			searchPattern,
-			startsWithPattern,
-			startsWithPattern,
-			startsWithPattern,
-			5
-			);
-			const formattedResults = results.map(user => ({
-			id: user.id,
-			firstname: user.firstname,
-			lastname: user.lastname,
-			username: user.username,
-			avatar: user.avatar,
-			fullName: `${user.firstname} ${user.lastname}`
-			}));
-	
-			return reply.code(200).send(formattedResults);
+	searchUsers(request, reply)
+	{
+		const db = request.server.db;
+		try
+		{
+			const { q, page } = request.query;
+			const pageNum = Math.max(1, Number(page));
+        	const limit = 10;
+			const offset = (pageNum - 1) * limit;
+			const query = q.trim();
+			if (!query || query.length < 2 || query.length > 20)
+				return reply.code(400).json({ error: 'INVALID_QUERY' });
+			const results = userModels.searchUsers(db, q, limit, offset);
+
+			return reply.code(200).send({message: "SUCCESS", users: results});
 		}
 		catch (error) {
 			if (error.code)

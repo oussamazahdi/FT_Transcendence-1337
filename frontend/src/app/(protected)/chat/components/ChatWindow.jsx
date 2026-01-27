@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import ChatHeader from "./ChatHeader";
 import ChatInput from "./ChatInput";
 import { useAuth } from "@/contexts/authContext";
 import MessageList from "./MessageList";
 import { useSocket } from "@/contexts/socketContext";
 
-export default function ChatWindow({ selectedFriend }) {
+export default function ChatWindow({ selectedFriend, updateLastMessage}) {
   const Friend = selectedFriend;
   const [messages, setMessages] = useState([]);
   const socket = useSocket();
@@ -23,7 +23,6 @@ export default function ChatWindow({ selectedFriend }) {
 
 
   useEffect(()=>{
-    
     const fetchMessages = async () => {
       if (!hasMore && page > 1)
         return;
@@ -38,11 +37,12 @@ export default function ChatWindow({ selectedFriend }) {
           throw new Error (data.error)
 
         const newMessages = data.messages || []
-        if (newMessages.length < 10) 
+        if (newMessages.length < 30) 
           setHasMore(false);
 
+        // console.log("come from backend=====>",newMessages)
         const formatedData = newMessages.map((message) => ({
-          id: message.id,
+          id: message.message_id,
           senderId: message.sender_id,
           avatar: message.avatar,
           type: "text",
@@ -51,14 +51,11 @@ export default function ChatWindow({ selectedFriend }) {
           isMe: user.id == message.senderId
         }))
 
-        const newestFirst = formatedData.reverse();
-
         setMessages((prev) => {
           if (page === 1) 
-            return newestFirst;
-          return [...prev, ...newestFirst]; 
+            return formatedData;
+          return [...prev, ...formatedData];
         })
-        // console.log("newMessage==================",messages);
       }catch(err){
         console.log("Failed to fetch messages", err);
       }finally{
@@ -69,17 +66,22 @@ export default function ChatWindow({ selectedFriend }) {
     fetchMessages();
   },[page, Friend.userid])
 
+  // console.log("all Messages ==================",messages);
+
   useEffect(() => {
     const handleReceive = (payload) => {
       setMessages((prev) => [{
-        id: payload.msgId || Date.now(),
+        id: payload.msgId,
         senderId: payload.senderId,
         avatar: payload.avatar,
+        type: "text",
         text: payload.content,
         timestamp: payload.sentAt,
         isMe: false,
       }, ...prev]);
+      updateLastMessage(payload.content, payload.sentAt, Friend.userid)
     };
+
     socket.on("chat:receiver", handleReceive)
 
     socket.on("chat:error", (err) => console.log(err.message));
@@ -92,7 +94,7 @@ export default function ChatWindow({ selectedFriend }) {
 
   const handleSend = (content) => {
     const tmpMessage = {
-      id: messages.length * 1000 + 1,
+      id: Date.now(),
       senderId : user.id,
       type: "text",
       text: content,
@@ -104,6 +106,7 @@ export default function ChatWindow({ selectedFriend }) {
     }
 
     setMessages((prev) => [tmpMessage, ...prev]);
+    updateLastMessage(tmpMessage.text, tmpMessage.timestamp, Friend.userid)
     socket.emit('chat:send', {
       receiverId: selectedFriend.userid,
       content: content

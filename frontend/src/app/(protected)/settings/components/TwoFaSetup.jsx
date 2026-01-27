@@ -1,6 +1,7 @@
 "use client";
 import react, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
+import { useAuth } from "@/contexts/authContext";
 
 export default function TwoFaSetup({ setEnable, setView }) {
   const [TwoFAcode, setTwoFAcode] = useState(new Array(6).fill(""));
@@ -8,6 +9,7 @@ export default function TwoFaSetup({ setEnable, setView }) {
   const [imagePreview, setImagePreview] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { updateUser } = useAuth()
 
   useEffect(() => {
     setError("");
@@ -37,7 +39,6 @@ export default function TwoFaSetup({ setEnable, setView }) {
 
   const VerifyQrCode = async () => {
     setError("");
-    console.log("hna tah rial");
     try {
       const tokenString = TwoFAcode.join("");
       const response = await fetch(
@@ -55,9 +56,8 @@ export default function TwoFaSetup({ setEnable, setView }) {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
 
-      console.log("hna nla3bo 3lih");
-
       setEnable(true);
+      updateUser({status2fa:true})
       setView("status");
     } catch (err) {
       console.log(err.message);
@@ -66,7 +66,8 @@ export default function TwoFaSetup({ setEnable, setView }) {
   };
 
   const handleChange = (element, index) => {
-    if (isNaN(element.value)) return;
+    if (isNaN(element.value)) 
+      return;
     const newTwoFAcode = [...TwoFAcode];
     newTwoFAcode[index] = element.value;
     setTwoFAcode(newTwoFAcode);

@@ -124,7 +124,7 @@ export function UserProvider({ children, initialUser }) {
 
   const blockUser = async (user) => {
     try{
-      const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks/${user.id}`,{
+      const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks/${user.userid}`,{
         method:"POST",
         credentials:"include",
       })

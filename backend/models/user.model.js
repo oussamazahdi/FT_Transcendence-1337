@@ -69,6 +69,33 @@ export class UserModels
         }
     }
 
+    searchUsers(db, query, limit, offset)
+    {
+        try {
+            const result = db.prepare(`
+                SELECT id, firstname, lastname, username, avatar
+                FROM users
+                WHERE
+                    firstname LIKE '%' || :query || '%'
+                    OR lastname LIKE '%' || :query || '%'
+                    OR username LIKE '%' || :query || '%'
+                ORDER BY
+                    CASE 
+                        WHEN firstname LIKE '%' || :query || '%' THEN 1
+                        WHEN lastname LIKE '%' || :query || '%' THEN 2
+                        WHEN username LIKE '%' || :query || '%' THEN 3
+                    END
+                LIMIT :limit
+                OFFSET :offset
+                `).all({query: query, limit: limit, offset: offset});
+        }
+        catch (error)
+        {
+            const dbError = handleDatabaseError(error, 'searchUsers');
+            throw dbError;
+        }
+    }
+
 }
 
 export const userModels = new UserModels();

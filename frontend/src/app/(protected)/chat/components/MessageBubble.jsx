@@ -20,7 +20,7 @@ const MessageBubble = (props) => {
           <div className="w-10 flex-none" />
         )}
       </div>
-      {props.message.type === "text" ? (
+      {props.message.type == "text" ? (
         <div
           className={`flex gap-3 max-w-[70%] p-2 rounded-xl text-xs ${
             props.isMe
@@ -33,24 +33,6 @@ const MessageBubble = (props) => {
             {props.message.timestamp}
           </span>
         </div>
-      ) : props.message.gameType === "ping_pong" ? (
-        <div
-          className={`flex flex-col gap-3 max-w-[70%] p-2 rounded-xl text-xs ${
-            props.isMe
-              ? "bg-[#595959]/65 text-white"
-              : "bg-[#0F0F0F]/65 text-white"
-          }`}
-        >
-          <p className="font-medium">{"1 vs 1 ping pong game invitation"}</p>
-          <div className="flex justify-center items-center gap-1">
-            <button className="bg-[#583F3F]/55 text-[8px] text-[#D55C5C] px-3 py-1 rounded-xs hover:bg-[#8D4646]/50 cursor-pointer">
-              Reject
-            </button>
-            <button className="bg-[#3F5846]/55 text-[8px] text-[#5CD57E] px-3 py-1 rounded-xs hover:bg-[#468C74]/50 cursor-pointer">
-              Accept
-            </button>
-          </div>
-        </div>
       ) : (
         <div
           className={`flex flex-col gap-3 max-w-[70%] p-2 rounded-xl text-xs ${
@@ -59,7 +41,7 @@ const MessageBubble = (props) => {
               : "bg-[#0F0F0F]/65 text-white"
           }`}
         >
-          <p className="font-medium">{"1 vs 1 Tic tac toe game invitation"}</p>
+          <p className="font-medium">{"1 vs 1 ping pong game invitation"}</p>
           <div className="flex justify-center items-center gap-1">
             <button className="bg-[#583F3F]/55 text-[8px] text-[#D55C5C] px-3 py-1 rounded-xs hover:bg-[#8D4646]/50 cursor-pointer">
               Reject
