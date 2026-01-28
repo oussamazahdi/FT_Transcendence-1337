@@ -4,6 +4,7 @@ import ChatInput from "./ChatInput";
 import { useAuth } from "@/contexts/authContext";
 import MessageList from "./MessageList";
 import { useSocket } from "@/contexts/socketContext";
+import { autofetch } from "@/lib/api";
 
 export default function ChatWindow({ selectedFriend, updateLastMessage}) {
   const Friend = selectedFriend;
@@ -28,7 +29,7 @@ export default function ChatWindow({ selectedFriend, updateLastMessage}) {
         return;
       setLoading(true)
       try{
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/messages?page=${page}&friendId=${Friend.userid}`,{
+        const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/messages?page=${page}&friendId=${Friend.id}`,{
           method:"GET",
           credentials:"include"
         })
@@ -37,10 +38,8 @@ export default function ChatWindow({ selectedFriend, updateLastMessage}) {
           throw new Error (data.error)
 
         const newMessages = data.messages || []
-        if (newMessages.length < 30) 
+        if (newMessages.length < 30)
           setHasMore(false);
-
-        // console.log("come from backend=====>",newMessages)
         const formatedData = newMessages.map((message) => ({
           id: message.message_id,
           senderId: message.sender_id,
@@ -58,15 +57,14 @@ export default function ChatWindow({ selectedFriend, updateLastMessage}) {
         })
       }catch(err){
         console.log("Failed to fetch messages", err);
+        setHasMore(false);
       }finally{
         setLoading(false)
       }
     }
 
     fetchMessages();
-  },[page, Friend.userid])
-
-  // console.log("all Messages ==================",messages);
+  },[page, Friend.id])
 
   useEffect(() => {
     const handleReceive = (payload) => {
@@ -79,13 +77,10 @@ export default function ChatWindow({ selectedFriend, updateLastMessage}) {
         timestamp: payload.sentAt,
         isMe: false,
       }, ...prev]);
-      updateLastMessage(payload.content, payload.sentAt, Friend.userid)
+      updateLastMessage(payload.content, payload.sentAt, Friend)
     };
-
     socket.on("chat:receiver", handleReceive)
-
     socket.on("chat:error", (err) => console.log(err.message));
-
     return () => {
       socket.off("chat:receiver");
       socket.off("chat:error");
@@ -106,9 +101,9 @@ export default function ChatWindow({ selectedFriend, updateLastMessage}) {
     }
 
     setMessages((prev) => [tmpMessage, ...prev]);
-    updateLastMessage(tmpMessage.text, tmpMessage.timestamp, Friend.userid)
+    updateLastMessage(tmpMessage.text, tmpMessage.timestamp, Friend)
     socket.emit('chat:send', {
-      receiverId: selectedFriend.userid,
+      receiverId: selectedFriend.id,
       content: content
     })
   }
@@ -118,7 +113,7 @@ export default function ChatWindow({ selectedFriend, updateLastMessage}) {
       <ChatHeader user={Friend} />
       <div className="flex-1 bg-[#333333]/65 rounded-lg flex flex-col overflow-hidden">
         <MessageList messages={messages} onLoadMore={() => setPage(p => p + 1)} loading={loading} hasMore={hasMore}/>
-        <ChatInput onSend={handleSend} />
+        <ChatInput onSend={handleSend} friend={Friend} />
       </div>
     </div>
   );

@@ -4,12 +4,25 @@ import SideBar from "./components/SideBar";
 import ChatPage from "./components/ChatPage";
 import { useState } from "react";
 import { SelectedFriendContext } from "@/contexts/userContexts";
+import { useSearchParams } from "next/navigation";
+import { useAuth } from "@/contexts/authContext";
 
 export default function chat() {
+  const {friends} = useAuth();
   const [selectedFriend, setSelectedFriend] = useState(null);
   const [displayData, setDisplayData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+  console.log(id);
 
+  useEffect(()=>{
+    const index = friends.findIndex(user => user.id == id)
+      if (index != -1)
+          setSelectedFriend(friends[index]);
+  },[id])
+
+  
   useEffect(() => {
     const fetchconversation = async () => {
       setLoading(true);
@@ -24,17 +37,15 @@ export default function chat() {
           throw new Error(data.error);
 
         const newConversation = data.conversations || []
-        console.log(newConversation);
         const formatedData = newConversation.map((conversation) => ({
+          id: conversation.userid,
+          convid: conversation.convid,
           avatar: conversation.avatar,
           firstname: conversation.firstname,
           lastname: conversation.lastname,
           lastMessage: conversation.last_message || "no message yet.",
           timeOfLastMsg: conversation.updatedate || "00:00",
           status: conversation.status || false,
-          userid: conversation.userid,
-          id: conversation.convid,
-          userid: conversation.userid
         }));
 
         setDisplayData(formatedData);
@@ -48,20 +59,32 @@ export default function chat() {
     fetchconversation();
   }, []);
 
-  const updateLastMessage = (lastmessage, time, friendId) => {
+  const updateLastMessage = (lastmessage, time, friend) => {
     setDisplayData((prev) => {
       const newList = [...prev];
       
-      const index = newList.findIndex((conv) => conv.userid === friendId);
+      const index = newList.findIndex((conv) => conv.userid === friend.userid);
       
       if (index !== -1) {
         const updatedConv = {
           ...newList[index],
           lastMessage: lastmessage,
           timeOfLastMsg: time,
-        };
+        }
         newList.splice(index, 1);
         newList.unshift(updatedConv);
+      }else{
+        const newConv = {
+          avatar: friend.avatar,
+          firstname: friend.firstname,
+          lastname: friend.lastname,
+          lastMessage: lastmessage,
+          timeOfLastMsg: time,
+          status : false,
+          id:friend.id,
+          convid: displayData.length + 1,
+        }
+        newList.unshift(newConv);
       }
       return newList;
     });
@@ -70,10 +93,10 @@ export default function chat() {
   return (
     <SelectedFriendContext.Provider value={{ selectedFriend, setSelectedFriend }}>
       <div className="flex w-full max-w-7xl h-[90vh] md:h-[86vh] rounded-lg overflow-hidden">
-        <div className={`w-full md:max-w-1/4 mr-2 h-full flex flex-col ${selectedFriend ? "hidden md:block" : "block"}`}>
+        <div className={`w-full md:max-w-1/4 md:mr-2 h-full flex flex-col ${selectedFriend ? "hidden md:block" : "block"}`}>
           <SideBar displayData={displayData} setDisplayData={setDisplayData} loading={loading} setLoading={setLoading} />
         </div>
-        <div className={`flex-1 h-full rounded-[12px] ${selectedFriend ? "block" : "hidden md:block"}`}>
+        <div className={`flex-1 h-full rounded-xl ${selectedFriend ? "block" : "hidden md:block"}`}>
           <ChatPage updateLastMessage={updateLastMessage} />
         </div>
       </div>

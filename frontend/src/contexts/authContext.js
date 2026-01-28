@@ -123,8 +123,9 @@ export function UserProvider({ children, initialUser }) {
   }
 
   const blockUser = async (user) => {
+    console.log("the blocked one", user);
     try{
-      const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks/${user.userid}`,{
+      const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks/${user.id}`,{
         method:"POST",
         credentials:"include",
       })
@@ -186,8 +187,6 @@ export function UserProvider({ children, initialUser }) {
 
 	const updateGameSettings = async (data) => {
 		try {
-			// console.log("*******************************************************> ", data);
-	
 			const payload = {};
 			const allowedKeys = new Set([
 				"player_xp",

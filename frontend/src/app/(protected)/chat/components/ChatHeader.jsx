@@ -46,7 +46,7 @@ const ChatHeader = ({ user }) => {
         {isOpen && (
           <div className="absolute z-10 right-0 top-full mt-2 rounded-lg w-48 bg-[#0F0F0F]/90 flex flex-col justify-center items-center gap-1 p-2 text-xs">
             <Link
-              href={`/profile/${user.userid}`}
+              href={`/profile/${user.id}`}
               className="w-full py-2 flex justify-center items-center gap-2 bg-[#252525] hover:bg-[#8D8D8D]/25 rounded-sm cursor-pointer"
             >
               <UserIcon className="size-3" />

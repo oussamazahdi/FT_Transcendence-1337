@@ -75,8 +75,7 @@ export class UserModels
             const result = db.prepare(`
                 SELECT id, firstname, lastname, username, avatar
                 FROM users
-                WHERE
-                    firstname LIKE '%' || :query || '%'
+                WHERE firstname LIKE '%' || :query || '%'
                     OR lastname LIKE '%' || :query || '%'
                     OR username LIKE '%' || :query || '%'
                 ORDER BY

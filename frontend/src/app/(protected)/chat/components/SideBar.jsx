@@ -2,11 +2,13 @@ import React, { useEffect } from "react";
 import Friends from "./Friends";
 import { useState } from "react";
 import SearchCard from "./SearchCard";
+import { autofetch } from "@/lib/api";
 
-export default function SideBar({displayData,loading}) {
+export default function SideBar({ displayData, loading }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchData, setSearchData] = useState([]);
-  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -23,56 +25,19 @@ export default function SideBar({displayData,loading}) {
     setSearchLoading(true);
     setIsOpen(true);
     try {
-      // const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/search?q=${searchQuery}&page=${1}`,{
-      //     method: "GET",
-      //     credentials: "include",
-      //   },
-      // );
-      // const data = await response.json();
-      // if (!response.ok) 
-      //    throw new Error("data.error");
+      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/search?q=${searchQuery}&page=${page}`,{
+          method: "GET",
+          credentials: "include",
+        },
+      );
+      const data = await response.json();
+      if (!response.ok) 
+         throw new Error("data.error");
       
-      //   console.log("response array",data) 
-      // const search = data.conversations || []
-      // if (search.length < 10)
-      //   setHasMore(false)
-      const search = [
-        {
-          id:1,
-          avatar:"http://localhost:3001/uploads/default/profile3.jpeg",
-          firstname:"flan",
-          lastname:"fertlan",
-          username: "Username",
-        },
-        {
-          id:2,
-          avatar:"http://localhost:3001/uploads/default/profile3.jpeg",
-          firstname:"tage3a",
-          lastname:"bouchaib",
-          username: "Username",
-        },
-        {
-          id:3,
-          avatar:"http://localhost:3001/uploads/default/profile3.jpeg",
-          firstname:"s7iri",
-          lastname:"miri",
-          username: "Username"       
-        },
-        {
-          id:4,
-          avatar:"http://localhost:3001/uploads/default/profile3.jpeg",
-          firstname:"krama",
-          lastname:"mrigel",
-          username: "Username"
-        },
-        {
-          id:5,
-          avatar:"http://localhost:3001/uploads/default/profile3.jpeg",
-          firstname:"stoph",
-          lastname:"lvista",
-          username: "Username"
-        },
-      ]
+        console.log("response array",data) 
+      const search = data.friends || []
+      if (page !== 1 && search.length < 10)
+        setHasMore(true)
       const formatedData = search.map((user) => ({
         id: user.id,
         avatar: user.avatar,
@@ -88,7 +53,7 @@ export default function SideBar({displayData,loading}) {
     }
   }, 500);
   return () => clearTimeout(delayDebounceFn);
-}, [searchQuery]);
+}, [searchQuery, page]);
 
 
   const renderList = () => {
@@ -105,11 +70,12 @@ export default function SideBar({displayData,loading}) {
             username={user.username}
             setIsOpen={setIsOpen}
             setSearchQuery={setSearchQuery}
+            displayData={displayData}
           />))}
         {hasMore && (
           <div className='w-full flex justify-center py-2 shrink-0'>
             <button 
-              // onClick={onLoadMore}
+              onClick={() => setPage(p => p + 1)}
               disabled={searchLoading}
               className='text-xs border border-gray-400 rounded-sm px-3 py-1 text-gray-300 hover:bg-gray-700 hover:text-white transition disabled:opacity-50'
             >
@@ -124,6 +90,7 @@ export default function SideBar({displayData,loading}) {
         return <div>Loading...</div>;
       return(<div className="text-sm text-center text-white/60 mt-4">No conversations </div>)
     }
+    displayData.sort((a, b) => new Date(b.timeOfLastMsg) - new Date(a.timeOfLastMsg));
     return displayData.map((conversation) => (
       <div key={conversation.id}> 
         <Friends

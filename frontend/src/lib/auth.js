@@ -56,7 +56,7 @@ export async function getCurrentUser() {
 			playerSettingsList = gameSettings?.settings || [];
 		}
 
-    // console.log("user", user.userData);
+    console.log("user", user.userData);
     // console.log("Friends", friendsList);
     // console.log("Blocked" ,blockedList);
     // console.log("pendingRequest", pendingReqList);

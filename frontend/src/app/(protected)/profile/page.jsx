@@ -19,8 +19,8 @@ export default function ProfilePage() {
         </div>
       </div>
       <div className="w-full md:basis-3/10 flex flex-col gap-4 h-auto md:h-full">
-        <Friends classname="w-full h-[400px] md:h-auto md:flex-1" />
-        <MatchHistory classname="w-full h-[400px] md:h-auto md:flex-1" />
+        <Friends classname="w-full h-100 md:h-auto md:flex-1" />
+        <MatchHistory classname="w-full h-100 md:h-auto md:flex-1" />
       </div>
 
     </div>

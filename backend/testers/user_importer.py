@@ -53,7 +53,7 @@ def make_unique_user(used_usernames: set, used_emails: set):
         if username not in used_usernames and email not in used_emails:
             used_usernames.add(username)
             used_emails.add(email)
-            return (username, email, PASSWORD, first, last, None)
+            return (username, email, PASSWORD, first, last, "http://localhost:3001/uploads/default/profile2.png", 1)
 
 def main():
     total = 1000
@@ -79,9 +79,9 @@ def main():
     # Insert SEED USER specifically
     try:
         cur.execute("""
-            INSERT INTO users (username, email, password, firstname, lastname, avatar)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """, (seed_username, seed_email, PASSWORD, "Seed", "User", None))
+            INSERT INTO users (username, email, password, firstname, lastname, avatar, isverified)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (seed_username, seed_email, PASSWORD, "Seed", "User", "http://localhost:3001/uploads/default/profile2.png", 1));
         print(f"✅ Inserted Seed User: {seed_email}")
     except sqlite3.IntegrityError:
         print(f"⚠️ Seed user {seed_email} already exists or conflict.")
@@ -91,8 +91,8 @@ def main():
         user_row = make_unique_user(used_usernames, used_emails)
         try:
             cur.execute("""
-                INSERT INTO users (username, email, password, firstname, lastname, avatar)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO users (username, email, password, firstname, lastname, avatar, isverified)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
             """, user_row)
             inserted += 1
         except sqlite3.IntegrityError:

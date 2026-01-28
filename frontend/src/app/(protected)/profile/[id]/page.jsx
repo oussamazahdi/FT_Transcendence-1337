@@ -30,7 +30,7 @@ async function getFriendProfile(id) {
 }
 //handle go back
 const FriendProfilePage = async ({ params }) => {
-  const { id } = params;
+  const { id } = await params;
 
   const [currentUserData, friendProfile] = await Promise.all([
     getCurrentUser(),
@@ -58,7 +58,7 @@ const FriendProfilePage = async ({ params }) => {
       <div className="flex flex-1 flex-col w-full basis-7/10 gap-4">
         <FriendsProfile userPage={friendProfile} />
         <div className="flex flex-1 flex-col md:flex-row justify-between gap-4">
-          <MatchPlayed classname="max-h-[360px]"/>
+          <MatchPlayed classname="max-h-90"/>
           <WinRate />
         </div>
       </div>

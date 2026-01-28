@@ -28,13 +28,13 @@ export class FriendsModels
             const result = db.prepare(`
                 SELECT u.id, u.username, u.avatar, u.firstname, u.lastname
                 FROM friends f
-                
-                WHERE
-                    (
-                        (f.sender_id = :me
-                        OR f.receiver_id = :me)
-                        AND f.status = 'accepted'
-                    )
+                JOIN users u ON CASE
+                    WHEN f.sender_id = :me THEN f.receiver_id
+                    ELSE f.sender_id
+                END
+                WHERE (f.sender_id = :me
+                    OR f.receiver_id = :me)
+                    AND f.status = 'accepted'
                     OR firstname LIKE '%' || :query || '%'
                     OR lastname LIKE '%' || :query || '%'
                     OR username LIKE '%' || :query || '%'
@@ -51,7 +51,7 @@ export class FriendsModels
         }
         catch (error)
         {
-            const dbError = handleDatabaseError(error, 'searchUsers');
+            const dbError = handleDatabaseError(error, 'searchFriends');
             throw dbError;
         }
     }

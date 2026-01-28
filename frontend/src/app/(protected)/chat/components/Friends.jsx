@@ -5,7 +5,6 @@ import { assets } from "@/assets/data";
 
 const Friends = (props) => {
   const { setSelectedFriend } = useContext(SelectedFriendContext);
-
   return (
     <div
       className="p-[2px] flex items-center rounded-xl bg-[#8D8D8D]/25 hover:bg-[#8D8D8D]/50 cursor-pointer mb-1"
