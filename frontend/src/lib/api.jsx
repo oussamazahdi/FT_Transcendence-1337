@@ -36,7 +36,7 @@ export const autofetch = async(url, options) => {
 
       return fetch(url, options);
     }catch(err){
-      console.error("❌ Session expired completely.");
+      console.error("Session expired completely.");
       logout();
     }
   }

@@ -173,9 +173,8 @@ export class UserController
 			const offset = (pageNum - 1) * limit;
 			const query = q.trim();
 			if (!query || query.length < 2 || query.length > 20)
-				return reply.code(400).json({ error: 'INVALID_QUERY' });
+				return reply.code(400).send({ error: 'INVALID_QUERY' });
 			const results = userModels.searchUsers(db, q, limit, offset);
-
 			return reply.code(200).send({message: "SUCCESS", users: results});
 		}
 		catch (error) {

@@ -18,6 +18,7 @@ import {
 } from "@heroicons/react/24/outline";
 import UserDropdown from "./UserDropdown";
 import { useAuth } from "@/contexts/authContext";
+import Search from "./Search";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -73,7 +74,7 @@ export default function Navbar() {
         </nav>
 
         {/* Desktop Search */}
-        <div className="hidden md:flex items-center border border-[#9D9D9D]/60 rounded-full px-4 py-2">
+        {/* <div className="hidden md:flex items-center border border-[#9D9D9D]/60 rounded-full px-4 py-2">
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -81,7 +82,8 @@ export default function Navbar() {
             className="bg-transparent outline-none text-white placeholder-white/40"
           />
           <MagnifyingGlassIcon className="w-5 h-5 ml-2 text-white/60" />
-        </div>
+        </div> */}
+        <Search/>
 
         {/* Desktop User */}
         <div className="hidden md:block">

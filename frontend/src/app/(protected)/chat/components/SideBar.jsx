@@ -21,7 +21,6 @@ export default function SideBar({ displayData, loading }) {
   }
 
   const delayDebounceFn = setTimeout(async () => {
-    console.log("Query", searchQuery);
     setSearchLoading(true);
     setIsOpen(true);
     try {
@@ -45,7 +44,7 @@ export default function SideBar({ displayData, loading }) {
         lastname: user.lastname,
         username: user.username,
       }));
-      setSearchData(formatedData);
+      setSearchData(formatedData);// append new to old later and make pagination real
     } catch (err) {
       console.log("Failed to fetch users", err);
     } finally {
