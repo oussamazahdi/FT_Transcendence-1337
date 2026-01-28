@@ -41,8 +41,10 @@ export class FriendsController {
         const limit = 10;
         const pageNum = Math.max(1, Number(page))
         const offset = (pageNum - 1) * limit;
+        const query = q.trim();
+        
         try {
-            const result = friendsModels.searchFriends(db, request.userId, q, limit, offset);
+            const result = friendsModels.searchFriends(db, request.userId, query, limit, offset);
             return reply.code(200).send({message: "SUCCESS", page: pageNum, limit: limit, friends: result });
         }
         catch (error) {

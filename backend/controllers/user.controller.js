@@ -177,7 +177,7 @@ export class UserController
 				return reply.code(400).json({ error: 'INVALID_QUERY' });
 			const results = userModels.searchUsers(db, q, limit, offset);
 			console.log(results);
-			return reply.code(200).send({message: "SUCCESSxxxxxxxx", page: pageNum, limit: limit, users: results});
+			return reply.code(200).send({message: "SUCCESS", page: pageNum, limit: limit, users: results});
 		}
 		catch (error) {
 			if (error.code)

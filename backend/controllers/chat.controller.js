@@ -12,9 +12,10 @@ export class ChatController
         const pageNum = Math.max(1, Number(page));
         const limit = 10;
         const offset = (pageNum - 1) * limit;
+        const query = q.trim();
 
         try {
-            const conversations = chatModels.searchConversationsByPairs(db, request.user.userId, q, limit, offset);
+            const conversations = chatModels.searchConversationsByPairs(db, request.user.userId, query, limit, offset);
             return reply.code(200).send({message: "SUCCESS", page: pageNum, limit: limit, conversations: conversations});
         }
         catch (error) {

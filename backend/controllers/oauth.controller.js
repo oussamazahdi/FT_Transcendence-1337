@@ -11,35 +11,20 @@ export class OAuthController
             isVerified: true,
             hasAvatar: true
         }
+        const goTo = `${process.env.FRONTEND_URL}/dashboard`;
         try {
             const { token } = await request.server.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(request);
             
-            const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+            const response = await fetch(process.env.GOOGLE_OAUTH_USERINFO_URL, {
             headers: { Authorization: `Bearer ${token.access_token}` }
             })
             const googleUser = await response.json();
-            const result = oauthModels.getUserByGoogleId(db, googleUser.id);
+            let result = oauthModels.getUserByGoogleId(db, googleUser.id);
             if (!result)
             {
                 const username = `${googleUser.given_name}-${googleUser.id}`;
                 const password = randomPasswordGenerator(20);
-                const user = await oauthModels.addNewUser(db, googleUser.id, googleUser.given_name, googleUser.family_name, username, googleUser.email, googleUser.picture, password);
-                const accessToken = generateToken(user.id, user.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION, params, "access");
-                const refreshToken = generateToken(user.id, user.username, process.env.JWT_REFRESH_SECRET, process.env.JWT_REFRESH_EXPIRATION, null, "refresh");
-                authModels.addNewToken(db, user.id, refreshToken);
-                reply.setCookie('refreshToken', refreshToken, {
-                    httpOnly: true,
-                    sameSite: 'strict',
-                    path: '/',
-                    maxAge: 7 * 24 * 60 * 60 * 1000
-                });
-                reply.setCookie('accessToken', accessToken, {
-                    httpOnly: true,
-                    sameSite: 'strict',
-                    path: '/',
-                    maxAge: 15 * 60 * 1000
-                });
-                return reply.redirect('http://localhost:3000/dashboard');
+                result = await oauthModels.addNewUser(db, googleUser.id, googleUser.given_name, googleUser.family_name, username, googleUser.email, googleUser.picture, password);
             }
             const accessToken = generateToken(result.id, result.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION, params, "access");
             const refreshToken = generateToken(result.id, result.username, process.env.JWT_REFRESH_SECRET, process.env.JWT_REFRESH_EXPIRATION, null, "refresh");
@@ -56,7 +41,7 @@ export class OAuthController
                 path: '/',
                 maxAge: 15 * 60 * 1000
             });
-            return reply.redirect('http://localhost:3000/dashboard');
+            return reply.redirect(goTo);
 
         }
         catch (error)
