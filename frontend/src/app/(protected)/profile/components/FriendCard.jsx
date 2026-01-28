@@ -11,13 +11,15 @@ const FriendCard = ({user}) => {
       key={user.id}
       className="flex items-center w-full bg-[#414141]/60 rounded-lg p-1 gap-1"
     >
-      <Image
-        src={user?.avatar || assets.defaultProfile}
-        alt="icon"
-        width={40}
-        height={40}
-        className="rounded-md shrink-0 object-cover"
-      />
+      <div className='size-10 flex items-center overflow-hidden rounded-sm'>
+        <Image
+          src={user?.avatar || assets.defaultProfile}
+          alt="icon"
+          width={40}
+          height={40}
+          className="object-cover"
+          />
+      </div>
       <div className="flex-1 min-w-0 flex flex-col justify-center">
         <p className="text-xs font-bold truncate">
           {user.firstname} {user.lastname}

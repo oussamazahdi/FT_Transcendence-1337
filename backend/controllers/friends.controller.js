@@ -44,10 +44,11 @@ export class FriendsController {
         const query = q.trim();
         
         try {
-            const result = friendsModels.searchFriends(db, request.userId, query, limit, offset);
+            const result = friendsModels.searchFriends(db, request.user.userId, query, limit, offset);
             return reply.code(200).send({message: "SUCCESS", page: pageNum, limit: limit, friends: result });
         }
         catch (error) {
+            console.log(error)
             if (error.code)
                 return reply.code(error.code).send({error: error.message});
             else

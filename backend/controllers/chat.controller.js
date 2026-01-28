@@ -85,12 +85,11 @@ export class ChatController
             const friendshipStatus = friendsModels.isFriendshipExists(db, senderId, receiverId);
             const blocked = friendsModels.isBlockedByUser(db, senderId, receiverId);
             if (!friendshipStatus || blocked.status)
-                socket.emit("chat:error", {message: "NOT_ALLOWED_TO_CONTACT_USER"});
+                return socket.emit("chat:error", {message: "NOT_ALLOWED_TO_CONTACT_USER"});
             if (senderId === receiverId)
-                socket.emit("chat:error", {message: "NOT_ALLOWED_TO_CONTACT_YOURSELF"});
+                return socket.emit("chat:error", {message: "NOT_ALLOWED_TO_CONTACT_YOURSELF"});
             const convId = chatModels.getOrCreateConversationId(db, senderId, receiverId);
             const msgId = chatModels.createNewMessage(db, convId, senderId, data.content);
-            // console.log("heeere is the is", msgId)
             chatModels.UpdateLastMessage(db, senderId, receiverId);
             const conversation = chatModels.getConversationById(db, senderId, convId);
             const payload = {

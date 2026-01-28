@@ -1,112 +1,109 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import Friends from "./Friends";
 import { useState } from "react";
-import { useAuth } from "@/contexts/authContext";
+import SearchCard from "./SearchCard";
+import { autofetch } from "@/lib/api";
 
-export default function SideBar() {
-  
-  const [displayData, setDisplayData] = useState([]);
+export default function SideBar({ displayData, loading }) {
   const [searchQuery, setSearchQuery] = useState("");
-
+  const [searchData, setSearchData] = useState([]);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-
-  const observer = useRef();
-
-  const lastElementObs = useCallback((node) => {
-    if (loading)
-      return
-    if (observer.current)
-      observer.current.disconnect()
-
-    observer.current = new IntersectionObserver((entries) => {
-      if (entries[0]?.isIntersecting && hasMore)
-        setPage((prev) => prev + 1)
-    })
-
-    if(node)
-      observer.current.observe(node);
-
-  }, [loading, hasMore])
+  const [hasMore, setHasMore] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    const fetchconversation = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/conversations/all?page=${page}`,{
-          method:"GET",
+  if (!searchQuery.trim()){
+    setIsOpen(false);
+    setSearchData([]);
+    // setSearchQuery("")
+    return;
+  }
+
+  const delayDebounceFn = setTimeout(async () => {
+    console.log("Query", searchQuery);
+    setSearchLoading(true);
+    setIsOpen(true);
+    try {
+      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/search?q=${searchQuery}&page=${page}`,{
+          method: "GET",
           credentials: "include",
-        })
+        },
+      );
+      const data = await response.json();
+      if (!response.ok) 
+         throw new Error("data.error");
+      
+        console.log("response array",data) 
+      const search = data.friends || []
+      if (page !== 1 && search.length < 10)
+        setHasMore(true)
+      const formatedData = search.map((user) => ({
+        id: user.id,
+        avatar: user.avatar,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        username: user.username,
+      }));
+      setSearchData(formatedData);
+    } catch (err) {
+      console.log("Failed to fetch users", err);
+    } finally {
+      setSearchLoading(false);
+    }
+  }, 500);
+  return () => clearTimeout(delayDebounceFn);
+}, [searchQuery, page]);
 
-        const data = await response.json();
-        if(!response.ok)
-          throw new Error(data.error);
-
-        const newConversation = data.conversations || []
-
-        const formatedData = newConversation.map((conversation) => ({
-          avatar: conversation.avatar,
-          firstname: conversation.firstname,
-          lastname: conversation.lastname,
-          lastMessage: conversation.last_message || "no message yet.",
-          timeOfLastMsg: conversation.updatedate || "00:00",
-          status: conversation.status || false,
-          userid: conversation.userid,
-          id: conversation.convid,
-          userid: conversation.userid
-        }));
-        if (formatedData.length < 10)
-          setHasMore(false);
-        setDisplayData((prev) => [...prev, ...formatedData]);
-      } catch (err) {
-        console.log("Failed to fetch conversations", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchconversation();
-  }, [page]);
 
   const renderList = () => {
+
+    if(isOpen){
+      return (
+        <div className="flex flex-col h-full">
+        {searchData.map((user) => (
+          <SearchCard key={user.id}
+            id={user.id}
+            avatar={user.avatar}
+            firstname={user.firstname}
+            lastname={user.lastname}
+            username={user.username}
+            setIsOpen={setIsOpen}
+            setSearchQuery={setSearchQuery}
+            displayData={displayData}
+          />))}
+        {hasMore && (
+          <div className='w-full flex justify-center py-2 shrink-0'>
+            <button 
+              onClick={() => setPage(p => p + 1)}
+              disabled={searchLoading}
+              className='text-xs border border-gray-400 rounded-sm px-3 py-1 text-gray-300 hover:bg-gray-700 hover:text-white transition disabled:opacity-50'
+            >
+              {searchLoading ? "Loading history..." : "Load more users"}
+            </button>
+          </div>)}
+        </div>
+    )}
+    
     if (!displayData || displayData.length == 0){
       if (loading)
         return <div>Loading...</div>;
       return(<div className="text-sm text-center text-white/60 mt-4">No conversations </div>)
     }
-    return displayData.map((conversation, index) => {
-      if (displayData.length === index + 1){
-        return (
-          <div ref={lastElementObs} key={conversation.id}> 
-            <Friends
-              id={conversation.id}
-              avatar={conversation.avatar}
-              firstname={conversation.firstname}
-              lastname={conversation.lastname}
-              lastmsg={conversation.lastMessage}
-              status={conversation.status}
-              time={conversation.timeOfLastMsg}
-              userid={conversation.userid}
-            />
-          </div>
-          );
-          } else {
-            return (
-              <div key={conversation.id}>
-                <Friends
-                  id={conversation.id}
-                  avatar={conversation.avatar}
-                  firstname={conversation.firstname}
-                  lastname={conversation.lastname}
-                  lastmsg={conversation.lastMessage}
-                  status={conversation.status}
-                  time={conversation.timeOfLastMsg}
-                  userid={conversation.userid}
-                />
-              </div>
-          );
-      }})
+    displayData.sort((a, b) => new Date(b.timeOfLastMsg) - new Date(a.timeOfLastMsg));
+    return displayData.map((conversation) => (
+      <div key={conversation.id}> 
+        <Friends
+          id={conversation.id}
+          avatar={conversation.avatar}
+          firstname={conversation.firstname}
+          lastname={conversation.lastname}
+          lastmsg={conversation.lastMessage}
+          status={conversation.status}
+          time={conversation.timeOfLastMsg}
+          userid={conversation.userid}
+        />
+      </div>))
   };
 
   return (
@@ -125,60 +122,9 @@ export default function SideBar() {
         </h1>
         <div className="flex-1 overflow-y-auto custom-scrollbar">
           {renderList()}
-          {loading && <div className="text-center text-xs text-gray-500 py-2">Loading more...</div>}
         </div>
       </div>
     </div>
   );
 }
 
-//---------------------Search Chat------------------------------------------
-// useEffect(() => {
-//   if (!searchQuery.trim()) {
-//     setDisplayData(conversations);
-//     setLoading(false);
-//     return;
-//   }
-
-//   const delayDebounceFn = setTimeout(async () => {
-//     console.log(searchQuery);
-//     setLoading(true);
-//     try {
-//       const response = await fetch(
-//         `${process.env.NEXT_PUBLIC_API_URL}/api/users/search?query=${searchQuery}`,
-//         {
-//           method: "GET",
-//           credentials: "include",
-//         },
-//       );
-//       if (!response.ok) throw new Error("Network response was not ok");
-//       const data = await response.json();
-//       const formatedData = data.map((user) => ({
-//         playerPdp: assets.kamalPdp,
-//         firstname: user.firstname,
-//         lastname: user.lastname,
-//         lastMessage: "user found via search",
-//         timeOfLastMsg: "",
-//         id: user.id,
-//       }));
-//       if (!formatedData[0]) throw new Error("no user found");
-//       setDisplayData(formatedData);
-//     } catch (err) {
-//       console.log("Failed to fetch users", err);
-
-//       setDisplayData([
-//         {
-//           playerPdp: assets.noUserFound,
-//           firstname: "No user Found",
-//           lastname: "",
-//           lastMessage: `${err}`,
-//           timeOfLastMsg: "now",
-//           id: "no-id",
-//         },
-//       ]);
-//     } finally {
-//       setLoading(false);
-//     }
-//   }, 500);
-//   return () => clearTimeout(delayDebounceFn);
-// }, [searchQuery]);

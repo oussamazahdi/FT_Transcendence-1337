@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   ChatBubbleOvalLeftIcon,
+  CheckIcon,
   ClockIcon,
   NoSymbolIcon,
   UserPlusIcon,
@@ -16,9 +17,10 @@ import RemoveUserConf from "./RemoveUserConf";
 import BlockUserPopUp from "@/app/(protected)/chat/components/BlockUserPopUp";
 
 const FriendsProfile = ({ userPage }) => {
-  const { sendFriendRequest, pendingRequests, cancelRequest, friends, user } = useAuth();
+  const { sendFriendRequest, pendingRequests, cancelRequest, incomingRequest, acceptRequest, friends, user } = useAuth();
   const [isFriend, setIsFriend] = useState(false);
   const [ispending, setIsPending] = useState(false);
+  const [isIncoming, setIsIncoming] = useState(false);
   const [showConfirmRemove, setShowconfirmRemove] = useState(false);
   const [showConfirmBlock, setShowconfirmBlock] = useState(false);
   const rawLevel = 15.65
@@ -41,6 +43,13 @@ const FriendsProfile = ({ userPage }) => {
       setIsPending(true);
     } else {
       setIsPending(false);
+    }
+
+    const isIncomingFound = incomingRequest.some(items => items.id === userPage.id);
+    if (isIncomingFound) {
+      setIsIncoming(true);
+    } else {
+      setIsIncoming(false);
     }
     setLoading(false);
   }, [friends, pendingRequests, userPage]);
@@ -95,14 +104,20 @@ const FriendsProfile = ({ userPage }) => {
                 Cancel request
             </button>
           )}
-          {!isFriend && !ispending && (
+          {isIncoming && (
+            <button onClick={() => acceptRequest(userPage)} className="flex items-center gap-1 bg-green-500/60 hover:bg-green-700/60 text-white px-3 py-1 rounded-sm text-[9px] transition-colors cursor-pointer hover:scale-105">
+              <CheckIcon className="size-4 brightness-150" />
+                Accept request
+            </button>
+          )}
+          {!isFriend && !ispending && !isIncoming && (
             <button onClick={() => sendFriendRequest(userPage)} className="flex items-center gap-1 bg-[#414141]/60 hover:bg-[#414141] text-white px-3 py-1 rounded-sm text-[9px] transition-colors cursor-pointer hover:scale-105">
               <UserPlusIcon className="size-4 brightness-150" />
                 Add friend
             </button>
           )}
           <Link
-            href={`/chat`}
+            href={`/chat?id=${userPage.id}`}
             className="flex justify-center items-center p-2 bg-[#414141]/60 hover:bg-[#414141] rounded-sm transition-colors cursor-pointer hover:scale-105"
           >
             <ChatBubbleOvalLeftIcon className="size-4 brightness-150" />
