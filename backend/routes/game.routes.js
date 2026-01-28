@@ -79,7 +79,7 @@ fastify.patch("/update-settings", { preHandler: authMiddleware }, async (req, re
       return reply.code(400).send({ message: "NO_FIELDS_TO_UPDATE" });
     }
 
-    const result = match.updateUserSettings(db, payload);
+    const result = await match.updateUserSettings(db, payload);
 
     return reply.code(200).send(result);
   } catch (err) {

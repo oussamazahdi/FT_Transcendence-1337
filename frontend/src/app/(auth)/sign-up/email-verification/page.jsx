@@ -18,7 +18,7 @@ const EmailVerification = () => {
   const [canResend, setCanResend] = useState(false);
 
   const hasFetchedRef = useRef(false);
-  const {user} = useAuth();
+  const {user, logout} = useAuth();
 
   const router = useRouter();
 
@@ -196,8 +196,9 @@ const EmailVerification = () => {
           >
             {isVerifying ? "Verifying..." : "Verify"}
           </button>
+          <div onClick={() => logout()} className="items-center text-gray-500 text-sm mt-2 hover:underline cursor-pointer">Change email</div>
         </div>
-        <div className="hidden md:block relative overflow-hidden m-2 bg-white rounded-3xl w-[400px]">
+        <div className="hidden md:block relative overflow-hidden m-2 bg-white rounded-3xl w-100">
           <Image
             src={assets.loginImg}
             alt="logo"

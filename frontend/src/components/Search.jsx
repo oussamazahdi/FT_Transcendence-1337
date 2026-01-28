@@ -67,33 +67,25 @@ const Search = () => {
       setLoading(true)
       setIsOpen(true);
       try{
-        // const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/search?q=${searchQuery}&page=${page}`,{
-        //     method: "GET",
-        //     credentials: "include",
-        //   },
-        // );
-        // const data = await response.json();
-        // if(!response.ok)
-        //   throw new Error(data.error);
+        const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/search?q=${searchQuery}&page=${page}`,{
+            method: "GET",
+            credentials: "include",
+          },
+        );
+        const data = await response.json();
+        if(!response.ok)
+          throw new Error(data.error);
 
-        // console.log(data);
-        // const searchResult = data.users;
+        console.log(data);
+        const searchResult = data.users;
 
 
-        // setSearchData(prev => {
-        //   if (page === 1) 
-        //     return newUsers; // New search: Replace everything
-        //   return [...prev, ...newUsers];   // Load more: Append to list
-        // });
-        // setHasMore(newUsers.length === 10);
-        const formatedData = mockdata.map((user)=>({
-          id: user.id,
-          avatar: user.avatar,
-          firstname: user.firstname,
-          lastname: user.lastname,
-          username: user.username,
-        }))
-        setSearchData(formatedData);
+        setSearchData(prev => {
+          if (page === 1) 
+            return searchResult;
+          return [...prev, ...searchResult];
+        });
+        setHasMore(searchResult.length === 10);
       }catch(err){
         console.log(err.message);
       }finally{

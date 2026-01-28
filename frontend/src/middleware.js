@@ -67,11 +67,18 @@ const onboardingSteps = {
           response.headers.set("Set-Cookie", setCookie);
         }
 
-        console.log("✅ Token refreshed successfully via Middleware");
+        console.log("Token refreshed successfully via Middleware");
         return response
+      }else {
+        console.log("Refresh failed. Session expired. Redirecting to login.");
+        const response = NextResponse.redirect(new URL("/sign-in", request.url));
+        response.cookies.delete("accessToken");
+        response.cookies.delete("refreshToken");
+        return response;
       }
     } catch (error) {
       console.error("Error during token refresh:", error);
+      return NextResponse.redirect(new URL("/sign-in", request.url));
     }
   }
 

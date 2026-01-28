@@ -116,12 +116,13 @@ const FriendsProfile = ({ userPage }) => {
                 Add friend
             </button>
           )}
-          <Link
-            href={`/chat?id=${userPage.id}`}
-            className="flex justify-center items-center p-2 bg-[#414141]/60 hover:bg-[#414141] rounded-sm transition-colors cursor-pointer hover:scale-105"
-          >
-            <ChatBubbleOvalLeftIcon className="size-4 brightness-150" />
-          </Link>
+          {isFriend && 
+            <Link
+              href={`/chat?id=${userPage.id}`}
+              className="flex justify-center items-center p-2 bg-[#414141]/60 hover:bg-[#414141] rounded-sm transition-colors cursor-pointer hover:scale-105"
+            >
+              <ChatBubbleOvalLeftIcon className="size-4 brightness-150" />
+            </Link>}
           <button className="flex justify-center items-center p-2 bg-[#414141]/60 hover:bg-[#414141] rounded-sm transition-colors cursor-pointer hover:scale-105">
             <Gamepad2 strokeWidth={1.5} className="size-4 brightness-150" />
           </button>

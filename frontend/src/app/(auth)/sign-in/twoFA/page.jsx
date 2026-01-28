@@ -4,6 +4,7 @@ import { assets } from "@/assets/data";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { AUTH_ERRORS } from "@/lib/utils";
+import { useAuth } from "@/contexts/authContext";
 
 const TwoFA = () => {
   const [loading, setLoading] = useState(false);
@@ -11,6 +12,7 @@ const TwoFA = () => {
   const inputRefs = useRef([]);
   const [error, setError] = useState("");
   const router = useRouter();
+  const {logout} = useAuth();
 
   const VerifyQrCode = async () => {
     setLoading(true);
@@ -117,6 +119,7 @@ const TwoFA = () => {
           >
             {loading ? "Verifing..." : "Verify"}
           </button>
+          <div onClick={() => logout()} className="items-center text-gray-500 text-sm mt-2 hover:underline cursor-pointer">Return to landing page</div>
         </div>
         <div className="hidden md:block relative overflow-hidden m-2 bg-white rounded-xl w-[400px]">
           <Image

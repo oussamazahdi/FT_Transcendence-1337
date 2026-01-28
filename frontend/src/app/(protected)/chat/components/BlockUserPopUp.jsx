@@ -13,7 +13,7 @@ const BlockUserPopUp = ({ user, setShowconfirm }) => {
         className="absolute inset-0 bg-black/15 backdrop-blur-xs"
         onClick={() => setShowconfirm(false)}
       ></div>
-      <div className="relative z-10 border border-[#414141] bg-[#0f0f0f]/75 py-10 px-16 rounded-4xl shadow-2xl w-[80%] md:w-100 flex flex-col items-center ">
+      <div className="relative z-10 border border-[#414141] bg-[#0f0f0f]/75 py-10 px-2 rounded-4xl shadow-2xl w-[80%] max-w-90 md:w-100 flex flex-col items-center ">
         <Image
           src={user.avatar || assets.defaultProfile}
           alt="icon"
