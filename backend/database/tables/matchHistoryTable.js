@@ -12,11 +12,12 @@ export function createMatchHistoryTable(db) {
 			player2_score INTEGER NOT NULL,
 			status TEXT NOT NULL,
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-			CHECK (player1_id <> player2_id),
+			
+			UNIQUE(player1_id, player2_id),
 
-			FOREIGN KEY (player1_id) REFERENCES users(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-			FOREIGN KEY (player2_id) REFERENCES users(id) ON DELETE RESTRICT ON UPDATE CASCADE
-			FOREIGN KEY (winner_id) REFERENCES users(id) ON DELETE RESTRICT ON UPDATE CASCADE
+			FOREIGN KEY (player1_id) REFERENCES users(id) ON UPDATE CASCADE,
+			FOREIGN KEY (player2_id) REFERENCES users(id) ON UPDATE CASCADE
+			FOREIGN KEY (winner_id) REFERENCES users(id) ON UPDATE CASCADE
 		);
 		`);
 	} catch (error) {

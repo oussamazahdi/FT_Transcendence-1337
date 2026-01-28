@@ -1,7 +1,8 @@
 import { handleDatabaseError } from "../utils/dbErrorHandler.js";
 
 export class GameSetting {
-  async addNewUserSetting(db, { userId }) {
+
+   addNewUserSetting(db, { userId }) {
     try {
       db.prepare(`INSERT INTO game_settings (player_id, player_xp, player_level, game_mode, ball_speed, score_limit, paddle_size) VALUES (?, ?, ?, ?, ?, ?, ?)`
       ).run(userId, 0, 0, "hell", 2, 10, 2);
@@ -11,7 +12,7 @@ export class GameSetting {
     }
   }
 
-  async getUserSettings(db, userId) {
+   getUserSettings(db, userId) {
     try {
       const settings = db.prepare("SELECT * FROM game_settings WHERE player_id = ?").get(userId);
 
