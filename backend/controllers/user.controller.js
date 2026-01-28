@@ -162,6 +162,7 @@ export class UserController
 				return reply.code(500).send({error: error.message});
         }
 	}
+
 	searchUsers(request, reply)
 	{
 		const db = request.server.db;
@@ -175,8 +176,8 @@ export class UserController
 			if (!query || query.length < 2 || query.length > 20)
 				return reply.code(400).json({ error: 'INVALID_QUERY' });
 			const results = userModels.searchUsers(db, q, limit, offset);
-
-			return reply.code(200).send({message: "SUCCESS", users: results});
+			console.log(results);
+			return reply.code(200).send({message: "SUCCESSxxxxxxxx", page: pageNum, limit: limit, users: results});
 		}
 		catch (error) {
 			if (error.code)

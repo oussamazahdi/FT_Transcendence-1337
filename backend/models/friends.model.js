@@ -31,6 +31,7 @@ export class FriendsModels
                 JOIN users u ON CASE
                     WHEN f.sender_id = :me THEN f.receiver_id
                     ELSE f.sender_id
+                END
                 WHERE
                     (
                         (f.sender_id = :me
@@ -53,7 +54,7 @@ export class FriendsModels
         }
         catch (error)
         {
-            const dbError = handleDatabaseError(error, 'searchUsers');
+            const dbError = handleDatabaseError(error, 'searchFriends');
             throw dbError;
         }
     }

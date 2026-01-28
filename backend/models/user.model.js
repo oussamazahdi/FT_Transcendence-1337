@@ -80,14 +80,20 @@ export class UserModels
                     OR lastname LIKE '%' || :query || '%'
                     OR username LIKE '%' || :query || '%'
                 ORDER BY
-                    CASE 
-                        WHEN firstname LIKE '%' || :query || '%' THEN 1
-                        WHEN lastname LIKE '%' || :query || '%' THEN 2
-                        WHEN username LIKE '%' || :query || '%' THEN 3
-                    END
+                    CASE
+                        WHEN username  LIKE :query || '%' THEN 1
+                        WHEN firstname LIKE :query || '%' THEN 2
+                        WHEN lastname  LIKE :query || '%' THEN 3
+                        WHEN username  LIKE '%' || :query || '%' THEN 4
+                        WHEN firstname LIKE '%' || :query || '%' THEN 5
+                        WHEN lastname  LIKE '%' || :query || '%' THEN 6
+                        ELSE 7
+                    END,
+                    username ASC
                 LIMIT :limit
-                OFFSET :offset
+                OFFSET :offset;
                 `).all({query: query, limit: limit, offset: offset});
+            return (result);
         }
         catch (error)
         {
