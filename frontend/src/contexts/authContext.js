@@ -6,7 +6,8 @@ import { USER_ERROR } from "@/lib/utils";
 const UserContext = createContext(null);
 
 export function UserProvider({ children, initialUser }) {
-  const [user, setUser] = useState(initialUser?.userData || {});
+
+  const [user, setUser] = useState(initialUser?.userData || null);
   const [friends, setFriends] = useState(initialUser?.friends || []);
   const [blocked, setBlocked] = useState(initialUser?.blocked || []);
   const [pendingRequests, setPendingRequests] = useState(initialUser?.pendingRequests || []);
@@ -15,13 +16,49 @@ export function UserProvider({ children, initialUser }) {
 	const [gameSetting, setGameSetting] = useState(initialUser?.gameSetting || [])
   const router = useRouter();
 
+  const refreshFriendReq = async () => {
+    try {
+      const [incomreqRes, pendReqRes, friendsRes, blockedRes, playerSettingsRes] = await Promise.all([
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests`,{credentials:"include"}),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/sent`,{credentials:"include"}),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/`,{credentials:"include"}),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks`, { credentials: "include" }),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/game/settings`, { credentials: "include" })
+      ]);
+
+      if (incomreqRes.ok) {
+          const data = await incomreqRes.json();
+          setIncomingRequests(data.requestsList || []);
+      }
+      
+      if (pendReqRes.ok) {
+          const data = await pendReqRes.json();
+          setPendingRequests(data.Requests || []);
+      }
+
+      if (friendsRes.ok) {
+          const data = await friendsRes.json();
+          setFriends(data.friendList || []);
+      }
+
+      if (blockedRes.ok) {
+          const data = await blockedRes.json();
+          setBlocked(data.blockedUsers || []);
+      }
+
+      if (playerSettingsRes.ok) {
+        const data = await playerSettingsRes.json();
+        setGameSetting(data.settings || []);
+      }
+
+    } catch (err) {
+      console.log("Failed to refresh friend data", err);
+    }
+  };
+
   const login = (userData) => {
     setUser(userData);
-    setFriends(initialUser?.friends || []);
-    setBlocked(initialUser?.blocked || []);
-    setPendingRequests(initialUser?.pendingRequests || []);
-    setIncomingRequests(initialUser?.incomingRequest || [])
-		setGameSetting(initialUser?.gameSetting || [])
+    refreshFriendReq();
   };
 
   const logout = async () => {
@@ -34,9 +71,15 @@ export function UserProvider({ children, initialUser }) {
       if(response.ok){
         router.push("/");
         router.refresh();
+        setUser(null);
+        setFriends([]);
+        setBlocked([]);
+        setPendingRequests([]);
+        setIncomingRequests([]);
+        setGameSetting([]);
       }
     } catch (error) {
-      triggerError(USER_ERROR[err.message] || USER_ERROR['default'])
+      triggerError(USER_ERROR[error.message] || USER_ERROR['default'])
     }
   };
 
@@ -74,7 +117,7 @@ export function UserProvider({ children, initialUser }) {
       if(!response.ok)
         throw new Error (data.error)
 
-      console.log("Friend request cancled succefully")
+      console.log("Friend request canceled succefully")
 
       setPendingRequests(pendingRequests.filter(items => items.id !== user.id));
       setIncomingRequests(incomingRequest.filter(items => items.id !== user.id))
@@ -94,7 +137,7 @@ export function UserProvider({ children, initialUser }) {
       if(!response.ok)
         throw new Error (data.error)
 
-      console.log("Friend request accepted succefully")
+      console.log("Friend request accepted successfully")
 
       setFriends((prev) => [...prev, user]);
       setIncomingRequests(incomingRequest.filter(items => items.id !== user.id))
@@ -123,7 +166,6 @@ export function UserProvider({ children, initialUser }) {
   }
 
   const blockUser = async (user) => {
-    console.log("the blocked one", user);
     try{
       const response = await fetch (`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks/${user.id}`,{
         method:"POST",
@@ -138,6 +180,7 @@ export function UserProvider({ children, initialUser }) {
       console.log("user blocked succefully");
   
       setBlocked((prev) => [...prev, user]);
+      setFriends(friends.filter(items => items.id !== user.id));
     }catch(err){
       triggerError(USER_ERROR[err.message] || USER_ERROR['default'])
     }
@@ -157,33 +200,10 @@ export function UserProvider({ children, initialUser }) {
       console.log("user Deblocked succefully");
   
       setBlocked(blocked.filter(items => items.id !== user.id));
-      setFriends(friends.filter(items => items.id !== user.id));
     }catch(err){
       triggerError(USER_ERROR[err.message] || USER_ERROR['default'])
     }
   }
-
-  const refreshFriendReq = async () => {
-    try {
-      const [incomreqRes, pendReqRes] = await Promise.all([
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests`,{credentials:"include"}),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/sent`,{credentials:"include"})
-      ]);
-
-      if (incomreqRes.ok) {
-          const data = await incomreqRes.json();
-          setIncomingRequests(data.requestsList || []);
-      }
-      
-      if (pendReqRes.ok) {
-          const data = await pendReqRes.json();
-          setPendingRequests(data.Requests || []);
-      }
-
-    } catch (err) {
-      console.log("Failed to refresh friend data", err);
-    }
-  };
 
 	const updateGameSettings = async (data) => {
 		try {
@@ -227,7 +247,7 @@ export function UserProvider({ children, initialUser }) {
 					details: json,
 				};
 			}
-	
+      //need to update your local settings
 			return { ok: true, status: res.status, data: json };
 		} catch (err) {
 			return { ok: false, status: 0, error: err?.message || "NETWORK_ERROR" };

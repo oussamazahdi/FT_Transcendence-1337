@@ -11,12 +11,11 @@ const FriendCard = ({user}) => {
       key={user.id}
       className="flex items-center w-full bg-[#414141]/60 rounded-lg p-1 gap-1"
     >
-      <div className='size-10 flex items-center overflow-hidden rounded-sm'>
+      <div className='relative size-10 flex items-center overflow-hidden rounded-sm'>
         <Image
           src={user?.avatar || assets.defaultProfile}
           alt="icon"
-          width={40}
-          height={40}
+          fill
           className="object-cover"
           />
       </div>

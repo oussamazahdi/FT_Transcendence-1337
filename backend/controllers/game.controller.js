@@ -14,7 +14,7 @@ export class MatchController {
 	}
 
 	async createMatchHistory(db, { player1, player2, score1, score2, winner = null, status = "finished" }) {
-		const inserted = await this.matchHistory.create(db, { player1, player2, score1, score2, winner, status,
+		const inserted = this.matchHistory.create(db, { player1, player2, score1, score2, winner, status,
 		});
 
 		if (!inserted?.id) throw httpError(500, "Failed to create match history");
@@ -30,7 +30,7 @@ export class MatchController {
 
 	async addNewGameSettings(db, userId) {
 		try {
-			const result = await this.gameSetting.addNewUserSetting(db, { userId });
+			const result = this.gameSetting.addNewUserSetting(db, { userId });
 	
 			return {
 				success: true,
@@ -44,7 +44,7 @@ export class MatchController {
 
 	async getUserSettings(db, userId) {
     try {
-      const settings = await this.gameSetting.getUserSettings(db, userId);
+      const settings = this.gameSetting.getUserSettings(db, userId);
       return settings;
     } catch (error) {
       throw error;
@@ -53,7 +53,7 @@ export class MatchController {
 
   async updateUserSettings( db, { userId, player_xp, player_level, game_mode, ball_speed, score_limit, paddle_size, }) {
     try {
-      const result = await this.gameSetting.updateUserSettings(db, { userId, player_xp, player_level, game_mode, ball_speed, score_limit, paddle_size,});
+      const result = this.gameSetting.updateUserSettings(db, { userId, player_xp, player_level, game_mode, ball_speed, score_limit, paddle_size,});
 
       return result;
     } catch (error) {

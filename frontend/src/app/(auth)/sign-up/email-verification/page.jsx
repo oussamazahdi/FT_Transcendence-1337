@@ -157,7 +157,7 @@ const EmailVerification = () => {
           <h1 className="text-white text-lg font-bold">Verify your identity</h1>
           <h2 className="text-[#A6A6A6] text-sm px-6 text-center">
             We've sent a 6-digit code to{" "}
-            <span className="text-white">{user.email}</span>
+            <span className="text-white">{user?.email || "You@example.com"}</span>
           </h2>
           <div className="flex gap-2 mb-1">
             {otp.map((data, index) => (

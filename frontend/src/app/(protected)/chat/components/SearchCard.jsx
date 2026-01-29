@@ -15,7 +15,7 @@ const SearchCard = (props) => {
   return (
     <div className='p-0.5 flex items-center rounded-xl bg-[#8D8D8D]/25 hover:bg-[#8D8D8D]/50 cursor-pointer mb-1'
       onClick={()=>selectHandler()}>
-      <div className="m-px size-12 flex items-center rounded-lg cursor-pointer overflow-hidden">
+      <div className="m-0.5 size-12 flex items-center rounded-lg cursor-pointer overflow-hidden">
         <Image
           src={props.avatar || assets.defaultProfile}
           alt=""

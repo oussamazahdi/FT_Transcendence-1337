@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import Friends from "../profile/components/Friends";
 import Profile from "../profile/components/Profile";
 import MatchHistory from "../profile/components/MatchHistory";
@@ -9,7 +9,11 @@ import Games from "./components/Games";
 import CercleGraph from "./components/CercleGraph";
 
 const dashboard = () => {
-  const { user } = useAuth();
+  const { user, refreshFriendReq } = useAuth();
+  
+  useEffect(()=>{
+      refreshFriendReq();
+  },[])
   return (
     <div className="flex w-full max-w-7xl flex-col md:flex-row gap-4 h-auto md:h-[86vh]">
       <div className="flex flex-col w-full md:w-7/10 gap-4">

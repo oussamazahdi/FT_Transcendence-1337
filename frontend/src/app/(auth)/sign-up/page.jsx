@@ -57,6 +57,7 @@ export default function SignUp() {
 
       if (!reply.ok) {
         const errorData = await reply.json();
+      console.log(errorData.error);
         const errorMessage = AUTH_ERRORS[errorData.error] || AUTH_ERRORS["default"];
         throw new Error(errorMessage);
       }

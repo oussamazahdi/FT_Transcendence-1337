@@ -48,8 +48,6 @@ const SignIn = () => {
 
       const data = await reply.json();
       login(data.userData);
-      console.log("tloga meziane");
-
       router.push("/dashboard");
     } catch (err) {
       if (err instanceof Error) 

@@ -9,6 +9,7 @@ export const AUTH_ERRORS = {
   USER_NOT_FOUND: "Invalid email or password.",
   INVALID_PASSWORD: "Invalid email or password.",
   USER_IS_ALREADY_EXIST:"An account with this user already exists. Try login instead.",
+  USERNAME_ALREADY_TAKEN:"That username is already in use. Please try another one.",
   EMAIL_ALREADY_EXISTS: "An account with this email already exists. Try login instead.",
   MISSING_FIELD: "Please complete all required fields.",
   UNAUTHORIZED_NO_TOKEN: "You must be logged in to view this page.",

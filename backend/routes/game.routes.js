@@ -48,7 +48,6 @@ fastify.patch("/update-settings", { preHandler: authMiddleware }, async (req, re
 		const db = req.server.db;
 
     const body = req.body ?? {};
-		// console.log("*******************************> body:", body);
 
 		const { ball_speed, score_limit, paddle_size } = req.body ?? {};
 

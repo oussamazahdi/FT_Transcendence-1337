@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import Friends from "./components/Friends";
 import MatchPlayed from "./components/MatchPlayed";
 import Profile from "./components/Profile";
@@ -8,7 +8,11 @@ import { useAuth } from "@/contexts/authContext";
 import MatchHistory from "./components/MatchHistory";
 
 export default function ProfilePage() {
-  const { user } = useAuth();
+  const { user, refreshFriendReq } = useAuth();
+  
+  useEffect(()=>{
+      refreshFriendReq();
+  },[])
   return (
     <div className="flex w-full max-w-7xl flex-col md:flex-row gap-4 h-auto md:h-[86vh] overflow-y-auto">
       <div className="flex flex-col w-full md:flex-1 md:basis-7/10 gap-4">
