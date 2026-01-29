@@ -1,5 +1,5 @@
 import { authMiddleware } from "../middlewares/authMiddleware.js";
-import { friendsController, friendsController } from "../controllers/friends.controller.js"
+import { friendsController } from "../controllers/friends.controller.js"
 import { 
     errorResponse,
     emptySuccessResponse,
