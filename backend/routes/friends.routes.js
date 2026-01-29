@@ -1,15 +1,16 @@
 import { authMiddleware } from "../middlewares/authMiddleware.js";
-import { FriendsController, friendsController } from "../controllers/friends.controller.js"
-import fastify from "fastify";
-import { errorResponse,
+import { friendsController, friendsController } from "../controllers/friends.controller.js"
+import { 
+    errorResponse,
     emptySuccessResponse,
     friendsListResponse,
     friendRequestsResponse,
     sentFriendRequestsResponse,
     blockedUsersResponse,
-    idParamSchema
+    friendsSearchResponse,
+    idParamSchema,
+    searchQuerySchema
 } from "../config/schemes.config.js";
-import { FriendsModels } from "../models/friends.model.js";
 
 function friendsRoutes(fastify)
 {
@@ -26,7 +27,19 @@ function friendsRoutes(fastify)
         }
     }, friendsController.getAllFriends);
 
-    fastify.get("/search", {preHandler: authMiddleware}, friendsController.searchFriends)
+    fastify.get("/search", {
+        preHandler: authMiddleware,
+        schema: {
+            description: "Search friends by name/username with pagination",
+            tags: ['Friends'],
+            querystring: searchQuerySchema,
+            response: {
+                200: friendsSearchResponse,
+                401: errorResponse,
+                500: errorResponse
+            }
+        }
+    }, friendsController.searchFriends);
     
     fastify.get("/requests", {
         preHandler: authMiddleware,
@@ -43,15 +56,15 @@ function friendsRoutes(fastify)
     
     fastify.get("/requests/sent", {
         preHandler: authMiddleware,
-        // schema: {
-        //     description: "Get outgoing friend requests",
-        //     tags: ['Friends'],
-        //     response: {
-        //         200: sentFriendRequestsResponse,
-        //         401: errorResponse,
-        //         500: errorResponse
-        //     }
-        // }
+        schema: {
+            description: "Get outgoing friend requests",
+            tags: ['Friends'],
+            response: {
+                200: sentFriendRequestsResponse,
+                401: errorResponse,
+                500: errorResponse
+            }
+        }
     }, friendsController.getSentRequests);
 
     fastify.post("/requests/:id", {
