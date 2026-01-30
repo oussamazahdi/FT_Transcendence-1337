@@ -9,12 +9,14 @@ import { useSocket } from '@/contexts/socketContext';
 const FriendCard = ({user}) => {
 	const socket = useSocket();
 
+	// socket.emit("users:status")
+	
+
 		const sendInvite = ()=>{
 			if(!socket) {
 				console.log("❌ socket not connected");
 	      return;
 			}
-
 			socket.emit("game:invite",{
 				user: user.id,
 				roomId: "test-room-1",

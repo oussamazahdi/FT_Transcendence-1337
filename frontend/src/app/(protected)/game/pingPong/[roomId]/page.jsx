@@ -1,9 +1,9 @@
 "use client";
 
+import {GAME_MODE, GAME_WIDTH, GAME_HEIGHT} from "@/components/ui/GameMode"
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useAuth } from "@/contexts/authContext";
 import { useSocket } from "@/contexts/socketContext";
-import {GAME_MODE, MAPS, GAME_WIDTH, GAME_HEIGHT} from "@/components/ui/GameMode"
+import { useAuth } from "@/contexts/authContext";
 
 let bgImg = null;
 let bgReady = false;
@@ -115,7 +115,7 @@ export default function GamePage() {
             width: GAME_WIDTH * scale,
             height: GAME_HEIGHT * scale,
           }}
-          className="rounded-2xl border border-white/60"
+          className="rotate-90 rounded-2xl border border-white/60"
         />
 
         {endGame && (

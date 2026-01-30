@@ -1,14 +1,8 @@
-import {
-	activeGames,
-	loops,
-	socketToUsername,
-	usernameToSocket,
-	waitingPlayer
-} from "../store/memory.store.js";
-
+import { activeGames, loops, socketToUsername, usernameToSocket, waitingPlayer } from "../store/memory.store.js";
+import { GAME_WIDTH, FPS } from "../constants/game.constants.js";
 import { updateGame } from "../services/GameLoop.service.js";
-
-const FPS = 1000 / 60;
+import { GameSession, Paddle } from "../store/game.store.js";
+import { randomUUID } from "crypto";
 
 export const getGame = (roomId) => activeGames.get(roomId);
 
@@ -82,4 +76,27 @@ export function isValidPlayerData(data) {
 		typeof data.lastName === "string" &&
 		typeof data.avatar === "string"
 	);
+}
+
+export function createGame(waiting, socket, player) {
+  const game = new GameSession();
+
+	if (!game?.roomId) game.roomId = randomUUID();
+
+  Object.assign(game.player1, {
+    ...waiting.player,
+    socketId: waiting.socketId,
+    roomId: game.roomId,
+    player: new Paddle(40)
+  });
+
+  Object.assign(game.player2, {
+    ...player,
+    socketId: socket.id,
+    roomId: game.roomId,
+    player: new Paddle(GAME_WIDTH - 60)
+  });
+
+  game.state = "MATCHED";
+  return game;
 }

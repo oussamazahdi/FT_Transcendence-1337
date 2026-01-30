@@ -29,8 +29,8 @@ export function initializeSocketes(app) {
       const cookies = cookie.parse(rawCookie);
       const accessToken = cookies.accessToken;
       const refreshToken = cookies.refreshToken;
-			console.log("accessToken:", accessToken);
-			console.log("refreshToken:", refreshToken);
+			// console.log("accessToken:", accessToken);
+			// console.log("refreshToken:", refreshToken);
 
       if (!accessToken) return next(new Error("Unauthorized"));
 

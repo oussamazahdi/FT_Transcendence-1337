@@ -105,7 +105,7 @@ export function UserProvider({ children, initialUser }) {
     }
   }
 
-  const removeFriend = async (user) => {
+  const removeFriend  = async (user) => {
     try{
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/${user.id}`, {
         method:"DELETE",

@@ -120,7 +120,10 @@ export const notificationSchema = {
 		status: { type: "string" },
 		is_read: { type: "integer" },
 		expires_at: { type: ["string", "null"] },
-		created_at: { type: "string" }
+		created_at: { type: "string" },
+		is_expired: { type: "integer", enum: [0, 1] },
+		sender_username: { type: ["string", "null"] },
+    sender_avatar: { type: ["string", "null"], format: "uri" }
 	}
 };
 

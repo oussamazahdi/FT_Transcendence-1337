@@ -9,6 +9,10 @@ import Games from "./components/Games";
 
 const dashboard = () => {
   const { user } = useAuth();
+	const vara = process.env.NEXT_PUBLIC_ENCRYPTION_OBJECT;
+
+
+	console.log(' ===? ' , vara)
   return (
     <div className="flex w-full max-w-7xl flex-col md:flex-row gap-4 h-auto md:h-[86vh]">
       <div className="flex flex-col w-full md:w-7/10 gap-4">

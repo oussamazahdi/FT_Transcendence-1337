@@ -31,7 +31,11 @@ export class NotifModel {
   }
 
   async getForUser(db, userId) {
-    return db.prepare(`SELECT * FROM notifications WHERE receiver_id = ? ORDER BY created_at DESC`).all(userId);
+    return db.prepare(`SELECT notif.*, u.id AS sender_id, u.username AS sender_username, u.avatar AS sender_avatar
+  	FROM notifications notif LEFT JOIN users u ON u.id = notif.sender_id WHERE notif.receiver_id = ?
+  	ORDER BY notif.created_at DESC`).all(userId);
+
+    // return db.prepare(`SELECT * FROM notifications WHERE receiver_id = ? ORDER BY created_at DESC`).all(userId);
   }
 
 	updateNotificationStatus(db, { notifId, status, isRead = 1 }) {

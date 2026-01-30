@@ -135,7 +135,6 @@ export default function MatchHistory({ classname = "" }) {
       const normalized = list
         .map((m) => normalizeMatch(m, mergedUsers[m.player1_id], mergedUsers[m.player2_id]))
         .filter(Boolean);
-			console.log("normalized:", normalized);
       setMatches(normalized);
     } catch (err) {
       console.error("Failed to load match history:", err);
