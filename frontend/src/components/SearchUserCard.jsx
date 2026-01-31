@@ -2,8 +2,10 @@ import React from 'react'
 import Image from 'next/image';
 import { assets } from '@/assets/data';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/authContext';
 
 const SearchUserCard = (props) => {
+  const {user} = useAuth();
   const selectHandler = () => {
     props.setIsOpen(false);//no need
     props.setSearchQuery("");
@@ -23,7 +25,7 @@ const SearchUserCard = (props) => {
       <div className="ml-2 flex flex-col items-start justify-between min-w-0">
         <h4 className="text-white text-xs font-semibold">{props.firstname} {props.lastname}</h4>
         <h2 className="text-gray-300 text-[12px] truncate">
-          @{props.username}
+          @{user.id === props.id ? "You" : `${props.username}`}
         </h2>
       </div>
     </Link>

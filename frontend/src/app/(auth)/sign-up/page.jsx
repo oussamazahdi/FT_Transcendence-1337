@@ -8,6 +8,7 @@ import Link from "next/link";
 import Input from "./components/Input";
 import ConnectWith from "@/components/ConnectWith";
 import { AUTH_ERRORS } from "@/lib/utils";
+import { useAuth } from "@/contexts/authContext";
 
 export default function SignUp() {
   const [firstname, setFirstname] = useState("");
@@ -19,6 +20,7 @@ export default function SignUp() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const {setUser} = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,12 +59,17 @@ export default function SignUp() {
 
       if (!reply.ok) {
         const errorData = await reply.json();
-      console.log(errorData.error);
         const errorMessage = AUTH_ERRORS[errorData.error] || AUTH_ERRORS["default"];
         throw new Error(errorMessage);
       }
 
       const data = await reply.json();
+      // setUser({
+      //   firstname : firstname,
+      //   lastname : lastname ,
+      //   username :username ,
+      //   email :email ,
+      // })
       console.log("Signup successful:", data);
       router.replace("/sign-up/email-verification");
     } catch (err) {

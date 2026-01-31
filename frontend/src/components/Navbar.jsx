@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import {
   Bars3Icon,
   XMarkIcon,
-  MagnifyingGlassIcon,
   HomeIcon,
   ChatBubbleOvalLeftIcon,
   TrophyIcon,
@@ -74,15 +73,6 @@ export default function Navbar() {
         </nav>
 
         {/* Desktop Search */}
-        {/* <div className="hidden md:flex items-center border border-[#9D9D9D]/60 rounded-full px-4 py-2">
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search"
-            className="bg-transparent outline-none text-white placeholder-white/40"
-          />
-          <MagnifyingGlassIcon className="w-5 h-5 ml-2 text-white/60" />
-        </div> */}
         <Search/>
 
         {/* Desktop User */}
@@ -132,7 +122,7 @@ export default function Navbar() {
             <div className="flex flex-col gap-4 mt-auto">
               <button
                 onClick={() => hardNavigate("/profile")}
-                className="flex gap-3 text-white/70  cursor-pointer cursor-pointer"
+                className="flex gap-3 text-white/70 cursor-pointer"
               >
                 <UserIcon className="w-5 h-5" />
                 Profile

@@ -49,13 +49,15 @@ const ProfileDropDown = ({ user }) => {
     <div ref={ref} className="relative shrink-0">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative size-12 md:size-14 rounded-[12px] flex items-center justify-center text-white hover:shadow-lg transition-all hover:scale-105 active:scale-95 overflow-hidden cursor-pointer"
+        className="relative size-12 md:size-14 rounded-xl flex items-center justify-center text-white hover:shadow-lg transition-all hover:scale-105 active:scale-95 overflow-hidden cursor-pointer"
       >
         <div className="h-full w-full  bg-white/10 flex items-center justify-center overflow-hidden">
           {user?.avatar && user.avatar !== "null" ? (
-            <img
+            <Image
               src={user.avatar}
-              alt={user.username || "User avatar"}
+              alt="avatar"
+              height={80}
+              width={80}
               className="h-full w-full object-cover"
             />
           ) : (

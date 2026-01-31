@@ -10,52 +10,6 @@ const Search = () => {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-
-  const mockdata = [
-    {
-      id: 1,
-      avatar: "http://localhost:3001/uploads/default/profile1.jpeg",
-      firstname: "Soufiane",
-      lastname: "Arif",
-      username: "soufiiiix",
-    },
-    {
-      id: 2,
-      avatar: "http://localhost:3001/uploads/default/profile2.jpeg",
-      firstname: "Chaymaa",
-      lastname: "Nour",
-      username: "chay_art",
-    },
-    {
-      id: 3,
-      avatar: "http://localhost:3001/uploads/default/profile3.jpeg",
-      firstname: "Jalal",
-      lastname: "Malyana",
-      username: "j_malyana",
-    },
-    {
-      id: 4,
-      avatar: "http://localhost:3001/uploads/default/profile4.jpeg",
-      firstname: "Amine",
-      lastname: "Sanhaji",
-      username: "amine_dev",
-    },
-    {
-      id: 5,
-      avatar: "http://localhost:3001/uploads/default/profile5.jpeg",
-      firstname: "Yassine",
-      lastname: "Benali",
-      username: "yassine_b",
-    },
-    {
-      id: 6,
-      avatar: "http://localhost:3001/uploads/default/profile6.jpeg",
-      firstname: "Salma",
-      lastname: "Rachid",
-      username: "salma_r",
-    },
-  ];
-
   useEffect(() => {
     if(!searchQuery.trim() || searchQuery.trim().length < 2){
       setIsOpen(false)
