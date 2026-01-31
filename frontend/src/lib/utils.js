@@ -55,3 +55,15 @@ export const SEARCH_ERROR = {
   QUERY_TOO_LONG: "Search term is too long. Please shorten your query.",
   default: "Search failed. Please try again.",
 };
+
+
+class componentUtils{
+	isExpired(notif) {
+		if (!notif) return true;
+		if (notif.is_expired === 1) return true;
+		if (!notif.expires_at) return false;
+		const t = new Date(notif.expires_at).getTime();
+		return Number.isFinite(t) ? Date.now() > t : false;
+	}
+}
+export const ComponentUtils = new componentUtils();

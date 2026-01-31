@@ -2,7 +2,7 @@ import { NotificationRules } from "../rules/notifications.rules.js";
 import { NotifModel } from "../models/notif.model.js";
 import { NOTIFICATION_TYPES } from "../rules/notifications.rules.js";
 
-const model = new NotifModel();
+// const model = new NotifModel();
 
 /******************************************************************************************************/
 export function httpError(code, message) {
@@ -56,7 +56,7 @@ function validateRulePayload(rule, payload) {
 }
 
 /******************************************************************************************************/
-export class NotifServices {
+class notifServices {
 	
 	/******************************************************************************************************/
 	async create(db, { senderId, receiverId, type, title, message, payload = {} }) {
@@ -68,7 +68,7 @@ export class NotifServices {
 
 		const expiresAt = getExpirationDate(rule);
 
-		const inserted = await model.create(db, {
+		const inserted = await NotifModel.create(db, {
 			senderId,
 			receiverId,
 			type,
@@ -80,7 +80,7 @@ export class NotifServices {
 
 		if (!inserted?.id) throw httpError(500, "Failed to create notification");
 
-		const row = await model.getById(db, inserted.id);
+		const row = await NotifModel.getById(db, inserted.id);
 		return row ? { ...row, payload: safeParsePayload(row.payload) } : inserted;
 	}
 
@@ -88,7 +88,7 @@ export class NotifServices {
 	async getForUser(db, userId, { expireOnFetch = true } = {}) {
 		if (!userId) throw httpError(400, "Missing userId");
 
-		const rows = (await model.getForUser(db, userId)) || [];
+		const rows = (await NotifModel.getForUser(db, userId)) || [];
 
 		if (!expireOnFetch) {
 			return rows.map((r) => ({ ...r, payload: safeParsePayload(r.payload) }));
@@ -98,11 +98,11 @@ export class NotifServices {
 		for (const r of rows) {
 			let row = r;
 
-			await model.markAsRead(db, row.id);
+			await NotifModel.markAsRead(db, row.id);
 			if (row?.status === "pending" && isExpired(row)) {
-				await model.markAsExpired(db, row.id);
-				await model.updateStatus(db, row.id, "expired");
-				row = (await model.getById(db, row.id)) || { ...row, status: "expired" };
+				await NotifModel.markAsExpired(db, row.id);
+				await NotifModel.updateStatus(db, row.id, "expired");
+				row = (await NotifModel.getById(db, row.id)) || { ...row, status: "expired" };
 			}
 
 			out.push({ ...row, payload: safeParsePayload(row.payload) });
@@ -113,24 +113,24 @@ export class NotifServices {
 
 	/******************************************************************************************************/
 	async getById(db, id) {
-		const row = await model.getById(db, id);
+		const row = await NotifModel.getById(db, id);
 		return row ? { ...row, payload: safeParsePayload(row.payload) } : null;
 	}
 
 	/******************************************************************************************************/
 	async markAsRead(db, { id, userId } = {}) {
-		const notif = await model.getById(db, id);
+		const notif = await NotifModel.getById(db, id);
 		if (!notif) throw httpError(404, "Notification not found");
 		if (userId != null && notif.receiver_id !== userId) throw httpError(403, "Forbidden");
 
-		await model.markAsRead(db, id);
-		const updated = (await model.getById(db, id)) || notif;
+		await NotifModel.markAsRead(db, id);
+		const updated = (await NotifModel.getById(db, id)) || notif;
 		return { ...updated, payload: safeParsePayload(updated.payload) };
 	}
 
 	/******************************************************************************************************/
 	async act(db, { id, userId, action }) {
-		const notif = await model.getById(db, id);
+		const notif = await NotifModel.getById(db, id);
 		if (!notif) throw httpError(404, "Notification not found");
 		if (notif.receiver_id !== userId) throw httpError(403, "Forbidden");
 
@@ -140,8 +140,8 @@ export class NotifServices {
 		if (!rule.allowedActions?.includes(action)) throw httpError(400, `Action not allowed: ${action}`);
 
 		if (notif.status === "pending" && isExpired(notif)) {
-			await model.updateStatus(db, id, "expired");
-			await model.markAsRead(db, id);
+			await NotifModel.updateStatus(db, id, "expired");
+			await NotifModel.markAsRead(db, id);
 			throw httpError(409, "Notification expired");
 		}
 
@@ -149,10 +149,10 @@ export class NotifServices {
 		if (!nextStatus) throw httpError(400, "Invalid action");
 		if (!rule.validTransitions?.includes(nextStatus)) throw httpError(400, "Invalid status transition");
 
-		await model.updateStatus(db, id, nextStatus);
-		await model.markAsRead(db, id);
+		await NotifModel.updateStatus(db, id, nextStatus);
+		await NotifModel.markAsRead(db, id);
 
-		const updated = await model.getById(db, id);
+		const updated = await NotifModel.getById(db, id);
 		return { ...updated, payload: safeParsePayload(updated?.payload) };
 	}
 
@@ -171,3 +171,6 @@ export class NotifServices {
 	}
 }
 /******************************************************************************************************/
+/******************************************************************************************************/
+
+export const NotifServices = new notifServices();

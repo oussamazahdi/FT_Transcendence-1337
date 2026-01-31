@@ -5,6 +5,7 @@ import { UserIcon } from "@heroicons/react/24/outline";
 import { Gamepad2 } from "lucide-react";
 import { assets } from '@/assets/data';
 import { useSocket } from '@/contexts/socketContext';
+import { randomUUID } from "crypto";
 
 const FriendCard = ({user}) => {
 	const socket = useSocket();
@@ -13,13 +14,10 @@ const FriendCard = ({user}) => {
 	
 
 		const sendInvite = ()=>{
-			if(!socket) {
-				console.log("❌ socket not connected");
-	      return;
-			}
+			if(!socket) return;
 			socket.emit("game:invite",{
 				user: user.id,
-				roomId: "test-room-1",
+				roomId: crypto.randomUUID(),
 				gameType: "pingpong",
 			},
 

@@ -23,7 +23,25 @@ const nextConfig = {
       },
     ],
   },
-  /* config options here */
+
+// 	images: {
+//     // local static assets are fine
+//     // unoptimized: false,
+//   },
+
+//   async rewrites() {
+//     return [
+//       {
+//         source: "/uploads/:path*",
+//         // ✅ if NOT using Docker
+//         destination: "http://127.0.0.1:3001/uploads/:path",
+
+//         // ✅ if using Docker, replace with:
+//         // destination: "http://backend:3001/uploads/:path*",
+//       },
+//     ];
+//   },
+//   /* config options here */
 };
 
 export default nextConfig;

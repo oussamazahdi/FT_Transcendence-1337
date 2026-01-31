@@ -1,6 +1,6 @@
 import { NOTIFICATION_TYPES } from "../rules/notifications.rules.js";
 
-export class NotifModel {
+class notifModel {
   async create(db, { senderId, receiverId, type, title, message, payload = null, expiresAt = null }) {
     if (!Object.values(NOTIFICATION_TYPES).includes(type)) return null;
     console.log("all types: ",typeof senderId, typeof receiverId, typeof type, typeof title, typeof message, typeof payload, typeof expiresAt)
@@ -46,4 +46,12 @@ export class NotifModel {
 	getNotificationById(db, notifId) {
 		return db.prepare(`SELECT * FROM notifications WHERE id = ?`).get(notifId);
 	}
+
+	getUnreadCount(db, userId){
+		return db.prepare(`SELECT COUNT(*) AS unreadCount FROM notifications WHERE receiver_id = ?
+			AND is_read = 0 AND (is_expired = 0 OR is_expired IS NULL)`).get(userId);
+	}
 }
+
+
+export const NotifModel = new notifModel();

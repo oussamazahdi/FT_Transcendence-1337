@@ -141,7 +141,7 @@ export default function GameSettings() {
     );
   }, [userData, selectedMap, baseline]);
 
-  const canSave = !hasErrors && hasChanges;
+  const [canSave, setCanSave] = useState(!hasErrors && hasChanges);
 
   const onNumberChange = useCallback(
     (key) => (e) => {
@@ -169,7 +169,7 @@ export default function GameSettings() {
     };
 
 		updateGameSettings(payload)
-		canSave = false;
+		// setCanSave(false);
     console.log("Saving:", payload);
   }, [canSave, userData, selectedMap]);
 

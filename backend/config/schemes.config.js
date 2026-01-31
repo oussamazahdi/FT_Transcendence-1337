@@ -131,7 +131,7 @@ export const notificationsSuccessResponse = {
   type: "object",
   properties: {
     message: { type: "string" },
-    userData: {
+    notifications: {
       type: "array",
       items: notificationSchema
     }

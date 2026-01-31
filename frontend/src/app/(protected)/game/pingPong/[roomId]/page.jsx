@@ -115,7 +115,7 @@ export default function GamePage() {
             width: GAME_WIDTH * scale,
             height: GAME_HEIGHT * scale,
           }}
-          className="rotate-90 rounded-2xl border border-white/60"
+          className="rounded-2xl border border-white/60"
         />
 
         {endGame && (

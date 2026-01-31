@@ -7,7 +7,6 @@ import { joinGame } from "../services/JoinGame.service.js"
 import { onlineUsers } from "../store/memory.store.js"
 
 
-const service = new NotifServices();
 
 
 export class ConnectionController 
@@ -53,7 +52,7 @@ export class ConnectionController
 				throw httpError(400, "You cannot invite yourself");
 			}
 			
-			const notif = await service.create(socket.db, {
+			const notif = await NotifServices.create(socket.db, {
 				senderId: userId,
 				receiverId: user,
 				type: "game_invite",
@@ -73,6 +72,89 @@ export class ConnectionController
 		}
 	}
 
+	// async onGameAccept(socket, io, data, ack) {
+	// 	try{
+
+	// 		ack?.({ ok: true, notification: notif });
+	// 	} catch(error) {
+	// 	}
+	// }
+
+
+	async onGameAccept(socket, io, data, ack) {
+		try{
+				const player1 = data?.player1 || null;
+				const player2 = data?.player2 || null;
+				const roomId = data?.payload?.roomId || null;
+				
+				if (!player1 || !player2 || !roomId) return;
+				if (!isValidPlayerData(player1) || !isValidPlayerData(player2)) return;
+				if (getGameByUsername(player1?.username) || getGameByUsername(player2?.username)) return;
+				if (usernameToSocket.has(player1?.username) || usernameToSocket.has(player2?.username)) return;
+				/* we should bined usernames with socket Ids */
+				// const game2 = createGame(player1, socket, player2);
+				/* implement create game logic */
+				const game = new GameSession();
+			
+			if (!game?.roomId) game.roomId = randomUUID();
+			
+			Object.assign(game.player1, {
+				... player1, 
+				// socketId: socket.id     in this case the socket.id should come with data obj
+				// socketId: socket.id     in this case the socket.id should come with data obj
+				roomId: game.roomId, 		// the same thing with
+				player: new Paddle(40),
+			})
+			
+			Object.assign(game.player2, {
+				... player2, 
+				// socketId: socket.id     in this case the socket.id should come with data obj
+				roomId: game.roomId, 		// the same thing with
+				player: new Paddle(GAME_WIDTH - 60),
+			})
+			
+			game.state = "MATCHED";
+			
+			activeGames.set(game.roomId, game);
+			
+			// io.to(game.player1.socketId).emit("match-accepted", game.player2);
+			// io.to(game.player2.socketId).emit("match-accepted", game.player1);
+			
+			
+			game.matchTimeOut = setTimeout(() => {
+				const current = activeGames.get(game.roomId);
+				if (!current || current.state !== "MATCHED") return;
+				
+				const p1Socket = io.sockets.sockets.get(game.player1.socketId);
+				const p2Socket = io.sockets.sockets.get(game.player2.socketId);
+				
+				if (!p1Socket || !p2Socket) {
+					if (p1Socket) io.to(game.player1.socketId).emit("match-canceled");
+					if (p2Socket) io.to(game.player2.socketId).emit("match-canceled");
+					cleanupPlayers(game);
+					removeGame(game.roomId);
+					return;
+				}
+				
+				game.state = "PLAYING";
+				
+				p1Socket.join(game.roomId);
+				p2Socket.join(game.roomId);
+				
+				io.to(game.roomId).emit("match-started", game.roomId);
+				setTimeout(()=> startGameLoop(io, game.roomId), 3000);
+				// startGameLoop(io, game.roomId);
+				io.to(game.roomId).emit("match-data", game);
+			}, 3000);
+			
+			
+			// startMatch(io, game);
+			ack?.({ ok: true, notification: notif });
+		} catch(err) {
+		
+		}
+	}
+	
 }
 
 

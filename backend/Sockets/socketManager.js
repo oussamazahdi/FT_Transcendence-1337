@@ -61,6 +61,7 @@ export async function onGameAccept(socket, io, data, ack) {
 	Object.assign(game.player1, {
 		... player1, 
 		// socketId: socket.id     in this case the socket.id should come with data obj
+		// socketId: socket.id     in this case the socket.id should come with data obj
 		roomId: game.roomId, 		// the same thing with
 		player: new Paddle(40),
 	})
@@ -130,5 +131,10 @@ export function initSocketManager(io) {
     socket.on("leave-game", () => connectionController.onDisconnect(socket, io));
     socket.on("game:invite", (data, ack) =>connectionController.onGameInvite(socket, io, data, ack));
 		// socket.on("game:accept", (data, ack) => {})
-  });
-}
+
+		socket.on("game:accept", async (data, ack) => {
+			console.log("***> Data come from Front-end accept event:", data);
+			ack?.({ ok: true, notification: data });
+  	});
+	}
+)}
