@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { assets } from "@/assets/data";
 
 const safeAvatarSrc = (src) => (src && src !== "null" ? src : assets.defaultProfile);
 

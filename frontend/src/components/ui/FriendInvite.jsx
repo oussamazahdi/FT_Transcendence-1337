@@ -1,4 +1,5 @@
 import { ComponentUtils } from "@/lib/utils";
+import { assets } from "@/assets/data";
 import Image from "next/image";
 
 const safeAvatarSrc = (src) => (src && src !== "null" ? src : assets.defaultProfile);
