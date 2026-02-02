@@ -4,6 +4,7 @@ import string
 import sys
 import bcrypt
 import os
+import math
 
 
 
@@ -55,6 +56,99 @@ def make_unique_user(used_usernames: set, used_emails: set):
             used_emails.add(email)
             return (username, email, PASSWORD, first, last, "http://localhost:3001/uploads/default/profile2.png", 1)
 
+def seed_game_settings(cur):
+    cur.execute("SELECT id FROM users")
+    user_ids = [row[0] for row in cur.fetchall()]
+
+    inserted = 0
+    for user_id in user_ids:
+        try:
+            # XP grows randomly
+            xp = random.randint(0, 20000)
+
+            # Level derived from XP
+            level = int(math.sqrt(xp / 100))
+
+            # Optional gameplay randomization
+            ball_speed = random.choice([5, 6, 7, 8])
+            paddle_size = random.choice([100, 120, 140])
+            score_limit = random.choice([5, 10, 15])
+
+            cur.execute("""
+                INSERT INTO game_settings (
+                    player_id,
+                    player_xp,
+                    player_level,
+                    game_mode,
+                    ball_speed,
+                    score_limit,
+                    paddle_size
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (
+                user_id,
+                xp,
+                level,
+                "hell",
+                ball_speed,
+                score_limit,
+                paddle_size
+            ))
+
+            inserted += 1
+
+        except sqlite3.IntegrityError:
+            pass
+
+    print(f"🎮 Inserted {inserted} game_settings rows")
+
+def seed_match_history(cur, matches=5000):
+    cur.execute("SELECT id FROM users")
+    user_ids = [r[0] for r in cur.fetchall()]
+
+    if len(user_ids) < 2:
+        print("⚠️ Not enough users to seed match_history")
+        return
+
+    inserted = 0
+    for _ in range(matches):
+        p1, p2 = random.sample(user_ids, 2)
+
+        score_limit = random.choice([5, 10, 15])
+        is_forfeit = (random.random() < 0.08)
+
+        winner_id = random.choice([p1, p2])
+
+        if is_forfeit:
+            status = "forfait"
+            if winner_id == p1:
+                p1_score, p2_score = score_limit, 0
+            else:
+                p1_score, p2_score = 0, score_limit
+        else:
+            # status stored from player1 perspective
+            status = "win" if winner_id == p1 else "lose"
+
+            loser_score = random.randint(0, score_limit - 1)
+            if winner_id == p1:
+                p1_score, p2_score = score_limit, loser_score
+            else:
+                p1_score, p2_score = loser_score, score_limit
+
+        cur.execute("""
+            INSERT INTO match_history (
+                player1_id, player2_id, winner_id,
+                player1_score, player2_score, status
+            )
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (p1, p2, winner_id, p1_score, p2_score, status))
+
+        inserted += 1
+
+    print(f"🏓 Inserted {inserted} match_history rows")
+
+
+
 def main():
     total = 1000
     if len(sys.argv) >= 2:
@@ -99,6 +193,15 @@ def main():
             pass
 
     conn.commit()
+
+    # Seed game_settings AFTER users exist
+    seed_game_settings(cur)
+    seed_match_history(cur, 10000)
+
+    conn.commit()
+    conn.close()
+
+    print(f"✅ Inserted {inserted} users into {DB_PATH}")
     conn.close()
 
     print(f"✅ Inserted {inserted} users into {DB_PATH}")

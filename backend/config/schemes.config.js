@@ -168,7 +168,7 @@ export const friendsSearchResponse = {
 
 // chat
 
-export const conversationSchema = {
+export const  conversationSchema = {
     type: 'object',
     properties: {
         userid: { type: 'integer' },
@@ -348,6 +348,33 @@ export const unreadCountResponse = {
     properties: {
         message: { type: 'string' },
         unreadCount: { type: 'integer' }
+    }
+};
+
+export const leaderboardSchema = {
+    type: 'object',
+    properties: {
+        userid: { type: 'integer' },
+        username: { type: 'string' },
+        avatar: { type: ['string', 'null'] },
+        firstname: { type: 'string' },
+        lastname: { type: 'string' },
+        player_xp: { type: ['integer'] },
+        player_level: { type: ['integer'] },
+        wins: { type: ['integer'] },
+        loses: { type: ['integer'] },
+        forfaits: { type: ['integer'] }
+    }
+};
+
+export const usersRanking = {
+    type: 'object',
+    properties: {
+        message: { type: 'string' },
+        conversations: {
+            type: 'array',
+            items: leaderboardSchema
+        }
     }
 };
 

@@ -9,7 +9,7 @@ import { generateFileNameByUser, generateToken, updateTokenFlags } from "../util
 import { getEmailLetter } from "../templates/emailLetter.js";
 import { MatchController } from "./game.controller.js";
 
-const match = new MatchController();
+const match = new MatchController(); // modify later
 
 export class AuthController {
 
@@ -64,7 +64,7 @@ export class AuthController {
         const db = request.server.db;
         try {
             const user = await authModels.addNewUser(db, firstname, lastname, username, email, password);
-						match.addNewGameSettings(request.server.db, user.id);
+			match.addNewGameSettings(request.server.db, user.id);
             const params = {
                 isVerified: !!user.isverified,
                 hasAvatar: !!user.avatar,

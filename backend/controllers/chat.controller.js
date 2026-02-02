@@ -1,7 +1,5 @@
 import { chatModels } from "../models/chat.model.js";
 import { friendsModels } from "../models/friends.model.js";
-import { userModels } from "../models/user.model.js";
-
 
 export class ChatController 
 {
@@ -67,13 +65,6 @@ export class ChatController
 
     sendMessage(socket, server, data)
     {
-        /**
-         * Payload must be : 
-         * {
-         *      receiverId : 5,
-         *      content : "Hello There"
-         * }
-         */
         const senderId = socket.user.userId;
         const db = server.db;
         try {
@@ -102,7 +93,6 @@ export class ChatController
             socket.to(`chat:${receiverId}`).emit("chat:receiver", payload);
         }
         catch(error) {
-            // if (error.code)
                 socket.emit("chat:error", { message: error.message || "Internal Server Error" });
         }
         console.log(senderId, data.content);
