@@ -26,7 +26,6 @@ export function initSocketManager(io) {
 
 		socket.on("game:accept", async (data, ack) => {
 			connectionController.onGameAccept(socket, io, data, ack);
-			// console.log("***> Data come from Front-end accept event:", data);
 			ack?.({ ok: true, notification: data });
   	});
 	}

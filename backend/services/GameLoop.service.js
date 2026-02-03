@@ -74,7 +74,6 @@ export function checkScore(game, io, roomId) {
 
   game.state = "FINISHED";
   io.to(roomId).emit("game-state", game);
-	// store data here
 
 	const db = io.db;
 
