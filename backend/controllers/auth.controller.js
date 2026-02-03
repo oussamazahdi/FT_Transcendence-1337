@@ -7,6 +7,7 @@ import { generateFileNameByUser, generateToken, updateTokenFlags } from "../util
 import { tokenModels } from "../models/token.model.js";
 import { getEmailLetter } from "../templates/emailLetter.js";
 import { MatchController } from "./game.controller.js";
+import { onlineUsers } from "../store/memory.store.js"
 
 const match = new MatchController();
 
@@ -177,7 +178,8 @@ export class AuthController {
     
     async   logout(request, reply)
     {
-        const db = request.server.db
+        const db = request.server.db;
+				const io = request.server.io;
         try {
             const refreshToken = request.cookies.refreshToken;
             if (!refreshToken)
@@ -196,6 +198,8 @@ export class AuthController {
                 sameSite: 'strict',
                 path: '/',
             });
+						onlineUsers.delete(decoded.userId);
+						io.emit("users:status", Array.from(onlineUsers.keys()));
             return reply.code(200).send({message: "LOGGED_OUT"});
     
         }
