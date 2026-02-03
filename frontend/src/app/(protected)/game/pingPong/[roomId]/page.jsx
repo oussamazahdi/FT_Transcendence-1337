@@ -25,6 +25,10 @@ export default function GamePage() {
 		preloadBackground(gameMode.image);
 	}, [])
 
+	useEffect(()=>{
+		console.log("game:", game)
+	}, [game])
+
 
   useEffect(() => {
     if (!user || !socket) return;

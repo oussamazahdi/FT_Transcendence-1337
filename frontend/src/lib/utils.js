@@ -58,12 +58,14 @@ export const SEARCH_ERROR = {
 
 
 class componentUtils{
+	
 	isExpired(notif) {
-		if (!notif) return true;
-		if (notif.is_expired === 1) return true;
+		if (!notif || notif.is_expired === 1) return true;
 		if (!notif.expires_at) return false;
 		const t = new Date(notif.expires_at).getTime();
 		return Number.isFinite(t) ? Date.now() > t : false;
 	}
+
 }
+
 export const ComponentUtils = new componentUtils();

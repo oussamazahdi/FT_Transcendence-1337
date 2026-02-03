@@ -180,7 +180,7 @@ async function onAccept(notifId, socket) {
         return;
       }
       // optional: navigate or update UI here
-      router.push(`/game/${roomId}`);
+      // router.push(`/game/${roomId}`);
     }
   );
 }

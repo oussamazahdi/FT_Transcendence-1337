@@ -68,7 +68,8 @@ export function isValidDirection(direction) {
 }
 
 export function isValidPlayerData(data) {
-	return ( data &&
+	console.log("data:", data)
+	return ( data && typeof data === "object" &&
 		typeof data.username === "string" &&
 		data.username.length > 0 &&
 		data.username.length <= 20 &&

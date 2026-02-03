@@ -13,3 +13,21 @@ export default function RootLayout({ children }) {
     </>
   );
 }
+
+
+/**
+ * 
+ * 
+ * 
+ * 
+ * last value +- value
+ * last value - value > 0 : 0
+ */
+
+
+
+
+
+
+
+// UPDATE gamesettings SET player_xp -= 60 CASE player_xp <= 0 THEN SET player_xp = 0 END 

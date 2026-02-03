@@ -153,10 +153,14 @@ export default function NotificationDropDown() {
 			if (!r.ok) return;
 
 			if (!connectSocketIfNeeded()) return;
+			setIsOpen(false);
 
 			socket.emit("game:accept", { notifId: Number(notif.id), roomId }, (ack) => {
-				if (!ack?.ok) return;
-				router.push(`/game/pingPong/${roomId}`);
+				if (!ack?.ok){
+					// console.log("=======>:");
+					return;
+				} 
+				// router.push(`/game/pingPong/${roomId}`);
 			});
 		},
 		[loadNotificationById, postNotificationAction, connectSocketIfNeeded, socket, router]

@@ -12,7 +12,7 @@ const dashboard = () => {
 	const vara = process.env.NEXT_PUBLIC_ENCRYPTION_OBJECT;
 
 
-	console.log(' ===? ' , vara)
+	// console.log(' ===? ' , vara)
   return (
     <div className="flex w-full max-w-7xl flex-col md:flex-row gap-4 h-auto md:h-[86vh]">
       <div className="flex flex-col w-full md:w-7/10 gap-4">

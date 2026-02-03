@@ -51,6 +51,8 @@ export function joinGame(socket, io, player) {
 
   if (waitingPlayer.value.player.username === player.username) return;
 
+	// console.log("*************************************\nWaiting Player:", waitingPlayer.value, ", Second Player:", player);
+
   const game = createGame(waitingPlayer.value, socket, player);
   waitingPlayer.value = null;
 

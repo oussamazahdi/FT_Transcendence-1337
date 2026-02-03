@@ -3,7 +3,7 @@ import { NOTIFICATION_TYPES } from "../rules/notifications.rules.js";
 class notifModel {
   async create(db, { senderId, receiverId, type, title, message, payload = null, expiresAt = null }) {
     if (!Object.values(NOTIFICATION_TYPES).includes(type)) return null;
-    console.log("all types: ",typeof senderId, typeof receiverId, typeof type, typeof title, typeof message, typeof payload, typeof expiresAt)
+    // console.log("all types: ",typeof senderId, typeof receiverId, typeof type, typeof title, typeof message, typeof payload, typeof expiresAt)
     const safeExpiresAt = expiresAt instanceof Date ? expiresAt.toISOString() : expiresAt ?? null;
 
     const res = db.prepare(
