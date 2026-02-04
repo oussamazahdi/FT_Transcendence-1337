@@ -7,6 +7,7 @@ import { notifRoutes } from "./notif.routes.js";
 import { gameRoutes } from "./game.routes.js";
 import { chatRoutes } from "./chat.routes.js";
 import { leaderboardRoutes } from "./leaderboard.routes.js";
+import { dashboardRoutes } from "./dashboard.routes.js";
 
 function initializeRoutes(fastify)
 {
@@ -19,6 +20,7 @@ function initializeRoutes(fastify)
     fastify.register(gameRoutes, {prefix: "/api/game"});
     fastify.register(chatRoutes, {prefix: "/api/chat"});
     fastify.register(leaderboardRoutes, {prefix: "/api/leaderboard"});
+    fastify.register(dashboardRoutes, {prefix: "/api/statistics"});
 }
 
 export { initializeRoutes };

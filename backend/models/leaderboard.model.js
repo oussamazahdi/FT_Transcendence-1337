@@ -1,6 +1,6 @@
 import { handleDatabaseError } from '../utils/dbErrorHandler.js';
 
-// id, firstname, lastname, avatar, level, xp, wins loses
+
 export class LeaderboardModels {
 
     getPlayerByRanking(db)

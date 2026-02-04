@@ -11,7 +11,7 @@ export function createMatchHistoryTable(db) {
 			player1_score INTEGER NOT NULL,
 			player2_score INTEGER NOT NULL,
 			status TEXT NOT NULL CHECK(
-				status IN ('win', 'lose', 'forfait')
+				status IN ('win', 'forfait')
 			),
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			

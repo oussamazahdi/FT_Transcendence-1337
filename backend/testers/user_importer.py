@@ -5,6 +5,7 @@ import sys
 import bcrypt
 import os
 import math
+from datetime import datetime, timedelta
 
 
 
@@ -102,51 +103,84 @@ def seed_game_settings(cur):
 
     print(f"🎮 Inserted {inserted} game_settings rows")
 
-def seed_match_history(cur, matches=5000):
+def seed_match_history(cur, matches=10000, days=7, min_per_day=None, start_days_ago=None):
     cur.execute("SELECT id FROM users")
     user_ids = [r[0] for r in cur.fetchall()]
 
     if len(user_ids) < 2:
-        print("⚠️ Not enough users to seed match_history")
         return
 
+    now = datetime.now()
+
+    # Window: [window_start, window_end]
+    if start_days_ago is None:
+        window_end = now
+        window_start = (now - timedelta(days=days - 1)).replace(hour=0, minute=0, second=0, microsecond=0)
+    else:
+        window_end = (now - timedelta(days=start_days_ago)).replace(hour=23, minute=59, second=59, microsecond=0)
+        window_start = (window_end - timedelta(days=days - 1)).replace(hour=0, minute=0, second=0, microsecond=0)
+
+    day_counts = [0] * days
+    if min_per_day is not None and min_per_day > 0:
+        base = min_per_day * days
+        if base > matches:
+            raise ValueError("min_per_day * days must be <= matches")
+        for i in range(days):
+            day_counts[i] = min_per_day
+        remaining = matches - base
+    else:
+        remaining = matches
+
+    for _ in range(remaining):
+        day_counts[random.randrange(days)] += 1
+
     inserted = 0
-    for _ in range(matches):
-        p1, p2 = random.sample(user_ids, 2)
+    for day_index, count_for_day in enumerate(day_counts):
+        day_start = window_start + timedelta(days=day_index)
 
-        score_limit = random.choice([5, 10, 15])
-        is_forfeit = (random.random() < 0.08)
+        for _ in range(count_for_day):
+            p1, p2 = random.sample(user_ids, 2)
 
-        winner_id = random.choice([p1, p2])
+            score_limit = random.choice([5, 10, 15])
+            is_forfeit = (random.random() < 0.08)
+            winner_id = random.choice([p1, p2])
 
-        if is_forfeit:
-            status = "forfait"
-            if winner_id == p1:
-                p1_score, p2_score = score_limit, 0
+            if is_forfeit:
+                status = "forfait"
+                if winner_id == p1:
+                    p1_score, p2_score = score_limit, 0
+                else:
+                    p1_score, p2_score = 0, score_limit
             else:
-                p1_score, p2_score = 0, score_limit
-        else:
-            # status stored from player1 perspective
-            status = "win" if winner_id == p1 else "lose"
+                status = "win"  # ALWAYS win for a normal match
 
-            loser_score = random.randint(0, score_limit - 1)
-            if winner_id == p1:
-                p1_score, p2_score = score_limit, loser_score
-            else:
-                p1_score, p2_score = loser_score, score_limit
+                loser_score = random.randint(0, score_limit - 1)
+                if winner_id == p1:
+                    p1_score, p2_score = score_limit, loser_score
+                else:
+                    p1_score, p2_score = loser_score, score_limit
 
-        cur.execute("""
-            INSERT INTO match_history (
-                player1_id, player2_id, winner_id,
-                player1_score, player2_score, status
-            )
-            VALUES (?, ?, ?, ?, ?, ?)
-        """, (p1, p2, winner_id, p1_score, p2_score, status))
+                loser_score = random.randint(0, score_limit - 1)
+                if winner_id == p1:
+                    p1_score, p2_score = score_limit, loser_score
+                else:
+                    p1_score, p2_score = loser_score, score_limit
+            seconds_into_day = random.randint(0, 86399)
+            created_at_dt = day_start + timedelta(seconds=seconds_into_day)
+            created_at = created_at_dt.strftime("%Y-%m-%d %H:%M:%S")
 
-        inserted += 1
+            cur.execute("""
+                INSERT INTO match_history (
+                    player1_id, player2_id, winner_id,
+                    player1_score, player2_score, status,
+                    created_at
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (p1, p2, winner_id, p1_score, p2_score, status, created_at))
 
-    print(f"🏓 Inserted {inserted} match_history rows")
+            inserted += 1
 
+    print(f"🏓 Inserted {inserted} match_history rows across {days} days")
 
 
 def main():
@@ -196,7 +230,7 @@ def main():
 
     # Seed game_settings AFTER users exist
     seed_game_settings(cur)
-    seed_match_history(cur, 10000)
+    seed_match_history(cur, matches=10000, days=7, min_per_day=500)
 
     conn.commit()
     conn.close()

@@ -10,7 +10,6 @@ export class LeaderboardController {
 
             const results = leaderboardModels.getPlayerByRanking(db);
             const count = leaderboardModels.countUsers(db);
-            console.log("Count : ", count, " Object Count : ", results.length);
             reply.code(200).send({message: "SUCCESS", totalUsers: count.count, result: results});
         }
         catch (error) {
