@@ -15,8 +15,11 @@ export function initSocketManager(io) {
     socket.on("paddle-move", (data) => connectionController.onPaddleMove(socket, io, data));
     
 		socket.on("disconnect", () => {
-			// onlineUsers.delete(userId);
-			// io.emit("users:status", Array.from(onlineUsers.keys()));
+			onlineUsers.delete(userId);
+			setTimeout(() => {
+				if(!onlineUsers.has(userId))
+					io.emit("users:status", Array.from(onlineUsers.keys()));
+			}, 2000);
 			connectionController.onDisconnect(socket, io);
 		});
     

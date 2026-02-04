@@ -65,30 +65,6 @@ class notifController {
 			return res.code(500).send({ok:false, error: error.message});
 		}
 	}
-	
-	// async unreadCounter (req, res) {
-	// 	try {
-	// 		const db = req.server.db;
-	// 		const userId = Number(req.user?.userId);
-			
-	// 		if (!Number.isInteger(userId) || userId <= 0) return res.code(400).send({ ok: false, error: "Invalid userId" });
-
-	// 		// check notif models we have one
-	// 		const row = db.prepare(`SELECT COUNT(*) AS unreadCount FROM notifications
-	// 			WHERE receiver_id = ? AND is_read = 0 AND (is_expired = 0 OR is_expired IS NULL)`).get(userId);
-
-	// 		const unreadCount = Number(row?.unreadCount ?? 0);
-
-	// 		return res.code(200).send({ ok: true, message: "SUCCESS", unreadCount });
-		
-	// 	} catch (err) {
-	// 		const status = Number(err?.code);
-	// 		if (Number.isInteger(status) && status >= 400 && status <= 599) {
-	// 			return res.code(status).send({ ok: false, error: err.message });
-	// 		}
-	// 		return res.code(500).send({ ok: false, error: err?.message || "Internal Server Error" });
-	// 	}
-	// }
 
 	async getNotifById (req, res) {
 		try {

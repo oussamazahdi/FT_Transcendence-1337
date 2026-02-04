@@ -197,8 +197,8 @@ export class AuthController {
                 sameSite: 'strict',
                 path: '/',
             });
-						onlineUsers.delete(decoded.userId);
-						io.emit("users:status", Array.from(onlineUsers.keys()));
+						// onlineUsers.delete(decoded.userId);
+						// io.emit("users:status", Array.from(onlineUsers.keys()));
             return reply.code(200).send({message: "LOGGED_OUT"});
     
         }

@@ -8,24 +8,16 @@ export const getGame = (roomId) => activeGames.get(roomId);
 
 export function getGameBySocket(socketId) {
 	for (const game of activeGames.values()) {
-		if (
-			game.player1.socketId === socketId ||
-			game.player2.socketId === socketId
-		) {
+		if (game.player1.socketId === socketId || game.player2.socketId === socketId)
 			return game;
-		}
 	}
 	return null;
 }
 
 export function getGameByUsername(username) {
 	for (const game of activeGames.values()) {
-		if (
-			game.player1.username === username ||
-			game.player2.username === username
-		) {
+		if (game.player1.username === username || game.player2.username === username)
 			return game;
-		}
 	}
 	return null;
 }

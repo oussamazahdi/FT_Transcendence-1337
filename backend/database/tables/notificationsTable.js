@@ -3,7 +3,7 @@ export function createNotificationsTable(db) {
     db.exec(`
       CREATE TABLE IF NOT EXISTS notifications (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        sender_id INTEGER,
+        sender_id INTEGER NOT NULL,
         receiver_id INTEGER NOT NULL,
         type TEXT NOT NULL,
         title TEXT NOT NULL,

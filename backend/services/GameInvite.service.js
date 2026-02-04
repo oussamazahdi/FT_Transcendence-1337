@@ -6,18 +6,14 @@ class gameInvite{
 		try {
 			const { user, roomId, gameType } = data ?? {};
 			
-			if (!user || !roomId || !gameType) {
+			if (!user || !roomId || !gameType)
 				throw httpError(400, "user, roomId, gameType are required");
-			}
 			
 			const userId = socket.user?.userId;
-			if (!userId) {
+			if (!userId)
 				throw httpError(401, "Unauthorized");
-			}
-			
-			if (user === userId) {
+			if (user === userId)
 				throw httpError(400, "You cannot invite yourself");
-			}
 			
 			const notif = await NotifServices.create(socket.db, {
 				senderId: userId,
