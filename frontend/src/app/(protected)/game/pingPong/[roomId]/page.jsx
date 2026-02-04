@@ -4,6 +4,7 @@ import {GAME_MODE, GAME_WIDTH, GAME_HEIGHT} from "@/components/ui/GameMode"
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSocket } from "@/contexts/socketContext";
 import { useAuth } from "@/contexts/authContext";
+import { useRouter } from "next/navigation";
 
 let bgImg = null;
 let bgReady = false;
@@ -11,6 +12,8 @@ let bgReady = false;
 export default function GamePage() {
   const socket = useSocket();
   const { user, gameSetting } = useAuth();
+
+	const router = useRouter();
 
   const canvasRef = useRef(null);
   const wrapperRef = useRef(null);
@@ -43,8 +46,23 @@ export default function GamePage() {
       avatar: user.avatar,
     });
 
+		const handleMatchStarted = (data) => {
+			const roomId = typeof data === "string" ? data : data?.roomId;
+			if (!roomId) return;
+		
+			// setActiveMatch({
+			// 	roomId,
+			// 	payload: typeof data === "object" ? data : null,
+			// 	ts: Date.now(),
+			// });
+		
+			router.push(`/game/pingPong/${roomId}`);
+			router.refresh();
+		};
+
     socket.on("match-data", setGame);
     socket.on("game-state", setGame);
+		// socket.on("match-started", handleMatchStarted);
 
     return () => {
       socket.off("match-data", setGame);

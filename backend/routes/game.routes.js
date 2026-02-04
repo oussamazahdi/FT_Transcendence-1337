@@ -1,8 +1,6 @@
 import { MatchController } from "../controllers/game.controller.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 
-const match = new MatchController();
-
 export async function gameRoutes(fastify) {
 	fastify.get("/history", { preHandler: authMiddleware }, async (req, res) => {
 		try {
@@ -13,7 +11,7 @@ export async function gameRoutes(fastify) {
 				return res.code(400).send({ error: "Invalid user id" });
 			}
 			
-			const data = await match.getMatchHistoryByUserId(db, userId);
+			const data = await MatchController.getMatchHistoryByUserId(db, userId);
 
 			return res.code(200).send({ message: "SUCCESS", data });
 		} catch (error) {
@@ -31,7 +29,7 @@ export async function gameRoutes(fastify) {
 				return res.code(400).send({ error: "Invalid user id" });
 			}
 
-			const settings = await match.getUserSettings(db, userId);
+			const settings = await MatchController.getUserSettings(db, userId);
 	
 			return res.code(200).send({ message: "SUCCESS", settings });
 		} catch (error) {
@@ -77,7 +75,7 @@ export async function gameRoutes(fastify) {
 				return reply.code(400).send({ message: "NO_FIELDS_TO_UPDATE" });
 			}
 
-			const result = await match.updateUserSettings(db, payload);
+			const result = await MatchController.updateUserSettings(db, payload);
 
 			return reply.code(200).send(result);
 		} catch (err) {

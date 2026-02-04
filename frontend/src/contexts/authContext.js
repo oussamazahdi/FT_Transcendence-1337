@@ -187,18 +187,9 @@ export function UserProvider({ children, initialUser }) {
   };
 
 	const updateGameSettings = async (data) => {
-		try {
-			// console.log("*******************************************************> ", data);
-	
+		try {	
 			const payload = {};
-			const allowedKeys = new Set([
-				"player_xp",
-				"player_level",
-				"game_mode",
-				"ball_speed",
-				"score_limit",
-				"paddle_size",
-			]);
+			const allowedKeys = new Set([ "player_xp", "player_level", "game_mode", "ball_speed", "score_limit", "paddle_size" ]);
 	
 			for (const [key, value] of Object.entries(data ?? {})) {
 				if (!allowedKeys.has(key)) continue;
@@ -210,9 +201,7 @@ export function UserProvider({ children, initialUser }) {
 				return { ok: false, status: 400, error: "NO_FIELDS_TO_UPDATE" };
 			}
 	
-			const res = await fetch(
-				`${process.env.NEXT_PUBLIC_API_URL}/api/game/update-settings`,
-				{
+			const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/game/update-settings`,{
 					method: "PATCH",
 					credentials: "include",
 					headers: { "Content-Type": "application/json" },
@@ -222,16 +211,9 @@ export function UserProvider({ children, initialUser }) {
 	
 			const json = await res.json().catch(() => ({}));
 	
-			if (!res.ok) {
-				return {
-					ok: false,
-					status: res.status,
-					error: json?.message || json?.error || "UPDATE_FAILED",
-					details: json,
-				};
-			}
-	
+			if (!res.ok) return { ok: false, status: res.status, error: json?.message || "UPDATE_FAILED"};
 			return { ok: true, status: res.status, data: json };
+	
 		} catch (err) {
 			return { ok: false, status: 0, error: err?.message || "NETWORK_ERROR" };
 		}

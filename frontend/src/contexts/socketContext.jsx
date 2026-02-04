@@ -144,12 +144,14 @@ export function SocketProvider({ children }) {
 		};
 		
 
-    socketHolder.on("match-started", handleMatchStarted);
+    socketHolder.on("match-started:accept", handleMatchStarted);
+    // socketHolder.on("match-started", handleMatchStarted);
 
     setSocket(socketHolder);
 
     return () => {
-      socketHolder.off("match-started", handleMatchStarted);
+      socketHolder.off("match-started:accept", handleMatchStarted);
+      // socketHolder.off("match-started", handleMatchStarted);
       socketHolder.disconnect();
       setSocket(null);
     };

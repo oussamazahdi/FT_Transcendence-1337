@@ -9,7 +9,6 @@ import { getEmailLetter } from "../templates/emailLetter.js";
 import { MatchController } from "./game.controller.js";
 import { onlineUsers } from "../store/memory.store.js"
 
-const match = new MatchController();
 
 export class AuthController {
 
@@ -60,7 +59,7 @@ export class AuthController {
         const db = request.server.db;
         try {
             const user = await authModels.addNewUser(db, firstname, lastname, username, email, password);
-						match.addNewGameSettings(request.server.db, user.id);
+						MatchController.addNewGameSettings(request.server.db, user.id);
             const params = {
                 isVerified: !!user.isverified,
                 hasAvatar: !!user.avatar,

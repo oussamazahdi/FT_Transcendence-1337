@@ -7,14 +7,10 @@ export function httpError(code, message) {
 	return err;
 }
 
-export class MatchController {
-	constructor() {
-		this.matchHistory = new MatchHistory();
-		this.gameSetting = new GameSetting();
-	}
+class matchController {
 
 	async createMatchHistory(db, { player1, player2, score1, score2, winner = null, status = "finished" }) {
-		const inserted = await this.matchHistory.create(db, { player1, player2, score1, score2, winner, status,
+		const inserted = await MatchHistory.create(db, { player1, player2, score1, score2, winner, status,
 		});
 
 		if (!inserted?.id) throw httpError(500, "Failed to create match history");
@@ -25,12 +21,12 @@ export class MatchController {
 	async getMatchHistoryByUserId(db, userId) {
 		if (!userId) throw httpError(400, "userId is required");
 
-		return this.matchHistory.getByUserId(db, userId);
+		return MatchHistory.getByUserId(db, userId);
 	}
 
 	async addNewGameSettings(db, userId) {
 		try {
-			const result = await this.gameSetting.addNewUserSetting(db, { userId });
+			const result = await GameSetting.addNewUserSetting(db, { userId });
 	
 			return {
 				success: true,
@@ -44,7 +40,7 @@ export class MatchController {
 
 	async getUserSettings(db, userId) {
     try {
-      const settings = await this.gameSetting.getUserSettings(db, userId);
+      const settings = await GameSetting.getUserSettings(db, userId);
       return settings;
     } catch (error) {
       throw error;
@@ -53,12 +49,23 @@ export class MatchController {
 
   async updateUserSettings( db, { userId, player_xp, player_level, game_mode, ball_speed, score_limit, paddle_size, }) {
     try {
-      const result = await this.gameSetting.updateUserSettings(db, { userId, player_xp, player_level, game_mode, ball_speed, score_limit, paddle_size,});
-
+      const result = await GameSetting.updateUserSettings(db, { userId, player_xp, player_level, game_mode, ball_speed, score_limit, paddle_size,});
       return result;
+
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateUserXpAndLevel( db, { userId, status }) {
+    try {
+      const result = await GameSetting.updateUserXpAndLevel(db, { userId, status});
+      return result;
+
     } catch (error) {
       throw error;
     }
   }
 	
 }
+export const MatchController = new matchController();

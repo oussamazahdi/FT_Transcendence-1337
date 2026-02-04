@@ -3,9 +3,6 @@ import { getGameBySocket, removeGame } from "../utils/GameUtils.js"
 import { WIN_SCORE } from "../constants/game.constants.js";
 import { MatchController } from "../controllers/game.controller.js";
 
-
-const controller = new MatchController();
-
 function cancelMatch(matchTimeOut, socketId, io) {
   clearTimeout(matchTimeOut);
   io.to(socketId).emit("match-canceled");
@@ -23,12 +20,10 @@ function finishGame(game, remainingPlayer, io) {
   const player1Id = game.player1.id;
   const player2Id = game.player2.id;
 
-  const winner =
-    game.player1.score > game.player2.score
-      ? player1Id
-      : player2Id;
+  const winner = game.player1.score > game.player2.score ? player1Id : player2Id;
+	const loser = winner == player1Id ? player2Id : player1Id;
 
-  controller.createMatchHistory(db, {
+		MatchController.createMatchHistory(db, {
     player1: player1Id,
     player2: player2Id,
     score1: game.player1.score,
@@ -36,6 +31,8 @@ function finishGame(game, remainingPlayer, io) {
     winner,
     status: "forfeit",
   });
+	MatchController.updateUserXpAndLevel(db, { userId: winner, status: "winner" });
+	MatchController.updateUserXpAndLevel(db, { userId: loser, status: "loser" });
 }
 
 function handleGameDisconnect(game, socketId, io) {

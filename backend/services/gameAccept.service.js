@@ -183,7 +183,7 @@ class gameAcceptService {
 			p1Socket.join(current.roomId);
     	p2Socket.join(current.roomId);
 
-			io.to(current.roomId).emit("match-started", current.roomId);
+			io.to(current.roomId).emit("match-started:accept", current.roomId);
 			setTimeout(()=> startGameLoop(io, current.roomId), 3000);
 			io.to(current.roomId).emit("match-data", current);
 

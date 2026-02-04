@@ -1,6 +1,6 @@
 import { handleDatabaseError } from "../utils/dbErrorHandler.js";
 
-export class MatchHistory {
+class matchHistory {
 	async create(db, { player1, player2, score1, score2, winner, status }) {
 		try {
 			const prepared = db.prepare(
@@ -22,3 +22,6 @@ export class MatchHistory {
 		}
 	}
 }
+
+
+export const MatchHistory = new matchHistory()
