@@ -28,11 +28,6 @@ export default function GamePage() {
 		preloadBackground(gameMode.image);
 	}, [])
 
-	useEffect(()=>{
-		console.log("game:", game)
-	}, [game])
-
-
   useEffect(() => {
     if (!user || !socket) return;
 
@@ -46,23 +41,8 @@ export default function GamePage() {
       avatar: user.avatar,
     });
 
-		const handleMatchStarted = (data) => {
-			const roomId = typeof data === "string" ? data : data?.roomId;
-			if (!roomId) return;
-		
-			// setActiveMatch({
-			// 	roomId,
-			// 	payload: typeof data === "object" ? data : null,
-			// 	ts: Date.now(),
-			// });
-		
-			router.push(`/game/pingPong/${roomId}`);
-			router.refresh();
-		};
-
     socket.on("match-data", setGame);
     socket.on("game-state", setGame);
-		// socket.on("match-started", handleMatchStarted);
 
     return () => {
       socket.off("match-data", setGame);

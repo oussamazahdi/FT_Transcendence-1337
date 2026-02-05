@@ -1,17 +1,12 @@
 import { NotificationRules } from "../rules/notifications.rules.js";
 import { NotifModel } from "../models/notif.model.js";
-import { NOTIFICATION_TYPES } from "../rules/notifications.rules.js";
 
-// const model = new NotifModel();
-
-/******************************************************************************************************/
 export function httpError(code, message) {
 	const err = new Error(message);
 	err.code = code;
 	return err;
 }
 
-/******************************************************************************************************/
 function hasRequiredPayload(payload = {}, rule = {}) {
 	const required = rule.requiredPayload;
 	if (!Array.isArray(required) || required.length === 0) return true;
@@ -21,7 +16,6 @@ function hasRequiredPayload(payload = {}, rule = {}) {
 	return true;
 }
 
-/******************************************************************************************************/
 function safeParsePayload(payload) {
 	if (payload == null) return null;
 	if (typeof payload === "object") return payload;
@@ -32,20 +26,17 @@ function safeParsePayload(payload) {
 	}
 }
 
-/******************************************************************************************************/
 function getExpirationDate(rule = {}) {
 	if (!rule.expiresInSeconds) return null;
 	return new Date(Date.now() + rule.expiresInSeconds * 1000);
 }
 
-/******************************************************************************************************/
 function isExpired(notif) {
 	if (!notif?.expires_at) return false;
 	const t = new Date(notif.expires_at).getTime();
 	return Number.isFinite(t) && t < Date.now();
 }
 
-/******************************************************************************************************/
 function validateRulePayload(rule, payload) {
 	if (rule?.allowedGameTypes) {
 		const gt = payload?.gameType;
@@ -55,10 +46,8 @@ function validateRulePayload(rule, payload) {
 	}
 }
 
-/******************************************************************************************************/
 class notifServices {
 	
-	/******************************************************************************************************/
 	async create(db, { senderId, receiverId, type, title, message, payload = {} }) {
 		const rule = NotificationRules[type];
 		if (!rule) throw httpError(400, `Invalid notification type: ${type}`);
@@ -84,7 +73,6 @@ class notifServices {
 		return row ? { ...row, payload: safeParsePayload(row.payload) } : inserted;
 	}
 
-	/******************************************************************************************************/
 	async getForUser(db, userId, { expireOnFetch = true } = {}) {
 		if (!userId) throw httpError(400, "Missing userId");
 
@@ -111,13 +99,11 @@ class notifServices {
 		return out;
 	}
 
-	/******************************************************************************************************/
 	async getById(db, id) {
 		const row = await NotifModel.getById(db, id);
 		return row ? { ...row, payload: safeParsePayload(row.payload) } : null;
 	}
 
-	/******************************************************************************************************/
 	async markAsRead(db, { id, userId } = {}) {
 		const notif = await NotifModel.getById(db, id);
 		if (!notif) throw httpError(404, "Notification not found");
@@ -128,7 +114,6 @@ class notifServices {
 		return { ...updated, payload: safeParsePayload(updated.payload) };
 	}
 
-	/******************************************************************************************************/
 	async act(db, { id, userId, action }) {
 		const notif = await NotifModel.getById(db, id);
 		if (!notif) throw httpError(404, "Notification not found");
@@ -156,12 +141,10 @@ class notifServices {
 		return { ...updated, payload: safeParsePayload(updated?.payload) };
 	}
 
-	/******************************************************************************************************/
 	async updateStatus(db, id, action, userId) {
 		return this.act(db, { id, userId, action });
 	}
 
-	/******************************************************************************************************/
 	async createGameInvitation(db, { senderId, receiverId, roomId, gameType }){
 		return await this.create(db, { senderId, receiverId,
 			type:"game_invite",

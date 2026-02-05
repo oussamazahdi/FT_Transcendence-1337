@@ -86,16 +86,8 @@ function MapCard({ map, isActive, isHovered, onEnter, onLeave, onSelect }) {
   );
 }
 
-const defaults = {
-  ball_speed: 2,
-  score_limit: 10,
-  paddle_size: 2,
-  selectedMap: "hell",
-};
-
 export default function GameSettings() {
   const { gameSetting, updateGameSettings } = useAuth();
-	// console.log("-------> Game Settings: ", gameSetting);
 
   const [hoveredMap, setHoveredMap] = useState(null);
 	const [selectedMap, setSelectedMap] = useState(gameSetting.game_mode);
@@ -160,8 +152,6 @@ export default function GameSettings() {
 
   const onSave = useCallback(() => {
     if (!canSave) return;
-
-    // Replace this with your fetch PATCH/PUT
 		
     const payload = {
       ...userData,

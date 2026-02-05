@@ -2,15 +2,13 @@ import { onlineUsers, socketToUsername, usernameToSocket, activeGames } from "..
 import { NotifServices } from "../services/Notification.service.js";
 import { GameSession, Paddle } from "../store/game.store.js";
 import { GAME_WIDTH } from "../constants/game.constants.js";
-import { getGameByUsername } from "../utils/GameUtils.js";
-import { startGameLoop } from "../utils/GameUtils.js";
+import { GameUtils } from "../utils/GameUtils.js";
 import { userModels } from "../models/user.model.js";
 import { randomUUID } from "crypto";
 
 
 class gameAcceptService {
   playerIsValid(data) {
-		console.log("data:", data)
 		return ( data && typeof data === "object" &&
 			typeof data.username === "string" &&
 			data.username.length > 0 &&
@@ -65,7 +63,7 @@ class gameAcceptService {
 			if (!this.playerIsValid(player1) || !this.playerIsValid(player2))
 				return { ok: false, message: "Invalid player data" };
 	
-			if (getGameByUsername(player1.username) || getGameByUsername(player2.username))
+			if (GameUtils.getGameByUsername(player1.username) || GameUtils.getGameByUsername(player2.username))
 				return { ok: false, message: "One of the players is already in a game 1" };
 	
 			const p1SocketId = onlineUsers?.get?.(senderId);
@@ -145,52 +143,6 @@ class gameAcceptService {
 			if (!game) return;
 			activeGames?.delete?.(game.roomId);
 		} catch (_) {}
-	}
-
-	async onGameAccept(socket, io, data, ack){
-		let bindInfo = null;
-		
-		try{
-			const validation = await this.loadAndValidateData(data, io);
-			if (!validation.ok) throw new Error(validation?.message);
-			const { roomId, notification, db } = validation;
-			
-			const authorization = this.authorizeReceiver(socket, notification);
-			if (!authorization.ok) throw new Error(authorization?.message);
-			const {receiverId, senderId} = authorization;
-			
-			const playersData = await this.loadPlayersData(db, senderId, receiverId, io);
-			if (!playersData?.ok)
-				{
-					console.log(playersData)
-					throw new Error(playersData?.message);
-				} 
-			const {player1, player2, p1SocketId, p2SocketId, p1Socket, p2Socket} = playersData
-			
-			bindInfo = { player1, player2, p1SocketId, p2SocketId };
-			this.bindUserToSocket(bindInfo);
-			
-			const GameInfo = { roomId, senderId, receiverId, p1SocketId, p2SocketId, player1, player2 };
-			const { result, current } = this.createGameSession(GameInfo);
-			if (!result.ok){
-				cleanupGame(current)
-				if (bindInfo) this.unbindUsernameSocketMaps(bindInfo);
-				throw new Error(result?.message);
-			}
-
-			current.state = "PLAYING";
-
-			p1Socket.join(current.roomId);
-    	p2Socket.join(current.roomId);
-
-			io.to(current.roomId).emit("match-started:accept", current.roomId);
-			setTimeout(()=> startGameLoop(io, current.roomId), 3000);
-			io.to(current.roomId).emit("match-data", current);
-
-			ack?.({ ok: true, notification: notification, message: "Success" });
-		} catch(err) {
-				ack?.({ ok: false, notification: null , message: err?.message });
-		}
 	}
 }
 

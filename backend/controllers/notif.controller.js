@@ -1,7 +1,7 @@
 import { NotifServices } from "../services/Notification.service.js";
 
 class notifController {
-	async getForUser(req, res) {
+	getForUser = async (req, res) => {
 		try {
 			const db = req.server.db;
 			const userId = req.user.userId;
@@ -15,7 +15,7 @@ class notifController {
 		}
 	}
 
-	async notificationAction (req, res){
+	notificationAction = async (req, res) => {
 		try {
 			const db = req.server.db;
 			const userId = req.user.userId;
@@ -33,7 +33,7 @@ class notifController {
 		}
 	}
 
-	async markAsReadById (req, res) {
+	markAsReadById = async (req, res) => {
 		try {
       const db = req.server.db;
       const userId = req.user.userId;
@@ -49,7 +49,7 @@ class notifController {
     }
 	}
 
-	async unreadCounter (req, res) {
+	unreadCounter = async (req, res) => {
 		try {
 			const db = req.server.db;
 			const userId = req.user.userId;
@@ -66,7 +66,7 @@ class notifController {
 		}
 	}
 
-	async getNotifById (req, res) {
+	getNotifById = async (req, res) => {
 		try {
 			const db = req.server.db;
 			const id = Number(req.params.id);
@@ -74,7 +74,6 @@ class notifController {
 			if (!Number.isInteger(id) || id <= 0) return res.code(400).send({ok: false, error: "Invalid notification id",});
 
 			const notification = await NotifServices.getById(db, id);
-
 			if (!notification) return res.code(404).send({ok: false, error: "Notification not found",});
 
 			return res.code(200).send({ok: true, message: "SUCCESS", notif: notification,});

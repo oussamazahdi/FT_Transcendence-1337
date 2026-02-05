@@ -52,7 +52,6 @@ export default function Matchmaking() {
       avatar: user.avatar,
 			id : user.id,
     });
-		// console.log("============> i emit join-game event to server")
     joinedRef.current = true;
     setStatus("Waiting for opponent...");
     setCanTryAgain(false);
@@ -71,16 +70,10 @@ export default function Matchmaking() {
   };
 
   useEffect(() => {
-		console.log("********> before checking socket")
     if (!user || !socket || navigatedRef.current) return;
-		
-		
-    // if (!socket.connected) socket.connect();
-		
-    // const handleConnect = () => {
+
 			setPlayer1(prev => ({ ...prev, socketId: socket.id }));
       if (!joinedRef.current) joinGame();
-    // };
 		
     const handleMatchFound = opponent => {
 			setPlayer2(opponent);
@@ -101,14 +94,12 @@ export default function Matchmaking() {
       router.refresh();
     };
 		
-		console.log("********> after checking socket")
-    // socket.on("connect", handleConnect);
+
     socket.on("match-found", handleMatchFound);
     socket.on("match-canceled", handleMatchCanceled);
     socket.on("match-started", handleMatchStarted);
 
     return () => {
-      // socket.off("connect", handleConnect);
       socket.off("match-found", handleMatchFound);
       socket.off("match-canceled", handleMatchCanceled);
       socket.off("match-started", handleMatchStarted);

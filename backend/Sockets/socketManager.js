@@ -19,7 +19,7 @@ export function initSocketManager(io) {
 			setTimeout(() => {
 				if(!onlineUsers.has(userId))
 					io.emit("users:status", Array.from(onlineUsers.keys()));
-			}, 2000);
+			}, 3000);
 			connectionController.onDisconnect(socket, io);
 		});
     
@@ -29,7 +29,6 @@ export function initSocketManager(io) {
 
 		socket.on("game:accept", async (data, ack) => {
 			connectionController.onGameAccept(socket, io, data, ack);
-			ack?.({ ok: true, notification: data });
   	});
 	}
 )}

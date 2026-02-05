@@ -62,12 +62,6 @@ export async function getCurrentUser() {
 			notificationsList = notifications?.userData || [];
 		}
 
-    // console.log("user", user.userData);
-    // console.log("Friends", friendsList);
-    // console.log("Blocked" ,blockedList);
-    // console.log("pendingRequest", pendingReqList);
-    // console.log("incomingRequest", incomingReqList);
-		// console.log("-------------> gameSettings:", playerSettingsList);
     return {
       userData: user.userData,
       friends: friendsList,

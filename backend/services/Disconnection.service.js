@@ -1,5 +1,5 @@
 import { socketToUsername, usernameToSocket, playerMove, waitingPlayer } from "../store/memory.store.js"
-import { getGameBySocket, removeGame } from "../utils/GameUtils.js"
+import { GameUtils } from "../utils/GameUtils.js";
 import { WIN_SCORE } from "../constants/game.constants.js";
 import { MatchController } from "../controllers/game.controller.js";
 
@@ -42,10 +42,10 @@ class disconnectionService{
     
     const remainingPlayer = socketId === player1.socketId ? player2 : player1;
     
-    if (state === "PLAYING") finishGame(game, remainingPlayer, io);
-    else cancelMatch(matchTimeOut, remainingPlayer.socketId, io);
+    if (state === "PLAYING") this.finishGame(game, remainingPlayer, io);
+    else this.cancelMatch(matchTimeOut, remainingPlayer.socketId, io);
     
-    removeGame(roomId);
+    GameUtils.removeGame(roomId);
   }
 
   handleWaitingPlayerDisconnect(socketId) {

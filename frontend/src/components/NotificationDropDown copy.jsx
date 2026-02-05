@@ -46,7 +46,7 @@ export async function fetchUnreadNotificationsCount() {
     credentials: "include",
   });
 
-	console.log("data:",data);
+
 
   if (!res || !res.ok) return 0;
   return Number(data?.unreadCount ?? 0);
@@ -114,8 +114,7 @@ const FriendInvite = ({ notif, onAccept, onReject }) => {
   );
 };
 
-/********************************************************************************************************************************* */
-/********************************************************************************************************************************* */
+
 async function onAccept(notifId, socket) {
 	
   if (!socket) return;
@@ -179,17 +178,9 @@ async function onAccept(notifId, socket) {
         console.error("Socket accept failed:", ack?.error || ack);
         return;
       }
-      // optional: navigate or update UI here
-      // router.push(`/game/${roomId}`);
     }
   );
 }
-
-/********************************************************************************************************************************* */
-/********************************************************************************************************************************* */
-
-
-
 
 const GameInvite = ({ notif, onAccept, onReject }) => {
   const username = notif?.sender_username || "Unknown";
@@ -279,15 +270,6 @@ export default function NotificationDropDown() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
-  // load unread count on mount
-  // useEffect(() => {
-  //   (async () => {
-  //     const count = await fetchUnreadNotificationsCount().catch(() => 0);
-  //     setUnreadCount(count);
-  //   })();
-  // }, []);
-
-  // realtime: new notification
   useEffect(() => {
     if (!socket) return;
 
@@ -304,51 +286,6 @@ export default function NotificationDropDown() {
     socket.on("notification:new", onNewNotification);
     return () => socket.off("notification:new", onNewNotification);
   }, [socket]);
-
-  // const postAction = useCallback(async (notifId, action) => {
-  //   const id = Number(notifId);
-  //   if (!Number.isInteger(id) || id <= 0) return { ok: false };
-
-  //   const { res, data } = await fetchJson(`${API}/api/notifications/${id}/action`, {
-  //     method: "POST",
-  //     credentials: "include",
-  //     headers: { "Content-Type": "application/json", Accept: "application/json" },
-  //     body: JSON.stringify({ action }),
-  //   });
-
-  //   if (!res || !res.ok) return { ok: false, error: data?.message || res?.statusText };
-  //   return { ok: true, data };
-  // }, []);
-
-  // const handleAccept = useCallback(
-  //   async (notif) => {
-  //     if (!notif?.id) return;
-  //     if (notif.status !== "pending" || isExpired(notif)) return;
-
-  //     // 1) mark accepted in DB
-  //     const r = await postAction(notif.id, "accept");
-  //     if (!r.ok) return;
-
-  //     // 2) update UI
-  //     setNotifications((prev) => prev.map((n) => (n.id === notif.id ? { ...n, status: "accepted" } : n)));
-
-  //     // 3) game invite special: emit + navigate
-  //     if (notif.type === "game_invite") {
-  //       const roomId = notif?.payload?.roomId;
-  //       if (typeof roomId !== "string" || roomId.length === 0) return;
-
-  //       if (socket) {
-  //         if (!socket.connected) socket.connect();
-
-  //         socket.emit("game:accept", { notifId: notif.id, roomId }, (ack) => {
-  //           if (!ack?.ok) return;
-  //           router.push(`/game/${roomId}`);
-  //         });
-  //       }
-  //     }
-  //   },
-  //   [postAction, router, socket]
-  // );
 
   const handleReject = useCallback(
     async (notif) => {
