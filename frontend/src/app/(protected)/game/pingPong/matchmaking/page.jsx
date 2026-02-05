@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/authContext";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DoorOpen, RotateCcw } from "lucide-react";
-import { useSocket } from "@/contexts/socketContext";
+import { useSocket } from "@/contexts/socketContext.tsx";
 
 const emptyPlayer = () => ({
   id: 0,

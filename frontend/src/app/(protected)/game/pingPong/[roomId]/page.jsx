@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/contexts/authContext";
-import { useSocket } from "@/contexts/socketContext";
+import { useSocket } from "@/contexts/socketContext.tsx";
 
 const GAME_WIDTH = 1024;
 const GAME_HEIGHT = 700;

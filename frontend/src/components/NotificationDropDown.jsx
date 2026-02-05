@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { BellAlertIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
-import { useSocket } from "@/contexts/socketContext";
+import { useSocket } from "@/contexts/socketContext.tsx";
 
 const SafeAvatar = ({ src, alt }) => {
   const safeSrc = src && src !== "null" ? src : assets.defaultProfile;

@@ -10,10 +10,12 @@ export function createMatchHistoryTable(db) {
 			winner_id INTEGER NOT NULL,
 			player1_score INTEGER NOT NULL,
 			player2_score INTEGER NOT NULL,
-			status TEXT NOT NULL,
+			status TEXT NOT NULL CHECK(
+				status IN ('win', 'forfait')
+			),
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			
-			UNIQUE(player1_id, player2_id),
+			CHECK(player1_id != player2_id),
 
 			FOREIGN KEY (player1_id) REFERENCES users(id) ON UPDATE CASCADE,
 			FOREIGN KEY (player2_id) REFERENCES users(id) ON UPDATE CASCADE

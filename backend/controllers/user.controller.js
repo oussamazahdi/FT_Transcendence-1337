@@ -13,16 +13,31 @@ import { updateUserSchema, zErrorHandler } from "../utils/inputValidator.js"
 
 async function fileUpload(user, file)
 {
-	const uploadDir = path.join(process.cwd(), 'uploads');
-	const image = file.fileStream;
-	const filename = generateFileNameByUser(user.username, file.filename, file.mimetype);
-	const filePath = path.join(uploadDir, filename);
-	console.log("MDR");
-	await pipeline(image, fs.createWriteStream(filePath));
-	console.log("LOL");
-	const fileLink = `${process.env.API_URL}/uploads/${filename}`;
-	console.log(fileLink);
-	return (fileLink);
+	try {
+		const oldAvatar = user?.avatar;
+
+		const uploadDir = path.join(process.cwd(), 'uploads');
+		const image = file.fileStream;
+		const filename = generateFileNameByUser(user.username, file.filename, file.mimetype);
+		const filePath = path.join(uploadDir, filename);
+		await pipeline(image, fs.createWriteStream(filePath));
+		const fileLink = `${process.env.API_URL}/uploads/${filename}`;
+		if (oldAvatar && !oldAvatar.includes('/uploads/default/')) 
+		{
+            const oldFilename = oldAvatar.split('/uploads/')[1];
+            if (oldFilename)
+			{
+                const oldPath = path.join(process.cwd(), 'uploads', oldFilename);
+                if (fs.existsSync(oldPath))
+					fs.unlinkSync(oldPath);
+            }
+        }
+		return (fileLink);
+	}
+	catch (error)
+	{
+		console.log(error);
+	}
 }
 
 export class UserController 
@@ -70,6 +85,10 @@ export class UserController
 
 			if (request.user.userId !== parseInt(request.params.id))
 				return reply.code(403).send({error: "FORBIDDEN"});
+
+			const user = userModels.getUserById(db, request.params.id);
+			if (!user)
+				return reply.code(404).send({error: "USER_NOT_FOUND"});
 			for await (const part of request.parts())
 			{
 				if (part.type === "field")
@@ -82,13 +101,10 @@ export class UserController
 						mimetype: part.mimetype,
 						fileStream: part.file
 					}
-					userData["avatar"] = await fileUpload(request.user, fileInfo);
+					userData["avatar"] = await fileUpload(user, fileInfo);
 				}
 			}
 			const validatedData = updateUserSchema.parse(userData);
-			const user = userModels.getUserById(db, request.params.id);
-			if (!user)
-				return reply.code(404).send({error: "USER_NOT_FOUND"});
 
 			userData = {
 				firstname: validatedData.firstname || user.firstname,

@@ -11,6 +11,7 @@ import { initializeSocketes } from './Sockets/initializeSocketes.js';
 
 const app = Fastify(serverConfig);
 
+
 registerDecorators(app);
 
 initAllTables(app.db);
