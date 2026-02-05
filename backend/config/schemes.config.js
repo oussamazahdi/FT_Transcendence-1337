@@ -354,7 +354,7 @@ export const unreadCountResponse = {
 export const leaderboardSchema = {
     type: 'object',
     properties: {
-        userid: { type: 'integer' },
+        id: { type: 'integer' },
         username: { type: 'string' },
         avatar: { type: ['string', 'null'] },
         firstname: { type: 'string' },
@@ -371,7 +371,8 @@ export const usersRanking = {
     type: 'object',
     properties: {
         message: { type: 'string' },
-        conversations: {
+        totalUsers: {type: 'integer'},
+        result: {
             type: 'array',
             items: leaderboardSchema
         }
