@@ -8,47 +8,45 @@ export default function Leaderboard() {
   const [leaders, setLeaders] = useState<Leaders[]>([]);
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
-  // const [page, setPage] = useState<number>(1);
   const [currentPage, setCurrentPage] = useState(1);
+  const [count, setCount] = useState<number>(0)
   const itemsPerPage = 10;
+  const [displayedPage, setDisplayedPage] = useState(1);
 
-  useEffect(() => {
-    setError("");
+  const fetchLeaders = async (page: number) => {
     setLoading(true);
-    const fetchLeaders = async () =>{
-      try{
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/leaderboard`,{
-          method:"get",
-          credentials:"include" 
-        });
-        
-        const data = await response.json();
-        if (!response.ok){
-          throw new Error(data.error || "faild to fetch leaders");
-        }
-
-        setLeaders(data.result)
-        console.log(data);
-      }catch(err:any){
-        setError(err.message);
-      }finally{
-        setLoading(false);
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/leaderboard/?page=${page}`, {
+        method: "get",
+        credentials: "include"
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setLeaders(data.result);
+        setCount(data.totalUsers);
+        setDisplayedPage(page);
       }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    fetchLeaders();
-    },[])
+useEffect(() => {
+    const handler = setTimeout(() => {
+      fetchLeaders(currentPage);
+    }, 200); 
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    return () => clearTimeout(handler);
+  }, [currentPage]);
 
   const rankedLeaders = leaders.map((leader, index) => ({
-    ...leader, 
-    rank: index + 1
-  }))
-  const currentItems = rankedLeaders.slice(indexOfFirstItem, indexOfLastItem)
+    ...leader,
+    rank: (index + 1) + ((displayedPage - 1) * 10)
+  }));
 
-  const totalPages = Math.ceil(leaders.length / itemsPerPage);
+  const totalPages = Math.ceil(count / itemsPerPage);
 
   const handleFirst = () => {
     if (currentPage != 1) 
@@ -69,9 +67,8 @@ export default function Leaderboard() {
     if (currentPage != totalPages)
       setCurrentPage(totalPages)
   }
-  console.log(currentItems)
 
-  const renderLeaders = currentItems.map((user) => (
+  const renderLeaders = rankedLeaders.map((user) => (
       <LeaderboardCard key={user.id}
         id={user.id}
         username={user.username}

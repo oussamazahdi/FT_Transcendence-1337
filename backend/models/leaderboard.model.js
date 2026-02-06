@@ -3,7 +3,7 @@ import { handleDatabaseError } from '../utils/dbErrorHandler.js';
 
 export class LeaderboardModels {
 
-    getPlayerByRanking(db)
+    getPlayerByRanking(db, limit, offset)
     {
          try {
             const ranking = db.prepare(`
@@ -39,7 +39,9 @@ export class LeaderboardModels {
 
                 ORDER BY
                     s.player_xp DESC
-                `).all();
+                LIMIT :limit
+                OFFSET :offset;
+                `).all({limit: limit, offset: offset});
             return (ranking);
         }
         catch (error) {

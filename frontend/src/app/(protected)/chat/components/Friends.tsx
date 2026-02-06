@@ -12,9 +12,17 @@ function parseTime(timeString: string) {
 
   const isToday = date.toDateString() === now.toDateString();
 
-  return isToday 
-    ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
-    : timeString;
+  if (isToday) {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+  } else {
+    return date.toLocaleString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+  }
 }
 
 const Friends = (props: Conversation) => {

@@ -371,7 +371,7 @@ export const usersRanking = {
     type: 'object',
     properties: {
         message: { type: 'string' },
-        count: { type: 'integer'},
+        totalUsers: { type: 'integer'},
         result: {
             type: 'array',
             items: leaderboardSchema
