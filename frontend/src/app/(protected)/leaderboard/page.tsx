@@ -8,6 +8,7 @@ export default function Leaderboard() {
   const [leaders, setLeaders] = useState<Leaders[]>([]);
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  // const [page, setPage] = useState<number>(1);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -68,6 +69,7 @@ export default function Leaderboard() {
     if (currentPage != totalPages)
       setCurrentPage(totalPages)
   }
+  console.log(currentItems)
 
   const renderLeaders = currentItems.map((user) => (
       <LeaderboardCard key={user.id}

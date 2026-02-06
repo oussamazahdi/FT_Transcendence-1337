@@ -1,36 +1,98 @@
-import React from 'react'
-import { PieChart } from '@mui/x-charts/PieChart';
+import React, { useEffect, useState } from "react";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  ChartOptions,
+} from 'chart.js';
+import { Doughnut } from 'react-chartjs-2';
 
+ChartJS.register(ArcElement, Tooltip, Legend);
 
-const CercleGraph = () => {
-  const data= [
-    { id: 0, value: 10, },
-    { id: 1, value: 15, },
-    { id: 2, value: 20, },
-    { id: 3, value: 30, },
-    { id: 4, value: 5, },
-    { id: 5, value: 12, },
-    { id: 6, value: 20, },
-  ]
+const MatchStats = () => {
+  const [statistics, setStatistics] = useState<(number | null)[]>([])
+  const [loading, setLoading] = useState(false);
+  
+  useEffect(()=>{
+    const fetchStatistics = async () => {
+      setLoading(true);
+      try{
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/statistics/`, {
+          method:"get",
+          credentials:"include"
+        })
+
+        if (!response.ok) 
+          throw new Error;
+        
+        const data = await response.json();
+        setStatistics([data.data[0].wins, data.data[0].loses,data.data[0].win_forfaits,data.data[0].lose_forfaits]);
+      }catch(error:any){
+        console.log("faild to fetch Statistics");
+        return []
+      }finally{
+        setLoading(false);
+      }
+    }
+    fetchStatistics()
+  },[])
+
+  const data = {
+    labels: ["Wins", "Loses", "Forfeit Wins", "Forfeit Loses"],
+    datasets: [
+      {
+        label: "Match Outcomes",
+        data: statistics,
+        backgroundColor: [
+          "#A2D7FF", // Pastel Blue (Wins)
+          "#FFB3B3", // Pastel Red (Loses)
+          "#C9E2A6", // Pastel Green (Forfeit Wins)
+          "#FFD9A2", // Pastel Orange (Forfeit Loses)
+        ],
+        borderColor: "rgba(15, 15, 15, 0.8)",
+        borderWidth: 2,
+        hoverOffset: 10,
+      },
+    ],
+  };
+
+  const options: ChartOptions<"doughnut"> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: "50%",
+    plugins: {
+      legend: {
+        position: "left",
+        labels: {
+          color: "white",
+          padding: 20,
+          font: {
+            size: 14,
+          },
+        },
+      },
+      tooltip: {
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        titleColor: "#fff",
+        bodyColor: "#fff",
+        padding: 10,
+        displayColors: true,
+      },
+    },
+  };
+
   return (
-    <div className="bg-[#0F0F0F]/75 rounded-[20px] flex-1 h-full max-h-[360px]">
-      <PieChart
-      series={[
-        {
-          data: data,
-          innerRadius: 80,
-          outerRadius: 100,
-          paddingAngle: 3,
-          cornerRadius: 5,
-          startAngle: 0,
-          endAngle: 360,
-          cx: 160,
-          cy: 160,
+    <div className="bg-[#0F0F0F]/75 rounded-[20px] flex-1 min-h-87.5 p-6 flex flex-col items-center">
+      <h3 className="text-white font-bold mb-4">Match Statistics</h3>
+      <div className="w-full h-full">
+        {loading ? <div>Loading....</div>
+        :
+        <Doughnut data={data} options={options} />
         }
-      ]}
-    />
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default CercleGraph
+export default MatchStats;

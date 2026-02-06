@@ -254,7 +254,7 @@ export class FriendsModels
                 WHERE (sender_id = :me AND receiver_id = :other)
                 OR
                 (sender_id = :other AND receiver_id = :me)`).get({me: sender, other: receiver});
-            if (result === undefined)
+            if (result === undefined || result.status != 'accepted')
                 return (false);
             return (true);
         }

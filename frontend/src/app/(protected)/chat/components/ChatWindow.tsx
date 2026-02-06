@@ -108,6 +108,12 @@ export default function ChatWindow({ selectedFriend, updateLastMessage}: ChatWin
     socket.on("chat:receiver", handleReceive);
     socket.on("chat:error", (err: any) => {
       const message = typeof err === "string" ? err : err?.message;
+      setMessages((prev) => {
+        if (prev.length === 0) 
+          return prev;
+        console.log("deleted");
+        return prev.slice(1, -1);
+      })
       triggerError(CHAT_ERROR[message] ?? CHAT_ERROR.default);
     });
     return () => {
@@ -132,7 +138,8 @@ export default function ChatWindow({ selectedFriend, updateLastMessage}: ChatWin
 
     setMessages((prev) => [tmpMessage, ...prev]);
     updateLastMessage(tmpMessage.text, tmpMessage.timestamp, Friend);
-    if (!socket) return;
+    if (!socket) 
+      return;
     socket.emit("chat:send", {
       receiverId: selectedFriend.id,
       content: content,
