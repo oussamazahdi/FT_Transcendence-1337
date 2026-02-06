@@ -17,8 +17,7 @@ class disconnectionService{
     io.to(game.roomId).emit("game-state", game);
     
     const db = io.db;
-    
-    console.log("game:", game);
+
     const player1Id = game.player1.id;
     const player2Id = game.player2.id;
     
@@ -52,6 +51,7 @@ class disconnectionService{
     if (waitingPlayer.value?.socketId !== socketId) return false;
     
     waitingPlayer.value = null;
+    waitingPlayer.data = null;
     return true;
   }
 

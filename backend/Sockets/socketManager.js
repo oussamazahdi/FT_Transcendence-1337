@@ -14,21 +14,10 @@ export function initSocketManager(io) {
     socket.on("update-data", (data) => connectionController.onUpdateData(socket, io, data));
     socket.on("paddle-move", (data) => connectionController.onPaddleMove(socket, io, data));
     
-		socket.on("disconnect", () => {
-			onlineUsers.delete(userId);
-			setTimeout(() => {
-				if(!onlineUsers.has(userId))
-					io.emit("users:status", Array.from(onlineUsers.keys()));
-			}, 3000);
-			connectionController.onDisconnect(socket, io);
-		});
-    
+		socket.on("disconnect", () => { connectionController.onDisconnect(socket, io);});
 		socket.on("leave-game", () => connectionController.onDisconnect(socket, io));
+    
     socket.on("game:invite", (data, ack) =>connectionController.onGameInvite(socket, io, data, ack));
-
-
-		socket.on("game:accept", async (data, ack) => {
-			connectionController.onGameAccept(socket, io, data, ack);
-  	});
+		socket.on("game:accept", async (data, ack) => {connectionController.onGameAccept(socket, io, data, ack);});
 	}
 )}

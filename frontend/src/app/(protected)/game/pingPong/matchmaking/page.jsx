@@ -1,14 +1,15 @@
 "use client";
 
 import { useAuth } from "@/contexts/authContext";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { DoorOpen, RotateCcw } from "lucide-react";
 import { useSocket } from "@/contexts/socketContext";
+import { PlayerCard } from "./PlayerCard";
 
-const emptyPlayer = () => ({
+const makeEmptyPlayer = () => ({
   id: 0,
-	socketId: "",
+  socketId: "",
   firstName: "",
   lastName: "",
   username: "",
@@ -19,92 +20,123 @@ const emptyPlayer = () => ({
 
 export default function Matchmaking() {
   const { user } = useAuth();
-  const router = useRouter();
   const socket = useSocket();
+  const router = useRouter();
 
+  const emptyPlayer = useMemo(() => makeEmptyPlayer(), []);
   const [status, setStatus] = useState("Searching for opponent...");
-  const [player1, setPlayer1] = useState(emptyPlayer());
-  const [player2, setPlayer2] = useState(emptyPlayer());
+  const [player1, setPlayer1] = useState(emptyPlayer);
+  const [player2, setPlayer2] = useState(emptyPlayer);
   const [canExit, setCanExit] = useState(true);
   const [canTryAgain, setCanTryAgain] = useState(false);
 
   const joinedRef = useRef(false);
   const navigatedRef = useRef(false);
 
+  // Keep player1 identity in sync with user (works on refresh too).
   useEffect(() => {
-    if (!user) return;
-    setPlayer1({
-      ...emptyPlayer(),
-      firstName: user.firstname,
-      lastName: user.lastname,
-      username: user.username,
-      avatar: user.avatar,
-			id : user.id,
-    });
-  }, [user]);
+    if (!user) {
+      setPlayer1(emptyPlayer);
+      return;
+    }
 
-  const joinGame = () => {
-    if (!socket || !socket.connected) return;
-    socket.emit("join-game", {
+    setPlayer1((prev) => ({
+      ...prev,
+      id: user.id,
       firstName: user.firstname,
       lastName: user.lastname,
       username: user.username,
       avatar: user.avatar,
-			id : user.id,
+    }));
+  }, [user, emptyPlayer]);
+
+  const joinGame = useCallback(() => {
+    if (!user || !socket) return;
+    if (joinedRef.current) return;
+
+    socket.emit("join-game", {
+      id: user.id,
+      firstName: user.firstname,
+      lastName: user.lastname,
+      username: user.username,
+      avatar: user.avatar,
     });
+
     joinedRef.current = true;
     setStatus("Waiting for opponent...");
     setCanTryAgain(false);
-  };
+  }, [user, socket]);
 
-  const handleExit = () => {
+  const handleExit = useCallback(() => {
     if (!socket || !canExit) return;
+
     navigatedRef.current = true;
     socket.emit("leave-game");
-    socket.disconnect();
-    router.push("/game/pingPong");
-  };
 
-  const handleTryAgain = () => {
-    window.location.reload();
-  };
+    // Optional: you can disconnect, but if you do, make sure you reconnect when coming back.
+    socket.disconnect();
+
+    router.push("/game/pingPong");
+  }, [socket, canExit, router]);
+
+  const handleTryAgain = useCallback(() => {
+		window.location.reload(true)
+  }, [emptyPlayer, socket, joinGame]);
 
   useEffect(() => {
     if (!user || !socket || navigatedRef.current) return;
 
-			setPlayer1(prev => ({ ...prev, socketId: socket.id }));
-      if (!joinedRef.current) joinGame();
-		
-    const handleMatchFound = opponent => {
-			setPlayer2(opponent);
+    // Ensure connected after refresh / after a previous disconnect.
+    if (!socket.connected) socket.connect();
+
+    const onConnect = () => {
+      setPlayer1((prev) => ({ ...prev, socketId: socket.id || "" }));
+      joinGame();
+    };
+
+    const onDisconnect = () => {
+      // You can optionally show a status; keeps UX transparent.
+      setStatus("Disconnected. Reconnecting...");
+      joinedRef.current = false;
+    };
+
+    const handleMatchFound = (opponent) => {
+      setPlayer2(opponent || emptyPlayer);
       setStatus("Match Found!");
       setCanExit(false);
     };
-		
+
     const handleMatchCanceled = () => {
-			setPlayer2(emptyPlayer());
+      setPlayer2(emptyPlayer);
       setStatus("Opponent left. Try again.");
       setCanExit(true);
       setCanTryAgain(true);
       joinedRef.current = false;
     };
-		
-    const handleMatchStarted = roomId => {
-			router.push(`/game/pingPong/${roomId}`);
+
+    const handleMatchStarted = (roomId) => {
+      navigatedRef.current = true;
+      router.push(`/game/pingPong/${roomId}`);
       router.refresh();
     };
-		
 
+    socket.on("connect", onConnect);
+    socket.on("disconnect", onDisconnect);
     socket.on("match-found", handleMatchFound);
     socket.on("match-canceled", handleMatchCanceled);
     socket.on("match-started", handleMatchStarted);
 
+    // If already connected when this effect runs, run connect logic immediately.
+    if (socket.connected) onConnect();
+
     return () => {
+      socket.off("connect", onConnect);
+      socket.off("disconnect", onDisconnect);
       socket.off("match-found", handleMatchFound);
       socket.off("match-canceled", handleMatchCanceled);
       socket.off("match-started", handleMatchStarted);
     };
-  }, [user, socket, router]);
+  }, [user, socket, router, joinGame, emptyPlayer]);
 
   return (
     <div className="w-full max-w-3xl rounded-3xl bg-[#0F0F0F]/65 p-6 sm:p-10 flex flex-col items-center gap-6 mx-8 my-2">
@@ -120,52 +152,20 @@ export default function Matchmaking() {
       </div>
 
       <div className="mt-4 flex flex-col sm:flex-row gap-3">
-        <button
-          onClick={handleTryAgain}
-          disabled={!canTryAgain}
-          className={`flex items-center gap-2 rounded-md px-6 py-2 font-medium transition ${
-            canTryAgain
-              ? "bg-[#1E3A2F] text-[#4DFFB3] hover:bg-[#162A22]"
-              : "bg-[#252525] text-[#717171] cursor-not-allowed"
-          }`}
-        >
+        <button onClick={handleTryAgain} disabled={!canTryAgain}
+        className={`flex items-center gap-2 rounded-md px-6 py-2 font-medium transition ${ canTryAgain
+				? "bg-[#1E3A2F] text-[#4DFFB3] hover:bg-[#162A22]" : "bg-[#252525] text-[#717171] cursor-not-allowed"}`}>
           <RotateCcw size={18} />
           Try Again
         </button>
 
-        <button
-          onClick={handleExit}
-          disabled={!canExit}
-          className={`flex items-center gap-2 rounded-md px-6 py-2 font-medium transition ${
-            canExit
-              ? "bg-[#442222] text-[#FF4848] hover:bg-[#3C1C1C]"
-              : "bg-[#252525] text-[#717171] cursor-not-allowed"
-          }`}
-        >
+        <button onClick={handleExit} disabled={!canExit}
+				className={`flex items-center gap-2 rounded-md px-6 py-2 font-medium transition ${ canExit
+        ? "bg-[#442222] text-[#FF4848] hover:bg-[#3C1C1C]" : "bg-[#252525] text-[#717171] cursor-not-allowed"}`}>
           <DoorOpen size={18} />
           Exit
         </button>
       </div>
-    </div>
-  );
-}
-
-function PlayerCard({ player, label }) {
-  const isActive = !!player.socketId;
-
-  return (
-    <div className="flex flex-col items-center text-center">
-      <img
-        src={isActive ? player.avatar : "/gameAvatars/Empty.jpeg"}
-        alt="profile"
-        className="h-28 w-28 sm:h-36 sm:w-36 rounded-xl object-cover"
-      />
-      <h3 className="mt-2 text-lg sm:text-xl font-semibold">
-        {isActive ? `${player.firstName}.${player.lastName?.[0]}` : label}
-      </h3>
-      <p className="text-sm font-medium text-[#6E6E6E]">
-        [{isActive ? player.username : "waiting"}]
-      </p>
     </div>
   );
 }

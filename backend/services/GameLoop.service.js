@@ -64,8 +64,7 @@ class gameLoop{
 		io.to(roomId).emit("game-state", game);
 	
 		const db = io.db;
-	
-		console.log("game:", game);
+
 		const player1Id = game.player1.id;
 		const player2Id = game.player2.id;
 	
