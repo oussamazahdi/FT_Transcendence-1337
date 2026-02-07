@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useRef, useState, useEffect } from "react";
+import { GameUtiles } from "./lib/utils";
+import {GAME_MODE, GAME_WIDTH, GAME_HEIGHT} from "@/components/ui/GameMode"
+import { useAuth } from "@/contexts/authContext";
 
 export default function PingPongGame() {
-  const paddleSpeed = 4;
   const [score1, setScore1] = useState(0);
   const [score2, setScore2] = useState(0);
   const [isPause, setIsPause] = useState(false);
@@ -11,6 +13,8 @@ export default function PingPongGame() {
   const [winner, setWinner] = useState("");
 
   const isPauseRef = useRef(false);
+
+	const printRef = useRef(false);
 
   const [players, setPlayers] = useState({
     player1: {
@@ -41,6 +45,10 @@ export default function PingPongGame() {
 
   useEffect(() => {
     const dataLine = localStorage.getItem("GameData");
+		if(!printRef.current){
+			console.log("----> Local Storage :", dataLine);
+			printRef.current = true;
+		}
     if (!dataLine) return;
     const data = JSON.parse(dataLine);
     const paddleHeight = 90 + 15 * data.paddleSize;
@@ -75,7 +83,6 @@ export default function PingPongGame() {
       keys: { w: false, s: false, ArrowUp: false, ArrowDown: false },
       scoreLimit: data.scoreLimit,
     };
-    // console.log("game data=>", data);
     setPlayers({
       player1: {
         nickName: data.player1NickName,
@@ -102,23 +109,13 @@ export default function PingPongGame() {
     const context = canvas.getContext("2d");
     if (!context) return;
 
-    const keyDownHandler = (e) => {
-      if (e.key === "w") state.keys.w = true;
-      if (e.key === "s") state.keys.s = true;
-      if (e.key === "ArrowUp") state.keys.ArrowUp = true;
-      if (e.key === "ArrowDown") state.keys.ArrowDown = true;
-      if (e.key === " ") togglePause();
-    };
+		const { onKeyDown, onKeyUp } = GameUtiles.createKeyboardHandlers({
+			stateRef: gameStateRef,
+			togglePause,
+		});
 
-    const keyUpHandler = (e) => {
-      if (e.key === "w") state.keys.w = false;
-      if (e.key === "s") state.keys.s = false;
-      if (e.key === "ArrowUp") state.keys.ArrowUp = false;
-      if (e.key === "ArrowDown") state.keys.ArrowDown = false;
-    };
-
-    window.addEventListener("keydown", keyDownHandler);
-    window.addEventListener("keyup", keyUpHandler);
+		window.addEventListener("keydown", onKeyDown);
+		window.addEventListener("keyup", onKeyUp);
 
     const gameLoop = () => {
       if (isPauseRef.current || gameOver) {
@@ -126,98 +123,13 @@ export default function PingPongGame() {
         return;
       }
 
-      // Movement
-      if (state.keys.w && state.player1.y > 0) state.player1.y -= paddleSpeed;
-      if (
-        state.keys.s &&
-        state.player1.y + state.player1.height < state.board.height
-      )
-        state.player1.y += paddleSpeed;
-      if (state.keys.ArrowUp && state.player2.y > 0)
-        state.player2.y -= paddleSpeed;
-      if (
-        state.keys.ArrowDown &&
-        state.player2.y + state.player2.height < state.board.height
-      )
-        state.player2.y += paddleSpeed;
-
-      // Clear board
       context.clearRect(0, 0, state.board.width, state.board.height);
-
-      // Ball collisions
-      if (
-        state.ball.y - state.ball.radius <= 0 ||
-        state.ball.y + state.ball.radius >= state.board.height
-      )
-        state.ball.velocityY *= -1;
-
-      if (
-        state.ball.x + state.ball.radius > state.player2.x &&
-        state.ball.y > state.player2.y &&
-        state.ball.y < state.player2.y + state.player2.height
-      ) {
-        state.ball.velocityX *= -1;
-        state.ball.velocityY =
-          (state.ball.y - state.player2.y) / state.player2.height - 0.5;
-      }
-      if (
-        state.ball.x - state.ball.radius <
-          state.player1.x + state.player1.width &&
-        state.ball.y - state.ball.radius > state.player1.y &&
-        state.ball.y + state.ball.radius <
-          state.player1.y + state.player1.height
-      ) {
-        state.ball.velocityX *= -1;
-        state.ball.velocityY =
-          ((state.ball.y - state.player1.y) / state.player1.height - 0.5) *
-          state.ball.speed *
-          2;
-      }
-
-      // Scoring
-      if (state.ball.x <= 0 || state.ball.x >= state.board.width) {
-        if (state.ball.x >= state.board.width) setScore1((s) => s + 1);
-        if (state.ball.x <= 0) setScore2((s) => s + 1);
-        state.ball.x = state.board.width / 2;
-        state.ball.y = state.board.height / 2;
-      }
-
-      // Ball movement
-      state.ball.x += state.ball.velocityX * state.ball.speed;
-      state.ball.y += state.ball.velocityY * state.ball.speed;
-
-      // Draw
-      context.beginPath();
-      context.setLineDash([15, 8]);
-      context.moveTo(state.board.width / 2, 0);
-      context.lineTo(state.board.width / 2, state.board.height);
-      context.strokeStyle = "#FFFFFF";
-      context.stroke();
-
-      context.fillStyle = players.player1.color;
-      context.fillRect(
-        state.player1.x,
-        state.player1.y,
-        state.player1.width,
-        state.player1.height,
-      );
-      context.fillRect(
-        state.player2.x,
-        state.player2.y,
-        state.player2.width,
-        state.player2.height,
-      );
-
-      context.beginPath();
-      context.arc(
-        state.ball.x,
-        state.ball.y,
-        state.ball.radius,
-        0,
-        Math.PI * 2,
-      );
-      context.fillStyle = players.ballColor;
-      context.fill();
+			
+			GameUtiles.paddleMovement(state);
+			GameUtiles.ballCollisions(state);
+			GameUtiles.handleScoring(state, setScore1, setScore2);
+			GameUtiles.ballMovement(state);
+			GameUtiles.drawLocalFrame(context, state, players);
 
       animationRef.current = requestAnimationFrame(gameLoop);
     };
@@ -225,8 +137,8 @@ export default function PingPongGame() {
     animationRef.current = requestAnimationFrame(gameLoop);
 
     return () => {
-      window.removeEventListener("keydown", keyDownHandler);
-      window.removeEventListener("keyup", keyUpHandler);
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
   }, [gameOver, players]);
@@ -290,3 +202,4 @@ export default function PingPongGame() {
     </div>
   );
 }
+
