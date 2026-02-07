@@ -32,7 +32,7 @@ const ProfileDropDown = ({ user }: ProfileDropDownProps) => {
       );
       if (response.ok) 
         router.push("/");
-    } catch (error) {
+    } catch (error:any) {
       console.log(error.error);
     }
   };
