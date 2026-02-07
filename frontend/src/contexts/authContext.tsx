@@ -3,6 +3,7 @@ import { useState, useContext, createContext, ReactNode, useCallback } from "rea
 import { useRouter } from "next/navigation";
 import { USER_ERROR } from "@/lib/utils.ts";
 import { User, fullUser } from "@/types/index"
+import { autofetch } from "@/lib/api";
 
 
 interface UserCtxValue {
@@ -120,7 +121,7 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
 
   const sendFriendRequest = async (user: any) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/${user.id}`, {
+      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/${user.id}`, {
         method: "POST",
         credentials: "include",
       })
@@ -142,7 +143,7 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
 
   const cancelRequest = async (user: any) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/${user.id}`, {
+      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/${user.id}`, {
         method: "DELETE",
         credentials: "include",
       })
@@ -165,7 +166,7 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
 
   const acceptRequest = async (user: any) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/${user.id}/accept`, {
+      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/${user.id}/accept`, {
         method: "POST",
         credentials: "include",
       })
@@ -188,7 +189,7 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
 
   const removeFriend = async (user: any) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/${user.id}`, {
+      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/${user.id}`, {
         method: "DELETE",
         credentials: "include",
       })
@@ -210,7 +211,7 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
 
   const blockUser = async (user: any) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks/${user.id}`, {
+      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks/${user.id}`, {
         method: "POST",
         credentials: "include",
       })
@@ -225,16 +226,14 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
       setBlocked((prev: any) => [...prev, user]);
       setFriends(friends.filter((items: any) => items.id !== user.id));
     } catch (err: unknown) {
-      const msg =
-    err instanceof Error ? err.message : typeof err === "string" ? err : "default";
-
-  triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
+      const msg = err instanceof Error ? err.message : typeof err === "string" ? err : "default";
+      triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
     }
   }
 
   const deblockUser = async (user: any) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks/${user.id}`, {
+      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks/${user.id}`, {
         method: "DELETE",
         credentials: "include"
       })

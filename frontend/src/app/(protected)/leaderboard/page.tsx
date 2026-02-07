@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import LeaderboardCard from "./components/LeaderboardCard";
 import { ChevronDoubleRightIcon, ChevronDoubleLeftIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { Leaders } from "@/types";
+import { autofetch } from "@/lib/api";
 
 export default function Leaderboard() {
   const [leaders, setLeaders] = useState<Leaders[]>([]);
@@ -16,7 +17,7 @@ export default function Leaderboard() {
   const fetchLeaders = async (page: number) => {
     setLoading(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/leaderboard/?page=${page}`, {
+      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/leaderboard/?page=${page}`, {
         method: "get",
         credentials: "include"
       });

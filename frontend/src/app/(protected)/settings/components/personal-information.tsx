@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/authContext";
 import { assets } from "@/assets/data";
 import { USER_ERROR } from "@/lib/utils.ts";
 import { ArrowUpTrayIcon } from "@heroicons/react/24/outline";
+import { autofetch } from "@/lib/api";
 
 type ProfileFormData = {
   firstname: string;
@@ -80,7 +81,7 @@ export default function Personal_information() {
     }
 
     try {
-      const response = await fetch(
+      const response = await autofetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/users/${user?.id}`,
         {
           method: "PUT",

@@ -22,7 +22,7 @@ interface FriendProfileProp{
 }
 
 const FriendsProfile = ({ userPage }:FriendProfileProp) => {
-  const { sendFriendRequest, pendingRequests, cancelRequest, incomingRequest, acceptRequest, friends, user } = useAuth();
+  const { sendFriendRequest, pendingRequests, cancelRequest, incomingRequest, acceptRequest, friends } = useAuth();
   const [isFriend, setIsFriend] = useState(false);
   const [ispending, setIsPending] = useState(false);
   const [isIncoming, setIsIncoming] = useState(false);

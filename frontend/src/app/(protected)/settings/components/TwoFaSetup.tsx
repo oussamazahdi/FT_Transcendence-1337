@@ -2,6 +2,7 @@
 import react, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import { useAuth } from "@/contexts/authContext";
+import { autofetch } from "@/lib/api";
 
 interface TwoFaSetupProps{
   setView: React.Dispatch<React.SetStateAction<string>>
@@ -19,7 +20,7 @@ export default function TwoFaSetup({ setEnable, setView }:TwoFaSetupProps) {
     setError("");
     const getQrCode = async () => {
       try {
-        const response = await fetch(
+        const response = await autofetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/2fa/setup`,
           {
             method: "post",
@@ -45,7 +46,7 @@ export default function TwoFaSetup({ setEnable, setView }:TwoFaSetupProps) {
     setError("");
     try {
       const tokenString = TwoFAcode.join("");
-      const response = await fetch(
+      const response = await autofetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/2fa/enable`,
         {
           method: "post",
