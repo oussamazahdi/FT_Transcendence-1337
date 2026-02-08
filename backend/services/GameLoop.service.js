@@ -77,7 +77,7 @@ class gameLoop{
 			score1: game.player1.score,
 			score2: game.player2.score,
 			winner,
-			status: "finished",});
+			status: "win",});
 	
 		MatchController.updateUserXpAndLevel(db, { userId: winner, status: "winner" });
 		MatchController.updateUserXpAndLevel(db, { userId: loser, status: "loser" });

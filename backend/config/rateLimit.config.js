@@ -4,7 +4,7 @@ export const rateLimitConfig = {
     //         return request.user.userId;
     //     return request.ip;
     // },
-    max: 100,
+    max: 500,
     timeWindow: '1 minute',
     errorResponseBuilder: () => ({
         error: "TOO_MANY_REQUESTS",

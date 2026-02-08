@@ -82,7 +82,7 @@ class gameSetting {
 					ELSE player_xp - 60
 				END, player_level = CASE
 					WHEN player_level - 0.032 < 0 THEN 0
-					ELSE player_level - 0.032
+					ELSE ROUND(player_level - 0.032, 2)
 				END, updated_at = CURRENT_TIMESTAMP
 					WHERE player_id = ?`);
 

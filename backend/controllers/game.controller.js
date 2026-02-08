@@ -10,7 +10,7 @@ export function httpError(code, message) {
 
 class matchController {
 
-	createMatchHistory = async (db, { player1, player2, score1, score2, winner = null, status = "finished" }) => {
+	createMatchHistory = async (db, { player1, player2, score1, score2, winner = null, status = "win" }) => {
 		const inserted = await MatchHistory.create(db, { player1, player2, score1, score2, winner, status,
 		});
 

@@ -363,7 +363,7 @@ export const leaderboardSchema = {
         firstname: { type: 'string' },
         lastname: { type: 'string' },
         player_xp: { type: ['integer'] },
-        player_level: { type: ['integer'] },
+        player_level: { type: ['number'] },
         wins: { type: ['integer'] },
         loses: { type: ['integer'] },
         forfaits: { type: ['integer'] }
