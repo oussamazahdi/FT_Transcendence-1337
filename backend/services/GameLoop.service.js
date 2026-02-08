@@ -93,7 +93,7 @@ export function checkScore(game, io, roomId) {
     score1: game.player1.score,
     score2: game.player2.score,
     winner,
-    status: "finished",
+    status: "win",
   });
   cleanupPlayers(game);
   removeGame(roomId);

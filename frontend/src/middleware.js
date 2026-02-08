@@ -51,7 +51,7 @@ const onboardingSteps = {
 
   if ((isTokenExpired || !accessToken) && refreshToken) {
     try {
-      const refreshResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/refresh`,{
+      const refreshResponse = await fetch(`${process.env.SERVER_SIDE_API_URL}/api/auth/refresh`,{
           method: "POST",
           headers: {
             Cookie: `refreshToken=${refreshToken}; accessToken=${accessToken || ""}`,

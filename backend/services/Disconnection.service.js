@@ -34,7 +34,7 @@ function finishGame(game, remainingPlayer, io) {
     score1: game.player1.score,
     score2: game.player2.score,
     winner,
-    status: "forfeit",
+    status: "forfait",
   });
 }
 

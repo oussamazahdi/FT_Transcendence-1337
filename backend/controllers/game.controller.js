@@ -13,7 +13,8 @@ export class MatchController {
 		this.gameSetting = new GameSetting();
 	}
 
-	async createMatchHistory(db, { player1, player2, score1, score2, winner = null, status = "finished" }) {
+	async createMatchHistory(db, { player1, player2, score1, score2, winner = null, status = "win" }) {
+		console.log("=============>", status);
 		const inserted = this.matchHistory.create(db, { player1, player2, score1, score2, winner, status,
 		});
 

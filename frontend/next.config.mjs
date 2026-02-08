@@ -5,6 +5,12 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'http',
+        hostname: '10.32.96.170',
+        port: '3001', // ⚠️ Crucial: Matches the port in your error URL
+        pathname: '/uploads/**', // Allows images from the uploads folder
+      },
+      {
+        protocol: 'http',
         hostname: 'localhost',
         port: '3001', // ⚠️ Crucial: Matches the port in your error URL
         pathname: '/uploads/**', // Allows images from the uploads folder

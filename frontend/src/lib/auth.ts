@@ -10,15 +10,15 @@ export async function getCurrentUser(): Promise<fullUser | null> {
   if (!rToken || !aToken) return null;
 
   try {
-
+    const API = process.env.SERVER_SIDE_API_URL;
     const headers: HeadersInit = {Cookie: `accessToken=${aToken.value}; refreshToken=${rToken.value}`}
 
-    const userPromise = fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`,{headers});
-    const friendsPromise = fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/`,{headers})
-    const blockedPromise = fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks`,{headers})
-    const pendingReqPromise = fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/sent`,{headers})
-    const incomingReqPromise = fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests`,{headers})
-		const playerSettingsPromise = fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/game/settings`,{headers});
+    const userPromise = fetch(`${API}/api/auth/me`,{headers});
+    const friendsPromise = fetch(`${API}/api/friends/`,{headers})
+    const blockedPromise = fetch(`${API}/api/friends/blocks`,{headers})
+    const pendingReqPromise = fetch(`${API}/api/friends/requests/sent`,{headers})
+    const incomingReqPromise = fetch(`${API}/api/friends/requests`,{headers})
+		const playerSettingsPromise = fetch(`${API}/api/game/settings`,{headers});
 
     const [userRes, friendsRes, blockedRes, pendingReqRes, incomingReqRes, playerSettingsRes] = await Promise.all([userPromise, friendsPromise, blockedPromise, pendingReqPromise, incomingReqPromise, playerSettingsPromise])
 
