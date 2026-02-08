@@ -29,6 +29,7 @@ export default function Matchmaking() {
   const [canTryAgain, setCanTryAgain] = useState(false);
 
   const joinedRef = useRef(false);
+	const [joinState, setJoinState] = useState(false);
   const navigatedRef = useRef(false);
 
   useEffect(() => {
@@ -44,7 +45,7 @@ export default function Matchmaking() {
   }, [user]);
 
   const joinGame = () => {
-    if (!socket || !socket.connected) return;
+    // if (!socket || !socket.connected) return;
     socket.emit("join-game", {
       firstName: user.firstname,
       lastName: user.lastname,
@@ -52,7 +53,6 @@ export default function Matchmaking() {
       avatar: user.avatar,
 			id : user.id,
     });
-		// console.log("============> i emit join-game event to server")
     joinedRef.current = true;
     setStatus("Waiting for opponent...");
     setCanTryAgain(false);
@@ -71,17 +71,14 @@ export default function Matchmaking() {
   };
 
   useEffect(() => {
-		console.log("********> before checking socket")
     if (!user || !socket || navigatedRef.current) return;
 		
-		
-    // if (!socket.connected) socket.connect();
-		
-    // const handleConnect = () => {
 			setPlayer1(prev => ({ ...prev, socketId: socket.id }));
-      if (!joinedRef.current) joinGame();
-    // };
-		
+			console.log("------------------------------------------> ", joinState);
+      // if (!joinState) joinGame();
+      joinGame();
+			setJoinState(true);
+
     const handleMatchFound = opponent => {
 			setPlayer2(opponent);
       setStatus("Match Found!");
@@ -101,14 +98,11 @@ export default function Matchmaking() {
       router.refresh();
     };
 		
-		console.log("********> after checking socket")
-    // socket.on("connect", handleConnect);
     socket.on("match-found", handleMatchFound);
     socket.on("match-canceled", handleMatchCanceled);
     socket.on("match-started", handleMatchStarted);
 
     return () => {
-      // socket.off("connect", handleConnect);
       socket.off("match-found", handleMatchFound);
       socket.off("match-canceled", handleMatchCanceled);
       socket.off("match-started", handleMatchStarted);

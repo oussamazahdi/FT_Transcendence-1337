@@ -34,6 +34,7 @@ function startMatch(io, game) {
 }
 
 export function joinGame(socket, io, player) {
+	console.log("++++++++++++++++++++++++++++++++> Waiting Player:", waitingPlayer);
   if (!player || !isValidPlayerData(player)) return;
 
   rebindSocket(player.username, socket.id);
@@ -51,10 +52,10 @@ export function joinGame(socket, io, player) {
 
   if (waitingPlayer.value.player.username === player.username) return;
 
-	// console.log("*************************************\nWaiting Player:", waitingPlayer.value, ", Second Player:", player);
 
   const game = createGame(waitingPlayer.value, socket, player);
   waitingPlayer.value = null;
+  waitingPlayer.data = null;
 
   activeGames.set(game.roomId, game);
   startMatch(io, game);
