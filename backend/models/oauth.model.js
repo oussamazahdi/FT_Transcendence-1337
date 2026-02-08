@@ -9,7 +9,7 @@ export class OAuthModels
             return  db.prepare(`SELECT id, firstname, lastname, username, email, avatar FROM users WHERE google_id = ?`).get(googleId);
         }
         catch (error) {
-            const dbError = handleDatabaseError(error, 'addNewToken');
+            const dbError = handleDatabaseError(error, 'getUserByGoogleId');
             throw dbError;
         }
     }

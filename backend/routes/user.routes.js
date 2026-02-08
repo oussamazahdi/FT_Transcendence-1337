@@ -149,18 +149,18 @@ function userRoutes(fastify)
             }
         }
     }, userController.changePassword);
-    // TODO: Refactor search later - needs querystring
+
     fastify.get("/search", {
         preHandler: authMiddleware,
         schema: {
             description: 'search route is under construction',
             tags: ['Users'],
-            response: {
-                200: emptySuccessResponse,
-                400: errorResponse,
-                401: errorResponse,
-                500: errorResponse
-            }
+            // response: {
+            //     200: emptySuccessResponse,
+            //     400: errorResponse,
+            //     401: errorResponse,
+            //     500: errorResponse
+            // }
         }
     }, userController.searchUsers);
 }

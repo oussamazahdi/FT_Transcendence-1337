@@ -42,7 +42,7 @@ export class AuthModels
                 throw dbError;
         }
     }
-    findUserById(db, userId, fields = ['id', 'username', 'firstname', 'lastname', 'username', 'email', 'avatar', 'isverified', 'status2fa'])
+    findUserById(db, userId, fields = ['id', 'username', 'firstname', 'lastname', 'username', 'email', 'avatar', 'isverified', 'status2fa', 'session2fa'])
     {
         try {
             const fieldList = fields.join(', ');

@@ -1,22 +1,13 @@
-FROM node:20-alpine
+FROM node:20-bookworm-slim
 
-RUN apk add --no-cache \
-		python3 \
-		make \
-		g++ \
-		sqlite \
-		sqlite-dev
+RUN apt update && apt install sqlite3 -y
 
 WORKDIR /app
 
 COPY package*.json ./
-
-RUN npm install .
-RUN npm rebuild better-sqlite3
-RUN npm install -g nodemon
+RUN npm i
 
 COPY . .
 
 EXPOSE 3001
-
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]

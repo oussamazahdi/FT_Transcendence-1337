@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BellAlertIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
-import { useSocket } from "@/contexts/socketContext";
+import { useSocket } from "@/contexts/socketContext.tsx";
 import { ComponentUtils } from "@/lib/utils";
 import { GameInvite } from "@/components/ui/GameInvite";
 import { FriendInvite } from "./ui/FriendInvite";

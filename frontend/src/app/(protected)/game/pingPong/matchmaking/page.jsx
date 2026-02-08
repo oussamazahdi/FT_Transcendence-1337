@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/authContext";
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { DoorOpen, RotateCcw } from "lucide-react";
-import { useSocket } from "@/contexts/socketContext";
+import { useSocket } from "@/contexts/socketContext.tsx";
 import { PlayerCard } from "./PlayerCard";
 
 const makeEmptyPlayer = () => ({

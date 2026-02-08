@@ -1,7 +1,6 @@
 import { authController } from "../controllers/auth.controller.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { errorResponse, emptySuccessResponse, objectSuccessResponse } from "../config/schemes.config.js";
-import { maxLength } from "zod";
 
 function authRoutes(fastify)
 {

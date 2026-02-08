@@ -22,6 +22,42 @@ export class FriendsModels
         }
     }
 
+    searchFriends(db, userId, query, limit, offset)
+    {
+        try {
+            console.log(query)
+            const result = db.prepare(`
+                SELECT u.id, u.username, u.avatar, u.firstname, u.lastname
+                    FROM friends f
+                    JOIN users u ON u.id = CASE
+                        WHEN f.sender_id = :me THEN f.receiver_id
+                        ELSE f.sender_id
+                    END
+                    WHERE
+                        (f.sender_id = :me OR f.receiver_id = :me)
+                        AND f.status = 'accepted'
+                            AND ( u.firstname LIKE '%' || :query || '%'
+                            OR u.lastname LIKE '%' || :query || '%'
+                            OR u.username LIKE '%' || :query || '%')
+                    ORDER BY
+                        CASE 
+                            WHEN u.firstname LIKE '%' || :query || '%' THEN 1
+                            WHEN u.lastname LIKE '%' || :query || '%' THEN 2
+                            WHEN u.username LIKE '%' || :query || '%' THEN 3
+                            ELSE 4 
+                        END
+                    LIMIT :limit
+                    OFFSET :offset;
+                `).all({me: userId, query: query, limit: limit, offset: offset});
+            return (result)
+        }
+        catch (error)
+        {
+            const dbError = handleDatabaseError(error, 'searchFriends');
+            throw dbError;
+        }
+    }
+
     getRequestsList(db, userId)
     {
         try {
@@ -193,14 +229,16 @@ export class FriendsModels
     isBlockedByUser(db, blocker, blocked)
     {
         try {
-            const status = db.prepare(`
+            const relation = db.prepare(`
                 SELECT status, blocked_by FROM friends
                 WHERE (
                 (sender_id = :me AND receiver_id = :other)
                 OR
                 (sender_id = :other AND receiver_id = :me))
-                AND status = 'blocked'`).get({me: blocker, other: blocked});
-            return (status);
+                `).get({me: blocker, other: blocked});
+            if (relation === 'blocked')
+                return (true);
+            return (false);
         }
         catch (error) 
         {
@@ -216,7 +254,7 @@ export class FriendsModels
                 WHERE (sender_id = :me AND receiver_id = :other)
                 OR
                 (sender_id = :other AND receiver_id = :me)`).get({me: sender, other: receiver});
-            if (result === undefined)
+            if (result === undefined || result.status != 'accepted')
                 return (false);
             return (true);
         }

@@ -13,7 +13,7 @@ export async function middleware(request) {
 const onboardingSteps = {
     verifyEmail: "/sign-up/email-verification",
     selectImage: "/sign-up/email-verification/select-image",
-    twoFA: "/sign-up/twoFA"
+    twoFA: "/sign-in/twoFA"
   };
   const isOnboardingRoute = Object.values(onboardingSteps).some(route => pathname.startsWith(route))
   const isPublicRoute = publicRoutes.includes(pathname);
@@ -23,6 +23,8 @@ const onboardingSteps = {
     isValid: false,
     isVerified: false,
     hasAvatar: false,
+    is2faEnabled: false,
+    is2faVerified: false,
   }
 
   let isTokenExpired = false;
@@ -32,10 +34,13 @@ const onboardingSteps = {
     try {
       const secret = new TextEncoder().encode(process.env.JWT_SECRET);
       const { payload } = await jwtVerify(accessToken, secret);
+      console.log(payload);
 
       userState.isValid = true;
       userState.isVerified = !!payload.isVerified;
       userState.hasAvatar = !!payload.hasAvatar;
+      userState.is2faEnabled = !!payload.status2fa;
+      userState.is2faVerified = !!payload.session2FA;
     } catch (error) {
       if (error.code === "ERR_JWT_EXPIRED" || error.message.includes("exp")) {
         isTokenExpired = true;
@@ -45,7 +50,7 @@ const onboardingSteps = {
 
   if ((isTokenExpired || !accessToken) && refreshToken) {
     try {
-      const refreshResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/refresh`,{
+      const refreshResponse = await fetch(`${process.env.SERVER_SIDE_API_URL}/api/auth/refresh`,{
           method: "POST",
           headers: {
             Cookie: `refreshToken=${refreshToken}; accessToken=${accessToken || ""}`,
@@ -61,10 +66,18 @@ const onboardingSteps = {
           response.headers.set("Set-Cookie", setCookie);
         }
 
+        console.log("Token refreshed successfully via Middleware");
         return response
+      }else {
+        console.log("Refresh failed. Session expired. Redirecting to login.");
+        const response = NextResponse.redirect(new URL("/sign-in", request.url));
+        response.cookies.delete("accessToken");
+        response.cookies.delete("refreshToken");
+        return response;
       }
     } catch (error) {
       console.error("Error during token refresh:", error);
+      return NextResponse.redirect(new URL("/sign-in", request.url));
     }
   }
 
@@ -87,12 +100,12 @@ const onboardingSteps = {
        return NextResponse.next();
     }
 
-    // if (userState.is2faEnabled && !userState.is2faVerified) {
-    //     if (pathname !== onboardingSteps.twoFactor) {
-    //         return NextResponse.redirect(new URL(onboardingSteps.twoFactor, request.url));
-    //     }
-    //     return NextResponse.next();
-    // }
+    if (userState.is2faEnabled && userState.is2faVerified) {
+        if (pathname !== onboardingSteps.twoFA) {
+            return NextResponse.redirect(new URL(onboardingSteps.twoFA, request.url));
+        }
+        return NextResponse.next();
+    }
 
     if (!userState.hasAvatar) {
        if (pathname !== onboardingSteps.selectImage) {

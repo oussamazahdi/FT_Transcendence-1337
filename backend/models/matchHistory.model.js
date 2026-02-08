@@ -14,7 +14,7 @@ class matchHistory {
 		}
 	}
 
-	async getByUserId(db, userId) {
+	 getByUserId(db, userId) {
 		try {
 			return (db.prepare(`SELECT * FROM match_history WHERE player1_id = ? OR player2_id = ? ORDER BY created_at DESC`).all(userId, userId));
 		} catch (error) {

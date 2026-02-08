@@ -11,7 +11,7 @@ class gameSetting {
     }
   }
 
-  async getUserSettings(db, userId) {
+   getUserSettings(db, userId) {
     try {
       const settings = db.prepare("SELECT * FROM game_settings WHERE player_id = ?").get(userId);
 
