@@ -4,15 +4,23 @@ import Link from "next/link";
 import { UserIcon } from "@heroicons/react/24/outline";
 import { Gamepad2 } from "lucide-react";
 import { assets } from '@/assets/data';
-import { User } from '@/types';
 import { useSocket } from '@/contexts/socketContext';
 
-interface FriendCardProps{
-  user:User
+type FriendStatus = "Online" | "Offline";
+type FriendCardUser = {
+  id: string | number;
+  firstname: string;
+  lastname: string;
+  avatar?: string | null;
+  status?: FriendStatus | "online" | "offline";
+};
+
+interface FriendCardProps {
+  user: FriendCardUser;
 }
 
 interface GameInvitePayload {
-  user: string;
+  user: string | number;
   roomId: string;
   gameType: string;
 }
@@ -23,25 +31,30 @@ interface InviteResponse {
   notification?: string;
 }
 
-const FriendCard = ({user}: FriendCardProps) => {
-  const status:string = "online"
+const FriendCard = ({ user }: FriendCardProps) => {
+  const rawStatus = user.status;
+  const status: FriendStatus =
+    typeof rawStatus === "string" && rawStatus.toLowerCase() === "online"
+      ? "Online"
+      : "Offline";
 
   const socket = useSocket();
 
 	// socket.emit("users:status")
 	
 
-		const sendInvite = (): void => {
-			if(!socket) return;
-			socket.emit("game:invite", {
-				user: user.id,
-				roomId: crypto.randomUUID(),
-				gameType: "pingpong",
-			}, (res: InviteResponse): void => {
-				if (!res.ok) console.error("Invite failed:", res.message);
-				else console.log("✅ Invite sent:", res.notification);
-			});
-		}
+  const sendInvite = (): void => {
+    if (!socket) return;
+    const payload: GameInvitePayload = {
+      user: user.id,
+      roomId: crypto.randomUUID(),
+      gameType: "pingpong",
+    };
+    socket.emit("game:invite", payload, (res: InviteResponse): void => {
+      if (!res.ok) console.error("Invite failed:", res.message);
+      else console.log("✅ Invite sent:", res.notification);
+    });
+  };
   return (
     <div
       key={user.id}

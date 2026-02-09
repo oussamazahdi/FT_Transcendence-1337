@@ -4,25 +4,44 @@ import React, { useEffect, useMemo, useState } from "react";
 import FriendCard from "./FriendCard";
 import { useAuth } from "@/contexts/authContext";
 import { useSocket } from "@/contexts/socketContext";
-interface FriendsProps{classname:string}
+interface FriendsProps {
+  classname?: string;
+}
+
+type FriendSummary = {
+  id: string | number;
+  firstname: string;
+  lastname: string;
+  avatar?: string | null;
+};
+
+type FriendStatus = "Online" | "Offline";
+type OnlineStatusPayload = Array<string | number> | Record<string, boolean> | null | undefined;
 
 const Friends = ({ classname = "" }: FriendsProps) => {
   const socket = useSocket();
   const { friends } = useAuth();
 
   // server sends: [1, 5, 9] (array of online user ids)
-  const [onlineIds, setOnlineIds] = useState([]);
+  const [onlineIds, setOnlineIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (!socket) return;
 
     if (!socket.connected) socket.connect();
 
-    const onUsersStatus = (data) => {
+    const onUsersStatus = (data: OnlineStatusPayload) => {
       // accept either array [ids] or object {id:true}
-      if (Array.isArray(data)) setOnlineIds(data);
-      else if (data && typeof data === "object") setOnlineIds(Object.keys(data).map(Number));
-      else setOnlineIds([]);
+      if (Array.isArray(data)) {
+        const ids = data
+          .filter((id) => typeof id === "string" || typeof id === "number")
+          .map((id) => String(id));
+        setOnlineIds(ids);
+      } else if (data && typeof data === "object") {
+        setOnlineIds(Object.keys(data));
+      } else {
+        setOnlineIds([]);
+      }
     };
 
     socket.on("users:status", onUsersStatus);
@@ -35,13 +54,15 @@ const Friends = ({ classname = "" }: FriendsProps) => {
   const onlineSet = useMemo(() => new Set(onlineIds), [onlineIds]);
 
   const renderFriends = () => {
-    if (!Array.isArray(friends) || friends.length === 0) {
+    const friendList = Array.isArray(friends) ? (friends as FriendSummary[]) : [];
+    if (friendList.length === 0) {
       return <div className="text-sm text-center text-white/60 mt-4">No friends</div>;
     }
 
-    return friends.map((user) => {
-      const isOnline = onlineSet.has(user.id);
-      return <FriendCard user={{ ...user, status: isOnline ? "Online" : "Offline" }} key={user.id} />;
+    return friendList.map((user) => {
+      const isOnline = onlineSet.has(String(user.id));
+      const status: FriendStatus = isOnline ? "Online" : "Offline";
+      return <FriendCard user={{ ...user, status }} key={user.id} />;
     });
   };
 

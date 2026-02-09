@@ -22,10 +22,13 @@ type ChatReceivePayload = {
   sentAt: string;
 };
 
+type UsersStatusPayload = Array<string | number> | Record<string, boolean>;
+
 type ServerToClientEvents = {
   "chat:receiver": (payload: ChatReceivePayload) => void;
   "chat:error": (err: { message: string } | string) => void;
   "match-started:accept": (payload: MatchStartedPayload) => void;
+  "users:status": (payload: UsersStatusPayload) => void;
 };
 
 type ClientToServerEvents = {

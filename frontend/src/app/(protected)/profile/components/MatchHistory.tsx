@@ -1,16 +1,74 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 import { assets } from "@/assets/data";
 import { useAuth } from "@/contexts/authContext";
 import Link from "next/link";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
-const safeAvatarSrc = (src) => (src && src !== "null" ? src : assets.defaultProfile);
+type AvatarSrc = string | StaticImageData;
 
-const SafeAvatar = React.memo(function SafeAvatar({ src, alt = "avatar" }) {
+type MatchHistoryProps = {
+  classname?: string;
+};
+
+type SafeAvatarProps = {
+  src?: AvatarSrc | null;
+  alt?: string;
+};
+
+type MinimalUser = {
+  id?: number | string;
+  username?: string;
+  avatar?: AvatarSrc | null;
+};
+
+type UsersById = Record<number, MinimalUser>;
+
+type RawMatch = {
+  id?: number | string;
+  player1_id?: number;
+  player2_id?: number;
+  player1_score?: number | string;
+  player2_score?: number | string;
+  created_at?: string;
+};
+
+type MatchHistoryResponse = {
+  data?: RawMatch[] | { items?: RawMatch[] };
+};
+
+type UserResponse = {
+  userData?: MinimalUser;
+  user?: MinimalUser;
+};
+
+type NormalizedMatch = {
+  id: string | number;
+  player1: {
+    id: number;
+    username: string;
+    avatar?: AvatarSrc | null;
+    score: string;
+  };
+  player2: {
+    id: number;
+    username: string;
+    avatar?: AvatarSrc | null;
+    score: string;
+  };
+  createdAt: string;
+};
+
+const safeAvatarSrc = (src?: AvatarSrc | null): AvatarSrc => {
+  if (!src) return assets.defaultProfile;
+  if (typeof src === "string" && src === "null") return assets.defaultProfile;
+  return src;
+};
+
+const SafeAvatar = React.memo(function SafeAvatar({ src, alt = "avatar" }: SafeAvatarProps) {
   return (
     <Image
       src={safeAvatarSrc(src)}
@@ -22,31 +80,35 @@ const SafeAvatar = React.memo(function SafeAvatar({ src, alt = "avatar" }) {
   );
 });
 
-function formatDate(input) {
+function formatDate(input?: string | number | Date | null) {
   if (!input) return "";
   const d = new Date(input);
   return Number.isNaN(d.getTime()) ? String(input) : d.toLocaleString();
 }
 
-async function fetchJson(url) {
+async function fetchJson<T = unknown>(url: string): Promise<{ res: Response; json: T }> {
   const res = await fetch(url, { method: "GET", credentials: "include" });
-  const json = await res.json().catch(() => ({}));
+  const json = await res.json().catch(() => ({} as T));
   return { res, json };
 }
 
-function normalizeUser(json) {
+function normalizeUser(json: UserResponse): MinimalUser | null {
   return json?.userData ?? json?.user ?? null;
 }
 
-function normalizeHistoryPayload(json) {
+function normalizeHistoryPayload(json: MatchHistoryResponse): RawMatch[] {
   const payload = json?.data;
   if (Array.isArray(payload)) return payload;
   if (Array.isArray(payload?.items)) return payload.items;
   return [];
 }
 
-function normalizeMatch(raw, u1, u2) {
-  if (!raw) return null;
+function normalizeMatch(
+  raw: RawMatch | null | undefined,
+  u1: MinimalUser | null | undefined,
+  u2: MinimalUser | null | undefined
+): NormalizedMatch | null {
+  if (!raw || typeof raw.player1_id !== "number" || typeof raw.player2_id !== "number") return null;
 
   return {
     id: raw.id ?? `${raw.player1_id}-${raw.player2_id}-${raw.created_at}`,
@@ -66,14 +128,14 @@ function normalizeMatch(raw, u1, u2) {
   };
 }
 
-export default function MatchHistory({ classname = "" }) {
+export default function MatchHistory({ classname = "" }: MatchHistoryProps) {
   useAuth(); // keep auth context hooked (even if user isn't used right now)
 
-  const [loading, setLoading] = useState(false);
-  const [usersById, setUsersById] = useState({});
-  const [matches, setMatches] = useState([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [usersById, setUsersById] = useState<UsersById>({});
+  const [matches, setMatches] = useState<NormalizedMatch[]>([]);
 
-  const usersByIdRef = useRef(usersById);
+  const usersByIdRef = useRef<UsersById>(usersById);
   useEffect(() => {
     usersByIdRef.current = usersById;
   }, [usersById]);
@@ -88,7 +150,7 @@ export default function MatchHistory({ classname = "" }) {
     setLoading(true);
     try {
       // 1) fetch history
-      const { res, json } = await fetchJson(`${API}/api/game/history`);
+      const { res, json } = await fetchJson<MatchHistoryResponse>(`${API}/api/game/history`);
       if (res.status === 401 || !res.ok) {
         setMatches([]);
         return;
@@ -109,18 +171,20 @@ export default function MatchHistory({ classname = "" }) {
       const currentUsers = usersByIdRef.current;
       const missingIds = ids.filter((id) => currentUsers[id] == null);
 
-      let mergedUsers = currentUsers;
+      let mergedUsers: UsersById = currentUsers;
 
       if (missingIds.length > 0) {
         const results = await Promise.all(
-          missingIds.map(async (id) => {
-            const { res: uRes, json: uJson } = await fetchJson(`${API}/api/users/${id}`);
+          missingIds.map(async (id): Promise<[number, MinimalUser | null]> => {
+            const { res: uRes, json: uJson } = await fetchJson<UserResponse>(
+              `${API}/api/users/${id}`
+            );
             if (!uRes.ok) return [id, null];
             return [id, normalizeUser(uJson)];
           })
         );
 
-        const patch = {};
+        const patch: UsersById = {};
         for (const [id, u] of results) {
           if (u) patch[id] = u;
         }
@@ -133,8 +197,16 @@ export default function MatchHistory({ classname = "" }) {
 
       // 4) normalize matches for UI
       const normalized = list
-        .map((m) => normalizeMatch(m, mergedUsers[m.player1_id], mergedUsers[m.player2_id]))
-        .filter(Boolean);
+        .map((m) => {
+          const player1Id = typeof m.player1_id === "number" ? m.player1_id : null;
+          const player2Id = typeof m.player2_id === "number" ? m.player2_id : null;
+          return normalizeMatch(
+            m,
+            player1Id != null ? mergedUsers[player1Id] : null,
+            player2Id != null ? mergedUsers[player2Id] : null
+          );
+        })
+        .filter((match): match is NormalizedMatch => match !== null);
       setMatches(normalized);
     } catch (err) {
       console.error("Failed to load match history:", err);

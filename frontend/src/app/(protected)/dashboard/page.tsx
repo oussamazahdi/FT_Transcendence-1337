@@ -2,7 +2,7 @@
 import React, { useEffect } from "react";
 import Friends from "../profile/components/Friends.tsx";
 import Profile from "../profile/components/Profile.tsx";
-import MatchHistory from "../profile/components/MatchHistory.jsx";
+import MatchHistory from "../profile/components/MatchHistory";
 import { useAuth } from "@/contexts/authContext.tsx";
 import WinRate from "../profile/components/WinRate.tsx";
 import Games from "./components/Games.tsx";
