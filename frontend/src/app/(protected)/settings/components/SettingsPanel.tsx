@@ -2,7 +2,7 @@ import React from "react";
 import Personal_information from "./personal-information.tsx";
 import BlockedUsers from "./blocked-users.tsx";
 import Security from "./security.tsx";
-import GameSettings from "./Game-setiings.jsx";
+import GameSettings from "./Game-settings";
 import { useActiveTab } from "@/contexts/userContexts.ts";
 import { ArrowLeftIcon} from "@heroicons/react/24/outline";
 
@@ -14,7 +14,7 @@ export default function SettingsPanel() {
       {activeTab === "personal-information" && <Personal_information />}
       {activeTab === "blocked-users" && <BlockedUsers />}
       {activeTab === "security" && <Security />}
-      {activeTab === "Game-setiings" && <GameSettings />}
+      {activeTab === "Game-settings" && <GameSettings />}
     </div>
   );
 }

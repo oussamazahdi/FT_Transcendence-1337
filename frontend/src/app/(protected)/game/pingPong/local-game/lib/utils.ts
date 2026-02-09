@@ -1,5 +1,60 @@
+type Board = {
+  width: number;
+  height: number;
+};
+
+type Ball = {
+  x: number;
+  y: number;
+  velocityX: number;
+  velocityY: number;
+  speed: number;
+  radius: number;
+};
+
+type Paddle = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+type KeysState = {
+  w: boolean;
+  s: boolean;
+  ArrowUp: boolean;
+  ArrowDown: boolean;
+};
+
+type GameState = {
+  board: Board;
+  ball: Ball;
+  player1: Paddle;
+  player2: Paddle;
+  keys: KeysState;
+};
+
+type PlayersConfig = {
+  player1?: { color?: string };
+  player2?: { color?: string };
+  boardColor?: string;
+  ballColor?: string;
+};
+
+type BackgroundImage = {
+  image: CanvasImageSource | null;
+  ready: boolean;
+};
+
+type SetScore = (value: number | ((prev: number) => number)) => void;
+
 class gameUtiles {
-  drawLocalFrame = (context, state, players, bg) => {
+  drawLocalFrame = (
+    context: CanvasRenderingContext2D,
+    state: GameState,
+    players: PlayersConfig,
+    bg: BackgroundImage
+  ) => {
     if (bg?.ready && bg?.image) {
       context.drawImage(bg.image, 0, 0, state.board.width, state.board.height);
     } else {
@@ -27,12 +82,12 @@ class gameUtiles {
     context.fill();
   };
 
-  ballMovement = (state) => {
+  ballMovement = (state: GameState) => {
     state.ball.x += state.ball.velocityX * state.ball.speed;
     state.ball.y += state.ball.velocityY * state.ball.speed;
   };
 
-  handleScoring = (state, setScore1, setScore2) => {
+  handleScoring = (state: GameState, setScore1: SetScore, setScore2: SetScore) => {
     if (state.ball.x <= 0 || state.ball.x >= state.board.width) {
       if (state.ball.x >= state.board.width) setScore1((s) => s + 1);
       if (state.ball.x <= 0) setScore2((s) => s + 1);
@@ -41,7 +96,7 @@ class gameUtiles {
     }
   };
 
-  ballCollisions = (state) => {
+  ballCollisions = (state: GameState) => {
     if (state.ball.y - state.ball.radius <= 0 || state.ball.y + state.ball.radius >= state.board.height)
       state.ball.velocityY *= -1;
 
@@ -65,7 +120,7 @@ class gameUtiles {
     }
   };
 
-  paddleMovement = (state) => {
+  paddleMovement = (state: GameState) => {
     const paddleSpeed = 4;
 
     if (state.keys.w && state.player1.y > 0) state.player1.y -= paddleSpeed;
@@ -76,8 +131,14 @@ class gameUtiles {
       state.player2.y += paddleSpeed;
   };
 
-  createKeyboardHandlers = ({ stateRef, togglePause }) => {
-    const setKey = (key, value) => {
+  createKeyboardHandlers = ({
+    stateRef,
+    togglePause,
+  }: {
+    stateRef: { current: GameState };
+    togglePause: () => void;
+  }) => {
+    const setKey = (key: string, value: boolean) => {
       const state = stateRef.current;
       if (!state?.keys) return;
 
@@ -87,7 +148,7 @@ class gameUtiles {
       else if (key === "ArrowDown") state.keys.ArrowDown = value;
     };
 
-    const onKeyDown = (e) => {
+    const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === " ") {
         e.preventDefault();
         togglePause();
@@ -96,7 +157,7 @@ class gameUtiles {
       setKey(e.key, true);
     };
 
-    const onKeyUp = (e) => setKey(e.key, false);
+    const onKeyUp = (e: KeyboardEvent) => setKey(e.key, false);
 
     return { onKeyDown, onKeyUp };
   };

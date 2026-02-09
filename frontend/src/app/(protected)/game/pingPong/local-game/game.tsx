@@ -4,10 +4,98 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { GameUtiles } from "./lib/utils";
 import { GAME_MODE, GAME_WIDTH, GAME_HEIGHT } from "@/components/ui/GameMode";
 
-let gameMapImg = null;
+type GameMode = (typeof GAME_MODE)[keyof typeof GAME_MODE] | null;
+
+type PlayerInput = {
+  nickName?: string;
+  username?: string;
+  avatar?: string;
+};
+
+type PlayersConfig = {
+  player1: { nickName: string; avatar: string; color: string };
+  player2: { nickName: string; avatar: string; color: string };
+  boardColor: string;
+  ballColor: string;
+};
+
+type Board = {
+  width: number;
+  height: number;
+};
+
+type Ball = {
+  x: number;
+  y: number;
+  velocityX: number;
+  velocityY: number;
+  speed: number;
+  radius: number;
+};
+
+type Paddle = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+type KeysState = {
+  w: boolean;
+  s: boolean;
+  ArrowUp: boolean;
+  ArrowDown: boolean;
+};
+
+type GameState = {
+  board: Board;
+  ball: Ball;
+  player1: Paddle;
+  player2: Paddle;
+  keys: KeysState;
+  scoreLimit: number;
+};
+
+type GameSetting = {
+  game_mode?: keyof typeof GAME_MODE;
+  paddle_size?: number;
+  ball_speed?: number;
+  score_limit?: number;
+  [key: string]: unknown;
+};
+
+type BackgroundImage = { image: HTMLImageElement | null; ready: boolean };
+
+type GameUtilesType = {
+  drawLocalFrame: (
+    context: CanvasRenderingContext2D,
+    state: GameState,
+    players: PlayersConfig,
+    bg: BackgroundImage
+  ) => void;
+  ballMovement: (state: GameState) => void;
+  handleScoring: (
+    state: GameState,
+    setScore1: React.Dispatch<React.SetStateAction<number>>,
+    setScore2: React.Dispatch<React.SetStateAction<number>>
+  ) => void;
+  ballCollisions: (state: GameState) => void;
+  paddleMovement: (state: GameState) => void;
+  createKeyboardHandlers: (args: {
+    stateRef: React.MutableRefObject<GameState>;
+    togglePause: () => void;
+  }) => {
+    onKeyDown: (e: KeyboardEvent) => void;
+    onKeyUp: (e: KeyboardEvent) => void;
+  };
+};
+
+const GameUtilesTyped = GameUtiles as GameUtilesType;
+
+let gameMapImg: HTMLImageElement | null = null;
 let bgReady = false;
 
-export function preloadBackground(imageUrl) {
+export function preloadBackground(imageUrl?: string | null) {
   if (!imageUrl) return;
   if (gameMapImg && gameMapImg.src === imageUrl) return;
 
@@ -22,18 +110,26 @@ export function preloadBackground(imageUrl) {
   };
 }
 
-export function getBackgroundImage() {
+export function getBackgroundImage(): BackgroundImage {
   return { image: gameMapImg, ready: bgReady };
 }
 
 const DEFAULT_AVATAR = "/gameAvatars/Empty.jpeg";
 
-const toNumber = (v, fallback) => {
+const toNumber = (v: unknown, fallback: number) => {
   const n = Number(v);
   return Number.isFinite(n) ? n : fallback;
 };
 
-const buildPlayers = ({ p1, p2, mode }) => {
+const buildPlayers = ({
+  p1,
+  p2,
+  mode,
+}: {
+  p1?: PlayerInput | null;
+  p2?: PlayerInput | null;
+  mode?: GameMode;
+}): PlayersConfig => {
   const paddleColor = mode?.paddle || "#D9D9D9";
   const ballColor = mode?.ball || "#D9D9D9";
 
@@ -53,7 +149,13 @@ const buildPlayers = ({ p1, p2, mode }) => {
   };
 };
 
-const initGameState = ({ gameSetting, mode }) => {
+const initGameState = ({
+  gameSetting,
+  mode,
+}: {
+  gameSetting?: GameSetting | null;
+  mode?: GameMode;
+}): GameState => {
   const width = GAME_WIDTH || 1024;
   const height = GAME_HEIGHT || 700;
 
@@ -95,10 +197,20 @@ const initGameState = ({ gameSetting, mode }) => {
   };
 };
 
-export function PingPongGame({ p1, p2, gameSetting, gameMode }) {
-  const mode = useMemo(() => {
+export function PingPongGame({
+  p1,
+  p2,
+  gameSetting,
+  gameMode,
+}: {
+  p1?: PlayerInput | null;
+  p2?: PlayerInput | null;
+  gameSetting?: GameSetting | null;
+  gameMode?: GameMode;
+}) {
+  const mode = useMemo<GameMode>(() => {
     if (gameMode) return gameMode;
-    const key = gameSetting?.game_mode;
+    const key = gameSetting?.game_mode as keyof typeof GAME_MODE | undefined;
     return key ? GAME_MODE?.[key] : null;
   }, [gameMode, gameSetting]);
 
@@ -109,11 +221,11 @@ export function PingPongGame({ p1, p2, gameSetting, gameMode }) {
   const [winner, setWinner] = useState("");
 
   const isPauseRef = useRef(false);
-  const canvasRef = useRef(null);
-  const animationRef = useRef(null);
-  const gameStateRef = useRef(initGameState({ gameSetting, mode }));
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const animationRef = useRef<number | null>(null);
+  const gameStateRef = useRef<GameState>(initGameState({ gameSetting, mode }));
 
-  const [players, setPlayers] = useState(() => buildPlayers({ p1, p2, mode }));
+  const [players, setPlayers] = useState<PlayersConfig>(() => buildPlayers({ p1, p2, mode }));
 
   const togglePause = useCallback(() => {
     setIsPause((prev) => {
@@ -141,7 +253,7 @@ export function PingPongGame({ p1, p2, gameSetting, gameMode }) {
     const context = canvas.getContext("2d");
     if (!context) return;
 
-    const { onKeyDown, onKeyUp } = GameUtiles.createKeyboardHandlers({
+    const { onKeyDown, onKeyUp } = GameUtilesTyped.createKeyboardHandlers({
       stateRef: gameStateRef,
       togglePause,
     });
@@ -155,12 +267,12 @@ export function PingPongGame({ p1, p2, gameSetting, gameMode }) {
       if (!isPauseRef.current && !gameOver) {
         context.clearRect(0, 0, state.board.width, state.board.height);
 
-        GameUtiles.paddleMovement(state);
-        GameUtiles.ballCollisions(state);
-        GameUtiles.handleScoring(state, setScore1, setScore2);
-        GameUtiles.ballMovement(state);
+        GameUtilesTyped.paddleMovement(state);
+        GameUtilesTyped.ballCollisions(state);
+        GameUtilesTyped.handleScoring(state, setScore1, setScore2);
+        GameUtilesTyped.ballMovement(state);
 
-        GameUtiles.drawLocalFrame(context, state, players, getBackgroundImage());
+        GameUtilesTyped.drawLocalFrame(context, state, players, getBackgroundImage());
       }
 
       animationRef.current = requestAnimationFrame(gameLoop);

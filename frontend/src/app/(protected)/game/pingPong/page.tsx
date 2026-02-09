@@ -4,11 +4,19 @@ import React, { useState } from "react";
 import GameSetup from "@/components/gameSetupComp/gameSetup";
 import { useRouter } from "next/navigation";
 
+type LocalGameItem = {
+	titel: string;
+	cover: string;
+	alt: string;
+	description: string;
+	button: string;
+};
+
 const LocalGame = () => {
 	const router = useRouter();
 
 	const [isModalVisible, setIsModalVisible] = useState(false);
-	const localGameItems = [
+	const localGameItems: LocalGameItem[] = [
 		{
 			titel: "Local Game",
 			cover: "/Game/pingpong/local.png",

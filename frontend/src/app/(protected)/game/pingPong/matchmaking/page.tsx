@@ -6,8 +6,45 @@ import { useRouter } from "next/navigation";
 import { DoorOpen, RotateCcw } from "lucide-react";
 import { useSocket } from "@/contexts/socketContext.tsx";
 import { PlayerCard } from "./PlayerCard";
+import type { User } from "@/types/index";
 
-const makeEmptyPlayer = () => ({
+type MatchPlayer = {
+  id: number | string;
+  socketId: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  avatar: string;
+  score: number;
+  roomId: string;
+};
+
+type JoinPayload = {
+  id: number | string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  avatar?: string | null;
+};
+
+type MatchSocket = {
+  id?: string;
+  connected: boolean;
+  connect: () => void;
+  disconnect: () => void;
+  emit: (event: "join-game", payload: JoinPayload) => void;
+  emit: (event: "leave-game") => void;
+  on: (event: "connect" | "disconnect", cb: () => void) => void;
+  on: (event: "match-found", cb: (opponent: MatchPlayer | null) => void) => void;
+  on: (event: "match-canceled", cb: () => void) => void;
+  on: (event: "match-started", cb: (roomId: string | number) => void) => void;
+  off: (event: "connect" | "disconnect", cb: () => void) => void;
+  off: (event: "match-found", cb: (opponent: MatchPlayer | null) => void) => void;
+  off: (event: "match-canceled", cb: () => void) => void;
+  off: (event: "match-started", cb: (roomId: string | number) => void) => void;
+};
+
+const makeEmptyPlayer = (): MatchPlayer => ({
   id: 0,
   socketId: "",
   firstName: "",
@@ -19,8 +56,8 @@ const makeEmptyPlayer = () => ({
 });
 
 export default function Matchmaking() {
-  const { user } = useAuth();
-  const socket = useSocket();
+  const { user } = useAuth() as { user: User | null };
+  const socket = useSocket() as MatchSocket | null;
   const router = useRouter();
 
   const emptyPlayer = useMemo(() => makeEmptyPlayer(), []);
@@ -80,8 +117,8 @@ export default function Matchmaking() {
   }, [socket, canExit, router]);
 
   const handleTryAgain = useCallback(() => {
-		window.location.reload(true)
-  }, [emptyPlayer, socket, joinGame]);
+    window.location.reload();
+  }, []);
 
   useEffect(() => {
     if (!user || !socket || navigatedRef.current) return;
@@ -100,7 +137,7 @@ export default function Matchmaking() {
       joinedRef.current = false;
     };
 
-    const handleMatchFound = (opponent) => {
+    const handleMatchFound = (opponent: MatchPlayer | null) => {
       setPlayer2(opponent || emptyPlayer);
       setStatus("Match Found!");
       setCanExit(false);
@@ -114,7 +151,7 @@ export default function Matchmaking() {
       joinedRef.current = false;
     };
 
-    const handleMatchStarted = (roomId) => {
+    const handleMatchStarted = (roomId: string | number) => {
       navigatedRef.current = true;
       router.push(`/game/pingPong/${roomId}`);
       router.refresh();

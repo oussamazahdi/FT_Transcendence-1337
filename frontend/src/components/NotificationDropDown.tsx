@@ -1,8 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from "react";
 import { BellAlertIcon } from "@heroicons/react/24/outline";
-import { useRouter } from "next/navigation";
 import { useSocket } from "@/contexts/socketContext.tsx";
 import { ComponentUtils } from "@/lib/utils";
 import { GameInvite } from "@/components/ui/GameInvite";
@@ -11,17 +10,78 @@ import { MessageNotif } from "./ui/MessageNotif";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
-const NOTIFICATION_COMPONENTS = {
+type NotificationType = "game_invite" | "friend_invite" | "friend_request" | "message" | (string & {});
+
+type NotificationItem = {
+	id: number | string;
+	type: NotificationType;
+	status?: "pending" | "accepted" | "rejected" | string;
+	message?: string;
+	sender_id?: number | string;
+	receiver_id?: number | string;
+	sender_username?: string;
+	sender_avatar?: string | null;
+	payload?: {
+		roomId?: string;
+		[key: string]: unknown;
+	};
+	is_expired?: number | boolean;
+	expires_at?: string | null;
+	[key: string]: unknown;
+};
+
+type NotificationListResponse = {
+	notifications?: NotificationItem[];
+};
+
+type NotificationByIdResponse = {
+	notif?: NotificationItem | null;
+};
+
+type NotificationActionResponse = {
+	message?: string;
+	[key: string]: unknown;
+};
+
+type UnreadCountResponse = {
+	unreadCount?: number;
+};
+
+type NotificationComponentProps = {
+	notif: NotificationItem;
+	onAccept?: (value: NotificationItem | NotificationItem["id"]) => void;
+	onReject?: (notif: NotificationItem) => void;
+};
+
+type NotificationSocket = {
+	connected: boolean;
+	connect: () => void;
+	on: (event: "notification:new", cb: (payload: NotificationItem) => void) => void;
+	off: (event: "notification:new", cb: (payload: NotificationItem) => void) => void;
+	emit: (
+		event: "game:accept",
+		payload: { notifId: number; roomId: string },
+		ack: (response?: { ok?: boolean; [key: string]: unknown }) => void
+	) => void;
+};
+
+const NOTIFICATION_COMPONENTS: Record<string, ComponentType<NotificationComponentProps>> = {
 	game_invite: GameInvite,
 	friend_invite: FriendInvite,
 	friend_request: FriendInvite,
 	message: MessageNotif,
 };
 
-async function requestJson(url, options) {
+type JsonResult<T> = {
+	res: Response | null;
+	data: T | null;
+	error: unknown;
+};
+
+async function requestJson<T = unknown>(url: string, options?: RequestInit): Promise<JsonResult<T>> {
 	try {
 		const res = await fetch(url, options);
-		const data = await res.json().catch(() => null);
+		const data = (await res.json().catch(() => null)) as T | null;
 		return { res, data, error: null };
 	} catch (error) {
 		return { res: null, data: null, error };
@@ -29,43 +89,50 @@ async function requestJson(url, options) {
 }
 
 export async function fetchUnreadNotificationsCount() {
-	const { res, data } = await requestJson(`${API_BASE_URL}/api/notifications/unread-count`, {
-		method: "GET",
-		credentials: "include",
-		headers: { Accept: "application/json" },
-	});
+	const { res, data } = await requestJson<UnreadCountResponse>(
+		`${API_BASE_URL}/api/notifications/unread-count`,
+		{
+			method: "GET",
+			credentials: "include",
+			headers: { Accept: "application/json" },
+		}
+	);
 
 	if (!res || !res.ok) return 0;
 	return Number(data?.unreadCount ?? 0);
 }
 
 export default function NotificationDropDown() {
-	const router = useRouter();
-	const socket = useSocket();
+	const socket = useSocket() as NotificationSocket | null;
 
-	const dropdownRef = useRef(null);
+	const dropdownRef = useRef<HTMLDivElement | null>(null);
 
 	const [isOpen, setIsOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [unreadCount, setUnreadCount] = useState(0);
-	const [notifications, setNotifications] = useState([]);
+	const [notifications, setNotifications] = useState<NotificationItem[]>([]);
 
 	const fetchNotificationsList = useCallback(async () => {
-		const { res, data } = await requestJson(`${API_BASE_URL}/api/notifications`, {
-			method: "GET",
-			credentials: "include",
-			headers: { Accept: "application/json" },
-		});
+		const { res, data } = await requestJson<NotificationListResponse>(
+			`${API_BASE_URL}/api/notifications`,
+			{
+				method: "GET",
+				credentials: "include",
+				headers: { Accept: "application/json" },
+			}
+		);
 
 		if (!res || res.status === 401 || !res.ok) return null;
 		return Array.isArray(data?.notifications) ? data.notifications : [];
 	}, []);
 
-	const postNotificationAction = useCallback(async (notifId, action) => {
+	const postNotificationAction = useCallback(async (notifId: NotificationItem["id"], action: string) => {
 		const id = Number(notifId);
 		if (!Number.isInteger(id) || id <= 0) return { ok: false };
 
-		const { res, data } = await requestJson(`${API_BASE_URL}/api/notifications/${id}/action`,{
+		const { res, data } = await requestJson<NotificationActionResponse>(
+			`${API_BASE_URL}/api/notifications/${id}/action`,
+			{
 				method: "POST",
 				credentials: "include",
 				headers: { "Content-Type": "application/json", Accept: "application/json" },
@@ -77,23 +144,27 @@ export default function NotificationDropDown() {
 		return { ok: true, data };
 	}, []);
 
-	const loadNotificationById = useCallback(async (notifId) => {
+	const loadNotificationById = useCallback(async (notifId: NotificationItem["id"]) => {
 		const id = Number(notifId);
 		if (!Number.isInteger(id) || id <= 0) return null;
 
-		const { res, data } = await requestJson(`${API_BASE_URL}/api/notifications/${id}`, {
-			method: "GET",
-			credentials: "include",
-			headers: { Accept: "application/json" },
-		});
+		const { res, data } = await requestJson<NotificationByIdResponse>(
+			`${API_BASE_URL}/api/notifications/${id}`,
+			{
+				method: "GET",
+				credentials: "include",
+				headers: { Accept: "application/json" },
+			}
+		);
 
 		if (!res || !res.ok) return null;
 		return data?.notif ?? null;
 	}, []);
 
-	const closeDropdownOnOutsideClick = useCallback((event) => {
+	const closeDropdownOnOutsideClick = useCallback((event: MouseEvent) => {
 		if (!dropdownRef.current) return;
-		if (!dropdownRef.current.contains(event.target)) setIsOpen(false);
+		const target = event.target;
+		if (target instanceof Node && !dropdownRef.current.contains(target)) setIsOpen(false);
 	}, []);
 
 	const connectSocketIfNeeded = useCallback(() => {
@@ -107,7 +178,7 @@ export default function NotificationDropDown() {
 		setUnreadCount(count);
 	}, []);
 
-	const addIncomingNotification = useCallback((raw) => {
+	const addIncomingNotification = useCallback((raw: NotificationItem) => {
 		if (!raw?.id) return;
 
 		setUnreadCount((prev) => prev + 1);
@@ -118,7 +189,7 @@ export default function NotificationDropDown() {
 	}, []);
 
 	const rejectNotification = useCallback(
-		async (notif) => {
+		async (notif: NotificationItem) => {
 			if (!notif?.id) return;
 			if (notif.status !== "pending") return;
 			if (ComponentUtils.isExpired(notif)) return;
@@ -134,7 +205,8 @@ export default function NotificationDropDown() {
 	);
 
 	const acceptGameInvite = useCallback(
-		async (notifId) => {
+		async (notifId: NotificationItem | NotificationItem["id"]) => {
+			if (typeof notifId === "object" && notifId !== null) return;
 			const notif = await loadNotificationById(notifId);
 			if (!notif) return;
 
@@ -152,7 +224,7 @@ export default function NotificationDropDown() {
 			const r = await postNotificationAction(notif.id, "accept");
 			if (!r.ok) return;
 
-			if (!connectSocketIfNeeded()) return;
+			if (!connectSocketIfNeeded() || !socket) return;
 			setIsOpen(false);
 
 			socket.emit("game:accept", { notifId: Number(notif.id), roomId }, (ack) => {
@@ -163,7 +235,7 @@ export default function NotificationDropDown() {
 				// router.push(`/game/pingPong/${roomId}`);
 			});
 		},
-		[loadNotificationById, postNotificationAction, connectSocketIfNeeded, socket, router]
+		[loadNotificationById, postNotificationAction, connectSocketIfNeeded, socket]
 	);
 
 	const handleBellClick = useCallback(async () => {
@@ -183,14 +255,21 @@ export default function NotificationDropDown() {
 		}
 	}, [fetchNotificationsList]);
 
-	const renderedNotifications = useMemo(() => {
-		return notifications.map((notif) => {
+	const renderedNotifications = useMemo<JSX.Element[]>(() => {
+		return notifications
+			.map((notif) => {
 				const Cmp = NOTIFICATION_COMPONENTS[notif.type];
 				if (!Cmp) return null;
 				return (
-					<Cmp key={notif.id} notif={notif} onAccept={acceptGameInvite} onReject={rejectNotification}/>
+					<Cmp
+						key={String(notif.id)}
+						notif={notif}
+						onAccept={acceptGameInvite}
+						onReject={rejectNotification}
+					/>
 				);
-			}).filter(Boolean);
+			})
+			.filter((item): item is JSX.Element => item !== null);
 	}, [notifications, acceptGameInvite, rejectNotification]);
 
 	useEffect(() => {

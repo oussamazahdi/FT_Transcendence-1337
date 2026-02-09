@@ -1,9 +1,41 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useAuth } from "@/contexts/authContext";
 
-const MAPS = [
+type MapDefinition = {
+  id: string;
+  label: string;
+  image: string;
+};
+
+type SettingsKey = "ball_speed" | "score_limit" | "paddle_size";
+
+type RangeSpec = {
+  min: number;
+  max: number;
+};
+
+type SettingsState = Record<SettingsKey, number | "">;
+
+type FieldProps = {
+  label: string;
+  rangeText: string;
+  value: number | "";
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  error?: string;
+};
+
+type MapCardProps = {
+  map: MapDefinition;
+  isActive: boolean;
+  isHovered: boolean;
+  onEnter: () => void;
+  onLeave: () => void;
+  onSelect: () => void;
+};
+
+const MAPS: MapDefinition[] = [
   { id: "desert", label: "DESERT", image: "/maps/desert.png" },
   { id: "hell", label: "HELL", image: "/maps/hell.png" },
   { id: "ocean", label: "OCÉAN", image: "/maps/water.png" },
@@ -12,24 +44,24 @@ const MAPS = [
   { id: "space", label: "SPACE", image: "/maps/space.png" },
 ];
 
-const RANGES = {
+const RANGES: Record<SettingsKey, RangeSpec> = {
   ball_speed: { min: 1, max: 3 },
   score_limit: { min: 5, max: 20 },
   paddle_size: { min: 1, max: 3 },
 };
 
-const SETTINGS_FIELDS = [
+const SETTINGS_FIELDS: Array<{ key: SettingsKey; label: string }> = [
   { key: "ball_speed", label: "Ball speed" },
   { key: "score_limit", label: "Score limit" },
   { key: "paddle_size", label: "Paddle size" },
 ];
 
-const clampNum = (v) => {
+const clampNum = (v: unknown): number => {
   const n = Number(v);
   return Number.isFinite(n) ? n : NaN;
 };
 
-function Field({ label, rangeText, value, onChange, error }) {
+function Field({ label, rangeText, value, onChange, error }: FieldProps) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex justify-between text-sm">
@@ -39,7 +71,7 @@ function Field({ label, rangeText, value, onChange, error }) {
 
       <input
         type="number"
-        value={value === "" ? "" : Number(value ?? "")}
+        value={value === "" ? "" : Number(value)}
         onChange={onChange}
         className={`h-12 px-4 rounded-xl bg-white/10 backdrop-blur-md text-white text-sm placeholder:text-white/25 focus:outline-none ring-1 transition
           ${error ? "ring-red-500/80 focus:ring-red-500/90" : "ring-white/10 focus:ring-white/30"}`}
@@ -50,7 +82,7 @@ function Field({ label, rangeText, value, onChange, error }) {
   );
 }
 
-function MapCard({ map, isActive, isHovered, onEnter, onLeave, onSelect }) {
+function MapCard({ map, isActive, isHovered, onEnter, onLeave, onSelect }: MapCardProps) {
   return (
     <button
       type="button"
@@ -89,17 +121,19 @@ function MapCard({ map, isActive, isHovered, onEnter, onLeave, onSelect }) {
 export default function GameSettings() {
   const { gameSetting, updateGameSettings } = useAuth();
 
-  const [hoveredMap, setHoveredMap] = useState(null);
-	const [selectedMap, setSelectedMap] = useState(gameSetting.game_mode);
+  const [hoveredMap, setHoveredMap] = useState<string | null>(null);
+  const [selectedMap, setSelectedMap] = useState<string | null>(
+    (gameSetting?.game_mode as string | undefined) ?? null
+  );
 
-  const [userData, setUserData] = useState({
-    ball_speed: gameSetting.ball_speed,
-    score_limit: gameSetting.score_limit,
-    paddle_size: gameSetting.paddle_size,
+  const [userData, setUserData] = useState<SettingsState>({
+    ball_speed: (gameSetting?.ball_speed as number | undefined) ?? "",
+    score_limit: (gameSetting?.score_limit as number | undefined) ?? "",
+    paddle_size: (gameSetting?.paddle_size as number | undefined) ?? "",
   });
 
-  const errors = useMemo(() => {
-    const error = {};
+  const errors = useMemo<Partial<Record<SettingsKey, string>>>(() => {
+    const error: Partial<Record<SettingsKey, string>> = {};
 
     const ballSpeed = clampNum(userData.ball_speed);
     if (!Number.isInteger(ballSpeed) || ballSpeed < RANGES.ball_speed.min || ballSpeed > RANGES.ball_speed.max)
@@ -136,7 +170,7 @@ export default function GameSettings() {
   const canSave = !hasErrors && hasChanges;
 
   const onNumberChange = useCallback(
-    (key) => (e) => {
+    (key: SettingsKey) => (e: React.ChangeEvent<HTMLInputElement>) => {
       const raw = e.target.value;
 
       if (raw === "") {
@@ -152,16 +186,15 @@ export default function GameSettings() {
 
   const onSave = useCallback(() => {
     if (!canSave) return;
-		
+
     const payload = {
       ...userData,
       game_mode: selectedMap,
     };
 
-		updateGameSettings(payload)
-		canSave = false;
+    updateGameSettings(payload);
     console.log("Saving:", payload);
-  }, [canSave, userData, selectedMap]);
+  }, [canSave, userData, selectedMap, updateGameSettings]);
 
   return (
     <div className="h-full w-full overflow-y-auto scroll-smooth text-white px-4 sm:px-8 py-10 custom-scrollbar">

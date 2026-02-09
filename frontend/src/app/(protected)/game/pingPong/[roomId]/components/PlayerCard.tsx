@@ -1,4 +1,22 @@
-export function PlayerCard({ player }) {
+type Player = {
+  username: string;
+  firstname?: string;
+  lastname?: string;
+  firstName?: string;
+  lastName?: string;
+  avatar?: string;
+  score: number;
+};
+
+type Game = {
+  player1: Player;
+  player2: Player;
+};
+
+export function PlayerCard({ player }: { player: Player }) {
+  const firstName = player.firstName ?? player.firstname ?? "";
+  const lastName = player.lastName ?? player.lastname;
+
   return (
     <div className="flex flex-col items-center">
       <img
@@ -6,7 +24,7 @@ export function PlayerCard({ player }) {
         className="w-14 h-14 rounded-lg object-cover"
       />
       <p className="font-semibold">
-        {player.firstName}.{player.lastName?.[0]}
+        {firstName}.{lastName?.[0]}
       </p>
       <span className="text-sm text-gray-400">
         [{player.username}]
@@ -15,7 +33,7 @@ export function PlayerCard({ player }) {
   );
 }
 
-export function ScoreBoard({ game }) {
+export function ScoreBoard({ game }: { game: Game }) {
   return (
     <div className="flex justify-between w-full max-w-5xl px-4 mt-6 mb-5">
       <PlayerCard player={game.player1} />

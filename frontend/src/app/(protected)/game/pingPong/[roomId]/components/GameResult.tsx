@@ -1,4 +1,20 @@
-export function GameResult({ game, width, height }) {
+type Player = {
+  username: string;
+  score: number;
+};
+
+type Game = {
+  player1: Player;
+  player2: Player;
+};
+
+type GameResultProps = {
+  game: Game;
+  width: number;
+  height: number;
+};
+
+export function GameResult({ game, width, height }: GameResultProps) {
   const winner = game.player1.score > game.player2.score ? game.player1 : game.player2;
 
   return (

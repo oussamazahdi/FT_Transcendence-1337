@@ -3,10 +3,18 @@
 import React, { useState } from "react";
 import Link from "next/link";
 
+type LocalGameItem = {
+	titel: string;
+	cover: string;
+	alt: string;
+	description: string;
+	button: string;
+};
+
 export default function Game() {
 	const [isModalVisible, setIsModalVisible] = useState(false);
 
-	const localGameItems = [
+	const localGameItems: LocalGameItem[] = [
 		{
 			titel: "Ping Pong",
 			cover: "/Game/PingPongCover.png",

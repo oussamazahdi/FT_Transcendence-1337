@@ -1,10 +1,42 @@
 
-import {GAME_WIDTH, GAME_HEIGHT} from "@/components/ui/GameMode"
+import { GAME_WIDTH, GAME_HEIGHT } from "@/components/ui/GameMode";
 
-let bgImg = null;
+type GameMode = {
+  ball: string;
+  paddle: string;
+};
+
+type Ball = {
+  x: number;
+  y: number;
+  radius: number;
+};
+
+type Paddle = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+type GamePlayer = {
+  player: Paddle;
+};
+
+type GameState = {
+  ball: Ball;
+  player1: GamePlayer;
+  player2: GamePlayer;
+};
+
+let bgImg: HTMLImageElement | null = null;
 let bgReady = false;
 
-export function drawFrame(ctx, game, gameMode) {
+export function drawFrame(
+  ctx: CanvasRenderingContext2D,
+  game: GameState,
+  gameMode: GameMode
+) {
   ctx.clearRect(0, 0, 1024, 700);
 
   if (bgReady && bgImg) {
@@ -33,16 +65,19 @@ export function drawFrame(ctx, game, gameMode) {
   drawPaddle(ctx, game.player2.player, gameMode);
 }
 
-
-export function drawPaddle(ctx, paddle, gameMode) {
+export function drawPaddle(
+  ctx: CanvasRenderingContext2D,
+  paddle: Paddle,
+  gameMode: GameMode
+) {
   ctx.fillStyle = gameMode.paddle;
   ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
 }
 
-export function preloadBackground(image) {
+export function preloadBackground(image?: string) {
   if (bgImg) return;
   bgImg = new Image();
-  bgImg.src = image;
+  bgImg.src = image || "";
   bgImg.onload = () => {
     bgReady = true;
   };
