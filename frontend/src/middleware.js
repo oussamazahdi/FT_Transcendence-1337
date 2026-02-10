@@ -45,7 +45,6 @@ const onboardingSteps = {
       if (error.code === "ERR_JWT_EXPIRED" || error.message.includes("exp")) {
         isTokenExpired = true;
       }
-      console.log("Access token invalid:", error.message);// to remove later
     }
   }
 

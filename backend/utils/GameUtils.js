@@ -1,85 +1,66 @@
-import {
-	activeGames,
-	loops,
-	socketToUsername,
-	usernameToSocket,
-	waitingPlayer
-} from "../store/memory.store.js";
+import { activeGames, loops, socketToUsername, usernameToSocket, waitingPlayer } from "../store/memory.store.js";
+import { GAME_WIDTH, FPS } from "../constants/game.constants.js";
+// import { updateGame } from "../services/GameLoop.service.js";
+import { GameSession, Paddle } from "../store/game.store.js";
+import { randomUUID } from "crypto";
 
-import { updateGame } from "../services/GameLoop.service.js";
+import { GameLoop } from "../services/GameLoop.service.js";
 
-const FPS = 1000 / 60;
+class gameUtils{
+	getGame = (roomId) => activeGames.get(roomId);
 
-export const getGame = (roomId) => activeGames.get(roomId);
-
-export function getGameBySocket(socketId) {
-	for (const game of activeGames.values()) {
-		if (
-			game.player1.socketId === socketId ||
-			game.player2.socketId === socketId
-		) {
-			return game;
+	 getGameBySocket(socketId) {
+		for (const game of activeGames.values()) {
+			if (game.player1.socketId === socketId || game.player2.socketId === socketId)
+				return game;
 		}
+		return null;
 	}
-	return null;
-}
 
-export function getGameByUsername(username) {
-	for (const game of activeGames.values()) {
-		if (
-			game.player1.username === username ||
-			game.player2.username === username
-		) {
-			return game;
+	getGameByUsername(username) {
+		for (const game of activeGames.values()) {
+			if (game.player1.username === username || game.player2.username === username)
+				return game;
 		}
+		return null;
 	}
-	return null;
-}
 
-export function removeGame(roomId) {
-	const loop = loops.get(roomId);
-	if (loop) clearInterval(loop);
+	removeGame(roomId) {
+		const loop = loops.get(roomId);
+		if (loop) clearInterval(loop);
 
-	loops.delete(roomId);
-	activeGames.delete(roomId);
-}
+		loops.delete(roomId);
+		activeGames.delete(roomId);
+	}
 
-export function startGameLoop(io, roomId) {
-	if (loops.has(roomId)) return;
+	startGameLoop(io, roomId) {
+		if (loops.has(roomId)) return;
 
-	const loop = setInterval(() => updateGame(io, roomId), FPS);
-	loops.set(roomId, loop);
-}
+		const loop = setInterval(() => GameLoop.updateGame(io, roomId), FPS);
+		loops.set(roomId, loop);
+	}
 
-export function rebindSocket(username, newSocketId) {
-	const oldSocketId = usernameToSocket.get(username);
-	if (!oldSocketId || oldSocketId === newSocketId) return;
+	cleanupPlayers(game) {
+		socketToUsername.delete(game.player1.socketId);
+		socketToUsername.delete(game.player2.socketId);
+		usernameToSocket.delete(game.player1.username);
+		usernameToSocket.delete(game.player2.username);
+	}
 
-	socketToUsername.delete(oldSocketId);
+	isValidDirection(direction) {
+		return direction === "up" || direction === "down";
+	}
 
-	if (waitingPlayer.value?.player.username === username) {
-		waitingPlayer.value.socketId = newSocketId;
+	isValidPlayerData(data) {
+		return ( data && typeof data === "object" &&
+			typeof data.username === "string" &&
+			data.username.length > 0 &&
+			data.username.length <= 20 &&
+			typeof data.firstName === "string" &&
+			typeof data.lastName === "string" &&
+			typeof data.avatar === "string"
+		);
 	}
 }
 
-export function cleanupPlayers(game) {
-	socketToUsername.delete(game.player1.socketId);
-	socketToUsername.delete(game.player2.socketId);
-	usernameToSocket.delete(game.player1.username);
-	usernameToSocket.delete(game.player2.username);
-}
-
-export function isValidDirection(direction) {
-	return direction === "up" || direction === "down";
-}
-
-export function isValidPlayerData(data) {
-	return ( data &&
-		typeof data.username === "string" &&
-		data.username.length > 0 &&
-		data.username.length <= 20 &&
-		typeof data.firstName === "string" &&
-		typeof data.lastName === "string" &&
-		typeof data.avatar === "string"
-	);
-}
+export const GameUtils = new gameUtils();

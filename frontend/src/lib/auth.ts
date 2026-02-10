@@ -19,8 +19,9 @@ export async function getCurrentUser(): Promise<fullUser | null> {
     const pendingReqPromise = fetch(`${API}/api/friends/requests/sent`,{headers})
     const incomingReqPromise = fetch(`${API}/api/friends/requests`,{headers})
 		const playerSettingsPromise = fetch(`${API}/api/game/settings`,{headers});
+		const notificationsPoromise = fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notifications`,{headers});
 
-    const [userRes, friendsRes, blockedRes, pendingReqRes, incomingReqRes, playerSettingsRes] = await Promise.all([userPromise, friendsPromise, blockedPromise, pendingReqPromise, incomingReqPromise, playerSettingsPromise])
+    const [userRes, friendsRes, blockedRes, pendingReqRes, incomingReqRes, playerSettingsRes, notificationsRes] = await Promise.all([userPromise, friendsPromise, blockedPromise, pendingReqPromise, incomingReqPromise, playerSettingsPromise, notificationsPoromise])
 
     if (!userRes.ok) 
       return null;
@@ -58,12 +59,12 @@ export async function getCurrentUser(): Promise<fullUser | null> {
 			playerSettingsList = gameSettings?.settings || [];
 		}
 
-    console.log("user", user.userData);
-    // console.log("Friends", friendsList);
-    // console.log("Blocked" ,blockedList);
-    // console.log("pendingRequest", pendingReqList);
-    // console.log("incomingRequest", incomingReqList);
-		// console.log("-------------> gameSettings:", playerSettingsList);
+		let notificationsList = [];
+		if (notificationsRes.ok) {
+			const notifications = await notificationsRes.json();
+			notificationsList = notifications?.userData || [];
+		}
+
     return {
       userData: user.userData,
       friends: friendsList,
@@ -71,6 +72,7 @@ export async function getCurrentUser(): Promise<fullUser | null> {
       pendingRequests: pendingReqList,
       incomingRequests: incomingReqList,
 			gameSetting: playerSettingsList,
+			notification: notificationsList,
     };
   } catch (error) {
     console.error("Failed to fetch user:", error);

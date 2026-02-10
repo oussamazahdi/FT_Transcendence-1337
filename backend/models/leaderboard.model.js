@@ -3,6 +3,8 @@ import { handleDatabaseError } from '../utils/dbErrorHandler.js';
 
 export class LeaderboardModels {
 
+    //chsnge this line : WHEN (m.player1_id = u.id OR m.player2_id = u.id) AND status = 'lose'
+
     getPlayerByRanking(db, limit, offset)
     {
          try {

@@ -20,6 +20,12 @@ function createUserTable(db)
             secret2fa TEXT,
             createdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )`);
+
+        const columns = db.prepare("PRAGMA table_info(users)").all();
+        const columnNames = new Set(columns.map((col) => col.name));
+        if (!columnNames.has("session2fa")) {
+            db.exec("ALTER TABLE users ADD COLUMN session2fa BOOLEAN DEFAULT false");
+        }
     }
     catch (error) {
         const dbError = handleDatabaseError(error, 'createUserTable');

@@ -9,7 +9,6 @@ import { generateFileNameByUser, generateToken, updateTokenFlags } from "../util
 import { getEmailLetter } from "../templates/emailLetter.js";
 import { MatchController } from "./game.controller.js";
 
-const match = new MatchController(); // modify later
 
 export class AuthController {
 
@@ -49,7 +48,6 @@ export class AuthController {
             return reply.code(200).send({message: "AUTHORIZED", userData: result});
         }
         catch (error) {
-            // console.log(error);
                 if (error.code)
                     return reply.code(error.code).send({error: error.message});
                 else
@@ -64,7 +62,7 @@ export class AuthController {
         const db = request.server.db;
         try {
             const user = await authModels.addNewUser(db, firstname, lastname, username, email, password);
-			match.addNewGameSettings(request.server.db, user.id);
+						MatchController.addNewGameSettings(request.server.db, user.id);
             const params = {
                 isVerified: !!user.isverified,
                 hasAvatar: !!user.avatar,
@@ -146,8 +144,7 @@ export class AuthController {
             if (blacklisted)
                 throw new Error("TOKEN_REVOKED");
             const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-            //query the status of isVerfied from the database to get fresh data in case refeesh token have old data
-            const tokenDbResults = tokenModels.tokenExists(db, refreshToken); // check if token exists
+            const tokenDbResults = tokenModels.tokenExists(db, refreshToken);
             if (!tokenDbResults)
                 throw new Error("INVALID_TOKEN");
             const user = authModels.findUserById(db, decoded.userId);
@@ -167,11 +164,9 @@ export class AuthController {
         const db = request.server.db;
         try {
             const user = authModels.findUserById(db, request.user.userId);
-            // console.log(user)
             return reply.code(200).send({message: "SUCCESS", userData: user});
         }
         catch (error) {
-            // console.log(error);
             if (error.code)
                 return reply.code(error.code).send({error: error.message});
             else
@@ -181,7 +176,8 @@ export class AuthController {
     
     async   logout(request, reply)
     {
-        const db = request.server.db
+        const db = request.server.db;
+				const io = request.server.io;
         try {
             const refreshToken = request.cookies.refreshToken;
             if (!refreshToken)

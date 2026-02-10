@@ -80,4 +80,5 @@ export interface fullUser{
   pendingRequests: any,
   incomingRequests: any,
   gameSetting: any,
+  notification: any,
 }
