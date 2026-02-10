@@ -178,7 +178,7 @@ export default function NotificationDropDown() {
   const fetchNotifications = useCallback(async () => {
     setUnreadCount(0);
     
-    const res = await fetch("http://localhost:3001/api/notifications", { credentials: "include" });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notifications`, { credentials: "include" });
     const data = await res.json().catch(() => ({}));
 
     if (res.status === 401 || !res.ok) {

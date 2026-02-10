@@ -12,7 +12,7 @@ async function getFriendProfile(id:string) {
   const cookieStore = await cookies();
 
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`, {
+    const response = await fetch(`${process.env.SERVER_SIDE_API_URL}/api/users/${id}`, {
       method: "GET",
       headers: {Cookie: cookieStore.toString()},
       cache: "no-store",

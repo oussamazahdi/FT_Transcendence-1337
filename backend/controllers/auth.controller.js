@@ -36,13 +36,13 @@ export class AuthController {
             authModels.addNewToken(db, result.id, refreshToken);
             reply.setCookie('refreshToken', refreshToken, {
                 httpOnly: true,
-                sameSite: 'strict',
+                sameSite: 'lax',
                 path: '/',
                 maxAge: 7 * 24 * 60 * 60 * 1000
             });
             reply.setCookie('accessToken', accessToken, {
                 httpOnly: true,
-                sameSite: 'strict',
+                sameSite: 'lax',
                 path: '/',
                 maxAge: 7 * 24 * 60 * 60 * 1000
             });

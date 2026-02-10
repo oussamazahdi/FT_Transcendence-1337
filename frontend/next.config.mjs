@@ -2,18 +2,18 @@
 const nextConfig = {
 
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'http',
-        hostname: '10.32.96.170',
-        port: '3001', // ⚠️ Crucial: Matches the port in your error URL
-        pathname: '/uploads/**', // Allows images from the uploads folder
+        hostname: 'localhost',
+        pathname: '/uploads/**',
       },
       {
         protocol: 'http',
-        hostname: 'localhost',
-        port: '3001', // ⚠️ Crucial: Matches the port in your error URL
-        pathname: '/uploads/**', // Allows images from the uploads folder
+        hostname: 'backend',
+        port: '3001',
+        pathname: '/uploads/**',
       },
       {
         protocol: 'https',
