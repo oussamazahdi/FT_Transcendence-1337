@@ -49,12 +49,7 @@ type BackgroundImage = {
 type SetScore = (value: number | ((prev: number) => number)) => void;
 
 class gameUtiles {
-  drawLocalFrame = (
-    context: CanvasRenderingContext2D,
-    state: GameState,
-    players: PlayersConfig,
-    bg: BackgroundImage
-  ) => {
+  drawLocalFrame = ( context: CanvasRenderingContext2D, state: GameState, players: PlayersConfig, bg: BackgroundImage ) => {
     if (bg?.ready && bg?.image) {
       context.drawImage(bg.image, 0, 0, state.board.width, state.board.height);
     } else {

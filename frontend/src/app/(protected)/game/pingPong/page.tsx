@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import GameSetup from "@/components/gameSetupComp/gameSetup";
 import { useRouter } from "next/navigation";
+import CreateTournamentModal from "./tournament/CreateTournamentModal"; // ✅ adjust path to where you place it
 
 type LocalGameItem = {
 	titel: string;
@@ -12,10 +13,60 @@ type LocalGameItem = {
 	button: string;
 };
 
+type UserLite = {
+	id: string;
+	username: string;
+	displayName?: string;
+	avatarUrl?: string | null;
+};
+
+type TournamentPlayer = {
+	id: string;
+	username: string;
+	displayName: string;
+	avatarUrl?: string | null;
+	isGuest?: boolean;
+};
+
 const LocalGame = () => {
 	const router = useRouter();
 
 	const [isModalVisible, setIsModalVisible] = useState(false);
+
+	// ✅ tournament modal state
+	const [isTournamentOpen, setIsTournamentOpen] = useState(false);
+
+	// ✅ example users list (replace with your real users/friends from API/store)
+	const users: UserLite[] = useMemo(
+		() => [
+			{
+				id: "1",
+				username: "Soarif",
+				displayName: "Soufiane Aarif",
+				avatarUrl: "/gameAvatars/profile1.jpeg",
+			},
+			{
+				id: "2",
+				username: "Zahdi",
+				displayName: "Oussama Zahdi",
+				avatarUrl: "/gameAvatars/profile3.jpeg",
+			},
+			{
+				id: "3",
+				username: "Zahdi",
+				displayName: "Oussama Zahdi",
+				avatarUrl: "/gameAvatars/profile4.jpeg",
+			},
+			{
+				id: "4",
+				username: "Zahdi",
+				displayName: "Oussama Zahdi",
+				avatarUrl: "/gameAvatars/profile5.jpeg",
+			},
+		],
+		[]
+	);
+
 	const localGameItems: LocalGameItem[] = [
 		{
 			titel: "Local Game",
@@ -39,6 +90,22 @@ const LocalGame = () => {
 			button: "Start Game",
 		},
 	];
+
+	const handleTournamentStart = (payload: {
+		name: string;
+		players: TournamentPlayer[];
+	}) => {
+		// ✅ close modal
+		setIsTournamentOpen(false);
+
+		// ✅ option A: store in localStorage and go to tournament page
+		localStorage.setItem("tournament:create", JSON.stringify(payload));
+		router.push("/game/pingPong/tournament");
+
+		// ✅ option B (later): call your API then navigate
+		// await fetch("/api/tournament", { method: "POST", body: JSON.stringify(payload) })
+	};
+
 	return (
 		<div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 w-full max-w-7xl">
 			<div
@@ -55,8 +122,7 @@ const LocalGame = () => {
 				</h1>
 				<p className="pb-3 text-[#D5D5D5]">{localGameItems[0].description}</p>
 				<button
-					className=" bg-[#333333]/60 hover:bg-[#333333]/40 mb-3 py-2 w-full rounded-lg \
-				cursor-pointer shadow-md font-medium"
+					className=" bg-[#333333]/60 hover:bg-[#333333]/40 mb-3 py-2 w-full rounded-lg cursor-pointer shadow-md font-medium"
 					onClick={() => setIsModalVisible(true)}
 				>
 					{localGameItems[0].button}
@@ -78,7 +144,7 @@ const LocalGame = () => {
 				<p className="pb-3 text-[#D5D5D5]">{localGameItems[1].description}</p>
 				<button
 					className=" bg-[#333333]/60 hover:bg-[#333333]/40 mb-3 py-2 w-full rounded-lg cursor-pointer shadow-md font-medium"
-					onClick={() => router.push("/game/pingPong/tournament")}
+					onClick={() => setIsTournamentOpen(true)} // ✅ open tournament modal
 				>
 					{localGameItems[1].button}
 				</button>
@@ -98,18 +164,24 @@ const LocalGame = () => {
 				</h1>
 				<p className="pb-3 text-[#D5D5D5]">{localGameItems[2].description}</p>
 				<button
-					className=" bg-[#333333]/60 hover:bg-[#333333]/40 mb-3 py-2 w-full rounded-lg \
-				cursor-pointer shadow-md font-medium"
+					className=" bg-[#333333]/60 hover:bg-[#333333]/40 mb-3 py-2 w-full rounded-lg cursor-pointer shadow-md font-medium"
 					onClick={() => router.push("/game/pingPong/matchmaking")}
 				>
 					{localGameItems[2].button}
 				</button>
 			</div>
 
-			<GameSetup
-				isVisible={isModalVisible}
-				onClose={() => setIsModalVisible(false)}
-			/>
+			{/* existing local setup modal */}
+			<GameSetup isVisible={isModalVisible} onClose={() => setIsModalVisible(false)} />
+
+			{/* ✅ tournament modal */}
+			<CreateTournamentModal
+  		open={isTournamentOpen}
+  		onClose={() => setIsTournamentOpen(false)}
+  		users={users}
+  		maxPlayers={4}/>
+
+
 		</div>
 	);
 };

@@ -67,24 +67,12 @@ type GameSetting = {
 type BackgroundImage = { image: HTMLImageElement | null; ready: boolean };
 
 type GameUtilesType = {
-  drawLocalFrame: (
-    context: CanvasRenderingContext2D,
-    state: GameState,
-    players: PlayersConfig,
-    bg: BackgroundImage
-  ) => void;
+  drawLocalFrame: ( context: CanvasRenderingContext2D, state: GameState, players: PlayersConfig, bg: BackgroundImage) => void;
   ballMovement: (state: GameState) => void;
-  handleScoring: (
-    state: GameState,
-    setScore1: React.Dispatch<React.SetStateAction<number>>,
-    setScore2: React.Dispatch<React.SetStateAction<number>>
-  ) => void;
+  handleScoring: ( state: GameState, setScore1: React.Dispatch<React.SetStateAction<number>>, setScore2: React.Dispatch<React.SetStateAction<number>>) => void;
   ballCollisions: (state: GameState) => void;
   paddleMovement: (state: GameState) => void;
-  createKeyboardHandlers: (args: {
-    stateRef: React.MutableRefObject<GameState>;
-    togglePause: () => void;
-  }) => {
+  createKeyboardHandlers: (args: {stateRef: React.MutableRefObject<GameState>; togglePause: () => void; }) => {
     onKeyDown: (e: KeyboardEvent) => void;
     onKeyUp: (e: KeyboardEvent) => void;
   };
@@ -121,15 +109,8 @@ const toNumber = (v: unknown, fallback: number) => {
   return Number.isFinite(n) ? n : fallback;
 };
 
-const buildPlayers = ({
-  p1,
-  p2,
-  mode,
-}: {
-  p1?: PlayerInput | null;
-  p2?: PlayerInput | null;
-  mode?: GameMode;
-}): PlayersConfig => {
+const buildPlayers = ({ p1, p2, mode }: { p1?: PlayerInput | null; p2?: PlayerInput | null; mode?: GameMode; }): PlayersConfig => {
+
   const paddleColor = mode?.paddle || "#D9D9D9";
   const ballColor = mode?.ball || "#D9D9D9";
 
@@ -149,13 +130,7 @@ const buildPlayers = ({
   };
 };
 
-const initGameState = ({
-  gameSetting,
-  mode,
-}: {
-  gameSetting?: GameSetting | null;
-  mode?: GameMode;
-}): GameState => {
+const initGameState = ({ gameSetting, mode, }: { gameSetting?: GameSetting | null; mode?: GameMode; }): GameState => {
   const width = GAME_WIDTH || 1024;
   const height = GAME_HEIGHT || 700;
 
@@ -197,17 +172,7 @@ const initGameState = ({
   };
 };
 
-export function PingPongGame({
-  p1,
-  p2,
-  gameSetting,
-  gameMode,
-}: {
-  p1?: PlayerInput | null;
-  p2?: PlayerInput | null;
-  gameSetting?: GameSetting | null;
-  gameMode?: GameMode;
-}) {
+export function PingPongGame({ p1, p2, gameSetting, gameMode }: { p1?: PlayerInput | null; p2?: PlayerInput | null; gameSetting?: GameSetting | null; gameMode?: GameMode; }) {
   const mode = useMemo<GameMode>(() => {
     if (gameMode) return gameMode;
     const key = gameSetting?.game_mode as keyof typeof GAME_MODE | undefined;

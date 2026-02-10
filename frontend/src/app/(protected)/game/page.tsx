@@ -12,7 +12,7 @@ type LocalGameItem = {
 };
 
 export default function Game() {
-	const [isModalVisible, setIsModalVisible] = useState(false);
+	// const [isModalVisible, setIsModalVisible] = useState(false);
 
 	const localGameItems: LocalGameItem[] = [
 		{
@@ -49,11 +49,7 @@ export default function Game() {
 						{localGameItems[0].description}
 					</p>
 					<Link href="/game/pingPong">
-						<button
-							className=" bg-[#333333]/60 hover:bg-[#333333]/40 mb-3 py-2 w-full rounded-lg \
-						cursor-pointer shadow-md font-medium"
-							onClick={() => setIsModalVisible(true)}
-						>
+						<button className=" bg-[#333333]/60 hover:bg-[#333333]/40 mb-3 py-2 w-full rounded-lg cursor-pointer shadow-md font-medium">
 							{localGameItems[0].button}
 						</button>
 					</Link>

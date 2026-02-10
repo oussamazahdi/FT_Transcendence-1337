@@ -32,7 +32,7 @@ class matchHistory {
 							JOIN users u2 ON u2.id = mh.player2_id
 							WHERE (mh.player1_id = :me OR mh.player2_id = :me)
 							ORDER BY 
-								mh.created_at ASC`).all({me: userId});
+								mh.created_at DESC`).all({me: userId});
 			return (result)
 			// return (db.prepare(`SELECT * FROM match_history WHERE player1_id = ? OR player2_id = ? ORDER BY created_at DESC`).all(userId, userId));
 		} catch (error) {

@@ -101,7 +101,7 @@ export default function GameSetup({ isVisible, onClose }: GameSetupProps) {
   const handlePlay = useCallback(() => {
     if (!isReadyToPlay) return;
     localStorage.setItem("GameData", JSON.stringify(gameData));
-    router.push("/game/pingPong/local-game");
+    router.push("/game/pingPong/local");
   }, [gameData, isReadyToPlay, router]);
 
   if (!isVisible) return null;

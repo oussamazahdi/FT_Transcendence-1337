@@ -33,7 +33,7 @@ export default function Home() {
       imageUrl: assets.mohcinePdp,
       links: {
         school42: "https://profile.intra.42.fr/users/ozahdi",
-        linkedin: "...",
+        linkedin: "https://www.linkedin.com/in/oussamazahdi/",
         github: "https://github.com/oussamazahdi",
       },
       key: "2",
