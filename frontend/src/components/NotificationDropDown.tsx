@@ -8,7 +8,7 @@ import { GameInvite } from "@/components/ui/GameInvite";
 import { FriendInvite } from "./ui/FriendInvite";
 import { MessageNotif } from "./ui/MessageNotif";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 type NotificationType = "game_invite" | "friend_invite" | "friend_request" | "message" | (string & {});
 
