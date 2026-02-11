@@ -50,6 +50,7 @@ const onboardingSteps = {
 
   if ((isTokenExpired || !accessToken) && refreshToken) {
     try {
+      console.log("==================================>", process.env.SERVER_SIDE_API_URL)
       const refreshResponse = await fetch(`${process.env.SERVER_SIDE_API_URL}/api/auth/refresh`,{
           method: "POST",
           headers: {
