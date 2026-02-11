@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 type AvatarOption = {
   color: string;
@@ -130,7 +131,9 @@ export default function GameSetup({ isVisible, onClose }: GameSetupProps) {
           <div className="flex flex-col items-center border border-dashed border-gray-500/60 rounded-xl p-6">
             <h2 className="text-xl font-semibold text-white mb-4">Player 1</h2>
 
-            <img
+            <Image
+							width={200}
+							height={200}
               src={gameData.player1Avatar}
               alt="Player 1 avatar"
               className="w-20 h-20 rounded-lg object-cover shadow mb-2"
@@ -145,7 +148,9 @@ export default function GameSetup({ isVisible, onClose }: GameSetupProps) {
               {AVATARS.map((a) => {
                 const isSelected = gameData.player1Avatar === a.color;
                 return (
-                  <img
+                  <Image
+										width={200}
+										height={200}
                     key={a.color}
                     src={isSelected ? a.color : a.black}
                     alt={a.alt}
@@ -175,7 +180,9 @@ export default function GameSetup({ isVisible, onClose }: GameSetupProps) {
           <div className="flex flex-col items-center border border-dashed border-gray-500/60 rounded-xl p-6">
             <h2 className="text-xl font-semibold text-white mb-4">Player 2</h2>
 
-            <img
+            <Image
+							width={200}
+							height={200}
               src={gameData.player2Avatar}
               alt="Player 2 avatar"
               className="w-20 h-20 rounded-lg object-cover shadow mb-2"
@@ -190,7 +197,9 @@ export default function GameSetup({ isVisible, onClose }: GameSetupProps) {
               {AVATARS.map((a) => {
                 const isSelected = gameData.player2Avatar === a.color;
                 return (
-                  <img
+                  <Image
+										width={200}
+										height={200}
                     key={a.color}
                     src={isSelected ? a.color : a.black}
                     alt={a.alt}

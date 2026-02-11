@@ -4,6 +4,7 @@ import React, { useMemo, useState } from "react";
 import GameSetup from "@/components/gameSetupComp/gameSetup";
 import { useRouter } from "next/navigation";
 import CreateTournamentModal from "./tournament/CreateTournamentModal"; // ✅ adjust path to where you place it
+import Image from "next/image";
 
 type LocalGameItem = {
 	titel: string;
@@ -112,7 +113,9 @@ const LocalGame = () => {
 				key={localGameItems[0].titel}
 				className="rounded-3xl bg-[#0F0F0F]/65 my-3 px-3 pt-3 text-center"
 			>
-				<img
+				<Image
+					width={400}
+					height={700}
 					src={localGameItems[0].cover}
 					alt={localGameItems[0].alt}
 					className="w-full h-110 object-cover rounded-xl"
@@ -133,7 +136,9 @@ const LocalGame = () => {
 				key={localGameItems[1].titel}
 				className="rounded-3xl bg-[#0F0F0F]/65 my-3 px-3 pt-3 text-center"
 			>
-				<img
+				<Image
+					width={400}
+					height={700}
 					src={localGameItems[1].cover}
 					alt={localGameItems[1].alt}
 					className="w-full h-110 object-cover rounded-xl"
@@ -154,7 +159,9 @@ const LocalGame = () => {
 				key={localGameItems[2].titel}
 				className="rounded-3xl bg-[#0F0F0F]/65 my-3 px-3 pt-3 text-center"
 			>
-				<img
+				<Image
+					width={400}
+					height={700}
 					src={localGameItems[2].cover}
 					alt={localGameItems[2].alt}
 					className="w-full h-110 object-cover rounded-xl"

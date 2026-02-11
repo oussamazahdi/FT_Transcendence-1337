@@ -443,8 +443,8 @@ function MatchCard({
 }) {
   const winner = getWinner(match);
 
-  const canPlay =
-    isCurrent && (match.status === "ready" || match.status === "in_progress") && match.status !== "completed";
+  const canPlay = isCurrent && (match.status === "ready" || match.status === "in_progress");
+
 
   return (
     <div className="rounded-3xl bg-white/5 p-4 ring-1 ring-white/10">

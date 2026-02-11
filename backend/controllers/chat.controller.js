@@ -69,9 +69,9 @@ export class ChatController
         const db = server.db;
         try {
             if (!data.receiverId)
-                socket.emit("chat:error", {message: "NO_RECEIVER_PROVIDED"});
+                return socket.emit("chat:error", {message: "NO_RECEIVER_PROVIDED"});
             if (data.content.length > 500 || !data.content)
-                socket.emit("chat:error", {message: "SOMETHING_WRONG_WITH_MESSAGE"});
+                return socket.emit("chat:error", {message: "SOMETHING_WRONG_WITH_MESSAGE"});
             const receiverId = data.receiverId;
             const friendshipStatus = friendsModels.isFriendshipExists(db, senderId, receiverId);
             const blocked = friendsModels.isBlockedByUser(db, senderId, receiverId);

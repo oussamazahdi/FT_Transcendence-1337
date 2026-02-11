@@ -26,25 +26,27 @@ const Friends = ({ classname = "" }: FriendsProps) => {
   const [onlineIds, setOnlineIds] = useState<string[]>([]);
 
   useEffect(() => {
+		console.log("**********************************************************1");
     if (!socket) return;
+		console.log("**********************************************************2");
 
-    if (!socket.connected) socket.connect();
+		if (!socket.connected) socket.connect();
 
-    const onUsersStatus = (data: OnlineStatusPayload) => {
-      // accept either array [ids] or object {id:true}
-      if (Array.isArray(data)) {
-        const ids = data
-          .filter((id) => typeof id === "string" || typeof id === "number")
-          .map((id) => String(id));
-        setOnlineIds(ids);
-      } else if (data && typeof data === "object") {
-        setOnlineIds(Object.keys(data));
-      } else {
-        setOnlineIds([]);
-      }
-    };
+		const onUsersStatus = (data: OnlineStatusPayload) => {
+			console.log("++++++++++> data:", data);
+			if (Array.isArray(data)) {
+				const ids = data.filter((id) => typeof id === "string" || typeof id === "number").map((id) => String(id));
+				setOnlineIds(ids);
+				console.log("+++++++++++> ids:", ids);
+			} else if (data && typeof data === "object") {
+				setOnlineIds(Object.keys(data));
+			} else {
+				setOnlineIds([]);
+			}
+			console.log("///////////////////////////////// online:", onlineIds);
+		};
 
-    socket.on("users:status", onUsersStatus);
+		socket.on("users:status", onUsersStatus);
 
     return () => {
       socket.off("users:status", onUsersStatus);

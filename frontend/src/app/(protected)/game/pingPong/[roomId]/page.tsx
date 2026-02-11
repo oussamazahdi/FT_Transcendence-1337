@@ -75,7 +75,7 @@ export default function GamePage() {
 
   useMemo(() => {
     preloadBackground(gameMode.image);
-  }, []);
+  }, [gameMode.image]);
 
   useEffect(() => {
     if (!user || !socket) return;
@@ -141,7 +141,7 @@ export default function GamePage() {
     canvas.width = GAME_WIDTH;
     canvas.height = GAME_HEIGHT;
 
-    let animationId;
+    let animationId : any;
 
 
     const render = () => {
@@ -151,7 +151,7 @@ export default function GamePage() {
 
     render();
     return () => cancelAnimationFrame(animationId);
-  }, [game, socket]);
+  }, [game, socket, gameMode]);
 
   return (
     <div className="flex flex-col items-center w-full overflow-hidden">

@@ -59,7 +59,7 @@ export const SEARCH_ERROR:Record<string, string> = {
 
 class componentUtils{
 	
-	isExpired(notif) {
+	isExpired(notif : any) {
 		if (!notif || notif.is_expired === 1) return true;
 		if (!notif.expires_at) return false;
 		const t = new Date(notif.expires_at).getTime();

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 type LocalGameItem = {
 	titel: string;
@@ -37,7 +38,9 @@ export default function Game() {
 		return (
 			<div className="flex items-center grid grid-cols-1 lg:grid-cols-2 w-full max-w-7xl">
 				<div className="rounded-3xl bg-[#0F0F0F]/60 px-3 pt-3 text-center m-3">
-					<img
+					<Image
+						width={400}
+						height={700}
 						src={localGameItems[0].cover}
 						alt={localGameItems[0].alt}
 						className="w-full h-110 object-cover rounded-xl "
@@ -55,7 +58,9 @@ export default function Game() {
 					</Link>
 				</div>
 				<div className="rounded-3xl bg-[#0F0F0F]/60 px-3 pt-3 text-center m-3">
-					<img
+					<Image
+						width={400}
+						height={700}
 						src={localGameItems[1].cover}
 						alt={localGameItems[1].alt}
 						className="w-full h-110 object-cover rounded-xl"

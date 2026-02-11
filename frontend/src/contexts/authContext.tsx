@@ -1,42 +1,58 @@
 "use client";
-import { useState, useContext, createContext, ReactNode, useCallback } from "react";
+
+import React, { useCallback, useContext, useState, createContext, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { USER_ERROR } from "@/lib/utils.ts";
-import { User, fullUser } from "@/types/index"
+import { USER_ERROR } from "@/lib/utils";
+import type { User, fullUser } from "@/types/index";
 import { autofetch } from "@/lib/api";
 
+type GameSetting = Record<string, unknown> | null;
 
 interface UserCtxValue {
   user: User | null;
+
   friends: any[];
   blocked: any[];
   pendingRequests: any[];
   incomingRequest: any[];
-  gameSetting: any[];
+
+  // NOTE: backend seems to return array sometimes; keep as unknown to avoid TS fights
+  gameSetting: any;
+
+  // ✅ add notifications
+  notification: any[];
+  setNotification: React.Dispatch<React.SetStateAction<any[]>>;
+
   globalError: string | null;
+
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  setFriends: React.Dispatch<React.SetStateAction<any[]>>;
+
   triggerError: (message: string) => void;
   login: (userData: User) => void;
   logout: () => Promise<void>;
   updateUser: (newData: Partial<User>) => void;
+
   sendFriendRequest: (user: any) => Promise<void>;
   cancelRequest: (user: any) => Promise<void>;
   acceptRequest: (user: any) => Promise<void>;
   removeFriend: (user: any) => Promise<void>;
   blockUser: (user: any) => Promise<void>;
   deblockUser: (user: any) => Promise<void>;
+
   refreshFriendReq: () => Promise<void>;
   updateGameSettings: (data: any) => Promise<any>;
-  setFriends: React.Dispatch<React.SetStateAction<any[]>>;
 }
+
 interface UserProviderProps {
-  children: ReactNode,
-  initialUser?: fullUser | null,
+  children: ReactNode;
+  initialUser?: fullUser | null;
 }
 
 const UserCtx = createContext<UserCtxValue | undefined>(undefined);
 
 export function UserProvider({ children, initialUser }: UserProviderProps) {
+  const router = useRouter();
 
   const [user, setUser] = useState<User | null>(initialUser?.userData || null);
   const [friends, setFriends] = useState<any[]>(initialUser?.friends || []);
@@ -44,20 +60,29 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
   const [pendingRequests, setPendingRequests] = useState<any[]>(initialUser?.pendingRequests || []);
   const [incomingRequest, setIncomingRequests] = useState<any[]>(initialUser?.incomingRequests || []);
   const [globalError, setGlobalError] = useState<string | null>(null);
-  const [gameSetting, setGameSetting] = useState<any>(initialUser?.gameSetting || [])
+
+  // keep as-is (your API returns array sometimes)
+  const [gameSetting, setGameSetting] = useState<any>(initialUser?.gameSetting || []);
+
+  // ✅ notifications
   const [notification, setNotification] = useState<any[]>(initialUser?.notification || []);
-  const router = useRouter();
 
   const refreshFriendReq = useCallback(async () => {
     try {
-      const [incomreqRes, pendReqRes, friendsRes, blockedRes, playerSettingsRes, notificationsRes] = await Promise.all([
+      const [
+        incomreqRes,
+        pendReqRes,
+        friendsRes,
+        blockedRes,
+        playerSettingsRes,
+        notificationsRes,
+      ] = await Promise.all([
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests`, { credentials: "include" }),
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/sent`, { credentials: "include" }),
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/`, { credentials: "include" }),
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks`, { credentials: "include" }),
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/game/settings`, { credentials: "include" }),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notifications`, { credentials: "include" })
-
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notifications`, { credentials: "include" }),
       ]);
 
       if (incomreqRes.ok) {
@@ -87,17 +112,22 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
 
       if (notificationsRes.ok) {
         const data = await notificationsRes.json();
-        setNotification(data?.userData || []);
+        // NOTE: adjust if your API returns "notifications"
+        setNotification(data?.userData || data?.notifications || []);
       }
-
     } catch (err) {
       console.log("Failed to refresh friend data", err);
     }
-  },[]);
+  }, []);
+
+  const triggerError = (message: string) => {
+    setGlobalError(message);
+    window.setTimeout(() => setGlobalError(null), 3000);
+  };
 
   const login = (userData: User) => {
     setUser(userData);
-    refreshFriendReq();
+    void refreshFriendReq();
   };
 
   const logout = async () => {
@@ -110,12 +140,14 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
       if (response.ok) {
         router.push("/");
         router.refresh();
+
         setUser(null);
         setFriends([]);
         setBlocked([]);
         setPendingRequests([]);
         setIncomingRequests([]);
         setGameSetting([]);
+        setNotification([]); // ✅ reset notifications too
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : typeof err === "string" ? err : "default";
@@ -127,151 +159,115 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
     setUser((prev) => (prev ? { ...prev, ...newData } : null));
   };
 
-  const sendFriendRequest = async (user: any) => {
+  const sendFriendRequest = async (u: any) => {
     try {
-      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/${user.id}`, {
+      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/${u.id}`, {
         method: "POST",
         credentials: "include",
-      })
+      });
       const data = await response.json();
 
-      if (!response.ok)
-        throw new Error(data.error)
+      if (!response.ok) throw new Error(data.error);
 
-      console.log("Friend Request sent succefully")
-
-      setPendingRequests((prev: any) => [...prev, user]);
-    } catch (err: unknown) {
-      const msg =
-    err instanceof Error ? err.message : typeof err === "string" ? err : "default";
-
-  triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
-    }
-  }
-
-  const cancelRequest = async (user: any) => {
-    try {
-      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/${user.id}`, {
-        method: "DELETE",
-        credentials: "include",
-      })
-      const data = await response.json();
-
-      if (!response.ok)
-        throw new Error(data.error)
-
-      console.log("Friend request canceled succefully")
-
-      setPendingRequests(pendingRequests.filter((items: any) => items.id !== user.id));
-      setIncomingRequests(incomingRequest.filter((items: any) => items.id !== user.id))
-    } catch (err: unknown) {
-      const msg =
-    err instanceof Error ? err.message : typeof err === "string" ? err : "default";
-
-  triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
-    }
-  }
-
-  const acceptRequest = async (user: any) => {
-    try {
-      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/${user.id}/accept`, {
-        method: "POST",
-        credentials: "include",
-      })
-      const data = await response.json();
-
-      if (!response.ok)
-        throw new Error(data.error)
-
-      console.log("Friend request accepted successfully")
-
-      setFriends((prev: any) => [...prev, user]);
-      setIncomingRequests(incomingRequest.filter((items: any) => items.id !== user.id))
-    } catch (err: unknown) {
-      const msg =
-    err instanceof Error ? err.message : typeof err === "string" ? err : "default";
-
-  triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
-    }
-  }
-
-  const removeFriend = async (user: any) => {
-    try {
-      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/${user.id}`, {
-        method: "DELETE",
-        credentials: "include",
-      })
-      const data = await response.json();
-
-      if (!response.ok)
-        throw new Error(data.error)
-
-      console.log("Friend removed sent succefully")
-
-      setFriends(friends.filter((items: any) => items.id !== user.id));
-    } catch (err: unknown) {
-      const msg =
-    err instanceof Error ? err.message : typeof err === "string" ? err : "default";
-
-  triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
-    }
-  }
-
-  const blockUser = async (user: any) => {
-    try {
-      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks/${user.id}`, {
-        method: "POST",
-        credentials: "include",
-      })
-
-      const data = await response.json()
-
-      if (!response.ok)
-        throw new Error(data.error)
-
-      console.log("user blocked succefully");
-
-      setBlocked((prev: any) => [...prev, user]);
-      setFriends(friends.filter((items: any) => items.id !== user.id));
+      setPendingRequests((prev) => [...prev, u]);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : typeof err === "string" ? err : "default";
       triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
     }
-  }
+  };
 
-  const deblockUser = async (user: any) => {
+  const cancelRequest = async (u: any) => {
     try {
-      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks/${user.id}`, {
+      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/${u.id}`, {
         method: "DELETE",
-        credentials: "include"
-      })
-      const data = await response.json()
+        credentials: "include",
+      });
+      const data = await response.json();
 
-      if (!response.ok)
-        throw new Error(data.error)
+      if (!response.ok) throw new Error(data.error);
 
-      console.log("user Deblocked succefully");
-
-      setBlocked(blocked.filter((items: any) => items.id !== user.id));
+      setPendingRequests((prev) => prev.filter((it: any) => it.id !== u.id));
+      setIncomingRequests((prev) => prev.filter((it: any) => it.id !== u.id));
     } catch (err: unknown) {
-      const msg =
-    err instanceof Error ? err.message : typeof err === "string" ? err : "default";
-
-  triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
+      const msg = err instanceof Error ? err.message : typeof err === "string" ? err : "default";
+      triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
     }
-  }
+  };
+
+  const acceptRequest = async (u: any) => {
+    try {
+      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/${u.id}/accept`, {
+        method: "POST",
+        credentials: "include",
+      });
+      const data = await response.json();
+
+      if (!response.ok) throw new Error(data.error);
+
+      setFriends((prev) => [...prev, u]);
+      setIncomingRequests((prev) => prev.filter((it: any) => it.id !== u.id));
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : typeof err === "string" ? err : "default";
+      triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
+    }
+  };
+
+  const removeFriend = async (u: any) => {
+    try {
+      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/${u.id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      const data = await response.json();
+
+      if (!response.ok) throw new Error(data.error);
+
+      setFriends((prev) => prev.filter((it: any) => it.id !== u.id));
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : typeof err === "string" ? err : "default";
+      triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
+    }
+  };
+
+  const blockUser = async (u: any) => {
+    try {
+      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks/${u.id}`, {
+        method: "POST",
+        credentials: "include",
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+
+      setBlocked((prev) => [...prev, u]);
+      setFriends((prev) => prev.filter((it: any) => it.id !== u.id));
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : typeof err === "string" ? err : "default";
+      triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
+    }
+  };
+
+  const deblockUser = async (u: any) => {
+    try {
+      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks/${u.id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      const data = await response.json();
+
+      if (!response.ok) throw new Error(data.error);
+
+      setBlocked((prev) => prev.filter((it: any) => it.id !== u.id));
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : typeof err === "string" ? err : "default";
+      triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
+    }
+  };
 
   const updateGameSettings = async (data: any) => {
     try {
       const payload: Record<string, any> = {};
-      const allowedKeys = new Set([
-        "player_xp",
-        "player_level",
-        "game_mode",
-        "ball_speed",
-        "score_limit",
-        "paddle_size",
-      ]);
+      const allowedKeys = new Set(["player_xp", "player_level", "game_mode", "ball_speed", "score_limit", "paddle_size"]);
 
       for (const [key, value] of Object.entries(data ?? {})) {
         if (!allowedKeys.has(key)) continue;
@@ -283,15 +279,12 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
         return { ok: false, status: 400, error: "NO_FIELDS_TO_UPDATE" };
       }
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/game/update-settings`,
-        {
-          method: "PATCH",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/game/update-settings`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
       const json = await res.json().catch(() => ({}));
 
@@ -303,26 +296,48 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
           details: json,
         };
       }
-      //need to update your local settings
+
+      // optionally refresh local settings here
       return { ok: true, status: res.status, data: json };
     } catch (err: any) {
       return { ok: false, status: 0, error: err?.message || "NETWORK_ERROR" };
     }
   };
 
-
-  const triggerError = (message: string) => {
-    setGlobalError(message);
-
-    setTimeout(() => {
-      setGlobalError(null);
-    }, 3000);
-  };
-
   return (
     <UserCtx.Provider
-      value= {{globalError, user, friends, pendingRequests, incomingRequest, blocked, setUser, triggerError, login, logout, updateUser, sendFriendRequest, cancelRequest, acceptRequest, removeFriend, setFriends, blockUser, deblockUser, refreshFriendReq, gameSetting, updateGameSettings, notification, setNotification}}>
-       { children }
+      value={{
+        globalError,
+        user,
+        friends,
+        pendingRequests,
+        incomingRequest,
+        blocked,
+
+        setUser,
+        triggerError,
+        login,
+        logout,
+        updateUser,
+
+        sendFriendRequest,
+        cancelRequest,
+        acceptRequest,
+        removeFriend,
+
+        setFriends,
+        blockUser,
+        deblockUser,
+        refreshFriendReq,
+
+        gameSetting,
+        updateGameSettings,
+
+        notification,       // ✅ now part of UserCtxValue
+        setNotification,    // ✅ now part of UserCtxValue
+      }}
+    >
+      {children}
     </UserCtx.Provider>
   );
 }

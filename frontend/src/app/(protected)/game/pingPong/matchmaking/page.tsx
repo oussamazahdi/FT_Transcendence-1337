@@ -32,17 +32,31 @@ type MatchSocket = {
   connected: boolean;
   connect: () => void;
   disconnect: () => void;
-  emit: (event: "join-game", payload: JoinPayload) => void;
-  emit: (event: "leave-game") => void;
-  on: (event: "connect" | "disconnect", cb: () => void) => void;
-  on: (event: "match-found", cb: (opponent: MatchPlayer | null) => void) => void;
-  on: (event: "match-canceled", cb: () => void) => void;
-  on: (event: "match-started", cb: (roomId: string | number) => void) => void;
-  off: (event: "connect" | "disconnect", cb: () => void) => void;
-  off: (event: "match-found", cb: (opponent: MatchPlayer | null) => void) => void;
-  off: (event: "match-canceled", cb: () => void) => void;
-  off: (event: "match-started", cb: (roomId: string | number) => void) => void;
+
+  emit: (
+    ...args:
+      | [event: "join-game", payload: JoinPayload]
+      | [event: "leave-game"]
+  ) => void;
+
+  on: (
+    ...args:
+      | [event: "connect" | "disconnect", cb: () => void]
+      | [event: "match-found", cb: (opponent: MatchPlayer | null) => void]
+      | [event: "match-canceled", cb: () => void]
+      | [event: "match-started", cb: (roomId: string | number) => void]
+  ) => void;
+
+  off: (
+    ...args:
+      | [event: "connect" | "disconnect", cb: () => void]
+      | [event: "match-found", cb: (opponent: MatchPlayer | null) => void]
+      | [event: "match-canceled", cb: () => void]
+      | [event: "match-started", cb: (roomId: string | number) => void]
+  ) => void;
 };
+
+
 
 const makeEmptyPlayer = (): MatchPlayer => ({
   id: 0,
@@ -54,6 +68,8 @@ const makeEmptyPlayer = (): MatchPlayer => ({
   score: 0,
   roomId: "",
 });
+
+const DEFAULT_AVATAR = "/game/gameAvatars/Empty.jpeg";
 
 export default function Matchmaking() {
   const { user } = useAuth() as { user: User | null };
@@ -70,6 +86,7 @@ export default function Matchmaking() {
   const joinedRef = useRef(false);
   const navigatedRef = useRef(false);
 
+
   // Keep player1 identity in sync with user (works on refresh too).
   useEffect(() => {
     if (!user) {
@@ -83,7 +100,7 @@ export default function Matchmaking() {
       firstName: user.firstname,
       lastName: user.lastname,
       username: user.username,
-      avatar: user.avatar,
+      avatar: user?.avatar ?? DEFAULT_AVATAR,
     }));
   }, [user, emptyPlayer]);
 

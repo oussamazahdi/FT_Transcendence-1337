@@ -1,12 +1,15 @@
-import React from 'react'
+"use client";
+
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { UserIcon } from "@heroicons/react/24/outline";
 import { Gamepad2 } from "lucide-react";
-import { assets } from '@/assets/data';
-import { useSocket } from '@/contexts/socketContext';
+import { assets } from "@/assets/data";
+import { useSocket, GameInvitePayload, InviteResponse } from "@/contexts/socketContext";
 
 type FriendStatus = "Online" | "Offline";
+
 type FriendCardUser = {
   id: string | number;
   firstname: string;
@@ -19,59 +22,56 @@ interface FriendCardProps {
   user: FriendCardUser;
 }
 
-interface GameInvitePayload {
-  user: string | number;
-  roomId: string;
-  gameType: string;
-}
-
-interface InviteResponse {
-  ok: boolean;
-  message?: string;
-  notification?: string;
+function safeUUID(): string {
+  // crypto.randomUUID exists in modern browsers; fallback for safety.
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
 const FriendCard = ({ user }: FriendCardProps) => {
   const rawStatus = user.status;
+
   const status: FriendStatus =
-    typeof rawStatus === "string" && rawStatus.toLowerCase() === "online"
-      ? "Online"
-      : "Offline";
+    typeof rawStatus === "string" && rawStatus.toLowerCase() === "online" ? "Online" : "Offline";
 
   const socket = useSocket();
 
-	// socket.emit("users:status")
-	
-
   const sendInvite = (): void => {
     if (!socket) return;
+
     const payload: GameInvitePayload = {
       user: user.id,
-      roomId: crypto.randomUUID(),
+      roomId: safeUUID(),
       gameType: "pingpong",
     };
+
+
     socket.emit("game:invite", payload, (res: InviteResponse): void => {
       if (!res.ok) console.error("Invite failed:", res.message);
       else console.log("✅ Invite sent:", res.notification);
     });
   };
+
   return (
     <div
       key={user.id}
       className="flex items-center w-full bg-[#414141]/60 rounded-lg p-1 gap-1"
     >
-      <div className='relative size-10 flex items-center overflow-hidden rounded-sm'>
+      <div className="relative size-10 flex items-center overflow-hidden rounded-sm">
         <Image
-          src={user?.avatar || assets.defaultProfile}
+          src={user.avatar ?? assets.defaultProfile}
           alt="icon"
           fill
+          sizes="40px"
           className="object-cover"
-          />
+        />
       </div>
+
       <div className="flex-1 min-w-0 flex flex-col justify-center">
         <p className="text-xs font-bold truncate">
           {user.firstname} {user.lastname}
         </p>
+
         <div className="flex items-center text-[9px] text-gray-500">
           <div
             className={`w-1.5 h-1.5 rounded-full mr-1 shrink-0 ${
@@ -81,10 +81,16 @@ const FriendCard = ({ user }: FriendCardProps) => {
           <p>{status}</p>
         </div>
       </div>
+
       <div className="ml-auto flex items-center gap-1">
-        <button className="w-12 h-7 bg-[#151515]/70 flex justify-center items-center rounded-lg cursor-pointer hover:brightness-150 hover:scale-110" onClick={sendInvite}>
-          <Gamepad2 className="size-4" />{" "}
+        <button
+          className="w-12 h-7 bg-[#151515]/70 flex justify-center items-center rounded-lg cursor-pointer hover:brightness-150 hover:scale-110"
+          onClick={sendInvite}
+          type="button"
+        >
+          <Gamepad2 className="size-4" />
         </button>
+
         <Link
           href={`/profile/${user.id}`}
           className="w-12 h-7 bg-[#151515]/70 flex justify-center items-center rounded-lg cursor-pointer hover:brightness-150 hover:scale-110"
@@ -93,7 +99,7 @@ const FriendCard = ({ user }: FriendCardProps) => {
         </Link>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default FriendCard
+export default FriendCard;

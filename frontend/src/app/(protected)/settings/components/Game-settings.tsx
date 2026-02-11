@@ -3,167 +3,146 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { useAuth } from "@/contexts/authContext";
 
-type MapDefinition = {
-  id: string;
-  label: string;
-  image: string;
-};
+// ─────────────────────────────────────────────────────────────────────────────
+// Types (adapt to your real domain)
+// ─────────────────────────────────────────────────────────────────────────────
 
 type SettingsKey = "ball_speed" | "score_limit" | "paddle_size";
 
-type RangeSpec = {
-  min: number;
-  max: number;
-};
-
 type SettingsState = Record<SettingsKey, number | "">;
 
-type FieldProps = {
+type GameSettingsModel = {
+  ball_speed?: number | null;
+  score_limit?: number | null;
+  paddle_size?: number | null;
+  game_mode?: string | null;
+};
+
+// These must exist in your file already; keeping as-is assumptions:
+declare const SETTINGS_FIELDS: Array<{ key: SettingsKey; label: string }>;
+declare const RANGES: Record<SettingsKey, { min: number; max: number }>;
+declare const MAPS: Array<{ id: string; [k: string]: unknown }>;
+declare function clampNum(v: unknown): number;
+declare function Field(props: {
   label: string;
   rangeText: string;
   value: number | "";
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string;
-};
-
-type MapCardProps = {
-  map: MapDefinition;
+}): React.JSX.Element;
+declare function MapCard(props: {
+  map: { id: string; [k: string]: unknown };
   isActive: boolean;
   isHovered: boolean;
   onEnter: () => void;
   onLeave: () => void;
   onSelect: () => void;
-};
+}): React.JSX.Element;
 
-const MAPS: MapDefinition[] = [
-  { id: "desert", label: "DESERT", image: "/maps/desert.png" },
-  { id: "hell", label: "HELL", image: "/maps/hell.png" },
-  { id: "ocean", label: "OCÉAN", image: "/maps/water.png" },
-  { id: "forest", label: "FOREST", image: "/maps/forest.jpeg" },
-  { id: "snow", label: "SNOW", image: "/maps/snow.jpeg" },
-  { id: "space", label: "SPACE", image: "/maps/space.png" },
-];
+// ─────────────────────────────────────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────────────────────────────────────
 
-const RANGES: Record<SettingsKey, RangeSpec> = {
-  ball_speed: { min: 1, max: 3 },
-  score_limit: { min: 5, max: 20 },
-  paddle_size: { min: 1, max: 3 },
-};
+function toGameSettingsModel(input: unknown): GameSettingsModel | null {
+  if (!input) return null;
 
-const SETTINGS_FIELDS: Array<{ key: SettingsKey; label: string }> = [
-  { key: "ball_speed", label: "Ball speed" },
-  { key: "score_limit", label: "Score limit" },
-  { key: "paddle_size", label: "Paddle size" },
-];
+  // if backend returned array, take first element
+  const candidate = Array.isArray(input) ? input[0] : input;
 
-const clampNum = (v: unknown): number => {
-  const n = Number(v);
-  return Number.isFinite(n) ? n : NaN;
-};
+  if (!candidate || typeof candidate !== "object") return null;
 
-function Field({ label, rangeText, value, onChange, error }: FieldProps) {
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="flex justify-between text-sm">
-        <span className="font-semibold">{label}</span>
-        <span className="text-white/40 text-xs">{rangeText}</span>
-      </div>
+  const obj = candidate as Record<string, unknown>;
 
-      <input
-        type="number"
-        value={value === "" ? "" : Number(value)}
-        onChange={onChange}
-        className={`h-12 px-4 rounded-xl bg-white/10 backdrop-blur-md text-white text-sm placeholder:text-white/25 focus:outline-none ring-1 transition
-          ${error ? "ring-red-500/80 focus:ring-red-500/90" : "ring-white/10 focus:ring-white/30"}`}
-      />
-
-      {error && <p className="text-[11px] text-red-400/90">{error}</p>}
-    </div>
-  );
+  return {
+    ball_speed: typeof obj.ball_speed === "number" ? obj.ball_speed : null,
+    score_limit: typeof obj.score_limit === "number" ? obj.score_limit : null,
+    paddle_size: typeof obj.paddle_size === "number" ? obj.paddle_size : null,
+    game_mode: typeof obj.game_mode === "string" ? obj.game_mode : null,
+  };
 }
 
-function MapCard({ map, isActive, isHovered, onEnter, onLeave, onSelect }: MapCardProps) {
-  return (
-    <button
-      type="button"
-      onMouseEnter={onEnter}
-      onMouseLeave={onLeave}
-      onClick={onSelect}
-      className={`relative h-40 rounded-2xl overflow-hidden text-left transition-transform duration-200
-        ${isActive ? "ring-2 ring-white/50" : "ring-1 ring-white/10"}
-        hover:scale-[1.01] focus:outline-none`}
-    >
-      <div
-        className={`absolute inset-0 bg-cover bg-center transition duration-300
-          ${isActive || isHovered ? "grayscale-0" : "grayscale"}
-          ${isActive || isHovered ? "opacity-100" : "opacity-70"}`}
-        style={{ backgroundImage: `url(${map.image})` }}
-      />
-
-      <div
-        className={`absolute inset-0 flex items-center justify-center transition duration-300
-          ${isActive || isHovered ? "bg-black/25" : "bg-black/50"}`}
-      >
-        <span className="text-2xl font-extrabold tracking-wide italic">
-          {map.label}
-        </span>
-      </div>
-
-      {isActive && (
-        <div className="absolute top-3 right-3 text-[10px] px-2 py-1 rounded-full bg-white/15 backdrop-blur-md">
-          Selected
-        </div>
-      )}
-    </button>
-  );
-}
+// ─────────────────────────────────────────────────────────────────────────────
+// Component
+// ─────────────────────────────────────────────────────────────────────────────
 
 export default function GameSettings() {
   const { gameSetting, updateGameSettings } = useAuth();
 
+  // ✅ normalize gameSetting (array/object/null) into a single typed object
+  const gs = useMemo(() => toGameSettingsModel(gameSetting), [gameSetting]);
+
   const [hoveredMap, setHoveredMap] = useState<string | null>(null);
-  const [selectedMap, setSelectedMap] = useState<string | null>(
-    (gameSetting?.game_mode as string | undefined) ?? null
-  );
+
+  const [selectedMap, setSelectedMap] = useState<string | null>(gs?.game_mode ?? null);
 
   const [userData, setUserData] = useState<SettingsState>({
-    ball_speed: (gameSetting?.ball_speed as number | undefined) ?? "",
-    score_limit: (gameSetting?.score_limit as number | undefined) ?? "",
-    paddle_size: (gameSetting?.paddle_size as number | undefined) ?? "",
+    ball_speed: gs?.ball_speed ?? "",
+    score_limit: gs?.score_limit ?? "",
+    paddle_size: gs?.paddle_size ?? "",
   });
+
+  // If game settings load async and you want the UI to update when they arrive:
+  // (optional but usually desired)
+  React.useEffect(() => {
+    setSelectedMap(gs?.game_mode ?? null);
+    setUserData({
+      ball_speed: gs?.ball_speed ?? "",
+      score_limit: gs?.score_limit ?? "",
+      paddle_size: gs?.paddle_size ?? "",
+    });
+    // only when gs changes
+  }, [gs]);
 
   const errors = useMemo<Partial<Record<SettingsKey, string>>>(() => {
     const error: Partial<Record<SettingsKey, string>> = {};
 
     const ballSpeed = clampNum(userData.ball_speed);
-    if (!Number.isInteger(ballSpeed) || ballSpeed < RANGES.ball_speed.min || ballSpeed > RANGES.ball_speed.max)
+    if (
+      !Number.isInteger(ballSpeed) ||
+      ballSpeed < RANGES.ball_speed.min ||
+      ballSpeed > RANGES.ball_speed.max
+    ) {
       error.ball_speed = `Ball speed must be between ${RANGES.ball_speed.min} and ${RANGES.ball_speed.max}`;
+    }
 
     const scoreLimit = clampNum(userData.score_limit);
-    if (!Number.isInteger(scoreLimit) || scoreLimit < RANGES.score_limit.min || scoreLimit > RANGES.score_limit.max)
+    if (
+      !Number.isInteger(scoreLimit) ||
+      scoreLimit < RANGES.score_limit.min ||
+      scoreLimit > RANGES.score_limit.max
+    ) {
       error.score_limit = `Score limit must be between ${RANGES.score_limit.min} and ${RANGES.score_limit.max}`;
+    }
 
     const paddleSize = clampNum(userData.paddle_size);
-    if (!Number.isInteger(paddleSize) || paddleSize < RANGES.paddle_size.min || paddleSize > RANGES.paddle_size.max)
+    if (
+      !Number.isInteger(paddleSize) ||
+      paddleSize < RANGES.paddle_size.min ||
+      paddleSize > RANGES.paddle_size.max
+    ) {
       error.paddle_size = `Paddle size must be between ${RANGES.paddle_size.min} and ${RANGES.paddle_size.max}`;
+    }
 
-    return (error);
+    return error;
   }, [userData]);
 
   const hasErrors = Object.keys(errors).length > 0;
 
   const baseline = useMemo(() => {
     return {
-      ball_speed: gameSetting?.ball_speed,
-      score_limit: gameSetting?.score_limit,
-      paddle_size: gameSetting?.paddle_size,
-      selectedMap: gameSetting?.game_mode,
+      ball_speed: gs?.ball_speed ?? "",
+      score_limit: gs?.score_limit ?? "",
+      paddle_size: gs?.paddle_size ?? "",
+      selectedMap: gs?.game_mode ?? null,
     };
-  }, [gameSetting]);
+  }, [gs]);
 
   const hasChanges = useMemo(() => {
-    return (userData.ball_speed !== baseline.ball_speed || userData.score_limit !== baseline.score_limit ||
-      userData.paddle_size !== baseline.paddle_size || selectedMap !== baseline.selectedMap
+    return (
+      userData.ball_speed !== baseline.ball_speed ||
+      userData.score_limit !== baseline.score_limit ||
+      userData.paddle_size !== baseline.paddle_size ||
+      selectedMap !== baseline.selectedMap
     );
   }, [userData, selectedMap, baseline]);
 
@@ -187,8 +166,10 @@ export default function GameSettings() {
   const onSave = useCallback(() => {
     if (!canSave) return;
 
-    const payload = {
-      ...userData,
+    const payload: GameSettingsModel = {
+      ball_speed: userData.ball_speed === "" ? null : Number(userData.ball_speed),
+      score_limit: userData.score_limit === "" ? null : Number(userData.score_limit),
+      paddle_size: userData.paddle_size === "" ? null : Number(userData.paddle_size),
       game_mode: selectedMap,
     };
 
@@ -201,8 +182,7 @@ export default function GameSettings() {
       <div className="text-center max-w-2xl mx-auto mb-12">
         <h1 className="text-2xl font-bold mb-2">Game setting</h1>
         <p className="text-sm text-white/60">
-          Customize your game settings to create a smoother, more enjoyable, and
-          personalized gaming experience.
+          Customize your game settings to create a smoother, more enjoyable, and personalized gaming experience.
         </p>
       </div>
 
@@ -247,12 +227,9 @@ export default function GameSettings() {
           type="button"
           onClick={onSave}
           disabled={!canSave}
-          className={`px-10 py-3 rounded-lg transition text-sm font-semibold
-            ${
-              canSave
-                ? "bg-black hover:bg-black/30"
-                : "bg-[#414141]/60 text-white/60 cursor-not-allowed"
-            }`}
+          className={`px-10 py-3 rounded-lg transition text-sm font-semibold ${
+            canSave ? "bg-black hover:bg-black/30" : "bg-[#414141]/60 text-white/60 cursor-not-allowed"
+          }`}
         >
           Save Changes
         </button>

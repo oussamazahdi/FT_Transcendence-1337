@@ -5,14 +5,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { GameUtiles } from "./utils";
 import { GAME_MODE, GAME_WIDTH, GAME_HEIGHT } from "@/components/ui/GameMode";
 import { useAuth } from "@/contexts/authContext";
+import NextImage from "next/image";
 
 /**
- * What this version adds (tournament mode):
- * - When gameOver === true AND urlMode === "tournament" AND matchId exists:
- *   1) store match result in localStorage ("tournament:state")
- *   2) after 3 seconds redirect back to Tournament page
- *
- * Adjust this if your tournament page route is different:
+ * Tournament redirect route
  */
 const TOURNAMENT_PAGE_ROUTE = "/game/pingPong/tournament";
 
@@ -79,7 +75,8 @@ type GameUtilesType = {
   handleScoring: (
     state: GameState,
     setScore1: React.Dispatch<React.SetStateAction<number>>,
-    setScore2: React.Dispatch<React.SetStateAction<number>>
+    setScore2: React.Dispatch<React.SetStateAction<number>>,
+    baseBallSpeed: number
   ) => void;
   ballCollisions: (state: GameState) => void;
   paddleMovement: (state: GameState) => void;
@@ -189,13 +186,7 @@ function advanceLocks(state: TournamentState): TournamentState {
   return next;
 }
 
-function setMatchResult(
-  state: TournamentState,
-  matchId: string,
-  scoreA: number,
-  scoreB: number
-): TournamentState {
-  // no draws
+function setMatchResult(state: TournamentState, matchId: string, scoreA: number, scoreB: number): TournamentState {
   if (scoreA === scoreB) return state;
 
   const next = structuredClone(state);
@@ -220,13 +211,25 @@ let bgReady = false;
 
 export function preloadBackground(imageUrl?: string | null) {
   if (!imageUrl) return;
-  if (gameMapImg && gameMapImg.src === imageUrl) return;
+
+  // prevent re-loading same URL
+  if (gameMapImg?.src === imageUrl) return;
 
   bgReady = false;
-  gameMapImg = new Image();
-  gameMapImg.src = imageUrl;
-  gameMapImg.onload = () => (bgReady = true);
-  gameMapImg.onerror = () => (bgReady = false);
+
+  // IMPORTANT: use browser Image constructor, not NextImage component
+  if (typeof window === "undefined") return;
+
+  const img = new window.Image();
+  img.src = imageUrl;
+  img.onload = () => {
+    bgReady = true;
+  };
+  img.onerror = () => {
+    bgReady = false;
+  };
+
+  gameMapImg = img;
 }
 
 export function getBackgroundImage(): BackgroundImage {
@@ -322,7 +325,6 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // from URL: /game/pingPong/local?mode=tournament&matchId=123
   const urlMode = searchParams.get("mode"); // "tournament"
   const matchId = searchParams.get("matchId"); // string | null
 
@@ -371,10 +373,49 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
     });
   }, []);
 
-  // Re-init on dependencies
+  function tournamentPlayerToInput(p: TournamentPlayer): PlayerInput {
+    return {
+      username: p.username,
+      nickName: p.displayName || p.username,
+      avatar: p.avatarUrl ?? undefined,
+    };
+  }
+
+  const [tournamentPlayers, setTournamentPlayers] = useState<{ p1: PlayerInput | null; p2: PlayerInput | null }>({
+    p1: null,
+    p2: null,
+  });
+
   useEffect(() => {
+    if (urlMode !== "tournament" || !matchId) {
+      setTournamentPlayers({ p1: null, p2: null });
+      return;
+    }
+
+    const existing = safeParse<TournamentState>(localStorage.getItem("tournament:state"));
+    if (!existing) {
+      setTournamentPlayers({ p1: null, p2: null });
+      return;
+    }
+
+    const match = findTournamentMatch(existing, matchId);
+    if (!match) {
+      setTournamentPlayers({ p1: null, p2: null });
+      return;
+    }
+
+    const p1 = tournamentPlayerToInput(match.a);
+    const p2 = tournamentPlayerToInput(match.b);
+
+    setTournamentPlayers({ p1, p2 });
+  }, [urlMode, matchId]);
+
+  useEffect(() => {
+    const effectiveP1 = urlMode === "tournament" ? tournamentPlayers.p1 : player1;
+    const effectiveP2 = urlMode === "tournament" ? tournamentPlayers.p2 : player2;
+
     gameStateRef.current = initGameState({ gameSetting, mode, scoreLimitOverride });
-    setPlayers(buildPlayers({ player1, player2, mode }));
+    setPlayers(buildPlayers({ player1: effectiveP1, player2: effectiveP2, mode }));
 
     setScore1(0);
     setScore2(0);
@@ -384,9 +425,8 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
     isPauseRef.current = false;
 
     storedResultRef.current = false;
-  }, [player1, player2, gameSetting, mode, scoreLimitOverride]);
+  }, [player1, player2, tournamentPlayers, urlMode, gameSetting, mode, scoreLimitOverride]);
 
-  // Decide game over based on score limit in state
   useEffect(() => {
     const limit = gameStateRef.current.scoreLimit;
     if (score1 >= limit) {
@@ -398,7 +438,6 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
     }
   }, [score1, score2, players]);
 
-  // Main loop
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -422,7 +461,7 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
 
         GameUtilesTyped.paddleMovement(state);
         GameUtilesTyped.ballCollisions(state);
-        GameUtilesTyped.handleScoring(state, setScore1, setScore2);
+        GameUtilesTyped.handleScoring(state, setScore1, setScore2, gameSetting?.ball_speed ?? 2);
         GameUtilesTyped.ballMovement(state);
 
         GameUtilesTyped.drawLocalFrame(context, state, players, getBackgroundImage());
@@ -438,16 +477,14 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
       window.removeEventListener("keyup", onKeyUp);
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
-  }, [players, gameOver, togglePause]);
+  }, [players, gameOver, togglePause, gameSetting?.ball_speed]);
 
-  // ✅ Tournament: store match result + redirect after 3s
   useEffect(() => {
     if (!gameOver) return;
     if (urlMode !== "tournament") return;
     if (!matchId) return;
     if (storedResultRef.current) return;
 
-    // prevent double-write
     storedResultRef.current = true;
 
     const existing = safeParse<TournamentState>(localStorage.getItem("tournament:state"));
@@ -468,9 +505,11 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
       <div className="relative inset-x-0 flex flex-col items-center text-white space-y-6">
         <div className="flex flex-row items-center justify-between w-full lg:max-w-5xl px-5">
           <div className="flex gap-1 flex-col items-center">
-            <img
+            <NextImage
               src={players.player1.avatar}
               alt="player 1 avatar"
+              width={80}
+              height={80}
               className="w-20 h-20 rounded-lg object-cover"
             />
             <h3 className="text-2xl font-semibold">{players.player1.nickName}</h3>
@@ -483,17 +522,17 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
             {gameOver ? (
               <div className="mt-2 flex flex-col items-center gap-1">
                 <p className="text-sm text-[#BDBDBD]">{winner ? `${winner} wins` : "Game over"}</p>
-                {urlMode === "tournament" ? (
-                  <p className="text-xs text-white/60">Returning to tournament in 3 seconds…</p>
-                ) : null}
+                {urlMode === "tournament" ? <p className="text-xs text-white/60">Returning to tournament in 3 seconds…</p> : null}
               </div>
             ) : null}
           </div>
 
           <div className="flex gap-1 flex-col items-center">
-            <img
+            <NextImage
               src={players.player2.avatar}
               alt="player 2 avatar"
+              width={80}
+              height={80}
               className="w-20 h-20 rounded-lg object-cover"
             />
             <h3 className="text-2xl font-semibold">{players.player2.nickName}</h3>
@@ -506,7 +545,7 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
             ref={canvasRef}
             width={gameStateRef.current.board.width}
             height={gameStateRef.current.board.height}
-            className="w-full max-w-240 rounded-2xl border border-white/20"
+            className="w-full max-w-240 rounded-2xl border border-white/20 "
           />
         </div>
 
@@ -516,6 +555,7 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
             onClick={togglePause}
             disabled={gameOver}
             title={gameOver ? "Game finished" : undefined}
+            type="button"
           >
             {isPause ? "Resume" : "Pause"}
           </button>

@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 type Player = {
   username: string;
   firstname?: string;
@@ -17,10 +19,14 @@ export function PlayerCard({ player }: { player: Player }) {
   const firstName = player.firstName ?? player.firstname ?? "";
   const lastName = player.lastName ?? player.lastname;
 
+	const avatarSrc = player?.avatar ?? "/game/gameAvatars/Empty.jpeg";
+
   return (
     <div className="flex flex-col items-center">
-      <img
-        src={player.avatar}
+      <Image
+        src={avatarSrc}
+				alt={"player avatar"}
+				width={14}
         className="w-14 h-14 rounded-lg object-cover"
       />
       <p className="font-semibold">

@@ -120,7 +120,7 @@ export default function ChatWindow({ selectedFriend, updateLastMessage}: ChatWin
       socket.off("chat:receiver");
       socket.off("chat:error");
     };
-  }, [socket, Friend, updateLastMessage]);
+  }, [socket, Friend, updateLastMessage, triggerError]);
 
   const handleSend = (content: string) => {
     const tmpMessage: ChatMessage = {
