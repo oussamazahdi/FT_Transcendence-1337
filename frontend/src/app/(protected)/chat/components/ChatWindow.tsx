@@ -8,16 +8,7 @@ import { useSocket } from "@/contexts/socketContext";
 import { autofetch } from "@/lib/api";
 import type { SelectedFriend } from "@/contexts/userContexts";
 import { CHAT_ERROR } from "@/lib/utils";
-
-export type ChatMessage = {
-  id: number | string;
-  senderId: number | string;
-  avatar?: string | null;
-  type: "text" | "game-invite";
-  text: string;
-  timestamp: string;
-  isMe: boolean;
-};
+import { ChatMessage } from "@/types";
 
 interface ChatWindowProps {
   selectedFriend: SelectedFriend;
@@ -64,13 +55,15 @@ export default function ChatWindow({selectedFriend, updateLastMessage, liveMessa
           throw new Error(data.error);
 
         const newMessages = data.messages || [];
-        if (newMessages.length < 30) setHasMore(false);
+        if (newMessages.length < 30) 
+          setHasMore(false);
 
+        console.log(newMessages);
         const formatedData: ChatMessage[] = newMessages.map((message: any) => ({
           id: message.message_id,
           senderId: message.sender_id,
           avatar: message.avatar,
-          type: "text",
+          type: message.type,
           text: message.content,
           timestamp: message.creationdate,
           isMe: String(user?.id) === String(message.sender_id),
@@ -132,14 +125,15 @@ export default function ChatWindow({selectedFriend, updateLastMessage, liveMessa
     };
   }, [socket, triggerError, updateLastMessage]);
 
-  const handleSend = (content: string) => {
+  const handleSend = (content: string, type: string) => {
     const now = new Date();
 
     const tmpMessage: ChatMessage = {
       id: `tmp-${now.getTime()}`,
       senderId: user?.id || "",
+      receiverId: selectedFriend.id,
       avatar: user?.avatar || null,
-      type: "text",
+      type: type,
       text: content,
       timestamp: now.toISOString(),
       isMe: true,
@@ -151,6 +145,7 @@ export default function ChatWindow({selectedFriend, updateLastMessage, liveMessa
       return;
     socket.emit("chat:send", {
       receiverId: Friend.id,
+      type: type,
       content,
     });
   };

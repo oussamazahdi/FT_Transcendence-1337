@@ -6,20 +6,10 @@ import { SelectedFriendContext, type SelectedFriend } from "@/contexts/userConte
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/authContext";
 import { useSocket } from "@/contexts/socketContext";
-import type { Conversation } from "@/types";
-
-type ChatMessage = {
-  id: number | string;
-  senderId: number | string;
-  avatar?: string | null;
-  type: "text";
-  text: string;
-  timestamp: string;
-  isMe: boolean;
-};
+import type { Conversation, ChatMessage } from "@/types";
 
 export default function Chat() {
-  const { friends, user } = useAuth();
+  const { friends } = useAuth();
   const socket = useSocket();
   const [selectedFriend, setSelectedFriend] = useState<SelectedFriend | null>(null);
   const [displayData, setDisplayData] = useState<Conversation[]>([]);
@@ -109,8 +99,9 @@ export default function Chat() {
         const msg: ChatMessage = {
           id: payload.msgId,
           senderId: payload.senderId,
+          receiverId: payload.receiverId,
           avatar: payload.avatar,
-          type: "text",
+          type: payload.type,
           text: payload.content,
           timestamp: payload.sentAt,
           isMe: false,

@@ -10,7 +10,6 @@ export class LeaderboardController {
         const pageNum = Math.max(1, Number(page));
         const offset = (pageNum - 1) * limit;
         try {
-
             const results = leaderboardModels.getPlayerByRanking(db, limit, offset);
             const count = leaderboardModels.countUsers(db);
             

@@ -1,6 +1,6 @@
 // needs more understanding
 export const corsConfig = {
-        origin: ['http://localhost:3000'],
+        origin: [process.env.FRONTEND_URL,`http://localhost:${process.env.FRONTEND_PORT}`],
         methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
         allowedHeaders: ['Content-Type','Authorization'],
         credentials: true,

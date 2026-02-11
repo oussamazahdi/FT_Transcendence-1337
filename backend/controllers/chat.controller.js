@@ -68,14 +68,10 @@ export class ChatController
         const senderId = socket.user.userId;
         const db = server.db;
         try {
-            if (!data.receiverId){
-               socket.emit("chat:error", {message: "NO_RECEIVER_PROVIDED"});
-                return;
-            }
-            if (data.content.length > 500 || !data.content){
-                socket.emit("chat:error", {message: "SOMETHING_WRONG_WITH_MESSAGE"});
-                return ; 
-            }
+            if (!data.receiverId)
+                return (socket.emit("chat:error", {message: "NO_RECEIVER_PROVIDED"}));
+            if (data.content.length > 500 || !data.content)
+                return (socket.emit("chat:error", {message: "SOMETHING_WRONG_WITH_MESSAGE"}));
             const receiverId = data.receiverId;
             const friendshipStatus = friendsModels.isFriendshipExists(db, senderId, receiverId);
             const blocked = friendsModels.isBlockedByUser(db, senderId, receiverId);
@@ -84,13 +80,15 @@ export class ChatController
             if (senderId === receiverId)
                 return socket.emit("chat:error", {message: "NOT_ALLOWED_TO_CONTACT_YOURSELF"});
             const convId = chatModels.getOrCreateConversationId(db, senderId, receiverId);
-            const msgId = chatModels.createNewMessage(db, convId, senderId, data.content);
+            const msgId = chatModels.createNewMessage(db, convId, senderId, data.type, data.content);
             chatModels.UpdateLastMessage(db, senderId, receiverId);
             const conversation = chatModels.getConversationById(db, senderId, convId);
             const payload = {
                 msgId: msgId,
                 senderId: senderId,
+                receiverId: receiverId,
                 avatar: conversation.avatar,
+                type: data.type,
                 content: conversation.last_message,
                 sentAt: conversation.updatedate
             }
@@ -98,8 +96,7 @@ export class ChatController
         }
         catch(error) {
                 socket.emit("chat:error", { message: error.message || "Internal Server Error" });
-        }
-        console.log(senderId, data.content);
+        } 
     }
 }
 

@@ -7,7 +7,7 @@ import { tokenModels } from "../models/token.model.js";
 export function initializeSocketes(app) {
   const io = new Server(app.server, {
     cors: {
-      origin: "http://localhost:3000",
+      origin: [process.env.FRONTEND_URL,`http://localhost:${process.env.FRONTEND_PORT}`],
       methods: ["GET", "POST"],
       credentials: true,
     },

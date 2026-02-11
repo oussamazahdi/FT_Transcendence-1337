@@ -7,7 +7,7 @@ import type { SelectedFriend } from "@/contexts/userContexts";
 
 interface ChatInputProps {
   friend: SelectedFriend;
-  onSend: (message: string) => void;
+  onSend: (message: string, type: string) => void;
 }
 
 const ChatInput = ({ onSend, friend }: ChatInputProps) => {
@@ -18,10 +18,16 @@ const ChatInput = ({ onSend, friend }: ChatInputProps) => {
   const isFriend = friends.some((user) => user.id == friend.id);
 
   const handleSendMessage = () => {
-    if (!inputValue.trim()) return;
-    onSend(inputValue);
+    if (!inputValue.trim()) 
+      return;
+    onSend(inputValue, "text_message");
     setInputValue("");
   };
+
+  const handleGameInvite = () => {
+    const content = "1vs1 game invite"
+    onSend(content, "game_invite")
+  }
 
   const handleKeyDown = (e:React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") 
@@ -59,7 +65,7 @@ const ChatInput = ({ onSend, friend }: ChatInputProps) => {
           <PaperAirplaneIcon className="size-4 text-[#FFFFFF]/50 group-hover:text-white" />
         </button>
         <button className="group bg-[#0F0F0F]/65 hover:bg-[#0F0F0F] rounded-sm h-10 w-10 flex items-center justify-center cursor-pointer transition">
-          <Gamepad2Icon className="size-4 text-[#FFFFFF]/50 group-hover:text-white" />
+          <Gamepad2Icon onClick={handleGameInvite} className="size-4 text-[#FFFFFF]/50 group-hover:text-white" />
         </button>
       </div>
     )}

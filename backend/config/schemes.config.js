@@ -200,6 +200,7 @@ export const messageSchema = {
     properties: {
         message_id: { type: 'integer' },
         sender_id: { type: 'integer' },
+        type: {type: 'string'},
         avatar: { type: ['string', 'null'] },
         content: { type: 'string' },
         creationdate: { type: 'string' }
@@ -316,31 +317,34 @@ export const matchHistoryResponse = {
 // notifs
 
 export const notificationSchema = {
-    type: 'object',
-    properties: {
-        id: { type: 'integer' },
-        sender_id: { type: 'integer' },
-        receiver_id: { type: 'integer' },
-        type: { type: 'string' },
-        title: { type: 'string' },
-        message: { type: 'string' },
-        payload: { type: ['object', 'null'] },
-        status: { type: 'string' },
-        is_read: { type: 'integer' },
-        expires_at: { type: ['string', 'null'] },
-        created_at: { type: 'string' }
-    }
+	type: "object",
+	properties: {
+		id: { type: "integer" },
+		sender_id: { type: "integer" },
+		receiver_id: { type: "integer" },
+		type: { type: "string" },
+		title: { type: "string" },
+		message: { type: "string" },
+		payload: { type: ["object", "null"] },
+		status: { type: "string" },
+		is_read: { type: "integer" },
+		expires_at: { type: ["string", "null"] },
+		created_at: { type: "string" },
+		is_expired: { type: "integer", enum: [0, 1] },
+		sender_username: { type: ["string", "null"] },
+    sender_avatar: { type: ["string", "null"], format: "uri" }
+	}
 };
 
 export const notificationsSuccessResponse = {
-    type: 'object',
-    properties: {
-        message: { type: 'string' },
-        userData: {
-            type: 'array',
-            items: notificationSchema
-        }
+  type: "object",
+  properties: {
+    message: { type: "string" },
+    notifications: {
+      type: "array",
+      items: notificationSchema
     }
+  }
 };
 
 export const unreadCountResponse = {
@@ -360,7 +364,7 @@ export const leaderboardSchema = {
         firstname: { type: 'string' },
         lastname: { type: 'string' },
         player_xp: { type: ['integer'] },
-        player_level: { type: ['integer'] },
+        player_level: { type: ['number'] },
         wins: { type: ['integer'] },
         loses: { type: ['integer'] },
         forfaits: { type: ['integer'] }

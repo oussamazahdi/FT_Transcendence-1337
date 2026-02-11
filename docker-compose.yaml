@@ -1,28 +1,52 @@
-services:
-  backend:
-    build: ./backend
-    ports:
-      - "3001:3001"
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
-    env_file:
-      - .env
-    networks:
-      - transcendence
-
-  frontend:
-    frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: ft_frontend
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-    restart: unless-stopped
+volumes:
+  sqlite_database:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./backend/database/
 
 networks:
   transcendence:
     driver: bridge
+  
+services:
+
+  backend:
+    build: ./backend
+    # ports:
+    #   - "3001:3001"
+    volumes:
+      - sqlite_database:/app/database
+    env_file:
+      - .env
+    networks:
+      - transcendence
+    restart: unless-stopped
+
+  frontend:
+    build: 
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    # ports:
+    #   - "3000:3000"
+    env_file:
+      - .env
+    networks:
+      - transcendence
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - transcendence
+
+

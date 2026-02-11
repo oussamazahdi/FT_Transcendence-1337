@@ -31,6 +31,17 @@ export type Conversation = {
   status: boolean;
 };
 
+export type ChatMessage = {
+  id: number | string;
+  senderId: number | string;
+  receiverId: number | string;
+  avatar?: string | null;
+  type: string;
+  text: string;
+  timestamp: string;
+  isMe: boolean;
+};
+
 export interface Leaders{
     id:number,
     username:string,
@@ -114,4 +125,5 @@ export interface fullUser{
   pendingRequests: any,
   incomingRequests: any,
   gameSetting: any,
+  notification: any,
 }

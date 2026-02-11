@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { EllipsisVertical } from "lucide-react";
 import Image from "next/image";
 import { ChevronLeftIcon, UserIcon, XCircleIcon } from "@heroicons/react/24/outline";
@@ -7,6 +7,7 @@ import BlockUserPopUp from "./BlockUserPopUp.tsx";
 import { assets } from "@/assets/data";
 import { useSelectedFriend } from "@/contexts/userContexts";
 import type { SelectedFriend } from "@/contexts/userContexts";
+import { useStatus } from "@/contexts/socketContext.tsx";
 
 interface ChatHeaderProp { user:SelectedFriend }
 
@@ -14,6 +15,10 @@ const ChatHeader = ({ user }: ChatHeaderProp) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showConfirm, setShowconfirm] = useState(false);
   const { setSelectedFriend } = useSelectedFriend();
+
+  const onlineSet = useStatus();
+  const isOnline = onlineSet.has(String(user.id));
+  const status = isOnline ? "Online" : "Offline";
 
   return (
     <div className="relative bg-[#0F0F0F]/65 flex items-center p-1 rounded-lg gap-1">
@@ -32,10 +37,10 @@ const ChatHeader = ({ user }: ChatHeaderProp) => {
         <div className="flex items-center text-[9px] text-gray-500">
           <div
             className={`w-1.5 h-1.5 rounded-full mr-1 shrink-0 ${
-              user.status ? "bg-[#42A78A]" : "bg-[#B23B3B]"
+              isOnline ? "bg-[#42A78A]" : "bg-[#B23B3B]"
             }`}
           />
-          {user.status ? <p>Online</p> : <p>Offline</p>}
+          <p>{status}</p>
         </div>
       </div>
       <div className="ml-auto">

@@ -13,7 +13,7 @@ export default function Sidebar() {
     { id: "personal-information", label: "Personal information", icon: UserIcon,},
     { id: "blocked-users", label: "Bolcked users", icon: NoSymbolIcon },
     { id: "security", label: "Security", icon: LockClosedIcon },
-    { id: "Game-setiings", label: "Game setting", icon: WrenchScrewdriverIcon },
+    { id: "Game-settings", label: "Game setting", icon: WrenchScrewdriverIcon },
   ];
 
   return (

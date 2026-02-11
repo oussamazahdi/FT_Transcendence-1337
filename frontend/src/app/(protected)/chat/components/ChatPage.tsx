@@ -1,8 +1,9 @@
 "use client";
 
 import WelcomeScreen from "./WelcomeScreen";
-import ChatWindow, { type ChatMessage } from "./ChatWindow";
+import ChatWindow from "./ChatWindow";
 import { useSelectedFriend, type SelectedFriend } from "@/contexts/userContexts";
+import { ChatMessage } from "@/types";
 
 interface ChatPageProps {
   updateLastMessage: (lastmessage: string, time: string, friend: SelectedFriend) => void;

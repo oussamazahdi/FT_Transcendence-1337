@@ -45,16 +45,19 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
   const [incomingRequest, setIncomingRequests] = useState<any[]>(initialUser?.incomingRequests || []);
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [gameSetting, setGameSetting] = useState<any>(initialUser?.gameSetting || [])
+  const [notification, setNotification] = useState<any[]>(initialUser?.notification || []);
   const router = useRouter();
 
   const refreshFriendReq = useCallback(async () => {
     try {
-      const [incomreqRes, pendReqRes, friendsRes, blockedRes, playerSettingsRes] = await Promise.all([
+      const [incomreqRes, pendReqRes, friendsRes, blockedRes, playerSettingsRes, notificationsRes] = await Promise.all([
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests`, { credentials: "include" }),
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/sent`, { credentials: "include" }),
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/`, { credentials: "include" }),
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks`, { credentials: "include" }),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/game/settings`, { credentials: "include" })
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/game/settings`, { credentials: "include" }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notifications`, { credentials: "include" })
+
       ]);
 
       if (incomreqRes.ok) {
@@ -80,6 +83,11 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
       if (playerSettingsRes.ok) {
         const data = await playerSettingsRes.json();
         setGameSetting(data.settings || []);
+      }
+
+      if (notificationsRes.ok) {
+        const data = await notificationsRes.json();
+        setNotification(data?.userData || []);
       }
 
     } catch (err) {
@@ -313,7 +321,7 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
 
   return (
     <UserCtx.Provider
-      value= {{globalError, user, friends, pendingRequests, incomingRequest, blocked, setUser, triggerError, login, logout, updateUser, sendFriendRequest, cancelRequest, acceptRequest, removeFriend, setFriends, blockUser, deblockUser, refreshFriendReq, gameSetting, updateGameSettings,}}>
+      value= {{globalError, user, friends, pendingRequests, incomingRequest, blocked, setUser, triggerError, login, logout, updateUser, sendFriendRequest, cancelRequest, acceptRequest, removeFriend, setFriends, blockUser, deblockUser, refreshFriendReq, gameSetting, updateGameSettings, notification, setNotification}}>
        { children }
     </UserCtx.Provider>
   );
