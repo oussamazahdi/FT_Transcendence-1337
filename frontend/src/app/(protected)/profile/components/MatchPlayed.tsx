@@ -103,7 +103,7 @@ const MatchesPlayed = () => {
   };
 
   return (
-    <div className="bg-[#0F0F0F]/75 rounded-[20px] flex-1 min-h-75 p-4">
+    <div className="bg-[#0F0F0F]/75 rounded-[20px] flex-1 h-full min-h-[220px] md:min-h-0 p-4">
       <Bar options={options} data={data} />
     </div>
   );

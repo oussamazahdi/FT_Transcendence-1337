@@ -15,19 +15,20 @@ export default function ProfilePage() {
   },[refreshFriendReq])
   
   return (
-    <div className="flex w-full max-w-7xl flex-col md:flex-row gap-4 h-auto md:h-[86vh] overflow-y-auto">
-      <div className="flex flex-col w-full md:flex-1 md:basis-7/10 gap-4">
-        <Profile user={user} className="" />
-        <div className="flex flex-col md:flex-row flex-1 justify-between gap-4 w-full">
-          <MatchPlayed />
-          <WinRate />
-        </div>
-      </div>
-      <div className="w-full md:basis-3/10 flex flex-col gap-4 h-auto md:h-full">
-        <Friends classname="w-full h-100 md:h-auto md:flex-1" />
-        <MatchHistory classname="w-full h-100 md:h-auto md:flex-1" />
+    <div className="grid w-full max-w-7xl grid-cols-1 gap-4 md:h-[86vh] md:grid-cols-12 md:grid-rows-[repeat(2,minmax(0,1fr))]">
+      <div className="min-w-0 md:col-span-8 md:row-start-1">
+        <Profile user={user} className="h-full" aspect="aspect-4/1" />
       </div>
 
+      <div className="grid min-w-0 grid-cols-1 gap-4 md:col-span-8 md:row-start-2 md:grid-cols-2">
+        <MatchPlayed />
+        <WinRate />
+      </div>
+
+      <div className="grid min-w-0 h-full grid-rows-2 gap-4 md:col-span-4 md:col-start-9 md:row-span-2">
+        <Friends classname="h-full min-h-0" />
+        <MatchHistory classname="h-full min-h-0" />
+      </div>
     </div>
   );
 }

@@ -65,7 +65,7 @@ const MessageBubble = (props:MessageBubble) => {
         </div>
       ) : (
         <div
-          className={`flex flex-col gap-3 max-w-[70%] p-2 rounded-xl text-xs ${
+          className={`flex flex-col gap-3 max-w-[70%] p-2 rounded-xl text-xs m-1 ${
             props.isMe
               ? "bg-[#595959]/65 text-white"
               : "bg-[#0F0F0F]/65 text-white"

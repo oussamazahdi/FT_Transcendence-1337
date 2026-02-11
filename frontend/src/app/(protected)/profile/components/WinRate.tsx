@@ -112,7 +112,7 @@ const WinRate = () => {
     ]
   }
   return (
-    <div className="bg-[#0F0F0F]/75 rounded-[20px] flex-1 max-h-97.25 p-2">
+    <div className="bg-[#0F0F0F]/75 rounded-[20px] flex-1 h-full min-h-[220px] md:min-h-0 p-2">
       <Line
         options={options}
         data={data}

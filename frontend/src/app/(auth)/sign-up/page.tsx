@@ -1,83 +1,65 @@
 "use client";
 import { assets } from "@/assets/data";
 import Image from "next/image";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Input from "./components/Input";
 import ConnectWith from "@/components/ConnectWith";
 import { AUTH_ERRORS } from "@/lib/utils";
+import { useForm } from "react-hook-form"
+import {zodResolver} from "@hookform/resolvers/zod"
+import { SignUpSchema, type SignUpForm } from "@/types/index";
 
 export default function SignUp() {
-  const [firstname, setFirstname] = useState("");
-  const [lastname, setLastname] = useState("");
-  const [username, setUsername] = useState("");
-  const [email, setemail] = useState("");
-  const [password, setpassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const {register, handleSubmit, formState: { errors, isSubmitting }, setError} = useForm<SignUpForm>({
+    resolver: zodResolver(SignUpSchema),
+    defaultValues: {
+      firstname: "",
+      lastname: "",
+      username: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+    mode: "onSubmit",
+  });
 
-  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>): Promise<void> => {
-    e.preventDefault();
-    setError("");
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters.");
-      return;
-    }
-    setLoading(true);
-
+  const onSubmit = async (values: SignUpForm) => {
     try {
-      if (firstname.length < 3 || lastname.length < 3 || username.length < 3)
-        throw new Error(AUTH_ERRORS["INVALID_NAME_LENGTH"]);
-      const reply = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`,
-        {
+      const reply = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`,{
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: {"Content-Type": "application/json",},
           credentials: "include",
           body: JSON.stringify({
-            firstname,
-            lastname,
-            username,
-            email,
-            password,
+            firstname: values.firstname,
+            lastname: values.lastname,
+            username: values.username,
+            email: values.email,
+            password: values.password,
           }),
         },
       );
 
       if (!reply.ok) {
         const errorData: { error?: string } = await reply.json();
-        const errorMessage =
-          (errorData.error && AUTH_ERRORS[errorData.error]) ||
-          AUTH_ERRORS["default"];
-        throw new Error(errorMessage);
+        const message = (errorData.error && AUTH_ERRORS[errorData.error]) || AUTH_ERRORS["default"];
+        setError("root", { message });
+        return;
       }
-      const data = await reply.json();
-      router.replace(`/sign-up/email-verification?email=${email}`);
+      router.replace(`/sign-up/email-verification?email=${values.email}`);
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : AUTH_ERRORS["default"];
-      setError(message);
-    } finally {
-      setLoading(false);
+      const message = err instanceof Error ? err.message : AUTH_ERRORS["default"];
+      setError("root", { message });
     }
   };
 
+  const rootError = errors.root?.message;
+
   return (
     <div className="min-h-screen flex justify-center items-center">
-      <div className="flex flex-col md:flex-row justify-center md:justify-between bg-[#1A1A1A]/75 w-full md:w-200 h-120 rounded-xl mx-4 md:mx-0">
+      <div className="flex flex-col md:flex-row justify-center md:justify-between bg-[#1A1A1A]/75 w-full md:w-200 h-140 rounded-xl mx-4 md:mx-0">
         <div className="flex flex-col items-center justify-center w-full md:w-1/2 p-2 md:p-2">
-          <form
-            onSubmit={handleSubmit}
+          <form onSubmit={handleSubmit(onSubmit)}
             className="space-y-1 flex flex-col items-center justify-center text-white w-full px-10"
           >
             <h1 className="text-xl md:text-3xl font-bold text-center">
@@ -87,50 +69,66 @@ export default function SignUp() {
               Enter your personal data to create your account
             </p>
             <div className="flex flex-col md:flex-row gap-1 w-full">
-              <Input
-                value={firstname}
-                onChange={(e:React.ChangeEvent<HTMLInputElement>) => setFirstname(e.target.value)}
-                placeholder="Firstname"
-              />
-              <Input
-                value={lastname}
-                onChange={(e:React.ChangeEvent<HTMLInputElement>) => setLastname(e.target.value)}
-                placeholder="Lastname"
-              />
+              <div className="w-full">
+                <input 
+                  className="w-full p-3 h-8 rounded bg-[#4D4D4D]/40 text-white text-xs placeholder-[#FFFFFF]/23 focus:outline-none"
+                  placeholder="Firstname" {...register("firstname")} />
+                {errors.firstname && (
+                  <p className="text-red-500 text-[10px] mt-1">{errors.firstname.message}</p>
+                )}
+              </div>
+              <div className="w-full">
+                <input 
+                  className="w-full p-3 h-8 rounded bg-[#4D4D4D]/40 text-white text-xs placeholder-[#FFFFFF]/23 focus:outline-none"
+                  placeholder="Lastname" {...register("lastname")}/>
+                  {errors.lastname && (
+                    <p className="text-red-500 text-[10px] mt-1">{errors.lastname.message}</p>
+                )}
+              </div>
             </div>
-            <Input
-              value={username}
-              onChange={(e:React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
-              placeholder="Nickname"
-            />
-            <Input
-              type="email"
-              value={email}
-              onChange={(e:React.ChangeEvent<HTMLInputElement>) => setemail(e.target.value)}
-              placeholder="Email address"
-            />
-            <Input
-              type="password"
-              value={password}
-              onChange={(e:React.ChangeEvent<HTMLInputElement>) => setpassword(e.target.value)}
-              placeholder="Password"
-            />
-            <Input
-              type="password"
-              value={confirmPassword}
-              onChange={(e:React.ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm password"
-            />
+            <div className="w-full">
+              <input 
+                className="w-full p-3 h-8 rounded bg-[#4D4D4D]/40 text-white text-xs placeholder-[#FFFFFF]/23 focus:outline-none"
+                placeholder="Nickname" {...register("username")} />
+                {errors.username && (
+                  <p className="text-red-500 text-[10px] mt-1">{errors.username.message}</p>
+              )}
+            </div>
+            <div className="w-full">
+              <input 
+                className="w-full p-3 h-8 rounded bg-[#4D4D4D]/40 text-white text-xs placeholder-[#FFFFFF]/23 focus:outline-none"
+                type="email" placeholder="Email address" {...register("email")} />
+                {errors.email && (
+                  <p className="text-red-500 text-[10px] mt-1">{errors.email.message}</p>
+              )}
+            </div>
+            <div className="w-full">
+              <input 
+                className="w-full p-3 h-8 rounded bg-[#4D4D4D]/40 text-white text-xs placeholder-[#FFFFFF]/23 focus:outline-none"
+                type="password" placeholder="Password" {...register("password")} />
+                {errors.password && (
+                  <p className="text-red-500 text-[10px] mt-1">{errors.password.message}</p>
+              )}
+            </div>
+            <div className="w-full">
+              <input 
+                className="w-full p-3 h-8 rounded bg-[#4D4D4D]/40 text-white text-xs placeholder-[#FFFFFF]/23 focus:outline-none"
+                type="password" placeholder="Confirm password" {...register("confirmPassword")} />
+                {errors.confirmPassword && (
+                  <p className="text-red-500 text-[10px] mt-1">{errors.confirmPassword.message}</p>
+              )}
+            </div>
 
-            {error && (
-              <p className="text-red-500 text-xs text-center">{error}</p>
+            {rootError && (
+              <p className="text-red-500 text-xs text-center">{rootError}</p>
             )}
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={isSubmitting}
               className=" w-full mt-3 px-4 py-2 bg-[#0F2C34] text-white text-xs rounded hover:bg-[#245664] disabled:bg-gray-500 transition"
             >
-              {loading ? "Creating account..." : "Continue"}
+              {isSubmitting ? "Creating account..." : "Continue"}
             </button>
 
             <p className="text-[#A6A6A6] text-xs text-center">

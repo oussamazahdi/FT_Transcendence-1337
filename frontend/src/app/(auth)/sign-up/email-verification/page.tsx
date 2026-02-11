@@ -19,7 +19,7 @@ const EmailVerification = () => {
   const [canResend, setCanResend] = useState(false);
 
   const hasFetchedRef = useRef(false);
-  const {user, logout} = useAuth();
+  const {logout} = useAuth();
 
   const router = useRouter();
   const searchParams = useSearchParams();

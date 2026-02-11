@@ -60,8 +60,8 @@ const FriendsProfile = ({ userPage }:FriendProfileProp) => {
   }, [friends, pendingRequests, incomingRequest, userPage]);
 
   return (
-    <div className="relative bg-[#0F0F0F]/75 rounded-[20px] flex flex-col pb-4 overflow-hidden p-3">
-      <div className="relative w-full h-24 md:h-42 overflow-hidden">
+    <div className="relative bg-[#0F0F0F]/75 rounded-[20px] flex flex-col overflow-hidden p-3 h-full min-h-0">
+      <div className="relative w-full h-24 md:h-52 overflow-hidden">
         <Image
           src={assets.coverPicture}
           alt="cover"
@@ -69,7 +69,7 @@ const FriendsProfile = ({ userPage }:FriendProfileProp) => {
           className="object-cover rounded-lg"
         />
       </div>
-      <div className="flex flex-col items-center -mt-12 md:-mt-16 z-5">
+      <div className="flex flex-1 flex-col items-center -mt-12 md:-mt-16 z-5">
         <div className="relative rounded-[10px]">
           {userPage?.avatar && userPage?.avatar !== "null" ? (
             <Image
@@ -136,15 +136,18 @@ const FriendsProfile = ({ userPage }:FriendProfileProp) => {
           </button>
         </div>
           )}
-          <div className="w-full mt-4">
-            <div className="flex justify-between text-xs md:text-sm mb-1">
-                <span className="font-bold ">Level: {rawLevel}</span>
-                <span >1950/3000</span>
-            </div>
-            <div className="w-full bg-[#000000] rounded-full h-2.5">
-                <div className="bg-[#D9D9D9] h-2.5 rounded-full transition-all duration-500"  style={{ width: `${progressPercent}%` }}></div>
-            </div>
+        <div className="w-full mt-auto px-1 pt-2">
+          <div className="flex justify-between text-xs md:text-sm mb-1">
+              <span className="font-bold ">Level: {rawLevel}</span>
+              <span >1950/3000</span>
           </div>
+          <div className="w-full bg-[#000000] rounded-full h-2.5">
+              <div 
+                  className="bg-linear-to-r from-blue-200 via-blue-400 to-blue-600 h-2.5 rounded-full transition-all duration-500" 
+                  style={{ width: `${progressPercent}%` }}
+              ></div>
+          </div>
+        </div>
         </div>
         {showConfirmRemove && (
           <RemoveUserConf user={userPage} setShowconfirmRemove={setShowconfirmRemove}/>

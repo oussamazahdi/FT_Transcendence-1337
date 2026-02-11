@@ -55,16 +55,18 @@ const FriendProfilePage = async ({ params }:any) => {
   }
 
   return (
-    <div className="flex w-full max-w-7xl mx-3 flex-col md:flex-row gap-4 h-[86vh]">
-      <div className="flex flex-1 flex-col w-full basis-7/10 gap-4">
+    <div className="grid w-full max-w-7xl mx-3 grid-cols-1 gap-2 md:h-[86vh] md:grid-cols-12 md:grid-rows-2">
+      <div className="min-w-0 md:col-span-8 md:row-start-1">
         <FriendsProfile userPage={friendProfile} />
-        <div className="flex flex-1 flex-col md:flex-row justify-between gap-4">
-          <MatchPlayed/>
-          <WinRate />
-        </div>
       </div>
-      <div className="basis-3/10  flex flex-col gap-4">
-        <MatchHistory classname="md:max-h-none" />
+
+      <div className="grid min-w-0 grid-cols-1 gap-2 md:col-span-8 md:row-start-2 md:grid-cols-2">
+        <MatchPlayed />
+        <WinRate />
+      </div>
+
+      <div className="min-w-0 h-full md:col-span-4 md:col-start-9 md:row-span-2">
+        <MatchHistory classname="h-full min-h-0" />
       </div>
     </div>
   );

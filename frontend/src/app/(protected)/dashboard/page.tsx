@@ -7,30 +7,40 @@ import { useAuth } from "@/contexts/authContext.tsx";
 import WinRate from "../profile/components/WinRate.tsx";
 import Games from "./components/Games.tsx";
 import CercleGraph from "./components/CercleGraph.tsx";
+import MatchesPlayed from "../profile/components/MatchPlayed.tsx";
 
 const Dashboard = () => {
   const { user, refreshFriendReq } = useAuth();
   
-  useEffect(()=>{
-      refreshFriendReq();
-  },[refreshFriendReq])
+  useEffect(() => {
+    refreshFriendReq();
+  }, [refreshFriendReq]);
   return (
-    <div className="flex w-full max-w-7xl flex-col md:flex-row gap-4 h-auto md:h-[86vh]">
-      <div className="flex flex-col w-full md:w-7/10 gap-4">
-        <div className="flex flex-col md:flex-row gap-4 h-auto md:flex-1">
-          <Profile user={user} className="w-full md:w-6/10"/>
-          <CercleGraph/>
-        </div>
-        <div className="flex flex-col md:flex-row gap-4 h-auto md:flex-1">
-          <WinRate />
-          <Games />
-        </div>
+    <div className="grid w-full max-w-7xl grid-cols-1 gap-2 md:h-[86vh] md:grid-cols-12 md:grid-rows-[minmax(0,1fr)_minmax(0,0.5fr)_minmax(0,1fr)]">
+      <div className="min-w-0 md:col-span-4 md:col-start-1 md:row-start-1">
+        <Profile user={user} className="w-full h-full" aspect="aspect-4/2"/>
       </div>
-      <div className="flex flex-col gap-4 w-full md:w-3/10">
-        <Friends classname="w-full h-100 md:flex-1" />
-        <MatchHistory classname="w-full h-100 md:flex-1" />
+
+      <div className="min-w-0 md:col-span-4 md:col-start-5 md:row-start-1">
+        <CercleGraph />
       </div>
-      
+
+      <div className="min-w-0 md:col-span-8 md:col-start-1 md:row-start-2">
+        <Games />
+      </div>
+
+      <div className="min-w-0 md:col-span-4 md:col-start-1 md:row-start-3">
+        <WinRate />
+      </div>
+
+      <div className="min-w-0 md:col-span-4 md:col-start-5 md:row-start-3">
+        <MatchesPlayed />
+      </div>
+
+      <div className="grid min-w-0 h-full grid-rows-2 gap-2 md:col-span-4 md:col-start-9 md:row-start-1 md:row-span-3">
+        <Friends classname="h-full min-h-0" />
+        <MatchHistory classname="h-full min-h-0" />
+      </div>
     </div>
   );
 };
