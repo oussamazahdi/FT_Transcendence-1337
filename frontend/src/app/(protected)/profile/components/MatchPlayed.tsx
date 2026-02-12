@@ -22,8 +22,8 @@ ChartJS.register(
 
 const MatchesPlayed = () => {
   const [total, setTotal] = useState<[]>([])
-  const [labels, setLabels] = useState<[]>([])
-  const [loading, setLoading] = useState(false);
+  const [labels, setLabels] = useState<any[]>([])
+  const [loading, setLoading] = useState(false);//to use later
 
   useEffect(()=>{
     const fetchDaysData = async () => {
@@ -36,15 +36,16 @@ const MatchesPlayed = () => {
 
         if (!response.ok) 
           throw new Error;
-        
+        //[0,1,2]
         const data = await response.json();
         const rawData = data.data || [];
-        const formattedLabels = rawData.map((item: any) => {
+        const formattedLabels = ["day1", "day2", "day3", "day4", "day5", "day6", "day7"]
+        formattedLabels.splice(0, rawData.length)
+        formattedLabels.unshift(rawData.map((item: any) => {
           const date = new Date(item.day);
           return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-        });
+        }));
         const totalData = rawData.map((item: any) => item.total);
-
         setLabels(formattedLabels);
         setTotal(totalData);
       }catch(error:any){
@@ -95,15 +96,14 @@ const MatchesPlayed = () => {
       {
         label: "Matches Played",
         data:total,
-        backgroundColor: "#2A1C91",
-        borderRadius: 8,
+        backgroundColor: "#555555",
         hoverBackgroundColor: "#C729AC",
       },
     ],
   };
 
   return (
-    <div className="bg-[#0F0F0F]/75 rounded-[20px] flex-1 h-full min-h-[220px] md:min-h-0 p-4">
+    <div className="bg-[#0F0F0F]/75 rounded-[20px] flex-1 h-full min-h-55 md:min-h-0 p-4">
       <Bar options={options} data={data} />
     </div>
   );

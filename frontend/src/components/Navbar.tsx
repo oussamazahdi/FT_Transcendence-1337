@@ -39,7 +39,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="relative mt-4 mx-4 md:mx-10">
+    <header className="relative pt-4 mx-4 md:mx-10">
       <div className="flex items-center justify-between ">
 
         {/* Logo */}

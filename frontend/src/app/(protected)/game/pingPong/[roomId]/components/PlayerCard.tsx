@@ -35,7 +35,7 @@ export function PlayerCard({ player }: { player: Player }) {
 
 export function ScoreBoard({ game }: { game: Game }) {
   return (
-    <div className="flex justify-between w-full max-w-5xl px-4 mt-6 mb-5">
+    <div className="flex justify-between w-full max-w-5xl px-4 py-2">
       <PlayerCard player={game.player1} />
       <p className="text-xl md:text-4xl font-bold">
         {game.player1.score} - {game.player2.score}
