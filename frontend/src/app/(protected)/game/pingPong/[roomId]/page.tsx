@@ -77,6 +77,17 @@ export default function GamePage() {
     preloadBackground(gameMode.image);
   }, [gameMode.image]);
 
+	useEffect(() => {
+		document.body.classList.add("no-scroll");
+		document.documentElement.classList.add("no-scroll"); // html too (mobile/Safari)
+	
+		return () => {
+			document.body.classList.remove("no-scroll");
+			document.documentElement.classList.remove("no-scroll");
+		};
+	}, []);
+	
+
   useEffect(() => {
     if (!user || !socket) return;
 

@@ -26,7 +26,8 @@ export function PlayerCard({ player }: { player: Player }) {
       <Image
         src={avatarSrc}
 				alt={"player avatar"}
-				width={14}
+				width={200}
+				height={200}
         className="w-14 h-14 rounded-lg object-cover"
       />
       <p className="font-semibold">

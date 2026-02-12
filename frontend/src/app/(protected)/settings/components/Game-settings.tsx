@@ -1,97 +1,110 @@
 "use client";
 
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { useAuth } from "@/contexts/authContext";
+import { Field, MapCard } from "./ui/Game-ui";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Types (adapt to your real domain)
-// ─────────────────────────────────────────────────────────────────────────────
+type MapDefinition = {
+  id: string;
+  label: string;
+  image: string;
+};
 
 type SettingsKey = "ball_speed" | "score_limit" | "paddle_size";
 
-type SettingsState = Record<SettingsKey, number | "">;
-
-type GameSettingsModel = {
-  ball_speed?: number | null;
-  score_limit?: number | null;
-  paddle_size?: number | null;
-  game_mode?: string | null;
+type RangeSpec = {
+  min: number;
+  max: number;
 };
 
-// These must exist in your file already; keeping as-is assumptions:
-declare const SETTINGS_FIELDS: Array<{ key: SettingsKey; label: string }>;
-declare const RANGES: Record<SettingsKey, { min: number; max: number }>;
-declare const MAPS: Array<{ id: string; [k: string]: unknown }>;
-declare function clampNum(v: unknown): number;
-declare function Field(props: {
-  label: string;
-  rangeText: string;
-  value: number | "";
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  error?: string;
-}): React.JSX.Element;
-declare function MapCard(props: {
-  map: { id: string; [k: string]: unknown };
-  isActive: boolean;
-  isHovered: boolean;
-  onEnter: () => void;
-  onLeave: () => void;
-  onSelect: () => void;
-}): React.JSX.Element;
+type SettingsState = Record<SettingsKey, number | "">;
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────────────────────────────────────
-
-function toGameSettingsModel(input: unknown): GameSettingsModel | null {
-  if (!input) return null;
-
-  // if backend returned array, take first element
-  const candidate = Array.isArray(input) ? input[0] : input;
-
-  if (!candidate || typeof candidate !== "object") return null;
-
-  const obj = candidate as Record<string, unknown>;
-
-  return {
-    ball_speed: typeof obj.ball_speed === "number" ? obj.ball_speed : null,
-    score_limit: typeof obj.score_limit === "number" ? obj.score_limit : null,
-    paddle_size: typeof obj.paddle_size === "number" ? obj.paddle_size : null,
-    game_mode: typeof obj.game_mode === "string" ? obj.game_mode : null,
-  };
+type fullSettings = {
+	ball_speed?: number;
+	score_limit?: number;
+	paddle_size?: number;
+	game_mode?: string;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Component
-// ─────────────────────────────────────────────────────────────────────────────
+type GameSetting = {
+	settings: fullSettings;
+};
+
+const MAPS: MapDefinition[] = [
+  { id: "desert", label: "DESERT", image: "/maps/desert.png" },
+  { id: "hell", label: "HELL", image: "/maps/hell.png" },
+  { id: "ocean", label: "OCÉAN", image: "/maps/water.png" },
+  { id: "forest", label: "FOREST", image: "/maps/forest.jpeg" },
+  { id: "snow", label: "SNOW", image: "/maps/snow.jpeg" },
+  { id: "space", label: "SPACE", image: "/maps/space.png" },
+];
+
+const RANGES: Record<SettingsKey, RangeSpec> = {
+  ball_speed: { min: 1, max: 3 },
+  score_limit: { min: 5, max: 20 },
+  paddle_size: { min: 1, max: 3 },
+};
+
+const SETTINGS_FIELDS: Array<{ key: SettingsKey; label: string }> = [
+  { key: "ball_speed", label: "Ball speed" },
+  { key: "score_limit", label: "Score limit" },
+  { key: "paddle_size", label: "Paddle size" },
+];
+
+const clampNum = (v: unknown): number => {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : NaN;
+};
+
+async function fetchGameSetting(): Promise<GameSetting> {
+  const res = await fetch("http://localhost:3001/api/game/settings", {
+    credentials: "include",
+  });
+
+  if (!res.ok) throw new Error("Failed to fetch game settings");
+
+  return res.json();
+}
 
 export default function GameSettings() {
-  const { gameSetting, updateGameSettings } = useAuth();
+  const { updateGameSettings } = useAuth();
 
-  // ✅ normalize gameSetting (array/object/null) into a single typed object
-  const gs = useMemo(() => toGameSettingsModel(gameSetting), [gameSetting]);
+  const [gameSetting, setGameSetting] = useState<GameSetting | null>(null);
+
+  const [selectedMap, setSelectedMap] = useState<string>(""); // keep string only
+  const [userData, setUserData] = useState<SettingsState>({
+    ball_speed: 2,
+    score_limit: 10,
+    paddle_size: 1,
+  });
 
   const [hoveredMap, setHoveredMap] = useState<string | null>(null);
 
-  const [selectedMap, setSelectedMap] = useState<string | null>(gs?.game_mode ?? null);
+  // ✅ fetch on mount
+  useEffect(() => {
+    let cancelled = false;
 
-  const [userData, setUserData] = useState<SettingsState>({
-    ball_speed: gs?.ball_speed ?? "",
-    score_limit: gs?.score_limit ?? "",
-    paddle_size: gs?.paddle_size ?? "",
-  });
+    (async () => {
+try {
+	const gameset = await fetchGameSetting();
+	if (cancelled) return;
 
-  // If game settings load async and you want the UI to update when they arrive:
-  // (optional but usually desired)
-  React.useEffect(() => {
-    setSelectedMap(gs?.game_mode ?? null);
-    setUserData({
-      ball_speed: gs?.ball_speed ?? "",
-      score_limit: gs?.score_limit ?? "",
-      paddle_size: gs?.paddle_size ?? "",
-    });
-    // only when gs changes
-  }, [gs]);
+	setGameSetting(gameset.settings as GameSetting); // Cast to GameSetting
+	setSelectedMap(gameset?.settings?.game_mode ?? "");
+	setUserData({
+		ball_speed: gameset?.settings?.ball_speed ?? 2,
+		score_limit: gameset?.settings?.score_limit ?? 10,
+		paddle_size: gameset?.settings?.paddle_size ?? 1,
+	});
+} catch (error) {
+	console.error(error);
+}
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const errors = useMemo<Partial<Record<SettingsKey, string>>>(() => {
     const error: Partial<Record<SettingsKey, string>> = {};
@@ -130,19 +143,27 @@ export default function GameSettings() {
 
   const baseline = useMemo(() => {
     return {
-      ball_speed: gs?.ball_speed ?? "",
-      score_limit: gs?.score_limit ?? "",
-      paddle_size: gs?.paddle_size ?? "",
-      selectedMap: gs?.game_mode ?? null,
+      ball_speed: gameSetting?.settings?.ball_speed,
+      score_limit: gameSetting?.settings?.score_limit,
+      paddle_size: gameSetting?.settings?.paddle_size,
+      selectedMap: gameSetting?.settings?.game_mode ?? "",
     };
-  }, [gs]);
+  }, [gameSetting]);
 
+  // ✅ normalize before compare (prevents false "changed")
   const hasChanges = useMemo(() => {
+    const normalizedUser = {
+      ball_speed: userData.ball_speed === "" ? undefined : Number(userData.ball_speed),
+      score_limit: userData.score_limit === "" ? undefined : Number(userData.score_limit),
+      paddle_size: userData.paddle_size === "" ? undefined : Number(userData.paddle_size),
+      game_mode: selectedMap || undefined,
+    };
+
     return (
-      userData.ball_speed !== baseline.ball_speed ||
-      userData.score_limit !== baseline.score_limit ||
-      userData.paddle_size !== baseline.paddle_size ||
-      selectedMap !== baseline.selectedMap
+      normalizedUser.ball_speed !== baseline.ball_speed ||
+      normalizedUser.score_limit !== baseline.score_limit ||
+      normalizedUser.paddle_size !== baseline.paddle_size ||
+      (normalizedUser.game_mode ?? "") !== baseline.selectedMap
     );
   }, [userData, selectedMap, baseline]);
 
@@ -163,26 +184,35 @@ export default function GameSettings() {
     []
   );
 
-  const onSave = useCallback(() => {
-    if (!canSave) return;
+const onSave = useCallback(() => {
+	if (!canSave) return;
 
-    const payload: GameSettingsModel = {
-      ball_speed: userData.ball_speed === "" ? null : Number(userData.ball_speed),
-      score_limit: userData.score_limit === "" ? null : Number(userData.score_limit),
-      paddle_size: userData.paddle_size === "" ? null : Number(userData.paddle_size),
-      game_mode: selectedMap,
-    };
+	const payload = {
+		...userData,
+		game_mode: selectedMap,
+	};
 
-    updateGameSettings(payload);
-    console.log("Saving:", payload);
-  }, [canSave, userData, selectedMap, updateGameSettings]);
+	updateGameSettings(payload);
+	console.log("Saving:", payload);
+
+	// ✅ update local baseline so button disables after save
+	setGameSetting(() => ({
+		settings: {
+			ball_speed: userData.ball_speed === "" ? undefined : Number(userData.ball_speed),
+			score_limit: userData.score_limit === "" ? undefined : Number(userData.score_limit),
+			paddle_size: userData.paddle_size === "" ? undefined : Number(userData.paddle_size),
+			game_mode: selectedMap,
+		},
+	}));
+}, [canSave, userData, selectedMap, updateGameSettings]);
 
   return (
     <div className="h-full w-full overflow-y-auto scroll-smooth text-white px-4 sm:px-8 py-10 custom-scrollbar">
       <div className="text-center max-w-2xl mx-auto mb-12">
         <h1 className="text-2xl font-bold mb-2">Game setting</h1>
         <p className="text-sm text-white/60">
-          Customize your game settings to create a smoother, more enjoyable, and personalized gaming experience.
+          Customize your game settings to create a smoother, more enjoyable, and
+          personalized gaming experience.
         </p>
       </div>
 
@@ -227,9 +257,12 @@ export default function GameSettings() {
           type="button"
           onClick={onSave}
           disabled={!canSave}
-          className={`px-10 py-3 rounded-lg transition text-sm font-semibold ${
-            canSave ? "bg-black hover:bg-black/30" : "bg-[#414141]/60 text-white/60 cursor-not-allowed"
-          }`}
+          className={`px-10 py-3 rounded-lg transition text-sm font-semibold
+            ${
+              canSave
+                ? "bg-black hover:bg-black/30"
+                : "bg-[#414141]/60 text-white/60 cursor-not-allowed"
+            }`}
         >
           Save Changes
         </button>

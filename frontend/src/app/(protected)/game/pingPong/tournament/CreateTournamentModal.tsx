@@ -245,7 +245,7 @@ export default function CreateTournamentModal({
 		<div
 		ref={overlayRef}
 		onMouseDown={onOverlayMouseDown}
-		className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+		className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-[3px] p-4"
 		aria-modal="true"
 		role="dialog"
 	>
@@ -410,7 +410,7 @@ export default function CreateTournamentModal({
 								className="w-full rounded-2xl bg-white/10 px-4 py-2.5 text-sm text-white placeholder:text-white/35 outline-none ring-1 ring-white/10 focus:ring-2 focus:ring-white/25"
 							/>
 
-							<div className="max-h-40 overflow-auto rounded-2xl ring-1 ring-white/10">
+							<div className="max-h-40 overflow-auto rounded-2xl ring-1 ring-white/10 custom-scrollbar">
 								{filteredUsers.length === 0 ? (
 									<div className="p-3 text-sm text-white/50">
 										No users found.
@@ -602,9 +602,9 @@ export default function CreateTournamentModal({
 				</div>
 			</div>
 
-			<div className="mt-6 flex items-center justify-center">
+			{/* <div className="mt-6 flex items-center justify-center">
 				<div className="h-1.5 w-24 rounded-full bg-white/10" />
-			</div>
+			</div> */}
 		</div>
 	</div>
   );

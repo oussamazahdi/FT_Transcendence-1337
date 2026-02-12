@@ -1,3 +1,4 @@
+// FriendCard.tsx
 "use client";
 
 import React from "react";
@@ -15,6 +16,7 @@ type FriendCardUser = {
   firstname: string;
   lastname: string;
   avatar?: string | null;
+  // Accept different status spellings/cases, or undefined.
   status?: FriendStatus | "online" | "offline";
 };
 
@@ -23,18 +25,19 @@ interface FriendCardProps {
 }
 
 function safeUUID(): string {
-  // crypto.randomUUID exists in modern browsers; fallback for safety.
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+function normalizeStatus(raw: FriendCardUser["status"]): FriendStatus {
+  const s = String(raw ?? "").trim().toLowerCase();
+  return s === "online" ? "Online" : "Offline";
+}
+
 const FriendCard = ({ user }: FriendCardProps) => {
-  const rawStatus = user.status;
-
-  const status: FriendStatus =
-    typeof rawStatus === "string" && rawStatus.toLowerCase() === "online" ? "Online" : "Offline";
-
   const socket = useSocket();
+
+  const status = normalizeStatus(user.status);
 
   const sendInvite = (): void => {
     if (!socket) return;
@@ -45,7 +48,6 @@ const FriendCard = ({ user }: FriendCardProps) => {
       gameType: "pingpong",
     };
 
-
     socket.emit("game:invite", payload, (res: InviteResponse): void => {
       if (!res.ok) console.error("Invite failed:", res.message);
       else console.log("✅ Invite sent:", res.notification);
@@ -53,10 +55,7 @@ const FriendCard = ({ user }: FriendCardProps) => {
   };
 
   return (
-    <div
-      key={user.id}
-      className="flex items-center w-full bg-[#414141]/60 rounded-lg p-1 gap-1"
-    >
+    <div className="flex items-center w-full bg-[#414141]/60 rounded-lg p-1 gap-1">
       <div className="relative size-10 flex items-center overflow-hidden rounded-sm">
         <Image
           src={user.avatar ?? assets.defaultProfile}

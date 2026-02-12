@@ -2,10 +2,15 @@ import { assets } from "@/assets/data";
 import Image from "next/image";
 import type { User } from "@/types";
 
+
 interface ProfileProps {
   user: User | null;
   className?: string;
 }
+
+
+
+
 const Profile = ({ user, className }: ProfileProps) => {
   const rawLevel = 15.99;
   const progressPercent = Math.round((rawLevel % 1) * 100);

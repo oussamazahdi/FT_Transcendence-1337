@@ -63,7 +63,9 @@ export default function Navbar() {
                 onClick={() => hardNavigate(item.href)}
                 className={`px-4 py-2 rounded-full border border-[#BEBEBE] text-sm
                   hover:bg-black/40 hover:text-white
-                  ${isActive ? "bg-black/60 text-white" : "text-[#BEBEBE]"}`}
+                  ${isActive ? "bg-black/40 shadow-2xl backdrop-blur-xl ring-1 ring-white/15 text-white" : "text-[#BEBEBE]"}`}
+                  // ${isActive ? "bg-black/60 text-white" : "text-[#BEBEBE]"}`}
+									//bg-white/10 p-6 shadow-2xl backdrop-blur-xl ring-1 ring-white/15
               >
                 {item.label}
               </button>
