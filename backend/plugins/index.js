@@ -1,5 +1,4 @@
 import multipart from '@fastify/multipart';
-import cookie from '@fastify/cookie';
 import fastifyStatic from "@fastify/static";
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
@@ -21,6 +20,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export async function registerPlugins(fastify) {
     // CORS
     await fastify.register(cors, corsConfig);
+
     // Swagger
     await fastify.register(swagger, swaggerConfig);
     await fastify.register(swaggerUi, swaggerUiConfig);
@@ -34,7 +34,7 @@ export async function registerPlugins(fastify) {
     // Oauth
     await fastify.register(googleOAuth2, oauth2Config);
     
-    // Other plugins
+    // multipart
     await fastify.register(multipart, multipartConfig);
     
     // Static files

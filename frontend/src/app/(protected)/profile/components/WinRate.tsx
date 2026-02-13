@@ -26,7 +26,7 @@ ChartJS.register(
 defaults.maintainAspectRatio = false;
 defaults.responsive = true;
 
-const WinRate = () => {
+const WinRate = ({id}:any) => {
   const [wins, setWins] = useState<any[]>([])
   const [loses, setLoses] = useState<any[]>([])
   const [labels, setLabels] = useState<any[]>([])
@@ -35,7 +35,7 @@ const WinRate = () => {
       const fetchDaysData = async () => {
         setLoading(true);
         try{
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/statistics/weekly`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/statistics/weekly?userId=${id}`, {
             method:"get",
             credentials:"include"
           })
@@ -45,7 +45,6 @@ const WinRate = () => {
           
           const data = await response.json();
           const rawData = data.data || [];
-          // const rawData = [{day: '2026-02-7', wins: 10, loses: 11, total: 21},{day: '2026-02-8', wins: 7, loses: 3, total: 10},{day: '2026-02-9', wins: 0, loses: 5, total: 5},{day: '2026-02-10', wins: 6, loses: 8, total: 14},{day: '2026-02-11', wins: 1, loses: 1, total: 2}]
           const formattedLabels = rawData.map((d: {day:string}) => {
             const date = new Date(d.day);
             return date.toLocaleDateString("en-GB", {
@@ -70,7 +69,7 @@ const WinRate = () => {
         }
       }
       fetchDaysData()
-    },[])
+    },[id])
   const options = {
     scales: {
       x: {

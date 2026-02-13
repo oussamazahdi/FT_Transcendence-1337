@@ -30,11 +30,11 @@ const Dashboard = () => {
       </div>
 
       <div className="min-w-0 md:col-span-4 md:col-start-1 md:row-start-3">
-        <WinRate />
+        <WinRate id={user?.id}/>
       </div>
 
       <div className="min-w-0 md:col-span-4 md:col-start-5 md:row-start-3">
-        <MatchesPlayed />
+        <MatchesPlayed id={user?.id}/>
       </div>
 
       <div className="grid min-w-0 h-full grid-rows-2 gap-2 md:col-span-4 md:col-start-9 md:row-start-1 md:row-span-3">

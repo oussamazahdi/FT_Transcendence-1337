@@ -10,7 +10,6 @@ import { getCurrentUser } from "@/lib/auth";
 
 async function getFriendProfile(id:string) {
   const cookieStore = await cookies();
-  console.log(cookieStore);
 
   try {
     const response = await fetch(`${process.env.SERVER_SIDE_API_URL}/api/users/${id}`, {
@@ -61,8 +60,8 @@ const FriendProfilePage = async ({ params }:any) => {
       </div>
 
       <div className="grid min-w-0 grid-cols-1 gap-2 md:col-span-8 md:row-start-2 md:grid-cols-2">
-        <MatchPlayed />
-        <WinRate />
+        <MatchPlayed id={id}/>
+        <WinRate id={id}/>
       </div>
 
       <div className="min-w-0 h-full md:col-span-4 md:col-start-9 md:row-span-2">

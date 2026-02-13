@@ -8,8 +8,9 @@ interface ProfileProps {
   aspect:string;
 }
 const Profile = ({ user, className, aspect }: ProfileProps) => {
-  const rawLevel = 15.99;
+  const rawLevel = user?.player_level || 0;
   const progressPercent = Math.round((rawLevel % 1) * 100);
+  const xp = user?.player_xp || 0
 
   return (
     <div className={`relative bg-[#0F0F0F]/75 rounded-[20px] flex flex-col pb-4 overflow-hidden p-3 shrink-0 ${className} `}>
@@ -52,7 +53,7 @@ const Profile = ({ user, className, aspect }: ProfileProps) => {
       <div className="w-full mt-auto px-1 pt-2">
         <div className="flex justify-between text-xs md:text-sm mb-1">
             <span className="font-bold ">Level: {rawLevel}</span>
-            <span >1950/3000</span>
+            <span >{xp}/{(Math.floor(rawLevel) + 1) * 3000}</span>
         </div>
         <div className="w-full bg-[#000000] rounded-full h-2.5 my-auto">
             <div 

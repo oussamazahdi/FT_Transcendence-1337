@@ -28,8 +28,9 @@ const FriendsProfile = ({ userPage }:FriendProfileProp) => {
   const [isIncoming, setIsIncoming] = useState(false);
   const [showConfirmRemove, setShowconfirmRemove] = useState(false);
   const [showConfirmBlock, setShowconfirmBlock] = useState(false);
-  const rawLevel = 15.65
+  const rawLevel = userPage?.player_level || 0;
   const progressPercent = Math.round((rawLevel % 1) * 100);
+  const xp = userPage?.player_xp || 0
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -139,7 +140,7 @@ const FriendsProfile = ({ userPage }:FriendProfileProp) => {
         <div className="w-full mt-auto px-1 pt-2">
           <div className="flex justify-between text-xs md:text-sm mb-1">
               <span className="font-bold ">Level: {rawLevel}</span>
-              <span >1950/3000</span>
+              <span >{xp}/{(Math.floor(rawLevel) + 1) * 3000}</span>
           </div>
           <div className="w-full bg-[#000000] rounded-full h-2.5">
               <div 

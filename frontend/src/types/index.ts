@@ -10,6 +10,8 @@ export interface User {
   avatar?: string | null;
   isverified?: boolean;
   status2fa?: boolean;
+  player_level: number;
+  player_xp: number
 }
 
 export interface otherUserData{
@@ -18,6 +20,8 @@ export interface otherUserData{
   username:string;
   id:string;
   avatar:StaticImageData | null | string;
+  player_level: number;
+  player_xp: number
 }
 
 export type Conversation = {
@@ -93,7 +97,6 @@ export interface Friend {
   id: string;
   username: string;
   avatar?: string;
-  status: 'online' | 'offline';
 }
 
 export interface GameSetting {

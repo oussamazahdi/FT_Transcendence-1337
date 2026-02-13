@@ -20,8 +20,8 @@ export default function ProfilePage() {
       </div>
 
       <div className="grid min-w-0 grid-cols-1 gap-4 md:col-span-8 md:row-start-2 md:grid-cols-2">
-        <MatchPlayed />
-        <WinRate />
+        <MatchPlayed id={user?.id}/>
+        <WinRate id={user?.id}/>
       </div>
 
       <div className="grid min-w-0 h-full grid-rows-2 gap-4 md:col-span-4 md:col-start-9 md:row-span-2">
