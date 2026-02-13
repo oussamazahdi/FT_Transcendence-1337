@@ -110,6 +110,19 @@ function friendsRoutes(fastify)
         }
     }, friendsController.getAllBlocked);
     
+    fastify.get("/blockers", {
+        preHandler: authMiddleware,
+        schema: {
+            description: "Get users who blocked you",
+            tags: ['Friends'],
+            response: {
+                200: blockedUsersResponse,
+                401: errorResponse,
+                500: errorResponse
+            }
+        }
+    }, friendsController.getAllBlockers);
+
     fastify.post("/blocks/:id", {
         preHandler: authMiddleware,
         schema: {

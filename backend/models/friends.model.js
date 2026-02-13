@@ -110,6 +110,25 @@ export class FriendsModels
                 throw dbError; 
             }
     }
+    
+    getBlockersList(db, userId)
+    {
+        try {
+            const blockedList = db.prepare( `
+                SELECT u.id, u.username, u.avatar, u.firstname, u.lastname 
+                FROM friends f JOIN users u 
+                ON u.id = CASE 
+                WHEN f.sender_id = :me THEN f.receiver_id 
+                ELSE f.sender_id 
+                END 
+                WHERE f.blocked_by != :me AND f.status = 'blocked' `).all({me : userId}); 
+                return (blockedList);
+            } 
+            catch (error) {
+                const dbError = handleDatabaseError(error, 'getBlockedUsersList');
+                throw dbError; 
+            }
+    }
 
     newFriendRequest(db, senderId, receiverId)
     {
@@ -248,6 +267,24 @@ export class FriendsModels
     }
 
     isFriendshipExists(db, sender, receiver)
+    {
+        try {
+            const result = db.prepare(`SELECT status FROM friends
+                WHERE (sender_id = :me AND receiver_id = :other)
+                OR
+                (sender_id = :other AND receiver_id = :me)`).get({me: sender, other: receiver});
+            if (result === undefined)
+                return (false);
+            return (true);
+        }
+        catch (error) 
+        {
+            const dbError = handleDatabaseError(error, 'isBlockedByUser');
+            throw dbError; 
+        }
+    }
+
+    isFriend(db, sender, receiver)
     {
         try {
             const result = db.prepare(`SELECT status FROM friends

@@ -23,8 +23,8 @@ export class DashboardController {
     {
         const db = request.server.db;
         try {
-
-            const results = dashboardModels.getWinsLosesTotalPerDay(db, request.user.userId);
+            const { userId } = request.query;
+            const results = dashboardModels.getWinsLosesTotalPerDay(db, Number(userId));
             reply.code(200).send({message: "SUCCESS", data: results});
         }
         catch (error) {

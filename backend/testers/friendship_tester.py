@@ -55,18 +55,16 @@ assert r.status_code in (200, 201)
 print("[*] Fetching users...")
 users = seed.get(USERS_URL).json()["userData"][:MAX_USERS]
 
+
 clients = []
-for u in users:
+for email in TEST_EMAILS[:MAX_USERS]:
     s = requests.Session()
-    if u["email"] == SEED_EMAIL:
-        clients.append(Client(u["id"], u["email"], seed))
-        continue
-
-    r = login(s, u["email"])
+    r = login(s, email)
     if r.status_code in (200, 201):
-        clients.append(Client(u["id"], u["email"], s))
+        me = r.json().get("userData", {})
+        clients.append(Client(me["id"], email, s))
 
-print(f"[OK] Logged in {len(clients)} users")
+print(f"[OK] Logged in {len(clients)} users")-
 
 
 # ================= ACTIONS =================

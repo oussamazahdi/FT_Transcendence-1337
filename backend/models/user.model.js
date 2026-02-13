@@ -19,7 +19,21 @@ export class UserModels
     getUserById(db, userId)
     {
         try {
-            const users = db.prepare('SELECT id, firstname, lastname, username, email, avatar From users WHERE id = ?').get(userId);
+            const users = db.prepare(`
+                SELECT  u.id AS id,
+                        u.username,
+                        u.firstname,
+                        u.lastname,
+                        u.email,
+                        u.avatar,
+                        u.isverified,
+                        u.status2fa,
+                        u.session2fa,
+                        gs.player_level,
+                        gs.player_xp
+                FROM users u
+                JOIN game_settings gs ON gs.player_id = u.id
+                WHERE u.id = ?`).get(userId);
             return (users)
         }
         catch (error) {

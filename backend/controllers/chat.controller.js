@@ -73,7 +73,7 @@ export class ChatController
             if (data.content.length > 500 || !data.content)
                 return (socket.emit("chat:error", {message: "SOMETHING_WRONG_WITH_MESSAGE"}));
             const receiverId = data.receiverId;
-            const friendshipStatus = friendsModels.isFriendshipExists(db, senderId, receiverId);
+            const friendshipStatus = friendsModels.isFriend(db, senderId, receiverId);
             const blocked = friendsModels.isBlockedByUser(db, senderId, receiverId);
             if (!friendshipStatus || blocked.status)
                 return socket.emit("chat:error", {message: "NOT_ALLOWED_TO_CONTACT_USER"});
