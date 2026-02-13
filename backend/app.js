@@ -13,15 +13,10 @@ const app = Fastify(serverConfig);
 
 
 registerDecorators(app);
-
 initAllTables(app.db);
-
 setupTokenCleanup(app.db);
-
 await registerPlugins(app);
-
 initializeRoutes(app);
-
 initializeSocketes(app);
 
 export default app;

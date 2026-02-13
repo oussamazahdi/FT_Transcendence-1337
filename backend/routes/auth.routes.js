@@ -19,6 +19,7 @@ function authRoutes(fastify)
                     password: {
                         type: 'string',
                         minLength: 8,
+                        maxLength: 64,
                     },
                 }
             },

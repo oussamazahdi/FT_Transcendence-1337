@@ -12,6 +12,8 @@ export const userSchema = {
         avatar: { type: ['string', 'null'] },
         isverified: { type: 'integer' },
         status2fa: { type: 'integer' },
+        player_level: { type: 'number' },
+        player_xp: { type: 'integer' }
     }
 };
 

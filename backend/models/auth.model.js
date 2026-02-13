@@ -19,7 +19,7 @@ export class AuthModels
             const user = db.prepare(`SELECT * FROM users WHERE email = ?`).get(email);
             if (!user)
                 return ({message: "USER_NOT_FOUND"});
-            const match = await bcrypt.compare(password, user.password);  // maybe i can move it to controller later
+            const match = await bcrypt.compare(password, user.password);
             if (!match)
                 return ({message: "INVALID_PASSWORD"});
             return (user);
@@ -42,11 +42,24 @@ export class AuthModels
                 throw dbError;
         }
     }
-    findUserById(db, userId, fields = ['id', 'username', 'firstname', 'lastname', 'username', 'email', 'avatar', 'isverified', 'status2fa', 'session2fa'])
+    findUserById(db, userId)
     {
         try {
-            const fieldList = fields.join(', ');
-            return db.prepare(`SELECT ${fieldList} FROM users WHERE id = ?`).get(userId);
+            return db.prepare(`
+                SELECT  u.id AS id,
+                        u.username,
+                        u.firstname,
+                        u.lastname,
+                        u.email,
+                        u.avatar,
+                        u.isverified,
+                        u.status2fa,
+                        u.session2fa,
+                        gs.player_level,
+                        gs.player_xp
+                FROM users u
+                JOIN game_settings gs ON gs.player_id = u.id
+                WHERE u.id = ?`).get(userId);
         } 
         catch (error) {
             const dbError = handleDatabaseError(error, 'findUserById');
