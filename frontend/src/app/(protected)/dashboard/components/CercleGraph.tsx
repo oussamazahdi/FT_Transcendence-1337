@@ -45,14 +45,16 @@ const MatchStats = () => {
         label: "Match Outcomes",
         data: statistics,
         backgroundColor: [
-          "#A2D7FF", // Pastel Blue (Wins)
-          "#FFB3B3", // Pastel Red (Loses)
-          "#C9E2A6", // Pastel Green (Forfeit Wins)
-          "#FFD9A2", // Pastel Orange (Forfeit Loses)
+          "rgb(66, 167, 138, 0.5)", // Pastel Blue (Wins)
+          "rgb(178, 59, 59, 0.5)", // Pastel Red (Loses)
+          "rgb(17, 95, 72, 0.5)", // Pastel Green (Forfeit Wins)
+          "rgb(152, 10, 10, 0.5)", // Pastel Orange (Forfeit Loses)
         ],
-        borderColor: "rgba(15, 15, 15, 0.8)",
-        borderWidth: 2,
+        borderColor: "rgba(15, 15, 15, 0)",
+        borderWidth: 0,
         hoverOffset: 10,
+        borderRadius: 6,
+        spacing: 2,
       },
     ],
   };
@@ -60,7 +62,7 @@ const MatchStats = () => {
   const options: ChartOptions<"doughnut"> = {
     responsive: true,
     maintainAspectRatio: false,
-    cutout: "50%",
+    cutout: "70%",
     plugins: {
       legend: {
         position: "left",
@@ -76,9 +78,18 @@ const MatchStats = () => {
         backgroundColor: "rgba(0, 0, 0, 0.8)",
         titleColor: "#fff",
         bodyColor: "#fff",
-        padding: 10,
+        padding: 30,
         displayColors: true,
       },
+      title:{
+        display: true,
+        color:"#FFFFFF",
+        text: "Matches statistics",
+        font: {
+          size: 20,
+          lineHeight: 1.2,
+        },
+      }
     },
   };
 

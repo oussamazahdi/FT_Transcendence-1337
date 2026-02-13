@@ -21,7 +21,7 @@ ChartJS.register(
 );
 
 const MatchesPlayed = () => {
-  const [total, setTotal] = useState<[]>([])
+  const [total, setTotal] = useState<any[]>([])
   const [labels, setLabels] = useState<any[]>([])
   const [loading, setLoading] = useState(false);//to use later
 
@@ -36,15 +36,19 @@ const MatchesPlayed = () => {
 
         if (!response.ok) 
           throw new Error;
-        //[0,1,2]
         const data = await response.json();
         const rawData = data.data || [];
-        const formattedLabels = ["day1", "day2", "day3", "day4", "day5", "day6", "day7"]
-        formattedLabels.splice(0, rawData.length)
-        formattedLabels.unshift(rawData.map((item: any) => {
-          const date = new Date(item.day);
-          return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-        }));
+        // const rawData = [{day: '2026-02-7', wins: 10, loses: 11, total: 21},{day: '2026-02-8', wins: 7, loses: 3, total: 10},{day: '2026-02-9', wins: 0, loses: 5, total: 5},{day: '2026-02-10', wins: 6, loses: 8, total: 14},{day: '2026-02-11', wins: 1, loses: 1, total: 2}]
+        const formattedLabels = rawData.map((d:{day:string}) => {
+          const date = new Date(d.day);
+          return date.toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short",
+          });
+        });
+        while (formattedLabels.length < 7) {
+          formattedLabels.push("-");
+        }
         const totalData = rawData.map((item: any) => item.total);
         setLabels(formattedLabels);
         setTotal(totalData);
@@ -87,6 +91,15 @@ const MatchesPlayed = () => {
           color: "white",
         },
       },
+      title:{
+        display: true,
+        color:"#FFFFFF",
+        text: "Match history",
+        font: {
+          size: 20,
+          lineHeight: 1.2,
+        },
+      }
     },
   };
 
@@ -96,8 +109,9 @@ const MatchesPlayed = () => {
       {
         label: "Matches Played",
         data:total,
-        backgroundColor: "#555555",
-        hoverBackgroundColor: "#C729AC",
+        backgroundColor: "rgb(17, 95, 72, 0.5)",
+        borderRadius: 3,
+        // hoverBackgroundColor: "#C729AC",
       },
     ],
   };

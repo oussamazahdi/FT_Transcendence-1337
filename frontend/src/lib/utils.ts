@@ -59,7 +59,7 @@ export const SEARCH_ERROR:Record<string, string> = {
 
 class componentUtils{
 	
-	isExpired(notif) {
+	isExpired(notif:any) {
 		if (!notif || notif.is_expired === 1) return true;
 		if (!notif.expires_at) return false;
 		const t = new Date(notif.expires_at).getTime();
@@ -69,3 +69,25 @@ class componentUtils{
 }
 
 export const ComponentUtils = new componentUtils();
+
+export const parseTime = (timeString: string) => {
+  const date = new Date(timeString);
+  const now = new Date();
+
+  if (isNaN(date.getTime())) 
+    return timeString;
+
+  const isToday = date.toDateString() === now.toDateString();
+
+  if (isToday) {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+  } else {
+    return date.toLocaleString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+  }
+}

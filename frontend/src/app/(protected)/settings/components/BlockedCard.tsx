@@ -9,7 +9,7 @@ interface blockedCardProp{
   user:otherUserData
 }
 const BlockedCard = ({user}:blockedCardProp) => {
-  const {deblockUser} = useAuth();
+  const {unblockUser} = useAuth();
 
   return (
     <div className="w-full mx-2 max-w-200 h-14 md:mx-4 rounded-sm bg-[#414141]/35 flex items-center gap-1 p-1 hover:bg-[#414141] cursor-pointer">
@@ -26,7 +26,7 @@ const BlockedCard = ({user}:blockedCardProp) => {
         </p>
         <p className="text-xs/3 md:text-xs text-[#909090]">{`[@${user.username}]`}</p>
       </div>
-      <button onClick={() => deblockUser(user)} className="ml-auto mr-1 md:mr-4 hover:scale-105 cursor-pointer transition-all duration-150 flex gap-1 rounded-full border-1 p-2">
+      <button onClick={() => unblockUser(user)} className="ml-auto mr-1 md:mr-4 hover:scale-105 cursor-pointer transition-all duration-150 flex gap-1 rounded-full border-1 p-2">
         <CheckCircleIcon className="w-4 h-4" />
         <p className="text-xs">Unblock</p>
       </button>

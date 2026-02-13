@@ -24,10 +24,12 @@ interface UserCtxValue {
   acceptRequest: (user: any) => Promise<void>;
   removeFriend: (user: any) => Promise<void>;
   blockUser: (user: any) => Promise<void>;
-  deblockUser: (user: any) => Promise<void>;
+  unblockUser: (user: any) => Promise<void>;
   refreshFriendReq: () => Promise<void>;
   updateGameSettings: (data: any) => Promise<any>;
   setFriends: React.Dispatch<React.SetStateAction<any[]>>;
+  notification:any
+  setNotification:React.Dispatch<React.SetStateAction<any[]>>;
 }
 interface UserProviderProps {
   children: ReactNode,
@@ -239,7 +241,7 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
     }
   }
 
-  const deblockUser = async (user: any) => {
+  const unblockUser = async (user: any) => {
     try {
       const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks/${user.id}`, {
         method: "DELETE",
@@ -250,14 +252,10 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
       if (!response.ok)
         throw new Error(data.error)
 
-      console.log("user Deblocked succefully");
-
       setBlocked(blocked.filter((items: any) => items.id !== user.id));
     } catch (err: unknown) {
-      const msg =
-    err instanceof Error ? err.message : typeof err === "string" ? err : "default";
-
-  triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
+      const msg = err instanceof Error ? err.message : typeof err === "string" ? err : "default";
+      triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
     }
   }
 
@@ -303,7 +301,6 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
           details: json,
         };
       }
-      //need to update your local settings
       return { ok: true, status: res.status, data: json };
     } catch (err: any) {
       return { ok: false, status: 0, error: err?.message || "NETWORK_ERROR" };
@@ -321,7 +318,7 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
 
   return (
     <UserCtx.Provider
-      value= {{globalError, user, friends, pendingRequests, incomingRequest, blocked, setUser, triggerError, login, logout, updateUser, sendFriendRequest, cancelRequest, acceptRequest, removeFriend, setFriends, blockUser, deblockUser, refreshFriendReq, gameSetting, updateGameSettings, notification, setNotification}}>
+      value= {{globalError, user, friends, pendingRequests, incomingRequest, blocked, setUser, triggerError, login, logout, updateUser, sendFriendRequest, cancelRequest, acceptRequest, removeFriend, setFriends, blockUser, unblockUser, refreshFriendReq, gameSetting, updateGameSettings, notification, setNotification}}>
        { children }
     </UserCtx.Provider>
   );

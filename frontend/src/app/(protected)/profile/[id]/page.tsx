@@ -55,7 +55,7 @@ const FriendProfilePage = async ({ params }:any) => {
   }
 
   return (
-    <div className="grid w-full max-w-7xl mx-3 grid-cols-1 gap-2 md:h-[86vh] md:grid-cols-12 md:grid-rows-2">
+    <div className="grid w-full max-w-7xl mx-3 grid-cols-1 gap-2 md:h-[86vh] lg:h-[60vh] md:grid-cols-12 md:grid-rows-2">
       <div className="min-w-0 md:col-span-8 md:row-start-1">
         <FriendsProfile userPage={friendProfile} />
       </div>
@@ -66,7 +66,7 @@ const FriendProfilePage = async ({ params }:any) => {
       </div>
 
       <div className="min-w-0 h-full md:col-span-4 md:col-start-9 md:row-span-2">
-        <MatchHistory classname="h-full min-h-0" />
+        <MatchHistory classname="h-full min-h-0" id={id}/>
       </div>
     </div>
   );
