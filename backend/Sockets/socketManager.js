@@ -5,14 +5,14 @@ import { onlineUsers } from "../store/memory.store.js";
 
 export function initSocketManager(io) {
   io.on("connection", (socket) => {
-		console.log("​✅​ ❇️ socket connected")
+		// console.log("​✅​ ❇️ socket connected")
 		const userId = socket.user?.userId;
     if (userId) {
 			socket.join(`user:${userId}`);
       socket.join(`chat:${userId}`);
     }
 		onlineUsers.set(userId, socket.id);
-		console.log("❇️❇️❇️❇️❇️❇️❇️❇️❇️❇️ online users :", userId, onlineUsers.get(userId), onlineUsers.keys());
+		// console.log("❇️❇️❇️❇️❇️❇️❇️❇️❇️❇️ online users :", userId, onlineUsers.get(userId), onlineUsers.keys());
 		
     io.emit("users:status", Array.from(onlineUsers.keys()));
 
@@ -21,7 +21,7 @@ export function initSocketManager(io) {
     socket.on("paddle-move", (data) => connectionController.onPaddleMove(socket, io, data));
     
     socket.on("disconnect", () => {
-			console.log("​🔻 ❇️ socket disconnected")
+			// console.log("​🔻 ❇️ socket disconnected")
       connectionController.onDisconnect(socket, io);
     });
     socket.on("leave-game", () => connectionController.onDisconnect(socket, io));

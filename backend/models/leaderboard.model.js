@@ -18,10 +18,10 @@ export class LeaderboardModels {
                         s.player_level,
 
                         COUNT(CASE 
-                            WHEN (m.player1_id = u.id OR m.player2_id = u.id) AND status = 'win'
+                            WHEN (m.player1_id = u.id OR m.player2_id = u.id) AND (status = 'win' AND m.winner_id = u.id)
                             THEN 1 END) AS wins,
                         COUNT(CASE 
-                            WHEN (m.player1_id = u.id OR m.player2_id = u.id) AND status = 'lose'
+                            WHEN (m.player1_id = u.id OR m.player2_id = u.id) AND (status = 'win' AND m.winner_id != u.id)
                             THEN 1 END) AS loses,
                         COUNT(CASE 
                             WHEN (m.player1_id = u.id OR m.player2_id = u.id) AND status = 'forfait'

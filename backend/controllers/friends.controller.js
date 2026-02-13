@@ -55,6 +55,7 @@ export class FriendsController {
                 return reply.code(500).send({error: error.message});
         }
     }
+
     async sendFriendRequest(request, reply)
     {
         const db = request.server.db;
@@ -64,6 +65,7 @@ export class FriendsController {
                 return reply.code(401).send({ error: "CANT_FRIEND_OR_UNFRIEND_YOURSELF" });
             const hasFriendship = friendsModels.isFriendshipExists(db, request.user.userId, request.params.id);
             const isBlocked = friendsModels.isBlockedByUser(db, request.user.userId, request.params.id);
+						console.log("friendship status :", isBlocked);
             if (isBlocked && isBlocked.status === 'blocked')
                 return (reply.code(401).send({error: "USER_IS_BLOCKED"}));
             if (hasFriendship)

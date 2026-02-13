@@ -17,6 +17,9 @@ function createChatTable(db)
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             conversation_id INTEGER NOT NULL,
             sender_id INTEGER NOT NULL,
+            type TEXT NOT NULL CHECK (
+                type IN ('text_message', 'game_invite')
+            ),
             content TEXT NOT NULL,
             sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             creationdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

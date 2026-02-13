@@ -188,6 +188,7 @@ export class ChatModels
             SELECT
                 m.id AS message_id,
                 m.sender_id,
+                m.type,
                 u.avatar,
                 m.content,
                 m.creationdate
@@ -210,13 +211,13 @@ export class ChatModels
     }
 
 
-    createNewMessage(db, convId, senderId, content)
+    createNewMessage(db, convId, senderId, type, content)
     {
         try {
             const result = db.prepare(`
                 INSERT INTO messages
-                (conversation_id, sender_id, content)
-                VALUES (?, ?, ?)`).run(convId, senderId, content);
+                (conversation_id, sender_id, type, content)
+                VALUES (?, ?, ?, ?)`).run(convId, senderId, type, content);
             return (result.lastInsertRowid);
 
         }

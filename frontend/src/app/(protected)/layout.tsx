@@ -9,7 +9,7 @@ export default function RootLayout({ children }:LayoutProps) {
     <>
       <SocketProvider>
         <Navbar />
-        <div className="relative mt-3 md:mt-5 text-white flex inset-x-0 justify-center mx-2">
+        <div className="flex-1 overflow-hidden pt-4 flex justify-center mx-2 text-white">
             {children}
         </div>
       </SocketProvider>

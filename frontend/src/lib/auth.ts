@@ -1,7 +1,6 @@
 import { cookies } from "next/headers";
 import { fullUser } from "@/types/index"
 
-
 export async function getCurrentUser(): Promise<fullUser | null> {
   const cookieStore = await cookies();
   const aToken = cookieStore.get("accessToken");

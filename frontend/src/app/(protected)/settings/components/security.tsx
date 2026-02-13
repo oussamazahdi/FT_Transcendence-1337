@@ -6,7 +6,13 @@ import TwoFaSetup from "./TwoFaSetup.tsx";
 import { USER_ERROR } from "@/lib/utils.ts";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { autofetch } from "@/lib/api";
+// import { z } from "zod"
+// import { zodResolver } from "@hookform/resolvers/zod";
+// import { useForm } from "react-hook-form";
 
+// const changePasswordSchema = z.object({
+
+// })
 //check if data empty
 interface PasswordInputParams{
   label:string

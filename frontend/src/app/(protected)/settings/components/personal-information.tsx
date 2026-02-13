@@ -1,56 +1,62 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import Image, { StaticImageData } from "next/image";
+import Image from "next/image";
 import { useAuth } from "@/contexts/authContext";
 import { assets } from "@/assets/data";
 import { USER_ERROR } from "@/lib/utils.ts";
 import { ArrowUpTrayIcon } from "@heroicons/react/24/outline";
 import { autofetch } from "@/lib/api";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-type ProfileFormData = {
-  firstname: string;
-  lastname: string;
-  username: string;
-  email: string;
-  avatar: File | string | null;
-};
+const ProfileSchema = z.object({
+  firstname: z.string().min(3, "Firstname must be at least 3 characters").max(50),
+  lastname: z.string().min(3, "Lastname must be at least 3 characters").max(50),
+  username: z.string().min(3, "Username must be at least 3 characters").max(20).regex(/^[a-zA-Z0-9_-]+$/, "Username can contain only letters, numbers, _ or -"),
+  email: z.string().email("Email address is invalid"),
+  avatar: z.union([z.instanceof(File), z.string(), z.null()]).optional(),
+});
+
+type ProfileFormData = z.infer<typeof ProfileSchema>;
 
 export default function Personal_information() {
   const { user, login } = useAuth();
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState<ProfileFormData>({
-    firstname: "",
-    lastname: "",
-    username: "",
-    email: "",
-    avatar: null,
+  const {register, handleSubmit, setValue, reset, formState: { errors, isSubmitting, isDirty }} = useForm<ProfileFormData>({
+  resolver: zodResolver(ProfileSchema),
+    defaultValues: {
+      firstname: "",
+      lastname: "",
+      username: "",
+      email: "",
+      avatar: null,
+    },
+    mode: "onSubmit",
   });
 
-  const [error, setError] = useState<string | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   useEffect(() => {
-    if (user) {
-      setFormData({
-        firstname: user.firstname || "",
-        lastname: user.lastname || "",
-        username: user.username || "",
-        email: user.email || "",
-        avatar: user.avatar || null,
-      });
-      setImagePreview(user.avatar && user.avatar !== "null" ? user.avatar : null);
-    }
-  }, [user]);
-  const isChanged =
-    formData.firstname !== (user?.firstname || "") ||
-    formData.lastname !== (user?.lastname || "") ||
-    formData.username !== (user?.username || "") ||
-    formData.email !== (user?.email || "") ||
-    formData.avatar !== user?.avatar;
+    if (!user) 
+      return;
+    reset({
+      firstname: user.firstname || "",
+      lastname: user.lastname || "",
+      username: user.username || "",
+      email: user.email || "",
+      avatar: user.avatar || null,
+    });
+
+    setImagePreview(user.avatar && user.avatar !== "null" ? user.avatar : null);
+  }, [user, reset]);
 
   function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    setError(null)
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file) 
+      return;
 
     if (!file.type.startsWith("image/")) {
       setError("Please select a valid image");
@@ -63,21 +69,20 @@ export default function Personal_information() {
     }
     const preview = URL.createObjectURL(file);
     setImagePreview(preview);
-    setFormData((prev) => ({ ...prev, avatar: file }));
+    setValue("avatar", file, { shouldDirty: true, shouldValidate: true });
   }
 
-  async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setError("");
+  const onSubmit = async(values: ProfileFormData) => {
+    setError(null);
 
     const userData = new FormData();
-    userData.append("firstname", formData.firstname);
-    userData.append("lastname", formData.lastname);
-    userData.append("username", formData.username);
-    userData.append("email", formData.email);
+    userData.append("firstname", values.firstname);
+    userData.append("lastname", values.lastname);
+    userData.append("username", values.username);
+    userData.append("email", values.email);
 
-    if (formData.avatar instanceof File) {
-      userData.append("avatar", formData.avatar);
+    if (values.avatar instanceof File) {
+      userData.append("avatar", values.avatar);
     }
 
     try {
@@ -109,7 +114,7 @@ export default function Personal_information() {
 
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={handleSubmit(onSubmit)}
       className="h-full flex flex-col justify-start mt-4 md:mt-0 items-center px-4 overflow-y-auto"
     >
       <div className="flex flex-col items-center w-full py-8 md:py-0 my-auto">
@@ -159,25 +164,17 @@ export default function Personal_information() {
           <div>
             <p className="text-[10px] text-gray-500">Firstname</p>
             <input
-              required
               type="text"
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, firstname: e.target.value }))
-              }
+              {...register("firstname")}
               className="w-full md:w-52 p-2 h-12 rounded-xl bg-[#4D4D4D]/40 text-white text-sm placeholder-[#FFFFFF]/23 focus:outline-none"
-              value={formData.firstname}
             />
           </div>
           <div>
             <p className="text-[10px] text-gray-500">Lastname</p>
             <input
-              required
               type="text"
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, lastname: e.target.value }))
-              }
+              {...register("lastname")}
               className="w-full md:w-52 p-2 h-12 rounded-xl bg-[#4D4D4D]/40 text-white text-sm placeholder-[#FFFFFF]/23 focus:outline-none"
-              value={formData.lastname}
             />
           </div>
         </div>
@@ -186,25 +183,17 @@ export default function Personal_information() {
           <div>
             <p className="text-[10px] text-gray-500">Username</p>
             <input
-              required
               type="text"
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, username: e.target.value }))
-              }
+              {...register("username")}
               className="w-full md:w-105 p-2 h-12 rounded-xl bg-[#4D4D4D]/40 text-white text-sm placeholder-[#FFFFFF]/23 focus:outline-none"
-              value={formData.username}
             />
           </div>
           <div>
             <p className="text-[10px] text-gray-500">Email</p>
             <input
-              required
               type="text"
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, email: e.target.value }))
-              }
+              {...register("email")}
               className="w-full md:w-105 p-2 h-12 rounded-xl bg-[#4D4D4D]/40 text-white text-sm placeholder-[#FFFFFF]/23 focus:outline-none"
-              value={formData.email}
             />
           </div>
         </div>
@@ -216,11 +205,11 @@ export default function Personal_information() {
         )}
 
         <button
-          disabled={!isChanged}
+          disabled={!isDirty}
           type="submit"
           className={`w-60 h-8 text-xs rounded-sm mt-4 transition-all duration-200
             ${
-              !isChanged
+              !isDirty
                 ? "bg-[#414141]/60 text-white-600 cursor-not-allowed opacity-50"
                 : "bg-[#070707] border-[#414141]/60 border hover:bg-[#0F2C34]/40 text-white hover:text-white cursor-pointer"
             }

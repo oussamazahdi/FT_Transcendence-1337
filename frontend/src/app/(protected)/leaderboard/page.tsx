@@ -97,7 +97,15 @@ useEffect(() => {
         <p className="text-center">Rank</p>
       </div>
       <div className="flex flex-col justify-items-start items-center gap-2 overflow-y-auto custom-scrollbar">
-        {renderLeaders}
+        {loading ? 
+          <div className="h-full w-full flex justify-center items-center">
+            <svg  className="w-20 h-20" fill="#909090" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="4" cy="12" r="3" opacity="1"><animate id="spinner_qYjJ" begin="0;spinner_t4KZ.end-0.25s" attributeName="opacity" dur="0.75s" values="1;.2" fill="freeze"/></circle><circle cx="12" cy="12" r="3" opacity=".4"><animate begin="spinner_qYjJ.begin+0.15s" attributeName="opacity" dur="0.75s" values="1;.2" fill="freeze"/></circle><circle cx="20" cy="12" r="3" opacity=".3"><animate id="spinner_t4KZ" begin="spinner_qYjJ.begin+0.3s" attributeName="opacity" dur="0.75s" values="1;.2" fill="freeze"/></circle></svg>  
+          </div>
+          :(error ? <p className="text-red-600 text-sm text-center px-6 py-2 bg-red-300/20 border mt-2 rounded">
+            {error}
+          </p>
+            :renderLeaders ) 
+        }
       </div>
       <div className="flex-1 flex justify-center items-end -mt-4 gap-2">
         <button onClick={() => {handleFirst()} }className="size-8 border-1 border-white rounded-sm p-1 hover:bg-white/20 cursor-pointer">

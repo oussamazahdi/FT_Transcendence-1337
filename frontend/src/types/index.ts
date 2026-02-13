@@ -1,4 +1,5 @@
 import { StaticImageData } from "next/image";
+import { z } from "zod";
 
 export interface User {
   id: string;
@@ -30,6 +31,17 @@ export type Conversation = {
   status: boolean;
 };
 
+export type ChatMessage = {
+  id: number | string;
+  senderId: number | string;
+  receiverId: number | string;
+  avatar?: string | null;
+  type: string;
+  text: string;
+  timestamp: string;
+  isMe: boolean;
+};
+
 export interface Leaders{
     id:number,
     username:string,
@@ -43,6 +55,39 @@ export interface Leaders{
     loses:number,
     rank:number,
 }
+
+export const SignUpSchema = z
+  .object({
+    username: z
+      .string()
+      .min(3, "Nickname must be at least 3 characters")
+      .max(20, "Nickname must be at most 20 characters")
+      .regex(/^[a-zA-Z0-9_-]+$/, "Nickname can only contain letters, numbers, _ or -"),
+    firstname: z
+      .string()
+      .min(3, "First name must be at least 3 characters")
+      .max(50, "First name must be at most 50 characters")
+      .regex(/^[a-zA-ZÀ-ÿ\s'-]+$/, "First name contains invalid characters"),
+    lastname: z
+      .string()
+      .min(3, "Last name must be at least 3 characters")
+      .max(50, "Last name must be at most 50 characters")
+      .regex(/^[a-zA-ZÀ-ÿ\s'-]+$/, "Last name contains invalid characters"),
+    email: z.string().email("Email address is invalid"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .regex(/[0-9]/, "Password must contain at least one number"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
+export type SignUpForm = z.infer<typeof SignUpSchema>;
+
 
 export interface Friend {
   id: string;

@@ -4,8 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { assets } from "@/assets/data";
-import Input from "../sign-up/components/Input";
-import ConnectWith from "@/components/ConnectWith";
+import ConnectWith from "@/components/ConnectWith.tsx";
 import { useAuth } from "@/contexts/authContext";
 import { AUTH_ERRORS } from "@/lib/utils.ts";
 
@@ -75,20 +74,22 @@ const SignIn = () => {
             className="space-y-1 mt-6 w-full max-w-xs"
           >
             <div>
-              <Input
+              <input
                 type="email"
                 value={email}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                 placeholder="E-mail"
+                className="w-full p-3 h-8 rounded bg-[#4D4D4D]/40 text-white text-xs placeholder-[#FFFFFF]/23 focus:outline-none"
               />
             </div>
 
             <div>
-              <Input
+              <input
                 type="password"
                 value={password}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setpassword(e.target.value)}
                 placeholder="your password"
+                className="w-full p-3 h-8 rounded bg-[#4D4D4D]/40 text-white text-xs placeholder-[#FFFFFF]/23 focus:outline-none"
               />
             </div>
             {error && (

@@ -41,6 +41,7 @@ export default function SideBar({ displayData, loading }: SideBarProps) {
         const search: otherUserData[] = data.friends || [];
         setHasMore(search.length === 10);
         setSearchData(search);
+				console.log("==========> seach object:", search); //remove later
       } catch (err) {
         console.log("Failed to fetch users", err);
       } finally {

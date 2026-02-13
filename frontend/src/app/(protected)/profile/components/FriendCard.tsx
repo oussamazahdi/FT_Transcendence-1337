@@ -16,7 +16,6 @@ type FriendCardUser = {
   firstname: string;
   lastname: string;
   avatar?: string | null;
-  // Accept different status spellings/cases, or undefined.
   status?: FriendStatus | "online" | "offline";
 };
 
@@ -58,7 +57,7 @@ const FriendCard = ({ user }: FriendCardProps) => {
     <div className="flex items-center w-full bg-[#414141]/60 rounded-lg p-1 gap-1">
       <div className="relative size-10 flex items-center overflow-hidden rounded-sm">
         <Image
-          src={user.avatar ?? assets.defaultProfile}
+          src={user?.avatar ?? assets.defaultProfile}
           alt="icon"
           fill
           sizes="40px"

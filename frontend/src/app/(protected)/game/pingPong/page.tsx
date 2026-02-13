@@ -5,6 +5,7 @@ import GameSetup from "@/components/gameSetupComp/gameSetup";
 import { useRouter } from "next/navigation";
 import CreateTournamentModal from "./tournament/CreateTournamentModal"; // ✅ adjust path to where you place it
 import Image from "next/image";
+import { useAuth } from "@/contexts/authContext";
 
 type LocalGameItem = {
 	titel: string;
@@ -29,8 +30,41 @@ type TournamentPlayer = {
 	isGuest?: boolean;
 };
 
+/**
+
+
+avatar: "http://localhost:3001/uploads/Ozahdi-1770926851589.jpeg"
+​​
+firstname: "Oussama"
+​​
+id: 1002
+​​
+lastname: "Zahdi"
+​​
+username: "Ozahdi"
+
+ */
+
+type Friends = {
+	avatar : string;
+	firstname: string;
+	id: number;
+	lastname: string;
+	username: string;
+}
+
+function normalizeFriends(friends: Friends[]) {
+	return friends.map((user) => ({
+		id: String(user.id),
+		username: user.username,
+		displayName: `${user.firstname} ${user.lastname}`,
+		avatarUrl: user.avatar,
+	}));
+}
+
 const LocalGame = () => {
 	const router = useRouter();
+	const { friends } = useAuth();
 
 	const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -38,35 +72,40 @@ const LocalGame = () => {
 	const [isTournamentOpen, setIsTournamentOpen] = useState(false);
 
 	// ✅ example users list (replace with your real users/friends from API/store)
-	const users: UserLite[] = useMemo(
-		() => [
-			{
-				id: "1",
-				username: "Soarif",
-				displayName: "Soufiane Aarif",
-				avatarUrl: "/gameAvatars/profile1.jpeg",
-			},
-			{
-				id: "2",
-				username: "Zahdi",
-				displayName: "Oussama Zahdi",
-				avatarUrl: "/gameAvatars/profile3.jpeg",
-			},
-			{
-				id: "3",
-				username: "Zahdi",
-				displayName: "Oussama Zahdi",
-				avatarUrl: "/gameAvatars/profile4.jpeg",
-			},
-			{
-				id: "4",
-				username: "Zahdi",
-				displayName: "Oussama Zahdi",
-				avatarUrl: "/gameAvatars/profile5.jpeg",
-			},
-		],
-		[]
-	);
+	// const users: UserLite[] = useMemo(
+	// 	() => [
+	// 		{
+	// 			id: "1",
+	// 			username: "Soarif",
+	// 			displayName: "Soufiane Aarif",
+	// 			avatarUrl: "/gameAvatars/profile1.jpeg",
+	// 		},
+	// 		{
+	// 			id: "2",
+	// 			username: "Zahdi",
+	// 			displayName: "Oussama Zahdi",
+	// 			avatarUrl: "/gameAvatars/profile3.jpeg",
+	// 		},
+	// 		{
+	// 			id: "3",
+	// 			username: "Zahdi",
+	// 			displayName: "Oussama Zahdi",
+	// 			avatarUrl: "/gameAvatars/profile4.jpeg",
+	// 		},
+	// 		{
+	// 			id: "4",
+	// 			username: "Zahdi",
+	// 			displayName: "Oussama Zahdi",
+	// 			avatarUrl: "/gameAvatars/profile5.jpeg",
+	// 		},
+	// 	],
+	// 	[]
+	// );
+
+	const users: UserLite[] = normalizeFriends(friends);
+
+	// const { friends } = useAuth();
+	// console.log("**********> Friends:", users);
 
 	const localGameItems: LocalGameItem[] = [
 		{

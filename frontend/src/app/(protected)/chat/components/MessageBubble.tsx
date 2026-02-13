@@ -2,7 +2,7 @@ import React from "react";
 import Image, { StaticImageData } from "next/image";
 import { useAuth } from "@/contexts/authContext.tsx";
 import { assets } from "@/assets/data";
-import type { ChatMessage } from "./ChatWindow";
+import type { ChatMessage } from "@/types";
 
 interface MessageBubble{
   message: ChatMessage
@@ -35,6 +35,7 @@ function parseTime(timeString: string) {
 const MessageBubble = (props:MessageBubble) => {
   const { user } = useAuth();
   const time = parseTime(props.message.timestamp)
+  const isMe = props.message.isMe;
   return (
     <div className={`flex gap-2 w-full items-center ${props.isMe ? "flex-row-reverse" : "justify-start"}`}>
       <div className="size-9 overflow-hidden rounded-sm">
@@ -50,7 +51,7 @@ const MessageBubble = (props:MessageBubble) => {
           <div className="w-10 flex-none" />
         )}
       </div>
-      {props.message.type == "text" ? (
+      {props.message.type == "text_message" ? (
         <div
           className={`flex gap-3 max-w-[70%] p-2 rounded-xl text-xs ${
             props.isMe
@@ -65,21 +66,23 @@ const MessageBubble = (props:MessageBubble) => {
         </div>
       ) : (
         <div
-          className={`flex flex-col gap-3 max-w-[70%] p-2 rounded-xl text-xs ${
+          className={`flex flex-col gap-3 max-w-[70%] p-2 rounded-xl text-xs m-1 ${
             props.isMe
               ? "bg-[#595959]/65 text-white"
               : "bg-[#0F0F0F]/65 text-white"
           }`}
         >
           <p className="font-medium">{"1 vs 1 ping pong game invitation"}</p>
-          <div className="flex justify-center items-center gap-1">
-            <button className="bg-[#583F3F]/55 text-[8px] text-[#D55C5C] px-3 py-1 rounded-xs hover:bg-[#8D4646]/50 cursor-pointer">
-              Reject
-            </button>
-            <button className="bg-[#3F5846]/55 text-[8px] text-[#5CD57E] px-3 py-1 rounded-xs hover:bg-[#468C74]/50 cursor-pointer">
-              Accept
-            </button>
-          </div>
+          {!isMe && (
+            <div className="flex justify-center items-center gap-1">
+              <button className="bg-[#583F3F]/55 text-[8px] text-[#D55C5C] px-3 py-1 rounded-xs hover:bg-[#8D4646]/50 cursor-pointer">
+                Reject
+              </button>
+              <button className="bg-[#3F5846]/55 text-[8px] text-[#5CD57E] px-3 py-1 rounded-xs hover:bg-[#468C74]/50 cursor-pointer">
+                Accept
+              </button>
+            </div>)}
+          
         </div>
       )}
     </div>

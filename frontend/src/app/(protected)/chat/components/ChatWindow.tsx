@@ -1,30 +1,25 @@
-import { useEffect, useState } from "react";
+"use client";
+import { useEffect, useRef, useState } from "react";
 import ChatHeader from "./ChatHeader";
 import ChatInput from "./ChatInput";
-import { useAuth } from "@/contexts/authContext";
 import MessageList from "./MessageList";
+import { useAuth } from "@/contexts/authContext";
 import { useSocket } from "@/contexts/socketContext";
 import { autofetch } from "@/lib/api";
 import type { SelectedFriend } from "@/contexts/userContexts";
 import { CHAT_ERROR } from "@/lib/utils";
-
-export type ChatMessage = {
-  id: number | string;
-  senderId: number | string;
-  avatar?: string | null;
-  type: "text";
-  text: string;
-  timestamp: string;
-  isMe: boolean;
-};
+import { ChatMessage } from "@/types";
 
 interface ChatWindowProps {
   selectedFriend: SelectedFriend;
   updateLastMessage: (lastmessage: string, time: string, friend: SelectedFriend) => void;
+  liveMessages: ChatMessage[];
+  clearLiveMessages: () => void;
 }
 
-export default function ChatWindow({ selectedFriend, updateLastMessage}: ChatWindowProps) {
+export default function ChatWindow({selectedFriend, updateLastMessage, liveMessages, clearLiveMessages}: ChatWindowProps) {
   const Friend = selectedFriend;
+  const friendRef = useRef(Friend);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const socket = useSocket();
   const { user, triggerError } = useAuth();
@@ -37,44 +32,50 @@ export default function ChatWindow({ selectedFriend, updateLastMessage}: ChatWin
     setMessages([]);
     setPage(1);
     setHasMore(true);
-  }, [Friend.userid]);
+  }, [Friend.id]);
 
+  useEffect(() => {
+    friendRef.current = Friend;
+  }, [Friend]);
 
   useEffect(() => {
     const fetchMessages = async () => {
-      if (!hasMore && page > 1) return;
+      if (!hasMore && page > 1) 
+        return;
+
       setLoading(true);
       try {
         const response = await autofetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/chat/messages?page=${page}&friendId=${Friend.id}`,
-          {
-            method: "GET",
-            credentials: "include",
-          }
+          { method: "GET", credentials: "include" }
         );
+
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error);
+        if (!response.ok) 
+          throw new Error(data.error);
 
         const newMessages = data.messages || [];
         if (newMessages.length < 30) 
           setHasMore(false);
+
+        console.log(newMessages);
         const formatedData: ChatMessage[] = newMessages.map((message: any) => ({
           id: message.message_id,
           senderId: message.sender_id,
           avatar: message.avatar,
-          type: "text",
+          type: message.type,
           text: message.content,
           timestamp: message.creationdate,
           isMe: String(user?.id) === String(message.sender_id),
         }));
-        console.log("loaded",formatedData);
-
+        
         setMessages((prev) => {
           if (page === 1) 
             return formatedData;
-          const existingIds = new Set(prev.map(msg => msg.id))
-          const uniqueNewMessages = formatedData.filter(msg => !existingIds.has(msg.id))
-          return [...prev, ...uniqueNewMessages]
+
+          const existingIds = new Set(prev.map((m) => String(m.id)));
+          const unique = formatedData.filter((m) => !existingIds.has(String(m.id)));
+          return [...prev, ...unique];
         });
       } catch (err) {
         console.log("Failed to fetch messages", err);
@@ -86,69 +87,74 @@ export default function ChatWindow({ selectedFriend, updateLastMessage}: ChatWin
 
     fetchMessages();
   }, [page, Friend.id, hasMore, user?.id]);
-  console.log("messages",messages);
 
   useEffect(() => {
-    if (!socket) return;
-    const handleReceive = (payload: any) => {
-      setMessages((prev) => [
-        {
-          id: payload.msgId,
-          senderId: payload.senderId,
-          avatar: payload.avatar,
-          type: "text",
-          text: payload.content,
-          timestamp: payload.sentAt,
-          isMe: false,
-        },
-        ...prev,
-      ]);
-      updateLastMessage(payload.content, payload.sentAt, Friend);
-    };
-    socket.on("chat:receiver", handleReceive);
-    socket.on("chat:error", (err: any) => {
-      const message = typeof err === "string" ? err : err?.message;
-      setMessages((prev) => {
-        if (prev.length === 0) 
-          return prev;
-        console.log("deleted");
-        return prev.slice(1, -1);
-      })
-      triggerError(CHAT_ERROR[message] ?? CHAT_ERROR.default);
-    });
-    return () => {
-      socket.off("chat:receiver");
-      socket.off("chat:error");
-    };
-  }, [socket, Friend, updateLastMessage, triggerError]);
+    if (!liveMessages || liveMessages.length === 0) 
+      return;
 
-  const handleSend = (content: string) => {
+    setMessages((prev) => {
+      const existingIds = new Set(prev.map((m) => String(m.id)));
+      const unique = liveMessages.filter((m) => !existingIds.has(String(m.id)));
+      return [...unique, ...prev];
+    });
+
+    clearLiveMessages();
+  }, [liveMessages, clearLiveMessages]);
+
+  useEffect(() => {
+    if (!socket) 
+      return;
+
+    const onError = (err: any) => {
+			console.log(err);
+      const message = typeof err === "string" ? err : err?.message;
+      const now = new Date();
+
+      setMessages((prev) => {
+        if (prev.length === 0)
+          return prev;
+        return prev.slice(1);
+      });
+      const currentFriend = friendRef.current;
+      updateLastMessage("Error", now.toISOString() , currentFriend);
+      triggerError(CHAT_ERROR[message] ?? CHAT_ERROR.default);
+    };
+
+    socket.on("chat:error", onError);
+    return () => {
+      socket.off("chat:error", onError);
+    };
+  }, [socket, triggerError, updateLastMessage]);
+
+  const handleSend = (content: string, type: string) => {
+    const now = new Date();
+
     const tmpMessage: ChatMessage = {
-      id: Date.now(),
+      id: `tmp-${now.getTime()}`,
       senderId: user?.id || "",
+      receiverId: selectedFriend.id,
       avatar: user?.avatar || null,
-      type: "text",
+      type: type,
       text: content,
-      timestamp: new Date().toLocaleDateString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
+      timestamp: now.toISOString(),
       isMe: true,
     };
-
     setMessages((prev) => [tmpMessage, ...prev]);
     updateLastMessage(tmpMessage.text, tmpMessage.timestamp, Friend);
+
     if (!socket) 
       return;
     socket.emit("chat:send", {
-      receiverId: selectedFriend.id,
-      content: content,
+      receiverId: Friend.id,
+      type: type,
+      content,
     });
   };
 
   return (
     <div className="w-full flex flex-col flex-1 gap-2 rounded-lg h-full">
       <ChatHeader user={Friend} />
+
       <div className="flex-1 bg-[#333333]/65 rounded-lg flex flex-col overflow-hidden">
         <MessageList
           messages={messages}

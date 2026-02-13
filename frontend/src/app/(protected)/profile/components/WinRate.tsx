@@ -29,7 +29,7 @@ defaults.responsive = true;
 const WinRate = () => {
   const [wins, setWins] = useState<[]>([])
   const [loses, setLoses] = useState<[]>([])
-  const [labels, setLabels] = useState<[]>([])
+  const [labels, setLabels] = useState<any[]>([])
   const [loading, setLoading] = useState(false);
     useEffect(()=>{
       const fetchDaysData = async () => {
@@ -45,10 +45,12 @@ const WinRate = () => {
           
           const data = await response.json();
           const rawData = data.data || [];
-          const formattedLabels = rawData.map((item: any) => {
-            const date = new Date(item.day);
-            return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-          });
+          const formattedLabels = ["day1", "day2", "day3", "day4", "day5", "day6", "day7"]
+          formattedLabels.splice(0, rawData.length)
+					rawData.map((item: any) => {
+						const date = new Date(item.day);
+						formattedLabels.unshift(date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }));
+					});
           const winsData = rawData.map((item: any) => item.wins);
           const losesData = rawData.map((item: any) => item.loses);
 
@@ -112,7 +114,7 @@ const WinRate = () => {
     ]
   }
   return (
-    <div className="bg-[#0F0F0F]/75 rounded-[20px] flex-1 max-h-97.25 p-2">
+    <div className="bg-[#0F0F0F]/75 rounded-[20px] flex-1 h-full min-h-55 md:min-h-0 p-2">
       <Line
         options={options}
         data={data}

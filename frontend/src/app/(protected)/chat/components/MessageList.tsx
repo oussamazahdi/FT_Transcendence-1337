@@ -1,7 +1,7 @@
 import React from 'react'
 import MessageBubble from './MessageBubble'
 import { useAuth } from '@/contexts/authContext';
-import { ChatMessage } from './ChatWindow';
+import { ChatMessage } from '@/types';
 
 interface MessageListProps{
   messages: ChatMessage[]
