@@ -32,10 +32,43 @@ function parseTime(timeString: string) {
   }
 }
 
+/**
+id: "tmp-1770993648371"
+isMe: true
+senderId: 2003
+receiverId: 1002
+text: "1vs1 game invite"
+type: "game_invite"
+avatar: "http://localhost:3001/uploads/default/profile4.jpeg"
+timestamp: "2026-02-13T14:40:48.371Z"
+ */
+
+type GAMEINVITECHAT = {
+	id: number;
+	isMe: boolean;
+	senderId:number | string;
+	// receiverId:number | string;
+	text:string;
+	type:string;
+	avatar:string;
+	timestamp:string;
+}
+
+
+
+
+
 const MessageBubble = (props:MessageBubble) => {
   const { user } = useAuth();
   const time = parseTime(props.message.timestamp)
   const isMe = props.message.isMe;
+	// const invit: GAMEINVITECHAT = props.message;
+
+	// function acceptGameInvitation (){
+		
+	// }
+
+	// console.log("----------> message bubble:", props.message);
   return (
     <div className={`flex gap-2 w-full items-center ${props.isMe ? "flex-row-reverse" : "justify-start"}`}>
       <div className="size-9 overflow-hidden rounded-sm">

@@ -1,9 +1,11 @@
 // "use client";
+
+
 export default function Background({ children }) {
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Background layer */}
-      <div className="fixed inset-0 -z-10">
+      <div className="fixed inset-0 -z-10 ">
         <img
           src="/BG.png"
           alt="Background"

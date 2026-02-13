@@ -118,10 +118,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
     });
 
     const handleMatchStarted = (data: MatchStartedPayload | MatchRoomId) => {
-      const roomId =
-        typeof data === "string" || typeof data === "number"
-          ? data
-          : data?.roomId;
+      const roomId = typeof data === "string" || typeof data === "number" ? data : data?.roomId;
       if (!roomId) return;
 
       setActiveMatch({

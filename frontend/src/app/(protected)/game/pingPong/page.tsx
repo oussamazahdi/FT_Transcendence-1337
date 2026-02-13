@@ -1,235 +1,182 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import GameSetup from "@/components/gameSetupComp/gameSetup";
 import { useRouter } from "next/navigation";
-import CreateTournamentModal from "./tournament/CreateTournamentModal"; // ✅ adjust path to where you place it
 import Image from "next/image";
+
+import GameSetup from "@/components/gameSetupComp/gameSetup";
+import CreateTournamentModal from "./tournament/CreateTournamentModal";
 import { useAuth } from "@/contexts/authContext";
 
 type LocalGameItem = {
-	titel: string;
-	cover: string;
-	alt: string;
-	description: string;
-	button: string;
+  title: string;
+  cover: string;
+  alt: string;
+  description: string;
+  button: string;
+  onClick: () => void;
 };
 
 type UserLite = {
-	id: string;
-	username: string;
-	displayName?: string;
-	avatarUrl?: string | null;
+  id: string;
+  username: string;
+  displayName?: string;
+  avatarUrl?: string | null;
 };
 
 type TournamentPlayer = {
-	id: string;
-	username: string;
-	displayName: string;
-	avatarUrl?: string | null;
-	isGuest?: boolean;
+  id: string;
+  username: string;
+  displayName: string;
+  avatarUrl?: string | null;
+  isGuest?: boolean;
 };
-
-/**
-
-
-avatar: "http://localhost:3001/uploads/Ozahdi-1770926851589.jpeg"
-​​
-firstname: "Oussama"
-​​
-id: 1002
-​​
-lastname: "Zahdi"
-​​
-username: "Ozahdi"
-
- */
 
 type Friends = {
-	avatar : string;
-	firstname: string;
-	id: number;
-	lastname: string;
-	username: string;
-}
-
-function normalizeFriends(friends: Friends[]) {
-	return friends.map((user) => ({
-		id: String(user.id),
-		username: user.username,
-		displayName: `${user.firstname} ${user.lastname}`,
-		avatarUrl: user.avatar,
-	}));
-}
-
-const LocalGame = () => {
-	const router = useRouter();
-	const { friends } = useAuth();
-
-	const [isModalVisible, setIsModalVisible] = useState(false);
-
-	// ✅ tournament modal state
-	const [isTournamentOpen, setIsTournamentOpen] = useState(false);
-
-	// ✅ example users list (replace with your real users/friends from API/store)
-	// const users: UserLite[] = useMemo(
-	// 	() => [
-	// 		{
-	// 			id: "1",
-	// 			username: "Soarif",
-	// 			displayName: "Soufiane Aarif",
-	// 			avatarUrl: "/gameAvatars/profile1.jpeg",
-	// 		},
-	// 		{
-	// 			id: "2",
-	// 			username: "Zahdi",
-	// 			displayName: "Oussama Zahdi",
-	// 			avatarUrl: "/gameAvatars/profile3.jpeg",
-	// 		},
-	// 		{
-	// 			id: "3",
-	// 			username: "Zahdi",
-	// 			displayName: "Oussama Zahdi",
-	// 			avatarUrl: "/gameAvatars/profile4.jpeg",
-	// 		},
-	// 		{
-	// 			id: "4",
-	// 			username: "Zahdi",
-	// 			displayName: "Oussama Zahdi",
-	// 			avatarUrl: "/gameAvatars/profile5.jpeg",
-	// 		},
-	// 	],
-	// 	[]
-	// );
-
-	const users: UserLite[] = normalizeFriends(friends);
-
-	// const { friends } = useAuth();
-	// console.log("**********> Friends:", users);
-
-	const localGameItems: LocalGameItem[] = [
-		{
-			titel: "Local Game",
-			cover: "/Game/pingpong/local.png",
-			alt: "1vs1 cover",
-			description: "Play a single game against a friend.",
-			button: "Start Game",
-		},
-		{
-			titel: "Tournament",
-			cover: "/Game/pingpong/Tour.png",
-			alt: "Tounament cover",
-			description: "Create your own tournament.",
-			button: "Create Tournament",
-		},
-		{
-			titel: "Remote Game",
-			cover: "/Game/pingpong/remote.png",
-			alt: "Remote Game cover",
-			description: "Play a single game against a friend.",
-			button: "Start Game",
-		},
-	];
-
-	const handleTournamentStart = (payload: {
-		name: string;
-		players: TournamentPlayer[];
-	}) => {
-		// ✅ close modal
-		setIsTournamentOpen(false);
-
-		// ✅ option A: store in localStorage and go to tournament page
-		localStorage.setItem("tournament:create", JSON.stringify(payload));
-		router.push("/game/pingPong/tournament");
-
-		// ✅ option B (later): call your API then navigate
-		// await fetch("/api/tournament", { method: "POST", body: JSON.stringify(payload) })
-	};
-
-	return (
-		<div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 w-full max-w-7xl">
-			<div
-				key={localGameItems[0].titel}
-				className="rounded-3xl bg-[#0F0F0F]/65 my-3 px-3 pt-3 text-center"
-			>
-				<Image
-					width={400}
-					height={700}
-					src={localGameItems[0].cover}
-					alt={localGameItems[0].alt}
-					className="w-full h-110 object-cover rounded-xl"
-				/>
-				<h1 className="font-bold text-2xl pt-3 pb-1">
-					{localGameItems[0].titel}
-				</h1>
-				<p className="pb-3 text-[#D5D5D5]">{localGameItems[0].description}</p>
-				<button
-					className=" bg-[#333333]/60 hover:bg-[#333333]/40 mb-3 py-2 w-full rounded-lg cursor-pointer shadow-md font-medium"
-					onClick={() => setIsModalVisible(true)}
-				>
-					{localGameItems[0].button}
-				</button>
-			</div>
-
-			<div
-				key={localGameItems[1].titel}
-				className="rounded-3xl bg-[#0F0F0F]/65 my-3 px-3 pt-3 text-center"
-			>
-				<Image
-					width={400}
-					height={700}
-					src={localGameItems[1].cover}
-					alt={localGameItems[1].alt}
-					className="w-full h-110 object-cover rounded-xl"
-				/>
-				<h1 className="font-bold text-2xl pt-3 pb-1">
-					{localGameItems[1].titel}
-				</h1>
-				<p className="pb-3 text-[#D5D5D5]">{localGameItems[1].description}</p>
-				<button
-					className=" bg-[#333333]/60 hover:bg-[#333333]/40 mb-3 py-2 w-full rounded-lg cursor-pointer shadow-md font-medium"
-					onClick={() => setIsTournamentOpen(true)} // ✅ open tournament modal
-				>
-					{localGameItems[1].button}
-				</button>
-			</div>
-
-			<div
-				key={localGameItems[2].titel}
-				className="rounded-3xl bg-[#0F0F0F]/65 my-3 px-3 pt-3 text-center"
-			>
-				<Image
-					width={400}
-					height={700}
-					src={localGameItems[2].cover}
-					alt={localGameItems[2].alt}
-					className="w-full h-110 object-cover rounded-xl"
-				/>
-				<h1 className="font-bold text-2xl pt-3 pb-1">
-					{localGameItems[2].titel}
-				</h1>
-				<p className="pb-3 text-[#D5D5D5]">{localGameItems[2].description}</p>
-				<button
-					className=" bg-[#333333]/60 hover:bg-[#333333]/40 mb-3 py-2 w-full rounded-lg cursor-pointer shadow-md font-medium"
-					onClick={() => router.push("/game/pingPong/matchmaking")}
-				>
-					{localGameItems[2].button}
-				</button>
-			</div>
-
-			{/* existing local setup modal */}
-			<GameSetup isVisible={isModalVisible} onClose={() => setIsModalVisible(false)} />
-
-			{/* ✅ tournament modal */}
-			<CreateTournamentModal
-  		open={isTournamentOpen}
-  		onClose={() => setIsTournamentOpen(false)}
-  		users={users}
-  		maxPlayers={4}/>
-
-
-		</div>
-	);
+  avatar: string;
+  firstname: string;
+  id: number;
+  lastname: string;
+  username: string;
 };
 
-export default LocalGame;
+function normalizeFriends(friends: Friends[] | undefined | null): UserLite[] {
+  if (!Array.isArray(friends)) return [];
+  return friends.map((user) => ({
+    id: String(user.id),
+    username: user.username,
+    displayName: `${user.firstname} ${user.lastname}`.trim(),
+    avatarUrl: user.avatar,
+  }));
+}
+
+function Card({
+  title,
+  cover,
+  alt,
+  description,
+  button,
+  onClick,
+}: {
+  title: string;
+  cover: string;
+  alt: string;
+  description: string;
+  button: string;
+  onClick: () => void;
+}) {
+  return (
+    <div className="group relative overflow-hidden rounded-3xl bg-[#0F0F0F]/65 ring-1 ring-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+      {/* image */}
+      <div className="relative h-120 w-full overflow-hidden">
+        <Image
+          fill
+          src={cover}
+          alt={alt}
+          className="object-cover transition duration-300 grayscale group-hover:grayscale-0 group-hover:scale-[1.03]"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          priority={false}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/60 to-transparent" />
+      </div>
+
+      {/* content */}
+      <div className="p-5 text-left">
+        <h2 className="text-xl font-bold text-white">{title}</h2>
+        <p className="mt-1 text-sm text-white/70">{description}</p>
+
+        <button
+          type="button"
+          onClick={onClick}
+          className="mt-4 w-full rounded-2xl bg-white/10 px-4 py-3 text-sm font-semibold text-white ring-1 ring-white/10 transition hover:bg-white/15 active:scale-[0.99]"
+        >
+          {button}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default function LocalGame() {
+  const router = useRouter();
+  const { friends } = useAuth();
+
+  const [isLocalSetupOpen, setIsLocalSetupOpen] = useState(false);
+  const [isTournamentOpen, setIsTournamentOpen] = useState(false);
+
+  const users: UserLite[] = useMemo(() => normalizeFriends(friends as unknown as Friends[]), [friends]);
+
+  const handleTournamentStart = (payload: { name: string; players: TournamentPlayer[] }) => {
+    setIsTournamentOpen(false);
+    localStorage.setItem("tournament:create", JSON.stringify(payload));
+    router.push("/game/pingPong/tournament");
+  };
+
+  const items: LocalGameItem[] = useMemo(
+    () => [
+      {
+        title: "Local Game",
+        cover: "/Local_bg.png",
+        alt: "Local 1vs1 cover",
+        description: "Play a single game against a friend on the same device.",
+        button: "Start Game",
+        onClick: () => setIsLocalSetupOpen(true),
+      },
+      {
+        title: "Tournament",
+        cover: "/Tournament_bg.png",
+        alt: "Tournament cover",
+        description: "Create a 4-player bracket and play match-by-match to crown a champion.",
+        button: "Create Tournament",
+        onClick: () => setIsTournamentOpen(true),
+      },
+      {
+        title: "Remote Game",
+        cover: "/Remote_bg.png",
+        alt: "Remote game cover",
+        description: "Queue up for an online match and compete against another player.",
+        button: "Start Game",
+        onClick: () => router.push("/game/pingPong/matchmaking"),
+      },
+    ],
+    [router]
+  );
+
+  return (
+    <div className="w-full">
+      <div className="mx-auto w-full max-w-7xl px-4 py-8">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-white">Ping Pong</h1>
+          <p className="mt-1 text-sm text-white/60">Choose a mode to start playing.</p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {items.map((it) => (
+            <Card
+              key={it.title}
+              title={it.title}
+              cover={it.cover}
+              alt={it.alt}
+              description={it.description}
+              button={it.button}
+              onClick={it.onClick}
+            />
+          ))}
+        </div>
+
+        {/* Local setup modal */}
+        <GameSetup isVisible={isLocalSetupOpen} onClose={() => setIsLocalSetupOpen(false)} />
+
+        {/* Tournament modal */}
+        <CreateTournamentModal
+          open={isTournamentOpen}
+          onClose={() => setIsTournamentOpen(false)}
+          users={users}
+          maxPlayers={4}
+          // If your modal supports it, this is the ideal API:
+          onStart={handleTournamentStart as any}
+        />
+      </div>
+    </div>
+  );
+}

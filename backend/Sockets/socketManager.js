@@ -32,6 +32,10 @@ export function initSocketManager(io) {
     socket.on("game:accept", async (data, ack) => {
       connectionController.onGameAccept(socket, io, data, ack);
     });
+
+		socket.on("chat:game:accept", (data, ack)=>{
+			console.log("====> this is all data from chat:game:accept:", data);
+		})
     socket.on("chat:send", (data) => chatController.sendMessage(socket, io, data));
     socket.on("chat:error", (error) => {
       console.error(error.message);

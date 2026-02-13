@@ -1,18 +1,24 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSocket } from "@/contexts/socketContext";
 
 /**
- * CLEAN VERSION:
- * - Removed score modal + score state/logic
- * - Removed setMatchResult / getLoser (not used here anymore)
- * - Kept bracket rendering + champion display (based on stored results)
- * - Play Match now ONLY redirects to the local game page
- * - Keeps lock/advance hydration when returning to this page
+ * FULL FIX:
+ * ✅ Do NOT call useSocket() inside a normal function (hooks rule)
+ * ✅ Compute next match + label
+ * ✅ Console log next round + players
+ * ✅ Notify ONLY the 2 players in the next match
+ * ✅ Avoid duplicate notifications (useRef)
+ * ✅ Only notify when next match becomes "ready"
  */
 
-type TournamentPlayer = {
+// ─────────────────────────────────────────────────────────────────────────────
+// Types
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type TournamentPlayer = {
   id: string;
   username: string;
   displayName: string;
@@ -27,16 +33,14 @@ type TournamentCreatePayload = {
 
 type MatchStatus = "locked" | "ready" | "in_progress" | "completed";
 
-type Match = {
+export type Match = {
   id: string;
-  round: 1 | 2; // 1 = semi, 2 = final
+  round: 1 | 2;
   a: TournamentPlayer;
   b: TournamentPlayer;
   status: MatchStatus;
-
   scoreA?: number;
   scoreB?: number;
-
   winnerId?: string;
 };
 
@@ -50,9 +54,9 @@ type TournamentState = {
   updatedAt: string;
 };
 
-function cn(...classes: Array<string | false | null | undefined>) {
-  return classes.filter(Boolean).join(" ");
-}
+// ─────────────────────────────────────────────────────────────────────────────
+// Storage + helpers
+// ─────────────────────────────────────────────────────────────────────────────
 
 function safeParse<T>(value: string | null): T | null {
   if (!value) return null;
@@ -84,6 +88,10 @@ function loadStateSafe(): TournamentState | null {
   return raw;
 }
 
+function saveState(state: TournamentState) {
+  localStorage.setItem("tournament:state", JSON.stringify(state));
+}
+
 function makeMatchId() {
   return `m_${Math.random().toString(16).slice(2)}_${Date.now()}`;
 }
@@ -113,10 +121,6 @@ function buildBracket(players: TournamentPlayer[], name: string): TournamentStat
     createdAt: now,
     updatedAt: now,
   };
-}
-
-function saveState(state: TournamentState) {
-  localStorage.setItem("tournament:state", JSON.stringify(state));
 }
 
 function findMatch(state: TournamentState, matchId: string): Match | null {
@@ -152,6 +156,7 @@ function advanceLocks(state: TournamentState): TournamentState {
   const semi1 = next.semis[0];
   const semi2 = next.semis[1];
 
+  // unlock semi2 after semi1 completes
   if (semi1.status === "completed" && semi2.status === "locked") {
     semi2.status = "ready";
   }
@@ -159,6 +164,7 @@ function advanceLocks(state: TournamentState): TournamentState {
   const w1 = getWinner(semi1);
   const w2 = getWinner(semi2);
 
+  // if both winners exist, set final players + unlock final
   if (w1 && w2) {
     next.final.a = w1;
     next.final.b = w2;
@@ -170,12 +176,423 @@ function advanceLocks(state: TournamentState): TournamentState {
   return next;
 }
 
+function computeChampion(finalMatch: Match | null): TournamentPlayer | null {
+  if (!finalMatch?.winnerId) return null;
+  return finalMatch.winnerId === finalMatch.a.id ? finalMatch.a : finalMatch.b;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Next round helpers (log + notify)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function getNextMatchInfo(state: TournamentState): { match: Match; label: string } {
+  const m1 = state.semis[0];
+  const m2 = state.semis[1];
+
+  if (m1.status !== "completed") return { match: m1, label: "Semifinal 1" };
+  if (m2.status !== "completed") return { match: m2, label: "Semifinal 2" };
+  return { match: state.final, label: "Final" };
+}
+
+function buildNextRoundMessage(label: string, a: TournamentPlayer, b: TournamentPlayer) {
+  return `🔥 ${label} is ready! ${a.displayName} vs ${b.displayName} — let’s see who advances 🏆`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Small UI Components (same UI)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function PageShell({ children }: { children: React.ReactNode }) {
+  return <div className="w-full max-w-7xl mx-auto px-4 py-8">{children}</div>;
+}
+
+function LoadingState() {
+  return (
+    <div className="min-h-[70vh] w-full flex items-center justify-center">
+      <div className="text-white/70">Loading tournament...</div>
+    </div>
+  );
+}
+
+function ErrorState({
+  title,
+  message,
+  onBack,
+  onClear,
+}: {
+  title: string;
+  message: string;
+  onBack: () => void;
+  onClear: () => void;
+}) {
+  return (
+    <div className="min-h-[70vh] w-full flex items-center justify-center px-4">
+      <div className="max-w-md w-full rounded-3xl bg-[#0F0F0F]/65 p-6 text-center ring-1 ring-white/10">
+        <h1 className="text-xl font-semibold text-white">{title}</h1>
+        <p className="mt-2 text-sm text-white/70">{message}</p>
+        <div className="mt-5 flex gap-3 justify-center">
+          <button
+            onClick={onBack}
+            className="rounded-2xl bg-white/10 px-4 py-2.5 text-sm font-semibold text-white ring-1 ring-white/10 hover:bg-white/15"
+          >
+            Back
+          </button>
+          <button
+            onClick={onClear}
+            className="rounded-2xl bg-white/10 px-4 py-2.5 text-sm font-semibold text-white ring-1 ring-white/10 hover:bg-white/15"
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TournamentHeader({
+  name,
+  currentMatchLabel,
+  onBack,
+  onReset,
+}: {
+  name: string;
+  currentMatchLabel: string;
+  onBack: () => void;
+  onReset: () => void;
+}) {
+  return (
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <h1 className="text-2xl font-bold text-white">{name}</h1>
+        <p className="mt-1 text-sm text-white/60">Single-elimination • 4 players • Match-by-match</p>
+        <p className="mt-1 text-xs text-white/45">
+          Current match: <span className="text-white/80 font-semibold">{currentMatchLabel}</span>
+        </p>
+      </div>
+
+      <div className="flex gap-3">
+        <button
+          onClick={onBack}
+          className="rounded-2xl bg-white/10 px-4 py-2.5 text-sm font-semibold text-white ring-1 ring-white/10 hover:bg-white/15"
+        >
+          Back
+        </button>
+        <button
+          onClick={onReset}
+          className="rounded-2xl bg-white/10 px-4 py-2.5 text-sm font-semibold text-white ring-1 ring-white/10 hover:bg-white/15"
+        >
+          Reset
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function PlayerAvatar({
+  src,
+  alt,
+  sizeClassName,
+  wrapperClassName,
+}: {
+  src: string;
+  alt: string;
+  sizeClassName: string;
+  wrapperClassName: string;
+}) {
+  return (
+    <div className={`${sizeClassName} overflow-hidden ${wrapperClassName}`}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt={alt} className="h-full w-full object-cover" />
+    </div>
+  );
+}
+
+function PlayersSection({ players }: { players: TournamentPlayer[] }) {
+  return (
+    <div className="mt-6 rounded-3xl bg-[#0F0F0F]/55 p-5 ring-1 ring-white/10">
+      <p className="text-sm font-semibold text-white/70">Players</p>
+
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {players.map((p) => (
+          <div key={p.id} className="flex items-center gap-3 rounded-2xl bg-white/5 p-3 ring-1 ring-white/10">
+            <PlayerAvatar
+              src={p.avatarUrl ?? "/avatars/placeholder.png"}
+              alt={p.displayName}
+              sizeClassName="h-12 w-12"
+              wrapperClassName="rounded-xl bg-white/10 ring-1 ring-white/10"
+            />
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-white">{p.displayName}</p>
+              <p className="truncate text-xs text-white/55">@{p.username}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MatchStatusBadge({ status, isCurrent }: { status: MatchStatus; isCurrent: boolean }) {
+  const base = "rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1";
+  let variant = "bg-white/5 text-white/55 ring-white/10";
+
+  if (status === "completed") variant = "bg-green-500/10 text-green-200 ring-green-500/20";
+  if (status === "in_progress") variant = "bg-yellow-500/10 text-yellow-200 ring-yellow-500/20";
+  if (status === "ready") variant = "bg-blue-500/10 text-blue-200 ring-blue-500/20";
+
+  return (
+    <span className={`${base} ${variant}`}>
+      {status}
+      {isCurrent && status !== "completed" ? " • current" : ""}
+    </span>
+  );
+}
+
+function PlayerRow({
+  player,
+  score,
+  active,
+}: {
+  player: TournamentPlayer;
+  score?: number;
+  active: boolean;
+}) {
+  const rowClass =
+    "flex items-center gap-3 rounded-2xl p-3 text-left ring-1 transition " +
+    (active ? "bg-white/10 ring-white/25" : "bg-black/20 ring-white/10");
+
+  return (
+    <div className={rowClass}>
+      <PlayerAvatar
+        src={player.avatarUrl ?? "/avatars/placeholder.png"}
+        alt={player.displayName}
+        sizeClassName="h-12 w-12"
+        wrapperClassName="rounded-xl bg-white/10 ring-1 ring-white/10"
+      />
+
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold text-white">{player.displayName}</p>
+        <p className="truncate text-xs text-white/55">@{player.username}</p>
+      </div>
+
+      <div className="rounded-xl bg-white/5 px-3 py-2 text-xs font-semibold text-white/75 ring-1 ring-white/10">
+        {typeof score === "number" ? score : "-"}
+      </div>
+    </div>
+  );
+}
+
+function MatchCard({
+  title,
+  match,
+  isCurrent,
+  onPlay,
+}: {
+  title: string;
+  match: Match;
+  isCurrent: boolean;
+  onPlay: () => void;
+}) {
+  const winner = getWinner(match);
+  const canPlay = isCurrent && (match.status === "ready" || match.status === "in_progress");
+
+  const buttonClass =
+    "flex-1 rounded-2xl px-4 py-2.5 text-sm font-semibold ring-1 transition " +
+    (canPlay
+      ? "bg-white/10 text-white ring-white/10 hover:bg-white/15"
+      : "bg-white/5 text-white/40 ring-white/10 cursor-not-allowed");
+
+  return (
+    <div className="rounded-3xl bg-white/5 p-4 ring-1 ring-white/10">
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-semibold text-white/75">{title}</p>
+        <MatchStatusBadge status={match.status} isCurrent={isCurrent} />
+      </div>
+
+      <div className="mt-4 grid grid-cols-1 gap-3">
+        <PlayerRow player={match.a} score={match.scoreA} active={winner?.id === match.a.id} />
+        <PlayerRow player={match.b} score={match.scoreB} active={winner?.id === match.b.id} />
+      </div>
+
+      {winner ? (
+        <div className="mt-3 rounded-2xl bg-white/5 p-3 text-sm text-white/70 ring-1 ring-white/10">
+          Winner: <span className="font-semibold text-white">{winner.displayName}</span>
+        </div>
+      ) : null}
+
+      <div className="mt-4 flex gap-3">
+        <button type="button" disabled={!canPlay} onClick={onPlay} className={buttonClass}>
+          Play Match
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function SemisSection({
+  semis,
+  currentMatchId,
+  onPlayMatch,
+}: {
+  semis: Match[];
+  currentMatchId: string;
+  onPlayMatch: (matchId: string) => void;
+}) {
+  return (
+    <div className="lg:col-span-2 rounded-3xl bg-[#0F0F0F]/55 p-5 ring-1 ring-white/10">
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-semibold text-white/70">Round 1 (Semifinals)</p>
+        <p className="text-xs text-white/45">Play match-by-match to advance</p>
+      </div>
+
+      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+        {semis.map((m, idx) => (
+          <MatchCard
+            key={m.id}
+            title={`Match ${idx + 1}`}
+            match={m}
+            isCurrent={currentMatchId === m.id}
+            onPlay={() => onPlayMatch(m.id)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ChampionCard({ champion }: { champion: TournamentPlayer | null }) {
+  return (
+    <div className="mt-5">
+      <p className="text-sm font-semibold text-white/70">Champion</p>
+
+      {champion ? (
+        <div className="mt-3 flex items-center gap-3 rounded-2xl bg-white/10 p-4 ring-1 ring-white/15">
+          <PlayerAvatar
+            src={champion.avatarUrl ?? "/avatars/placeholder.png"}
+            alt={champion.displayName}
+            sizeClassName="h-14 w-14"
+            wrapperClassName="rounded-2xl bg-white/10 ring-1 ring-white/10"
+          />
+
+          <div className="min-w-0">
+            <p className="truncate text-base font-bold text-white">{champion.displayName}</p>
+            <p className="truncate text-sm text-white/55">@{champion.username}</p>
+          </div>
+
+          <div className="ml-auto rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/80 ring-1 ring-white/10">
+            🏆 Winner
+          </div>
+        </div>
+      ) : (
+        <div className="mt-3 rounded-2xl bg-white/5 p-4 text-sm text-white/60 ring-1 ring-white/10">
+          No winner yet.
+        </div>
+      )}
+    </div>
+  );
+}
+
+function FinalAndChampionSection({
+  finalMatch,
+  currentMatchId,
+  champion,
+  onPlayMatch,
+}: {
+  finalMatch: Match;
+  currentMatchId: string;
+  champion: TournamentPlayer | null;
+  onPlayMatch: (matchId: string) => void;
+}) {
+  return (
+    <div className="rounded-3xl bg-[#0F0F0F]/55 p-5 ring-1 ring-white/10">
+      <p className="text-sm font-semibold text-white/70">Final</p>
+
+      <div className="mt-4">
+        {finalMatch.status === "locked" ? (
+          <div className="rounded-2xl bg-white/5 p-4 text-sm text-white/60 ring-1 ring-white/10">
+            Waiting for semifinal winners...
+          </div>
+        ) : (
+          <MatchCard
+            title="Championship"
+            match={finalMatch}
+            isCurrent={currentMatchId === finalMatch.id}
+            onPlay={() => onPlayMatch(finalMatch.id)}
+          />
+        )}
+      </div>
+
+      <ChampionCard champion={champion} />
+    </div>
+  );
+}
+
+function BracketLayout({
+  semis,
+  finalMatch,
+  currentMatchId,
+  champion,
+  onPlayMatch,
+}: {
+  semis: Match[];
+  finalMatch: Match;
+  currentMatchId: string;
+  champion: TournamentPlayer | null;
+  onPlayMatch: (matchId: string) => void;
+}) {
+  return (
+    <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <SemisSection semis={semis} currentMatchId={currentMatchId} onPlayMatch={onPlayMatch} />
+      <FinalAndChampionSection
+        finalMatch={finalMatch}
+        currentMatchId={currentMatchId}
+        champion={champion}
+        onPlayMatch={onPlayMatch}
+      />
+    </div>
+  );
+}
+
+function FooterActions({
+  isComplete,
+  onEndTournament,
+}: {
+  isComplete: boolean;
+  onEndTournament: () => void;
+}) {
+  return (
+    <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="text-sm text-white/60">
+        {isComplete ? "Tournament complete." : "Play the current match to progress."}
+      </div>
+
+      <div className="flex gap-3">
+        <button
+          onClick={onEndTournament}
+          className="rounded-2xl bg-white/10 px-4 py-2.5 text-sm font-semibold text-white ring-1 ring-white/10 hover:bg-white/15"
+        >
+          End Tournament
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Page
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function TournamentPage() {
   const router = useRouter();
+  const socket = useSocket();
 
   const [state, setState] = useState<TournamentState | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // prevents spamming notifications for the same match
+  const lastNotifiedMatchIdRef = useRef<string | null>(null);
+
+  // init / hydrate
   useEffect(() => {
     const existing = loadStateSafe();
     if (existing) {
@@ -196,18 +613,37 @@ export default function TournamentPage() {
     setState(built);
   }, []);
 
+  // ✅ log + notify next round
+  useEffect(() => {
+    if (!state) return;
+
+    const { match: nextMatch, label } = getNextMatchInfo(state);
+
+    if (!socket) return;
+    if (nextMatch.status !== "ready") return;
+
+    if (lastNotifiedMatchIdRef.current === nextMatch.id) return;
+    lastNotifiedMatchIdRef.current = nextMatch.id;
+
+    const message = buildNextRoundMessage(label, nextMatch.a, nextMatch.b);
+
+    const receivers = Array.from(new Set([state.semis[0].b.id, state.semis[1].a.id, state.semis[1].b.id]));
+    receivers.forEach((receiverId) => {
+			socket.emit("chat:send", {
+				receiverId: receiverId,
+				type: "text_message",
+				content: message,
+			});
+    });
+  }, [state, socket]);
+
   const payload = useMemo(() => {
     if (!state) return null;
     return { name: state.name, players: state.players } satisfies TournamentCreatePayload;
   }, [state]);
 
-  const semis = state?.semis ?? [];
   const finalMatch = state?.final ?? null;
-
-  const champion = useMemo(() => {
-    if (!finalMatch?.winnerId) return null;
-    return finalMatch.winnerId === finalMatch.a.id ? finalMatch.a : finalMatch.b;
-  }, [finalMatch]);
+  const champion = useMemo(() => computeChampion(finalMatch), [finalMatch]);
 
   const persist = (next: TournamentState) => {
     setState(next);
@@ -221,6 +657,15 @@ export default function TournamentPage() {
     saveState(rebuilt);
     setError(null);
     setState(rebuilt);
+
+    // allow notifications again after reset
+    lastNotifiedMatchIdRef.current = null;
+  };
+
+  const clearAndBack = () => {
+    localStorage.removeItem("tournament:create");
+    localStorage.removeItem("tournament:state");
+    router.push("/game/pingPong");
   };
 
   const playMatch = (matchId: string) => {
@@ -245,292 +690,43 @@ export default function TournamentPage() {
 
   if (error) {
     return (
-      <div className="min-h-[70vh] w-full flex items-center justify-center px-4">
-        <div className="max-w-md w-full rounded-3xl bg-[#0F0F0F]/65 p-6 text-center ring-1 ring-white/10">
-          <h1 className="text-xl font-semibold text-white">Tournament</h1>
-          <p className="mt-2 text-sm text-white/70">{error}</p>
-          <div className="mt-5 flex gap-3 justify-center">
-            <button
-              onClick={() => router.push("/game/pingPong")}
-              className="rounded-2xl bg-white/10 px-4 py-2.5 text-sm font-semibold text-white ring-1 ring-white/10 hover:bg-white/15"
-            >
-              Back
-            </button>
-            <button
-              onClick={() => {
-                localStorage.removeItem("tournament:create");
-                localStorage.removeItem("tournament:state");
-                router.push("/game/pingPong");
-              }}
-              className="rounded-2xl bg-white/10 px-4 py-2.5 text-sm font-semibold text-white ring-1 ring-white/10 hover:bg-white/15"
-            >
-              Clear
-            </button>
-          </div>
-        </div>
-      </div>
+      <ErrorState
+        title="Tournament"
+        message={error}
+        onBack={() => router.push("/game/pingPong")}
+        onClear={clearAndBack}
+      />
     );
   }
 
-  if (!payload || !finalMatch || !state) {
-    return (
-      <div className="min-h-[70vh] w-full flex items-center justify-center">
-        <div className="text-white/70">Loading tournament...</div>
-      </div>
-    );
-  }
+  if (!payload || !finalMatch || !state) return <LoadingState />;
+
+  const currentMatchLabel = (() => {
+    const cm = findMatch(state, state.currentMatchId);
+    if (!cm) return "—";
+    return `${cm.a.displayName} vs ${cm.b.displayName}`;
+  })();
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-white">{payload.name}</h1>
-          <p className="mt-1 text-sm text-white/60">Single-elimination • 4 players • Match-by-match</p>
-          <p className="mt-1 text-xs text-white/45">
-            Current match:{" "}
-            <span className="text-white/80 font-semibold">
-              {(() => {
-                const cm = findMatch(state, state.currentMatchId);
-                if (!cm) return "—";
-                return `${cm.a.displayName} vs ${cm.b.displayName}`;
-              })()}
-            </span>
-          </p>
-        </div>
+    <PageShell>
+      <TournamentHeader
+        name={payload.name}
+        currentMatchLabel={currentMatchLabel}
+        onBack={() => router.push("/game/pingPong")}
+        onReset={resetTournament}
+      />
 
-        <div className="flex gap-3">
-          <button
-            onClick={() => router.push("/game/pingPong")}
-            className="rounded-2xl bg-white/10 px-4 py-2.5 text-sm font-semibold text-white ring-1 ring-white/10 hover:bg-white/15"
-          >
-            Back
-          </button>
-          <button
-            onClick={resetTournament}
-            className="rounded-2xl bg-white/10 px-4 py-2.5 text-sm font-semibold text-white ring-1 ring-white/10 hover:bg-white/15"
-          >
-            Reset
-          </button>
-        </div>
-      </div>
+      <PlayersSection players={payload.players} />
 
-      {/* Players row */}
-      <div className="mt-6 rounded-3xl bg-[#0F0F0F]/55 p-5 ring-1 ring-white/10">
-        <p className="text-sm font-semibold text-white/70">Players</p>
-        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {payload.players.map((p) => (
-            <div key={p.id} className="flex items-center gap-3 rounded-2xl bg-white/5 p-3 ring-1 ring-white/10">
-              <div className="h-12 w-12 overflow-hidden rounded-xl bg-white/10 ring-1 ring-white/10">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={p.avatarUrl ?? "/avatars/placeholder.png"}
-                  alt={p.displayName}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-white">{p.displayName}</p>
-                <p className="truncate text-xs text-white/55">@{p.username}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <BracketLayout
+        semis={state.semis}
+        finalMatch={finalMatch}
+        currentMatchId={state.currentMatchId}
+        champion={champion}
+        onPlayMatch={playMatch}
+      />
 
-      {/* Bracket */}
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Semis */}
-        <div className="lg:col-span-2 rounded-3xl bg-[#0F0F0F]/55 p-5 ring-1 ring-white/10">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-semibold text-white/70">Round 1 (Semifinals)</p>
-            <p className="text-xs text-white/45">Play match-by-match to advance</p>
-          </div>
-
-          <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-            {semis.map((m, idx) => (
-              <MatchCard
-                key={m.id}
-                title={`Match ${idx + 1}`}
-                match={m}
-                isCurrent={state.currentMatchId === m.id}
-                onPlay={() => playMatch(m.id)}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Final + Champion */}
-        <div className="rounded-3xl bg-[#0F0F0F]/55 p-5 ring-1 ring-white/10">
-          <p className="text-sm font-semibold text-white/70">Final</p>
-
-          <div className="mt-4">
-            {finalMatch.status === "locked" ? (
-              <div className="rounded-2xl bg-white/5 p-4 text-sm text-white/60 ring-1 ring-white/10">
-                Waiting for semifinal winners...
-              </div>
-            ) : (
-              <MatchCard
-                title="Championship"
-                match={finalMatch}
-                isCurrent={state.currentMatchId === finalMatch.id}
-                onPlay={() => playMatch(finalMatch.id)}
-              />
-            )}
-          </div>
-
-          <div className="mt-5">
-            <p className="text-sm font-semibold text-white/70">Champion</p>
-            {champion ? (
-              <div className="mt-3 flex items-center gap-3 rounded-2xl bg-white/10 p-4 ring-1 ring-white/15">
-                <div className="h-14 w-14 overflow-hidden rounded-2xl bg-white/10 ring-1 ring-white/10">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={champion.avatarUrl ?? "/avatars/placeholder.png"}
-                    alt={champion.displayName}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-                <div className="min-w-0">
-                  <p className="truncate text-base font-bold text-white">{champion.displayName}</p>
-                  <p className="truncate text-sm text-white/55">@{champion.username}</p>
-                </div>
-                <div className="ml-auto rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/80 ring-1 ring-white/10">
-                  🏆 Winner
-                </div>
-              </div>
-            ) : (
-              <div className="mt-3 rounded-2xl bg-white/5 p-4 text-sm text-white/60 ring-1 ring-white/10">
-                No winner yet.
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Optional actions */}
-      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="text-sm text-white/60">
-          {finalMatch.winnerId ? "Tournament complete." : "Play the current match to progress."}
-        </div>
-
-        <div className="flex gap-3">
-          <button
-            onClick={() => {
-              localStorage.removeItem("tournament:create");
-              localStorage.removeItem("tournament:state");
-              router.push("/game/pingPong");
-            }}
-            className="rounded-2xl bg-white/10 px-4 py-2.5 text-sm font-semibold text-white ring-1 ring-white/10 hover:bg-white/15"
-          >
-            End Tournament
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function MatchCard({
-  title,
-  match,
-  isCurrent,
-  onPlay,
-}: {
-  title: string;
-  match: Match;
-  isCurrent: boolean;
-  onPlay: () => void;
-}) {
-  const winner = getWinner(match);
-
-  const canPlay = isCurrent && (match.status === "ready" || match.status === "in_progress");
-
-
-  return (
-    <div className="rounded-3xl bg-white/5 p-4 ring-1 ring-white/10">
-      <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-white/75">{title}</p>
-
-        <span
-          className={cn(
-            "rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1",
-            match.status === "completed"
-              ? "bg-green-500/10 text-green-200 ring-green-500/20"
-              : match.status === "in_progress"
-              ? "bg-yellow-500/10 text-yellow-200 ring-yellow-500/20"
-              : match.status === "ready"
-              ? "bg-blue-500/10 text-blue-200 ring-blue-500/20"
-              : "bg-white/5 text-white/55 ring-white/10"
-          )}
-        >
-          {match.status}
-          {isCurrent && match.status !== "completed" ? " • current" : ""}
-        </span>
-      </div>
-
-      <div className="mt-4 grid grid-cols-1 gap-3">
-        <PlayerRow player={match.a} score={match.scoreA} active={winner?.id === match.a.id} />
-        <PlayerRow player={match.b} score={match.scoreB} active={winner?.id === match.b.id} />
-      </div>
-
-      {winner && (
-        <div className="mt-3 rounded-2xl bg-white/5 p-3 text-sm text-white/70 ring-1 ring-white/10">
-          Winner: <span className="font-semibold text-white">{winner.displayName}</span>
-        </div>
-      )}
-
-      <div className="mt-4 flex gap-3">
-        <button
-          type="button"
-          disabled={!canPlay}
-          onClick={onPlay}
-          className={cn(
-            "flex-1 rounded-2xl px-4 py-2.5 text-sm font-semibold ring-1 transition",
-            canPlay
-              ? "bg-white/10 text-white ring-white/10 hover:bg-white/15"
-              : "bg-white/5 text-white/40 ring-white/10 cursor-not-allowed"
-          )}
-        >
-          Play Match
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function PlayerRow({
-  player,
-  score,
-  active,
-}: {
-  player: TournamentPlayer;
-  score?: number;
-  active: boolean;
-}) {
-  return (
-    <div
-      className={cn(
-        "flex items-center gap-3 rounded-2xl p-3 text-left ring-1 transition",
-        active ? "bg-white/10 ring-white/25" : "bg-black/20 ring-white/10"
-      )}
-    >
-      <div className="h-12 w-12 overflow-hidden rounded-xl bg-white/10 ring-1 ring-white/10">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={player.avatarUrl ?? "/avatars/placeholder.png"}
-          alt={player.displayName}
-          className="h-full w-full object-cover"
-        />
-      </div>
-
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-white">{player.displayName}</p>
-        <p className="truncate text-xs text-white/55">@{player.username}</p>
-      </div>
-
-      <div className="rounded-xl bg-white/5 px-3 py-2 text-xs font-semibold text-white/75 ring-1 ring-white/10">
-        {typeof score === "number" ? score : "-"}
-      </div>
-    </div>
+      <FooterActions isComplete={!!finalMatch.winnerId} onEndTournament={clearAndBack} />
+    </PageShell>
   );
 }
