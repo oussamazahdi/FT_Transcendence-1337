@@ -5,7 +5,7 @@ import ChatInput from "./ChatInput";
 import MessageList from "./MessageList";
 import { useAuth } from "@/contexts/authContext";
 import { useSocket } from "@/contexts/socketContext";
-import { autofetch } from "@/lib/api";
+import { autofetch } from "@/lib/api.tsx";
 import type { SelectedFriend } from "@/contexts/userContexts";
 import { CHAT_ERROR } from "@/lib/utils";
 import { ChatMessage } from "@/types";

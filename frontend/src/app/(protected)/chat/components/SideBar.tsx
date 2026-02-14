@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Friends from "./Friends";
 import SearchCard from "./SearchCard.tsx";
-import { autofetch } from "@/lib/api";
+import { autofetch } from "@/lib/api.tsx";
 import { Conversation, otherUserData } from "@/types";
 import { SEARCH_USERS_ERROR } from "@/lib/utils.ts";
 import { useAuth } from "@/contexts/authContext.tsx";
@@ -43,8 +43,12 @@ export default function SideBar({ displayData, loading }: SideBarProps) {
           throw new Error(SEARCH_USERS_ERROR[data.error] || SEARCH_USERS_ERROR.default);
 
         const search: otherUserData[] = data.friends || [];
+        setSearchData((prev) => {
+          if (page === 1)
+            return search;
+          return [...prev, ...search];
+        });
         setHasMore(search.length === 10);
-        setSearchData(search);
       } catch (err:any) {
         triggerError(err.message)
       } finally {
@@ -103,7 +107,7 @@ export default function SideBar({ displayData, loading }: SideBarProps) {
         new Date(a.timeOfLastMsg).getTime()
     );
     return sorted.map((conversation) => (
-      <div key={conversation.id}>
+      <div key={conversation.convid}>
         <Friends
           id={conversation.id}
           avatar={conversation.avatar}
@@ -124,7 +128,10 @@ export default function SideBar({ displayData, loading }: SideBarProps) {
           placeholder="Search"
           maxLength={30}
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.currentTarget.value)}
+          onChange={(e) => {
+            setSearchQuery(e.currentTarget.value);
+            setPage(1);
+          }}
         ></input>
       </div>
       <div className="flex flex-col bg-[#1A1A1A]/75 rounded-lg px-2 flex-1 min-h-0 overflow-hidden">

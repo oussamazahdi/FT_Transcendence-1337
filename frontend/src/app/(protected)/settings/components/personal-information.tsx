@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/authContext";
 import { assets } from "@/assets/data";
 import { AUTH_ERRORS, USER_ERROR } from "@/lib/utils.ts";
 import { ArrowUpTrayIcon } from "@heroicons/react/24/outline";
-import { autofetch } from "@/lib/api";
+import { autofetch } from "@/lib/api.tsx";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";

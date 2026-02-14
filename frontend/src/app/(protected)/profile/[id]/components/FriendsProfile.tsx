@@ -129,9 +129,6 @@ const FriendsProfile = ({ userPage }:FriendProfileProp) => {
             >
               <ChatBubbleOvalLeftIcon className="size-4 brightness-150" />
             </Link>}
-          <button className="flex justify-center items-center p-2 bg-[#414141]/60 hover:bg-[#414141] rounded-sm transition-colors cursor-pointer hover:scale-105">
-            <Gamepad2 strokeWidth={1.5} className="size-4 brightness-150" />
-          </button>
           <button onClick={() => setShowconfirmBlock(true)} className="flex justify-center items-center p-2 bg-[#583636]/40 hover:bg-[#583636] rounded-sm transition-colors cursor-pointer hover:scale-105">
             <NoSymbolIcon strokeWidth={1.5} className="size-4 brightness-150 text-[#D92F2F]" />
           </button>

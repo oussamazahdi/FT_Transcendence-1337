@@ -2,7 +2,7 @@
 import react, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import { useAuth } from "@/contexts/authContext";
-import { autofetch } from "@/lib/api";
+import { autofetch } from "@/lib/api.tsx";
 
 interface TwoFaSetupProps{
   setView: React.Dispatch<React.SetStateAction<string>>

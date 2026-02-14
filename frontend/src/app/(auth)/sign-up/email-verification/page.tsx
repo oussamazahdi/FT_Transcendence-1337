@@ -5,7 +5,7 @@ import { assets } from "@/assets/data";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AUTH_ERRORS } from "@/lib/utils.ts";
 import { useAuth } from "@/contexts/authContext";
-import { autofetch } from "@/lib/api";
+import { autofetch } from "@/lib/api.tsx";
 
 const EmailVerification = () => {
   const [otp, setOtp] = useState<string[]>(new Array(6).fill(""));
