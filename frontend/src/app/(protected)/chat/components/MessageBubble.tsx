@@ -3,33 +3,13 @@ import Image, { StaticImageData } from "next/image";
 import { useAuth } from "@/contexts/authContext.tsx";
 import { assets } from "@/assets/data";
 import type { ChatMessage } from "@/types";
+import { parseTime } from "@/lib/utils"
 
 interface MessageBubble{
   message: ChatMessage
   isMe: boolean
   showAvatar: boolean
   friendAvatar : StaticImageData | string | null
-}
-function parseTime(timeString: string) {
-  const date = new Date(timeString);
-  const now = new Date();
-
-  if (isNaN(date.getTime())) 
-    return timeString;
-
-  const isToday = date.toDateString() === now.toDateString();
-
-  if (isToday) {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-  } else {
-    return date.toLocaleString('en-GB', {
-      day: 'numeric',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    });
-  }
 }
 
 /**
@@ -70,7 +50,7 @@ const MessageBubble = (props:MessageBubble) => {
 
 	// console.log("----------> message bubble:", props.message);
   return (
-    <div className={`flex gap-2 w-full items-center ${props.isMe ? "flex-row-reverse" : "justify-start"}`}>
+    <div className={`flex gap-1 w-full items-center ${props.isMe ? "flex-row-reverse" : "justify-start"}`}>
       <div className="size-9 overflow-hidden rounded-sm">
         {props.showAvatar ? (
           <Image

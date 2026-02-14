@@ -6,14 +6,37 @@ import TwoFaSetup from "./TwoFaSetup.tsx";
 import { USER_ERROR } from "@/lib/utils.ts";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { autofetch } from "@/lib/api";
-// import { z } from "zod"
-// import { zodResolver } from "@hookform/resolvers/zod";
-// import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-// const changePasswordSchema = z.object({
+const changePasswordSchema = z.object({
+    current: z
+      .string()
+      .min(8, "Current password must be at least 8 characters")
+      .max(64, "Password is too long"),
+    newPass: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .max(64, "Password is too long")
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .regex(/[0-9]/, "Password must contain at least one number"),
+    confirmPass: z
+      .string()
+      .min(8, "Confirm password must be at least 8 characters")
+      .max(64, "Password is too long"),
+  })
+  .refine((data) => data.newPass !== data.current, {
+    message:
+      USER_ERROR["NEW_PASSWORD_MATCHS_OLD_PASSWORD"] || USER_ERROR["default"],
+    path: ["newPass"],
+  })
+  .refine((data) => data.newPass === data.confirmPass, {
+    message:
+      USER_ERROR["NEW_PASSWORDS_DO_NOT_MATCH"] || USER_ERROR["default"],
+    path: ["confirmPass"],
+  });
 
-// })
-//check if data empty
+type ChangePasswordForm = z.infer<typeof changePasswordSchema>;
+
 interface PasswordInputParams{
   label:string
   name:string
@@ -63,24 +86,30 @@ export default function Security() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [greeting, setGreeting] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<
+    Partial<Record<keyof ChangePasswordForm, string>>>({});
+
 
   const handleSubmit = async (e:React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     setGreeting("");
+    setFieldErrors({});
+
+    const parsed = changePasswordSchema.safeParse(passwords);
+    if (!parsed.success) {
+      const flat = parsed.error.flatten().fieldErrors;
+      setFieldErrors({
+        current: flat.current?.[0],
+        newPass: flat.newPass?.[0],
+        confirmPass: flat.confirmPass?.[0],
+      });
+      setLoading(false);
+      return;
+    }
 
     try {
-      if (passwords.current === passwords.newPass)
-        throw new Error(
-          USER_ERROR["NEW_PASSWORD_MATCHS_OLD_PASSWORD"] ||
-            USER_ERROR["default"],
-        );
-      if (passwords.newPass !== passwords.confirmPass)
-        throw new Error(
-          USER_ERROR["NEW_PASSWORDS_DO_NOT_MATCH"] || USER_ERROR["default"],
-        );
-
       const response = await autofetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/users/change-password`,
         {
@@ -90,15 +119,16 @@ export default function Security() {
           },
           credentials: "include",
           body: JSON.stringify({
-            oldPassword: passwords.current,
-            newPassword: passwords.newPass,
-            repeatNewPassword: passwords.confirmPass,
+            oldPassword: parsed.data.current,
+            newPassword: parsed.data.newPass,
+            repeatNewPassword: parsed.data.confirmPass,
           }),
         },
       );
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
+      if (!response.ok) 
+        throw new Error(USER_ERROR[data.error] || USER_ERROR["default"]);
 
       setGreeting("password changed successfully");
       setPasswords({ current: "", newPass: "", confirmPass: "" });
@@ -134,6 +164,7 @@ export default function Security() {
           value={passwords.current}
           onChange={handleChange}
         />
+        {fieldErrors.current && (<p className="text-red-600 text-xs px-1">{fieldErrors.current}</p>)}
         <PasswordInput
           label="New password"
           name="newPass"
@@ -142,6 +173,7 @@ export default function Security() {
           value={passwords.newPass}
           onChange={handleChange}
         />
+        {fieldErrors.newPass && (<p className="text-red-600 text-xs px-1">{fieldErrors.newPass}</p>)}
         <PasswordInput
           label="Confirm new password"
           name="confirmPass"
@@ -150,16 +182,9 @@ export default function Security() {
           value={passwords.confirmPass}
           onChange={handleChange}
         />
-        {error && (
-          <p className="text-red-600 text-xs text-center px-3 py-1 bg-red-300/20 border">
-            {error}
-          </p>
-        )}
-        {greeting && (
-          <p className="text-white text-xs text-center w-full h-6 bg-orange-300/20 border border-green-500/20 p-1">
-            {greeting}
-          </p>
-        )}
+        {fieldErrors.confirmPass && (<p className="text-red-600 text-xs px-1">{fieldErrors.confirmPass}</p>)}
+        {error && (<p className="text-red-600 text-xs px-1">{error}</p>)}
+        {greeting && (<p className="text-green-600 text-xs px-1">{greeting}</p>)}
         <button
           type="submit"
           disabled={loading}

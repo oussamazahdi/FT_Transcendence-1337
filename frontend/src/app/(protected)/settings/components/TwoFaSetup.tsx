@@ -117,7 +117,7 @@ export default function TwoFaSetup({ setEnable, setView }:TwoFaSetupProps) {
         {!loading ? (
           <Image
             src={imagePreview}
-            alt="icon to replace later"
+            alt="icon"
             width={90}
             height={90}
             className="rounded-md"

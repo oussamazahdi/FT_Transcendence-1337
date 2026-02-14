@@ -45,21 +45,25 @@ export const USER_ERROR:Record<string, string> = {
 
 export const CHAT_ERROR:Record<string, string> = {
   NOT_ALLOWED_TO_CONTACT_USER:"You can no longer send messages to this user.",
+  MESSAGE_TOO_LONG:"Message exceeds the allowed length. Please shorten it and try again.",
   default: "An unexpected error occurred. Please try again.",
 }
 
-export const SEARCH_ERROR:Record<string, string> = {
-  QUERY_PARAMETER_REQUERED: "Please enter a keyword to search.",
-  QUERY_TOO_SHORT:
-    "Search term is too short. Please use at least 3 characters.",
-  QUERY_TOO_LONG: "Search term is too long. Please shorten your query.",
+export const SEARCH_USERS_ERROR: Record<string, string> = {
+  INVALID_QUERY: "Please enter 2 to 20 characters to search users.",
+  UNAUTHORIZED_NO_ACCESS_TOKEN: "Please sign in to search users.",
+  TOKEN_REVOKED: "Your session was closed. Please sign in again.",
+  EXPIRED_TOKEN: "Your session expired. Please sign in again.",
+  INVALID_TOKEN: "Your session is invalid. Please sign in again.",
+  DATABASE_BUSY: "The server is busy right now. Please try again in a moment.",
+  INTERNAL_SERVER_ERROR: "Something went wrong on our side. Please try again later.",
+  DATABASE_ERROR: "We couldn't load users right now. Please try again.",
   default: "Search failed. Please try again.",
 };
 
-
 class componentUtils{
 	
-	isExpired(notif : any) {
+	isExpired(notif:any) {
 		if (!notif || notif.is_expired === 1) return true;
 		if (!notif.expires_at) return false;
 		const t = new Date(notif.expires_at).getTime();
@@ -69,3 +73,25 @@ class componentUtils{
 }
 
 export const ComponentUtils = new componentUtils();
+
+export const parseTime = (timeString: string) => {
+  const date = new Date(timeString);
+  const now = new Date();
+
+  if (isNaN(date.getTime())) 
+    return timeString;
+
+  const isToday = date.toDateString() === now.toDateString();
+
+  if (isToday) {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+  } else {
+    return date.toLocaleString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+  }
+}

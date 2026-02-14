@@ -182,6 +182,140 @@ def seed_match_history(cur, matches=10000, days=7, min_per_day=None, start_days_
 
     print(f"🏓 Inserted {inserted} match_history rows across {days} days")
 
+def seed_social_graph(
+    cur,
+    *,
+    wipe=True,
+    accepted_per_user=8,
+    pending_per_user=3,
+    blocked_per_user=1,
+    messages_per_conversation=30,
+):
+    # --- Load users ---
+    cur.execute("SELECT id FROM users")
+    user_ids = [r[0] for r in cur.fetchall()]
+    if len(user_ids) < 2:
+        print("⚠️ Not enough users to seed friends/conversations/messages.")
+        return
+
+    if wipe:
+        # Wipe in dependency order
+        cur.execute("DELETE FROM messages")
+        cur.execute("DELETE FROM conversations")
+        cur.execute("DELETE FROM friends")
+        print("🧹 Cleared messages, conversations, friends")
+
+    def upsert_friend(sender_id, receiver_id, status, blocked_by=None):
+        # INSERT OR IGNORE because you have UNIQUE(sender_id, receiver_id)
+        cur.execute("""
+            INSERT OR IGNORE INTO friends (sender_id, receiver_id, status, blocked_by)
+            VALUES (?, ?, ?, ?)
+        """, (sender_id, receiver_id, status, blocked_by))
+
+    def ensure_conversation(user_id, friend_id):
+        cur.execute("""
+            INSERT OR IGNORE INTO conversations (user_id, friend_id, last_message)
+            VALUES (?, ?, NULL)
+        """, (user_id, friend_id))
+        cur.execute("""
+            SELECT id FROM conversations
+            WHERE user_id = ? AND friend_id = ?
+        """, (user_id, friend_id))
+        row = cur.fetchone()
+        return row[0] if row else None
+
+    def insert_message(conversation_id, sender_id, content, msg_type="text_message"):
+        cur.execute("""
+            INSERT INTO messages (conversation_id, sender_id, type, content)
+            VALUES (?, ?, ?, ?)
+        """, (conversation_id, sender_id, msg_type, content))
+
+    def update_last_message(conversation_id, content):
+        cur.execute("""
+            UPDATE conversations
+            SET last_message = ?, updatedate = CURRENT_TIMESTAMP
+            WHERE id = ?
+        """, (content, conversation_id))
+
+    # --- Seed friends ---
+    # We'll create relations per user, but avoid duplicates by keeping a set of directed pairs.
+    directed_pairs = set()
+
+    def pick_targets(me, k, exclude_set):
+        pool = [u for u in user_ids if u != me and u not in exclude_set]
+        random.shuffle(pool)
+        return pool[:k]
+
+    for me in user_ids:
+        # gather already-used targets for this user (avoid spamming same users)
+        used_targets = set()
+
+        # Accepted (create ONE directed row; your queries must treat it undirected)
+        for other in pick_targets(me, accepted_per_user, used_targets):
+            used_targets.add(other)
+            if (me, other) in directed_pairs or (other, me) in directed_pairs:
+                continue
+
+            # random direction on who sent the request originally
+            sender, receiver = (me, other) if random.random() < 0.5 else (other, me)
+            upsert_friend(sender, receiver, "accepted")
+            directed_pairs.add((sender, receiver))
+
+        # Pending (direction matters)
+        for other in pick_targets(me, pending_per_user, used_targets):
+            used_targets.add(other)
+            if (me, other) in directed_pairs:
+                continue
+            upsert_friend(me, other, "pending")
+            directed_pairs.add((me, other))
+
+        # Blocked (direction matters + blocked_by)
+        for other in pick_targets(me, blocked_per_user, used_targets):
+            used_targets.add(other)
+            if (me, other) in directed_pairs:
+                continue
+            # blocked_by is the blocker (me)
+            upsert_friend(me, other, "blocked", blocked_by=me)
+            directed_pairs.add((me, other))
+
+    # --- Seed conversations + messages for accepted friendships ---
+    cur.execute("""
+        SELECT sender_id, receiver_id
+        FROM friends
+        WHERE status = 'accepted'
+    """)
+    accepted_pairs = cur.fetchall()
+
+    inserted_convos = 0
+    inserted_msgs = 0
+
+    for a, b in accepted_pairs:
+        # Make two convo rows so each user has their own (matches UNIQUE(user_id, friend_id))
+        convo_ab = ensure_conversation(a, b)
+        convo_ba = ensure_conversation(b, a)
+        if convo_ab: inserted_convos += 1
+        if convo_ba: inserted_convos += 1
+
+        # Messages: distribute randomly between a and b,
+        # and insert into BOTH conversations so each user sees same history.
+        for i in range(messages_per_conversation):
+            sender = a if random.random() < 0.5 else b
+            content = f"msg_{i}_{rand_suffix(10)}"
+            msg_type = "text_message"
+
+            if convo_ab:
+                insert_message(convo_ab, sender, content, msg_type)
+                update_last_message(convo_ab, content)
+                inserted_msgs += 1
+            if convo_ba:
+                insert_message(convo_ba, sender, content, msg_type)
+                update_last_message(convo_ba, content)
+                inserted_msgs += 1
+
+    print(f"👥 Seeded friends: accepted={len(accepted_pairs)} (directional rows)")
+    print(f"💬 Seeded conversations rows (attempted): ~{inserted_convos}")
+    print(f"✉️ Seeded messages rows: {inserted_msgs}")
+
 
 def main():
     total = 1000
@@ -231,6 +365,16 @@ def main():
     # Seed game_settings AFTER users exist
     seed_game_settings(cur)
     seed_match_history(cur, matches=10000, days=7, min_per_day=500)
+    seed_social_graph(
+        cur,
+        wipe=True,                 # set False if you don't want to clear old data
+        accepted_per_user=8,
+        pending_per_user=3,
+        blocked_per_user=1,
+        messages_per_conversation=25
+    )
+
+    conn.commit()
 
     conn.commit()
     conn.close()

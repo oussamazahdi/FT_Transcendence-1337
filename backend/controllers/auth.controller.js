@@ -8,6 +8,7 @@ import { twoFactorModels } from "../models/twoFactor.model.js";
 import { generateFileNameByUser, generateToken, updateTokenFlags } from "../utils/authUtils.js";
 import { getEmailLetter } from "../templates/emailLetter.js";
 import { MatchController } from "./game.controller.js";
+import { passwordValidator, zErrorHandler } from "../utils/inputValidator.js"
 
 
 export class AuthController {
@@ -24,7 +25,6 @@ export class AuthController {
                 status2fa: !!result.status2fa,
                 session2FA: !!result.status2fa
             }
-            console.log(params);
             if (result.message && result.message.includes("USER_NOT_FOUND"))
                 return reply.code(404).send({error: "USER_NOT_FOUND"});
             if (result.message && result.message.includes("INVALID_PASSWORD"))
@@ -43,8 +43,9 @@ export class AuthController {
                 httpOnly: true,
                 sameSite: 'lax',
                 path: '/',
-                maxAge: 7 * 24 * 60 * 60 * 1000
+                maxAge: 15 * 60 * 1000
             });
+            console.log(result);
             return reply.code(200).send({message: "AUTHORIZED", userData: result});
         }
         catch (error) {
@@ -61,8 +62,9 @@ export class AuthController {
         const { firstname, lastname, username, email, password } = request.body;
         const db = request.server.db;
         try {
-            const user = await authModels.addNewUser(db, firstname, lastname, username, email, password);
-						MatchController.addNewGameSettings(request.server.db, user.id);
+            const validPass  = passwordValidator.parse(password);
+            const user = await authModels.addNewUser(db, firstname, lastname, username, email, validPass);
+			MatchController.addNewGameSettings(request.server.db, user.id);
             const params = {
                 isVerified: !!user.isverified,
                 hasAvatar: !!user.avatar,
@@ -73,20 +75,23 @@ export class AuthController {
             authModels.addNewToken(db, user.id, refreshToken);
             reply.setCookie('refreshToken', refreshToken, {
                 httpOnly: true,
-                sameSite: 'strict',
+                sameSite: 'lax',
                 path: '/',
                 maxAge: 7 * 24 * 60 * 60 * 1000
             });
             reply.setCookie('accessToken', accessToken, {
                 httpOnly: true,
-                sameSite: 'strict',
+                sameSite: 'lax',
                 path: '/',
-                maxAge: 7 * 24 * 60 * 60 * 1000
+                maxAge: 15 * 60 * 1000
             });
             return reply.code(201).send({message: "USER_CREATED_SUCCESSFULLY"});
         }
         catch (error)
         {
+            const zError = zErrorHandler(error);
+            if (zError !== null)
+                return reply.code(zError.code).send({error: zError.error, fields: zError.fields});
             if (error.code)
                 return reply.code(error.code).send({error: error.message});
             else
@@ -164,6 +169,8 @@ export class AuthController {
         const db = request.server.db;
         try {
             const user = authModels.findUserById(db, request.user.userId);
+            // console.log("request.user = ", request.user);
+            // console.log("from Get me the user is",user);
             return reply.code(200).send({message: "SUCCESS", userData: user});
         }
         catch (error) {
@@ -177,7 +184,7 @@ export class AuthController {
     async   logout(request, reply)
     {
         const db = request.server.db;
-				const io = request.server.io;
+		const io = request.server.io;
         try {
             const refreshToken = request.cookies.refreshToken;
             if (!refreshToken)
@@ -188,12 +195,12 @@ export class AuthController {
             tokenModels.revokeToken(db, refreshToken, expiration);
             reply.clearCookie('accessToken', {
                 httpOnly: true,
-                sameSite: 'strict',
+                sameSite: 'lax',
                 path: '/',
             });
             reply.clearCookie('refreshToken', {
                 httpOnly: true,
-                sameSite: 'strict',
+                sameSite: 'lax',
                 path: '/',
             });
             return reply.code(200).send({message: "LOGGED_OUT"});

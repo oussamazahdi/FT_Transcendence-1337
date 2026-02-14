@@ -71,13 +71,9 @@ class matchController {
 	MatchHistory = async (req, res) => {
 		try {
 			const db = req.server.db;
-			const userId = Number(req.user.userId);
-
-			if (!Number.isInteger(userId)) {
-				return res.code(400).send({ error: "Invalid user id" });
-			}
+			const { id } = req.query
 			
-			const data = await this.getMatchHistoryByUserId(db, userId);
+			const data = await this.getMatchHistoryByUserId(db, id);
 
 			return res.code(200).send({ message: "SUCCESS", data });
 		} catch (error) {

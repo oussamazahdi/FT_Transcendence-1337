@@ -75,6 +75,7 @@ const SignIn = () => {
           >
             <div>
               <input
+                maxLength={256}
                 type="email"
                 value={email}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
@@ -85,6 +86,7 @@ const SignIn = () => {
 
             <div>
               <input
+                maxLength={256}
                 type="password"
                 value={password}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setpassword(e.target.value)}

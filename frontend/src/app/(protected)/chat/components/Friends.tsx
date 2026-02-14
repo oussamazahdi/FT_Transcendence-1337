@@ -2,28 +2,7 @@ import Image from "next/image";
 import { useSelectedFriend } from "@/contexts/userContexts";
 import { assets } from "@/assets/data";
 import type { Conversation } from "@/types";
-
-function parseTime(timeString: string) {
-  const date = new Date(timeString);
-  const now = new Date();
-
-  if (isNaN(date.getTime())) 
-    return timeString;
-
-  const isToday = date.toDateString() === now.toDateString();
-
-  if (isToday) {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-  } else {
-    return date.toLocaleString('en-GB', {
-      day: 'numeric',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    });
-  }
-}
+import { parseTime } from "@/lib/utils"
 
 const Friends = (props: Conversation) => {
   const { setSelectedFriend } = useSelectedFriend();

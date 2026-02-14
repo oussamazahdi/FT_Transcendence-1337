@@ -13,7 +13,7 @@ const MessageList = ({ messages, onLoadMore, loading, hasMore}:MessageListProps)
   const { user } = useAuth();
 
   return (
-    <div className={`w-full flex-1 overflow-y-auto px-4 custom-scrollbar flex flex-col-reverse ${!hasMore && "py-4"}`}>
+    <div className={`w-full flex-1 overflow-y-auto px-4 custom-scrollbar flex flex-col-reverse gap-1 ${!hasMore && "py-4"}`}>
     {messages.map((msg, index) => {
         const isLastInSequence = 
           index === messages.length - 1 || messages[index + 1]?.senderId !== msg.senderId;

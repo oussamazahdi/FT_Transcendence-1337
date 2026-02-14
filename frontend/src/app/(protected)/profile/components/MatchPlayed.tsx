@@ -20,8 +20,8 @@ ChartJS.register(
   Legend
 );
 
-const MatchesPlayed = () => {
-  const [total, setTotal] = useState<[]>([])
+const MatchesPlayed = ({id}:any) => {
+  const [total, setTotal] = useState<any[]>([])
   const [labels, setLabels] = useState<any[]>([])
   const [loading, setLoading] = useState(false);//to use later
 
@@ -29,22 +29,25 @@ const MatchesPlayed = () => {
     const fetchDaysData = async () => {
       setLoading(true);
       try{
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/statistics/weekly`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/statistics/weekly?userId=${id}`, {
           method:"get",
           credentials:"include"
         })
 
         if (!response.ok) 
           throw new Error;
-        //[0,1,2]
         const data = await response.json();
         const rawData = data.data || [];
-        const formattedLabels = ["day1", "day2", "day3", "day4", "day5", "day6", "day7"]
-        formattedLabels.splice(0, rawData.length)
-				rawData.map((item: any) => {
-          const date = new Date(item.day);
-          formattedLabels.unshift(date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }));
+        const formattedLabels = rawData.map((d:{day:string}) => {
+          const date = new Date(d.day);
+          return date.toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short",
+          });
         });
+        while (formattedLabels.length < 7) {
+          formattedLabels.push("-");
+        }
         const totalData = rawData.map((item: any) => item.total);
         setLabels(formattedLabels);
         setTotal(totalData);
@@ -56,7 +59,7 @@ const MatchesPlayed = () => {
       }
     }
     fetchDaysData()
-  },[])
+  },[id])
 
   const options = {
     responsive: true,
@@ -87,6 +90,15 @@ const MatchesPlayed = () => {
           color: "white",
         },
       },
+      title:{
+        display: true,
+        color:"#FFFFFF",
+        text: "Match history",
+        font: {
+          size: 20,
+          lineHeight: 1.2,
+        },
+      }
     },
   };
 
@@ -96,15 +108,19 @@ const MatchesPlayed = () => {
       {
         label: "Matches Played",
         data:total,
-        backgroundColor: "#555555",
-        hoverBackgroundColor: "#C729AC",
+        backgroundColor: "rgb(17, 95, 72, 0.5)",
+        borderRadius: 3,
       },
     ],
   };
 
   return (
     <div className="bg-[#0F0F0F]/75 rounded-[20px] flex-1 h-full min-h-55 md:min-h-0 p-4">
+      {loading? 
+        <p>loading...</p>
+        :
       <Bar options={options} data={data} />
+      }
     </div>
   );
 };

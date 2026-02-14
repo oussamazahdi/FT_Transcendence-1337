@@ -3,6 +3,8 @@ import Friends from "./Friends";
 import SearchCard from "./SearchCard.tsx";
 import { autofetch } from "@/lib/api";
 import { Conversation, otherUserData } from "@/types";
+import { SEARCH_USERS_ERROR } from "@/lib/utils.ts";
+import { useAuth } from "@/contexts/authContext.tsx";
 
 interface SideBarProps {
   displayData: Conversation[];
@@ -16,6 +18,7 @@ export default function SideBar({ displayData, loading }: SideBarProps) {
   const [hasMore, setHasMore] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const { triggerError } = useAuth()
 
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -36,20 +39,20 @@ export default function SideBar({ displayData, loading }: SideBarProps) {
         },
         );
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error);
+        if (!response.ok) 
+          throw new Error(SEARCH_USERS_ERROR[data.error] || SEARCH_USERS_ERROR.default);
 
         const search: otherUserData[] = data.friends || [];
         setHasMore(search.length === 10);
         setSearchData(search);
-				console.log("==========> seach object:", search); //remove later
-      } catch (err) {
-        console.log("Failed to fetch users", err);
+      } catch (err:any) {
+        triggerError(err.message)
       } finally {
         setSearchLoading(false);
       }
     }, 500);
     return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery, page]);
+  }, [searchQuery, page, triggerError]);
 
 
   const renderList = () => {
@@ -67,6 +70,8 @@ export default function SideBar({ displayData, loading }: SideBarProps) {
               setIsOpen={setIsOpen}
               setSearchQuery={setSearchQuery}
               displayData={displayData}
+              player_level={user.player_level}
+              player_xp={user.player_xp}
             />
           ))}
           {hasMore && (
@@ -117,6 +122,7 @@ export default function SideBar({ displayData, loading }: SideBarProps) {
         <input
           className="h-10 w-full px-2 placeholder:text-sm placeholder:text-gray-400 hover:rounded-lg focus:outline-none "
           placeholder="Search"
+          maxLength={30}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.currentTarget.value)}
         ></input>
