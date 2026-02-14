@@ -71,6 +71,7 @@ export default function SignUp() {
             <div className="flex flex-col md:flex-row gap-1 w-full">
               <div className="w-full">
                 <input 
+                  maxLength={15}
                   className="w-full p-3 h-8 rounded bg-[#4D4D4D]/40 text-white text-xs placeholder-[#FFFFFF]/23 focus:outline-none"
                   placeholder="Firstname" {...register("firstname")} />
                 {errors.firstname && (
@@ -79,6 +80,7 @@ export default function SignUp() {
               </div>
               <div className="w-full">
                 <input 
+                  maxLength={15}
                   className="w-full p-3 h-8 rounded bg-[#4D4D4D]/40 text-white text-xs placeholder-[#FFFFFF]/23 focus:outline-none"
                   placeholder="Lastname" {...register("lastname")}/>
                   {errors.lastname && (
@@ -88,6 +90,7 @@ export default function SignUp() {
             </div>
             <div className="w-full">
               <input 
+                maxLength={15}
                 className="w-full p-3 h-8 rounded bg-[#4D4D4D]/40 text-white text-xs placeholder-[#FFFFFF]/23 focus:outline-none"
                 placeholder="Nickname" {...register("username")} />
                 {errors.username && (
@@ -95,7 +98,8 @@ export default function SignUp() {
               )}
             </div>
             <div className="w-full">
-              <input 
+              <input
+                maxLength={256}
                 className="w-full p-3 h-8 rounded bg-[#4D4D4D]/40 text-white text-xs placeholder-[#FFFFFF]/23 focus:outline-none"
                 type="email" placeholder="Email address" {...register("email")} />
                 {errors.email && (
@@ -104,6 +108,7 @@ export default function SignUp() {
             </div>
             <div className="w-full">
               <input 
+                maxLength={64}
                 className="w-full p-3 h-8 rounded bg-[#4D4D4D]/40 text-white text-xs placeholder-[#FFFFFF]/23 focus:outline-none"
                 type="password" placeholder="Password" {...register("password")} />
                 {errors.password && (
@@ -111,7 +116,8 @@ export default function SignUp() {
               )}
             </div>
             <div className="w-full">
-              <input 
+              <input
+                maxLength={64}
                 className="w-full p-3 h-8 rounded bg-[#4D4D4D]/40 text-white text-xs placeholder-[#FFFFFF]/23 focus:outline-none"
                 type="password" placeholder="Confirm password" {...register("confirmPassword")} />
                 {errors.confirmPassword && (

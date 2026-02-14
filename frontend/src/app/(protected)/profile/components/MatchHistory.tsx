@@ -82,13 +82,8 @@ const MatchHistory = ({ classname, id }:any) => {
 });
 
   return (
-    <div
-      className={`min-h-0 h-full bg-[#0F0F0F]/75 rounded-[20px] p-3 flex flex-col ${classname}`}
-    >
-      <div>
-        <p className="font-bold text-sm shrink-0">Match history</p>
-      
-      </div>
+    <div className={`min-h-0 h-full bg-[#0F0F0F]/75 rounded-[20px] p-3 flex flex-col ${classname}`}>
+      <p className="font-bold text-sm shrink-0">Match history</p>
       <div className="flex flex-col gap-1 w-full mt-2 overflow-y-auto custom-scrollbar flex-1 min-h-0">
         {renderHistory}
       </div>

@@ -66,6 +66,8 @@ export default function SideBar({ displayData, loading }: SideBarProps) {
               setIsOpen={setIsOpen}
               setSearchQuery={setSearchQuery}
               displayData={displayData}
+              player_level={user.player_level}
+              player_xp={user.player_xp}
             />
           ))}
           {hasMore && (
@@ -116,6 +118,7 @@ export default function SideBar({ displayData, loading }: SideBarProps) {
         <input
           className="h-10 w-full px-2 placeholder:text-sm placeholder:text-gray-400 hover:rounded-lg focus:outline-none "
           placeholder="Search"
+          maxLength={30}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.currentTarget.value)}
         ></input>

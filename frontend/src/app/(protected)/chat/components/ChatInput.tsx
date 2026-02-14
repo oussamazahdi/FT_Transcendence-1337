@@ -53,6 +53,7 @@ const ChatInput = ({ onSend, friend }: ChatInputProps) => {
           <input
             value={inputValue}
             onKeyDown={handleKeyDown}
+            maxLength={500}
             onChange={(e) => setInputValue(e.currentTarget.value)}
             placeholder="Type a message..."
             className="h-full w-full bg-transparent border-none outline-none text-xs text-white px-2 placeholder-gray-500"

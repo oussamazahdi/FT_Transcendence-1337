@@ -164,6 +164,8 @@ export class AuthController {
         const db = request.server.db;
         try {
             const user = authModels.findUserById(db, request.user.userId);
+            console.log("request.user = ", request.user);
+            console.log("from Get me the user is",user);
             return reply.code(200).send({message: "SUCCESS", userData: user});
         }
         catch (error) {

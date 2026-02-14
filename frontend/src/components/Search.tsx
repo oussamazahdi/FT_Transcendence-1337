@@ -101,6 +101,7 @@ const Search = () => {
       <div className="flex items-center">
         <input
           value={searchQuery}
+          maxLength={30}
           onChange={(e) => {
             setSearchQuery(e.currentTarget.value);
             setPage(1);

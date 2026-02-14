@@ -164,6 +164,7 @@ export default function Personal_information() {
           <div>
             <p className="text-[10px] text-gray-500">Firstname</p>
             <input
+              maxLength={15}
               type="text"
               {...register("firstname")}
               className="w-full md:w-52 p-2 h-12 rounded-xl bg-[#4D4D4D]/40 text-white text-sm placeholder-[#FFFFFF]/23 focus:outline-none"
@@ -172,6 +173,7 @@ export default function Personal_information() {
           <div>
             <p className="text-[10px] text-gray-500">Lastname</p>
             <input
+              maxLength={15}
               type="text"
               {...register("lastname")}
               className="w-full md:w-52 p-2 h-12 rounded-xl bg-[#4D4D4D]/40 text-white text-sm placeholder-[#FFFFFF]/23 focus:outline-none"
@@ -183,6 +185,7 @@ export default function Personal_information() {
           <div>
             <p className="text-[10px] text-gray-500">Username</p>
             <input
+              maxLength={15}
               type="text"
               {...register("username")}
               className="w-full md:w-105 p-2 h-12 rounded-xl bg-[#4D4D4D]/40 text-white text-sm placeholder-[#FFFFFF]/23 focus:outline-none"
@@ -191,6 +194,7 @@ export default function Personal_information() {
           <div>
             <p className="text-[10px] text-gray-500">Email</p>
             <input
+              maxLength={254}
               type="text"
               {...register("email")}
               className="w-full md:w-105 p-2 h-12 rounded-xl bg-[#4D4D4D]/40 text-white text-sm placeholder-[#FFFFFF]/23 focus:outline-none"
