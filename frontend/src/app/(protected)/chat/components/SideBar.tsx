@@ -3,6 +3,8 @@ import Friends from "./Friends";
 import SearchCard from "./SearchCard.tsx";
 import { autofetch } from "@/lib/api";
 import { Conversation, otherUserData } from "@/types";
+import { SEARCH_USERS_ERROR } from "@/lib/utils.ts";
+import { useAuth } from "@/contexts/authContext.tsx";
 
 interface SideBarProps {
   displayData: Conversation[];
@@ -16,6 +18,7 @@ export default function SideBar({ displayData, loading }: SideBarProps) {
   const [hasMore, setHasMore] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const { triggerError } = useAuth()
 
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -36,19 +39,20 @@ export default function SideBar({ displayData, loading }: SideBarProps) {
         },
         );
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error);
+        if (!response.ok) 
+          throw new Error(SEARCH_USERS_ERROR[data.error] || SEARCH_USERS_ERROR.default);
 
         const search: otherUserData[] = data.friends || [];
         setHasMore(search.length === 10);
         setSearchData(search);
-      } catch (err) {
-        console.log("Failed to fetch users", err);
+      } catch (err:any) {
+        triggerError(err.message)
       } finally {
         setSearchLoading(false);
       }
     }, 500);
     return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery, page]);
+  }, [searchQuery, page, triggerError]);
 
 
   const renderList = () => {

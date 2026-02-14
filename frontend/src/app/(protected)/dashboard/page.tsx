@@ -16,7 +16,7 @@ const Dashboard = () => {
     refreshFriendReq();
   }, [refreshFriendReq]);
   return (
-    <div className="grid w-full max-w-7xl grid-cols-1 gap-2 md:h-[86vh] lg:h-[76vh] md:grid-cols-12 md:grid-rows-[minmax(0,1fr)_minmax(0,0.7fr)_minmax(0,1fr)]">
+    <div className="grid w-[90vw] grid-cols-1 gap-2 md:h-[86vh] md:grid-cols-12 md:grid-rows-[minmax(0,1fr)_minmax(0,0.7fr)_minmax(0,1fr)]">
       <div className="min-w-0 md:col-span-4 md:col-start-1 md:row-start-1">
         <Profile user={user} className="w-full h-full" aspect="aspect-4/2"/>
       </div>

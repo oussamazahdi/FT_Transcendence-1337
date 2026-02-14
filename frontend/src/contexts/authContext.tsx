@@ -147,7 +147,7 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
       const msg =
     err instanceof Error ? err.message : typeof err === "string" ? err : "default";
 
-  triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
+    triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
     }
   }
 

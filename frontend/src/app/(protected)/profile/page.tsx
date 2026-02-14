@@ -14,7 +14,7 @@ export default function ProfilePage() {
       refreshFriendReq();
   },[refreshFriendReq])
   return (
-    <div className="grid w-full max-w-7xl grid-cols-1 gap-4 md:h-[86vh] lg:h-[60vh] md:grid-cols-12 md:grid-rows-2">
+    <div className="grid w-[90vw] grid-cols-1 gap-4 md:h-[86vh] md:grid-cols-12 md:grid-rows-2">
       <div className="min-w-0 md:col-span-8 md:row-start-1">
         <Profile user={user} className="h-full" aspect="aspect-4/1" />
       </div>

@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import SearchUserCard from "./SearchUserCard";
 import { autofetch } from "@/lib/api";
 import type { User } from "@/types";
+import { SEARCH_USERS_ERROR } from "@/lib/utils";
+import { useAuth } from "@/contexts/authContext";
 
 type SearchUser = Pick<User, "id" | "avatar" | "firstname" | "lastname" | "username">;
 
@@ -13,6 +15,7 @@ const Search = () => {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const { triggerError } = useAuth();
   useEffect(() => {
     if (!searchQuery.trim() || searchQuery.trim().length < 2) {
       setIsOpen(false);
@@ -31,7 +34,7 @@ const Search = () => {
         );
         const data = await response.json();
         if (!response.ok) 
-          throw new Error(data.error);
+          throw new Error(SEARCH_USERS_ERROR[data.error] || SEARCH_USERS_ERROR.default);
 
         const searchResult: SearchUser[] = data.users ?? [];
 
@@ -41,15 +44,15 @@ const Search = () => {
         });
         setHasMore(searchResult.length === 10);
       } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : "Search failed";
-        console.log(message);
+        const message = err instanceof Error ? err.message : SEARCH_USERS_ERROR.default;
+        triggerError(message);
       } finally {
         setLoading(false);
       }
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery, page]);
+  }, [searchQuery, page, triggerError]);
 
   const renderlist = () => {
     if (!searchData || searchData.length === 0) {
