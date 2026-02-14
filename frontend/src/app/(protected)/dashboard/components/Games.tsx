@@ -16,7 +16,7 @@ const Games = () => {
           className="relative flex-1 min-h-[120px] md:min-h-0 rounded-2xl overflow-hidden cursor-pointer
             transition-transform duration-200 hover:scale-[1.01] ring-1 ring-white/10 hover:ring-white/30 group">
           <Image src="/Local.png" alt="Local Game" fill sizes="(max-width: 768px) 100vw, 33vw" priority
-            className="object-cover transition duration-300 grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100"/>
+            className="object-cover transition duration-300 grayscale-30 opacity-70 group-hover:grayscale-0 group-hover:opacity-100"/>
 
           <div className="absolute inset-0 flex flex-col items-center justify-center
               bg-black/50 group-hover:bg-black/25 transition duration-300 text-center">
@@ -30,7 +30,7 @@ const Games = () => {
           className="relative flex-1 min-h-[120px] md:min-h-0 rounded-2xl overflow-hidden cursor-pointer
             transition-transform duration-200 hover:scale-[1.01] ring-1 ring-white/10 hover:ring-white/30 group">
           <Image src="/Remote.png" alt="Remote Game" fill sizes="(max-width: 768px) 100vw, 33vw"
-            className="object-cover transition duration-300 grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100"/>
+            className="object-cover transition duration-300 grayscale-30 opacity-70 group-hover:grayscale-0 group-hover:opacity-100"/>
 
           <div className="absolute inset-0 flex flex-col items-center justify-center
               bg-black/50 group-hover:bg-black/25 transition duration-300 text-center">
