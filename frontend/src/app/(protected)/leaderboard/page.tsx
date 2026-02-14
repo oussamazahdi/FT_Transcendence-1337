@@ -86,7 +86,7 @@ useEffect(() => {
   ))
 
   return (
-    <div className="bg-[#0F0F0F]/65 h-[86vh] w-full max-w-7xl flex flex-col px-4 pt-4 pb-2 gap-4 rounded-xl">
+    <div className="bg-[#0F0F0F]/65 h-[86vh] w-[90vw] flex flex-col px-4 pt-4 pb-2 gap-4 rounded-xl">
       <div className="grid grid-cols-[2fr_1fr_1fr_1fr] md:grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_1fr] font-bold text-sm md:text-xl px-1">
         <p>Player</p>
         <p className="text-center">Level</p>

@@ -62,7 +62,7 @@ const FriendsProfile = ({ userPage }:FriendProfileProp) => {
 
   return (
     <div className="relative bg-[#0F0F0F]/75 rounded-[20px] flex flex-col overflow-hidden p-3 h-full min-h-0">
-      <div className="relative w-full h-24 md:h-52 overflow-hidden">
+      <div className="relative w-full aspect-4/2 overflow-hidden rounded-lg">
         <Image
           src={assets.coverPicture}
           alt="cover"

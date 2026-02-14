@@ -54,9 +54,9 @@ const FriendProfilePage = async ({ params }:any) => {
   }
 
   return (
-    <div className="grid w-full max-w-7xl mx-3 grid-cols-1 gap-2 md:h-[86vh] lg:h-[60vh] md:grid-cols-12 md:grid-rows-2">
+    <div className="grid w-[90vw] mx-3 grid-cols-1 gap-2 md:h-[86vh] md:grid-cols-12 md:grid-rows-2">
       <div className="min-w-0 md:col-span-8 md:row-start-1">
-        <FriendsProfile userPage={friendProfile} />
+        <FriendsProfile userPage={friendProfile}  />
       </div>
 
       <div className="grid min-w-0 grid-cols-1 gap-2 md:col-span-8 md:row-start-2 md:grid-cols-2">

@@ -129,4 +129,5 @@ export interface fullUser{
   incomingRequests: any,
   gameSetting: any,
   notification: any,
+  blockers:any,
 }

@@ -30,7 +30,7 @@ export default function Home() {
     },
     {
       name: "Oussama [ozahdi]",
-      imageUrl: assets.mohcinePdp,
+      imageUrl: assets.OussamaPdp,
       links: {
         school42: "https://profile.intra.42.fr/users/ozahdi",
         linkedin: "https://www.linkedin.com/in/oussamazahdi/",

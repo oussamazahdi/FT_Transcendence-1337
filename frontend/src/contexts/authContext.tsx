@@ -30,6 +30,7 @@ interface UserCtxValue {
   setFriends: React.Dispatch<React.SetStateAction<any[]>>;
   notification:any
   setNotification:React.Dispatch<React.SetStateAction<any[]>>;
+  blockers:any
 }
 interface UserProviderProps {
   children: ReactNode,
@@ -48,7 +49,9 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [gameSetting, setGameSetting] = useState<any>(initialUser?.gameSetting || [])
   const [notification, setNotification] = useState<any[]>(initialUser?.notification || []);
+  const blockers = initialUser?.blockers
   const router = useRouter();
+  console.log("hhhhhhhhhhhhhhhhh", user);
 
   const refreshFriendReq = useCallback(async () => {
     try {
@@ -318,7 +321,7 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
 
   return (
     <UserCtx.Provider
-      value= {{globalError, user, friends, pendingRequests, incomingRequest, blocked, setUser, triggerError, login, logout, updateUser, sendFriendRequest, cancelRequest, acceptRequest, removeFriend, setFriends, blockUser, unblockUser, refreshFriendReq, gameSetting, updateGameSettings, notification, setNotification}}>
+      value= {{globalError, user, friends, pendingRequests, incomingRequest, blocked, blockers, setUser, triggerError, login, logout, updateUser, sendFriendRequest, cancelRequest, acceptRequest, removeFriend, setFriends, blockUser, unblockUser, refreshFriendReq, gameSetting, updateGameSettings, notification, setNotification}}>
        { children }
     </UserCtx.Provider>
   );

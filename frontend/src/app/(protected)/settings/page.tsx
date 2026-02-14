@@ -22,7 +22,7 @@ export default function SettingsPage() {
   },[tab])
   return (
     <ActiveTabContext.Provider value={{activeTab, setActiveTab}}>
-      <div className="flex w-full max-w-7xl mx-auto h-full md:h-[86vh] gap-2">
+      <div className="flex w-[90vw] mx-auto h-full md:h-[86vh] gap-2">
         <div className={`w-full md:max-w-1/4 h-full ${activeTab ? "hidden md:block" : "block"}`}>
           <Sidebar />
         </div>

@@ -1,6 +1,7 @@
 import { oauthModels } from "../models/oauth.model.js";
 import { authModels } from "../models/auth.model.js";
 import { randomPasswordGenerator, generateToken } from "../utils/authUtils.js";
+import { MatchController } from "./game.controller.js";
 
 export class OAuthController
 {
@@ -26,6 +27,7 @@ export class OAuthController
                 const username = `${googleUser.given_name}-${googleUser.id}`;
                 const password = randomPasswordGenerator(20);
                 result = await oauthModels.addNewUser(db, googleUser.id, googleUser.given_name, googleUser.family_name, username, googleUser.email, googleUser.picture, password);
+                MatchController.addNewGameSettings(db, result.id);
             }
             const accessToken = generateToken(result.id, result.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION, params, "access");
             const refreshToken = generateToken(result.id, result.username, process.env.JWT_REFRESH_SECRET, process.env.JWT_REFRESH_EXPIRATION, null, "refresh");
@@ -47,6 +49,8 @@ export class OAuthController
         }
         catch (error)
         {
+            if (error.message.includes('Response Error: 400 Bad Request'))
+                return reply.redirect(process.env.FRONTEND_URL)
             if (error.code)
                 return reply.code(error.code).send({error: error.message});
             else
