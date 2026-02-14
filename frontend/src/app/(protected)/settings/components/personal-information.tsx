@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useAuth } from "@/contexts/authContext";
 import { assets } from "@/assets/data";
-import { USER_ERROR } from "@/lib/utils.ts";
+import { AUTH_ERRORS, USER_ERROR } from "@/lib/utils.ts";
 import { ArrowUpTrayIcon } from "@heroicons/react/24/outline";
 import { autofetch } from "@/lib/api";
 import { z } from "zod";
@@ -11,21 +11,38 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const ProfileSchema = z.object({
-  firstname: z.string().min(3, "Firstname must be at least 3 characters").max(50),
-  lastname: z.string().min(3, "Lastname must be at least 3 characters").max(50),
-  username: z.string().min(3, "Username must be at least 3 characters").max(20).regex(/^[a-zA-Z0-9_-]+$/, "Username can contain only letters, numbers, _ or -"),
+  firstname: z
+    .string()
+    .min(3, "Firstname must be at least 3 characters")
+    .max(15, "Firstname must be at most 15 characters")
+    .regex(/^[a-zA-Z0-9_-]+$/, "Lastname contains invalid characters"),
+
+  lastname: z
+    .string()
+    .min(3, "Lastname must be at least 3 characters")
+    .max(15, "Lastname must be at most 15 characters")
+    .regex(/^[a-zA-ZÀ-ÿ\s'-]+$/, "Lastname contains invalid characters"),
+
+  username: z
+    .string()
+    .min(3, "Username must be at least 3 characters")
+    .max(15, "Username must be at most 15 characters")
+    .regex(/^[a-zA-Z0-9_-]+$/, "Username can contain only letters, numbers, _ or -"),
+
   email: z.string().email("Email address is invalid"),
+
   avatar: z.union([z.instanceof(File), z.string(), z.null()]).optional(),
 });
+
 
 type ProfileFormData = z.infer<typeof ProfileSchema>;
 
 export default function Personal_information() {
   const { user, login } = useAuth();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [Rooterror, setRootError] = useState<string | null>(null);
 
-  const {register, handleSubmit, setValue, reset, formState: { errors, isSubmitting, isDirty }} = useForm<ProfileFormData>({
+  const {register, handleSubmit, setValue, reset, formState: { errors, isDirty }, setError} = useForm<ProfileFormData>({
   resolver: zodResolver(ProfileSchema),
     defaultValues: {
       firstname: "",
@@ -53,18 +70,18 @@ export default function Personal_information() {
   }, [user, reset]);
 
   function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    setError(null)
+    setRootError(null)
     const file = e.target.files?.[0];
     if (!file) 
       return;
 
     if (!file.type.startsWith("image/")) {
-      setError("Please select a valid image");
+      setRootError("Please select a valid image");
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      setError("Image size must be less than 5MB");
+      setRootError("Image size must be less than 5MB");
       return;
     }
     const preview = URL.createObjectURL(file);
@@ -73,7 +90,7 @@ export default function Personal_information() {
   }
 
   const onSubmit = async(values: ProfileFormData) => {
-    setError(null);
+    setRootError(null);
 
     const userData = new FormData();
     userData.append("firstname", values.firstname);
@@ -100,7 +117,8 @@ export default function Personal_information() {
       if (!response.ok) {
         if (data.error === "INVALID_INPUT")
           throw new Error(`invalid ${data.fields}`);
-        throw new Error(USER_ERROR[data.error] || USER_ERROR["default"]);
+        console.log(data);
+        throw new Error(AUTH_ERRORS[data.error] || AUTH_ERRORS["default"]);
       }
 
       const newUser = data.user;
@@ -108,7 +126,7 @@ export default function Personal_information() {
       console.log("user update successfully :)");
     } catch (err:any) {
       console.log("failed to update user :( ", err.message);
-      setError(err.message);
+      setRootError(err.message)
     }
   }
 
@@ -169,6 +187,7 @@ export default function Personal_information() {
               {...register("firstname")}
               className="w-full md:w-52 p-2 h-12 rounded-xl bg-[#4D4D4D]/40 text-white text-sm placeholder-[#FFFFFF]/23 focus:outline-none"
             />
+            {errors.firstname && (<p className="text-red-500 text-[10px] mt-1">{errors.firstname.message}</p>)}
           </div>
           <div>
             <p className="text-[10px] text-gray-500">Lastname</p>
@@ -178,6 +197,7 @@ export default function Personal_information() {
               {...register("lastname")}
               className="w-full md:w-52 p-2 h-12 rounded-xl bg-[#4D4D4D]/40 text-white text-sm placeholder-[#FFFFFF]/23 focus:outline-none"
             />
+            {errors.lastname && (<p className="text-red-500 text-[10px] mt-1">{errors.lastname.message}</p>)}
           </div>
         </div>
 
@@ -190,6 +210,7 @@ export default function Personal_information() {
               {...register("username")}
               className="w-full md:w-105 p-2 h-12 rounded-xl bg-[#4D4D4D]/40 text-white text-sm placeholder-[#FFFFFF]/23 focus:outline-none"
             />
+            {errors.username && (<p className="text-red-500 text-[10px] mt-1">{errors.username.message}</p>)}
           </div>
           <div>
             <p className="text-[10px] text-gray-500">Email</p>
@@ -200,13 +221,10 @@ export default function Personal_information() {
               className="w-full md:w-105 p-2 h-12 rounded-xl bg-[#4D4D4D]/40 text-white text-sm placeholder-[#FFFFFF]/23 focus:outline-none"
             />
           </div>
+          {errors.email && (<p className="text-red-500 text-[10px] mt-1">{errors.email.message}</p>)}
         </div>
 
-        {error && (
-          <p className="text-red-600 text-xs text-center px-3 py-1 bg-red-300/20 border mt-2 rounded">
-            {error}
-          </p>
-        )}
+        {Rooterror && (<p className="text-red-600 text-xs text-center px-3 py-1 bg-red-300/20 border mt-2 rounded">{Rooterror}</p>)}
 
         <button
           disabled={!isDirty}

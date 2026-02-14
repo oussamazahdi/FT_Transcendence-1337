@@ -45,17 +45,16 @@ export const USER_ERROR:Record<string, string> = {
 
 export const CHAT_ERROR:Record<string, string> = {
   NOT_ALLOWED_TO_CONTACT_USER:"You can no longer send messages to this user.",
+  MESSAGE_TOO_LONG:"Message exceeds the allowed length. Please shorten it and try again.",
   default: "An unexpected error occurred. Please try again.",
 }
 
 export const SEARCH_ERROR:Record<string, string> = {
   QUERY_PARAMETER_REQUERED: "Please enter a keyword to search.",
-  QUERY_TOO_SHORT:
-    "Search term is too short. Please use at least 3 characters.",
+  QUERY_TOO_SHORT: "Search term is too short. Please use at least 3 characters.",
   QUERY_TOO_LONG: "Search term is too long. Please shorten your query.",
   default: "Search failed. Please try again.",
 };
-
 
 class componentUtils{
 	

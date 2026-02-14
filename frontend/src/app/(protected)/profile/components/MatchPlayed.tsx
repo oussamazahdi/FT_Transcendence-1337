@@ -116,7 +116,11 @@ const MatchesPlayed = ({id}:any) => {
 
   return (
     <div className="bg-[#0F0F0F]/75 rounded-[20px] flex-1 h-full min-h-55 md:min-h-0 p-4">
+      {loading? 
+        <p>loading...</p>
+        :
       <Bar options={options} data={data} />
+      }
     </div>
   );
 };

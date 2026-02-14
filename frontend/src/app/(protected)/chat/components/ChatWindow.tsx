@@ -128,6 +128,11 @@ export default function ChatWindow({selectedFriend, updateLastMessage, liveMessa
   const handleSend = (content: string, type: string) => {
     const now = new Date();
 
+    if(content.length > 500){
+      triggerError(CHAT_ERROR["MESSAGE_TOO_LONG"])
+      return
+    }
+
     const tmpMessage: ChatMessage = {
       id: `tmp-${now.getTime()}`,
       senderId: user?.id || "",

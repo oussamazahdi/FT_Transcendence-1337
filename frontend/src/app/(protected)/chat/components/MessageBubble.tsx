@@ -17,7 +17,7 @@ const MessageBubble = (props:MessageBubble) => {
   const time = parseTime(props.message.timestamp)
   const isMe = props.message.isMe;
   return (
-    <div className={`flex gap-2 w-full items-center ${props.isMe ? "flex-row-reverse" : "justify-start"}`}>
+    <div className={`flex gap-1 w-full items-center ${props.isMe ? "flex-row-reverse" : "justify-start"}`}>
       <div className="size-9 overflow-hidden rounded-sm">
         {props.showAvatar ? (
           <Image

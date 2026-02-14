@@ -127,7 +127,8 @@ export default function Security() {
       );
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
+      if (!response.ok) 
+        throw new Error(USER_ERROR[data.error] || USER_ERROR["default"]);
 
       setGreeting("password changed successfully");
       setPasswords({ current: "", newPass: "", confirmPass: "" });
@@ -182,8 +183,8 @@ export default function Security() {
           onChange={handleChange}
         />
         {fieldErrors.confirmPass && (<p className="text-red-600 text-xs px-1">{fieldErrors.confirmPass}</p>)}
-        {error && (<p className="text-red-600 text-xs text-center px-3 py-1 bg-red-300/20 border">{error}</p>)}
-        {greeting && (<p className="text-white text-xs text-center w-full h-6 bg-orange-300/20 border border-green-500/20 p-1">{greeting}</p>)}
+        {error && (<p className="text-red-600 text-xs px-1">{error}</p>)}
+        {greeting && (<p className="text-green-600 text-xs px-1">{greeting}</p>)}
         <button
           type="submit"
           disabled={loading}

@@ -120,7 +120,6 @@ export class UserController
 		}
 		catch (error) {
 			const zError = zErrorHandler(error);
-			console.log(zError.fields);
 			if (zError !== null)
 				return reply.code(zError.code).send({error: zError.error, fields: zError.fields});
 			if (error.code)
