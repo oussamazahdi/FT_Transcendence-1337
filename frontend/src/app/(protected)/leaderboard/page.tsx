@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import LeaderboardCard from "./components/LeaderboardCard";
 import { ChevronDoubleRightIcon, ChevronDoubleLeftIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { Leaders } from "@/types";
-import { autofetch } from "@/lib/api";
+import { autofetch } from "@/lib/api.tsx";
 
 export default function Leaderboard() {
   const [leaders, setLeaders] = useState<Leaders[]>([]);

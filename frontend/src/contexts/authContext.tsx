@@ -3,7 +3,7 @@ import { useState, useContext, createContext, ReactNode, useCallback } from "rea
 import { useRouter } from "next/navigation";
 import { USER_ERROR } from "@/lib/utils.ts";
 import { User, fullUser } from "@/types/index"
-import { autofetch } from "@/lib/api";
+import { autofetch } from "@/lib/api.tsx";
 
 
 interface UserCtxValue {
@@ -51,7 +51,8 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
   const [notification, setNotification] = useState<any[]>(initialUser?.notification || []);
   const blockers = initialUser?.blockers
   const router = useRouter();
-  console.log("hhhhhhhhhhhhhhhhh", user);
+  console.log("hhhhhhhhhhhhhhhhh", blocked);
+  console.log("jajajajjajajajaja", blockers);
 
   const refreshFriendReq = useCallback(async () => {
     try {

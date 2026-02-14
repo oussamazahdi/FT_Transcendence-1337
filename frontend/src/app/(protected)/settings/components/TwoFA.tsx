@@ -1,6 +1,6 @@
 "use client";
 import { useAuth } from "@/contexts/authContext";
-import { autofetch } from "@/lib/api";
+import { autofetch } from "@/lib/api.tsx";
 import React, { useState } from "react";
 
 interface TwoFaProps{

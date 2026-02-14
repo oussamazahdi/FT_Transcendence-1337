@@ -67,6 +67,8 @@ export class ChatController
     {
         const senderId = socket.user.userId;
         const db = server.db;
+        let msgId;
+        let expDate = null;
         try {
             if (!data.receiverId)
                 return (socket.emit("chat:error", {message: "NO_RECEIVER_PROVIDED"}));
@@ -80,7 +82,13 @@ export class ChatController
             if (senderId === receiverId)
                 return socket.emit("chat:error", {message: "NOT_ALLOWED_TO_CONTACT_YOURSELF"});
             const convId = chatModels.getOrCreateConversationId(db, senderId, receiverId);
-            const msgId = chatModels.createNewMessage(db, convId, senderId, data.type, data.content);
+            if (data.type === "game_invite")
+            {
+                expDate = new Date(Date.now() + (15 * 1000));
+                msgId = chatModels.createNewMessage(db, convId, senderId, data.type, data.content, expDate);
+            }
+            else
+                msgId = chatModels.createNewMessage(db, convId, senderId, data.type, data.content, expDate);
             chatModels.UpdateLastMessage(db, senderId, receiverId);
             const conversation = chatModels.getConversationById(db, senderId, convId);
             const payload = {
@@ -90,6 +98,7 @@ export class ChatController
                 avatar: conversation.avatar,
                 type: data.type,
                 content: conversation.last_message,
+                expired_at: expDate,
                 sentAt: conversation.updatedate
             }
             socket.to(`chat:${receiverId}`).emit("chat:receiver", payload);

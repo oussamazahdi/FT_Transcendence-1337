@@ -39,19 +39,22 @@ const FriendProfilePage = async ({ params }:any) => {
 
   const currentUser = currentUserData?.userData;
   const blockedList = currentUserData?.blocked || [];
+  const blockers = currentUserData?.blockers || []
 
   if (currentUser && currentUser.id == id) {
     redirect("/profile");
   }
 
   const isBlocked = blockedList.some((item:any) => item.id == id);
-  if (isBlocked) {
+  if (isBlocked) 
     return <UserNotFound />;
-  }
+  
+  const isBlocker = blockers.some((item:any) => item.id == id)
+  if (isBlocker)
+    return <UserNotFound />;
 
-  if (!friendProfile) {
+  if (!friendProfile) 
     return <UserNotFound />;
-  }
 
   return (
     <div className="grid w-[90vw] mx-3 grid-cols-1 gap-2 md:h-[86vh] md:grid-cols-12 md:grid-rows-2">

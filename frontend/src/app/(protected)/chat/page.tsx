@@ -35,6 +35,7 @@ export default function Chat() {
 
         const data = await response.json();
         if (!response.ok) throw new Error(data.error);
+        console.log("hhhhhhhhh",data.conversations);
 
         const formatedData: Conversation[] = (data.conversations || []).map((conversation: any) => ({
           id: conversation.userid,

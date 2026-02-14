@@ -121,11 +121,11 @@ export class FriendsModels
                 WHEN f.sender_id = :me THEN f.receiver_id 
                 ELSE f.sender_id 
                 END 
-                WHERE f.blocked_by != :me AND f.status = 'blocked' `).all({me : userId}); 
+                WHERE (f.sender_id = :me OR f.receiver_id = :me) AND (f.blocked_by != :me AND f.status = 'blocked') `).all({me : userId}); 
                 return (blockedList);
             } 
             catch (error) {
-                const dbError = handleDatabaseError(error, 'getBlockedUsersList');
+                const dbError = handleDatabaseError(error, 'getBlockersList');
                 throw dbError; 
             }
     }

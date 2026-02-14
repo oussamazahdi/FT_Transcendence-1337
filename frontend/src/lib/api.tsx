@@ -1,21 +1,4 @@
-
-const logout = async () => {
-  try {
-    const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
-      method: "POST",
-      credentials: "include",
-    });
-
-    if(response.ok){
-      router.push("/");
-      router.refresh();
-    }
-  } catch (error) {
-    triggerError(USER_ERROR[err.message] || USER_ERROR['default'])
-  }
-};
-
-export const autofetch = async(url, options) => {
+export const autofetch = async(url:string, options:any) => {
 
   const response = await fetch(url, options);
   if (response.status === 401){
@@ -32,7 +15,7 @@ export const autofetch = async(url, options) => {
       return fetch(url, options);
     }catch(err){
       console.error("Session expired completely.");
-      logout();
+      window.location.href = "/";
     }
   }
   return response

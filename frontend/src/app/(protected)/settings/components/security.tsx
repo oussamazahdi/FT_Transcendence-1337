@@ -5,7 +5,7 @@ import TwoFA from "./TwoFA.tsx";
 import TwoFaSetup from "./TwoFaSetup.tsx";
 import { USER_ERROR } from "@/lib/utils.ts";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
-import { autofetch } from "@/lib/api";
+import { autofetch } from "@/lib/api.tsx";
 import { z } from "zod";
 
 const changePasswordSchema = z.object({

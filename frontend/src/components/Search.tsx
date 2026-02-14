@@ -1,7 +1,7 @@
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
 import SearchUserCard from "./SearchUserCard";
-import { autofetch } from "@/lib/api";
+import { autofetch } from "@/lib/api.tsx";
 import type { User } from "@/types";
 import { SEARCH_USERS_ERROR } from "@/lib/utils";
 import { useAuth } from "@/contexts/authContext";
