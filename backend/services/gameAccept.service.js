@@ -125,6 +125,8 @@ class gameAcceptService {
 	}
 	
 	bindUserToSocket = ({ player1, player2, p1SocketId, p2SocketId })=>{
+		console.log("***********************************>",player1, player2)
+			if(!player1 || !player2) return;
 			usernameToSocket.set(player1.username, p1SocketId);
 			usernameToSocket.set(player2.username, p2SocketId);
 			socketToUsername.set(p1SocketId, player1.username);

@@ -9,6 +9,7 @@ import { DisconnectionService } from "../services/Disconnection.service.js";
 class ConnectionController 
 {
 	onJoinGame(socket, io, player) {
+		console.log("*********************> join game:", socket.id);
 		if (!player || !GameUtils.isValidPlayerData(player)) return;
 		
 		JoinGameServices.rebindSocket(player.username, socket.id);
@@ -142,10 +143,10 @@ class ConnectionController
 			
 			const playersData = await GameAcceptService.loadPlayersData(db, senderId, receiverId, io);
 			if (!playersData?.ok)
-				{
-					// console.log(playersData)
-					throw new Error(playersData?.message);
-				} 
+			{
+				// console.log(playersData)
+				throw new Error(playersData?.message);
+			} 
 			const {player1, player2, p1SocketId, p2SocketId, p1Socket, p2Socket} = playersData
 			
 			bindInfo = { player1, player2, p1SocketId, p2SocketId };
