@@ -37,7 +37,7 @@ export class UserModels
             return (users)
         }
         catch (error) {
-            const dbError = handleDatabaseError(error, 'getAllUsers');
+            const dbError = handleDatabaseError(error, 'getUserById');
             throw dbError;
         }
 
@@ -46,12 +46,14 @@ export class UserModels
     updateUserById(db, userId, userData)
     {
         try {
+            const mEmail = userData.email.toLowerCase();
+            const mUsername = userData.username.toLowerCase();
             const result = db.prepare('UPDATE users SET firstname = ?, lastname = ?, username = ?, email = ?, avatar = ? WHERE id = ?')
-			.run(userData.firstname, userData.lastname, userData.username, userData.email, userData.avatar, userId);
+			.run(userData.firstname, userData.lastname, mUsername, mEmail, userData.avatar, userId);
             return (result);
         }
         catch (error) {
-            const dbError = handleDatabaseError(error, 'getAllUsers');
+            const dbError = handleDatabaseError(error, 'updateUserById');
             throw dbError;
         }
 

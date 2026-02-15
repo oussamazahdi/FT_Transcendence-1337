@@ -35,6 +35,7 @@ export default function Chat() {
 
         const data = await response.json();
         if (!response.ok) throw new Error(data.error);
+        console.log("hhhhhhhhh",data.conversations);
 
         const formatedData: Conversation[] = (data.conversations || []).map((conversation: any) => ({
           id: conversation.userid,
@@ -124,7 +125,7 @@ export default function Chat() {
 
   return (
     <SelectedFriendContext.Provider value={{ selectedFriend, setSelectedFriend }}>
-      <div className="flex w-full max-w-7xl h-[90vh] md:h-[86vh] rounded-lg overflow-hidden">
+      <div className="flex w-[90vw] h-[90vh] md:h-[86vh] rounded-lg overflow-hidden">
         <div className={`w-full md:max-w-1/4 md:mr-2 h-full flex flex-col ${selectedFriend ? "hidden md:block" : "block"}`}>
           <SideBar displayData={displayData} loading={loading} />
         </div>

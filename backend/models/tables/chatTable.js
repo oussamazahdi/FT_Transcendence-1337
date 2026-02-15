@@ -20,9 +20,13 @@ function createChatTable(db)
             type TEXT NOT NULL CHECK (
                 type IN ('text_message', 'game_invite')
             ),
+            status TEXT CHECK(
+                status IN ('accepted', 'rejected', 'pending')
+            ),
             content TEXT NOT NULL,
             sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             creationdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            expired_at TIMESTAMP,
             FOREIGN KEY (conversation_id) REFERENCES conversations(id),
             FOREIGN KEY (sender_id) REFERENCES users(id)
         )`);

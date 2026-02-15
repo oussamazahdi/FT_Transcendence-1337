@@ -33,7 +33,17 @@ type ChatReceivePayload = {
   content: string;
   sentAt: string;
 };
-
+type GameAcceptPayload ={
+	msgId: number | string;
+	sender_id: number | string,
+	recever_id: number | string,
+	room_id: number | string,
+	type: string
+}
+type GameRejectPayload ={
+	msgId: number | string;
+	type: string
+}
 type UsersStatusPayload = Array<string | number> | Record<string, boolean>;
 
 type ServerToClientEvents = {
@@ -46,6 +56,8 @@ type ServerToClientEvents = {
 type ClientToServerEvents = {
   "chat:send": (payload: { receiverId: number | string; content: string; type: string}) => void;
 	"game:invite": (payload: GameInvitePayload, ack?: (res: InviteResponse) => void) => void;
+	"chat:game:accept": (payload:GameAcceptPayload , ack?: (res: InviteResponse) => void) => void
+	"chat:game:reject": (payload:GameRejectPayload , ack?: (res: InviteResponse) => void) => void
 };
 
 type SocketType = Socket<ServerToClientEvents, ClientToServerEvents>;
@@ -118,6 +130,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
     });
 
     const handleMatchStarted = (data: MatchStartedPayload | MatchRoomId) => {
+			console.log("+++++> data:", data);
       const roomId = typeof data === "string" || typeof data === "number" ? data : data?.roomId;
       if (!roomId) return;
 
@@ -126,6 +139,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
         payload: typeof data === "object" ? data : null,
         ts: Date.now(),
       });
+
 
       router.push(`/game/pingPong/${roomId}`);
     };

@@ -57,11 +57,16 @@ type GameSocket = {
   off(event: "match-data" | "game-state", cb: (game: GameState) => void): void;
 };
 
+function isGameModeKey(v: unknown): v is keyof typeof GAME_MODE {
+  return typeof v === "string" && v in GAME_MODE;
+}
+
 export default function GamePage() {
   const socket = useSocket() as GameSocket | null;
+
   const { user, gameSetting } = useAuth() as {
     user: User | null;
-    gameSetting: { game_mode?: keyof typeof GAME_MODE } | Record<string, unknown>;
+    gameSetting: { game_mode?: unknown } | Record<string, unknown>;
   };
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -71,28 +76,38 @@ export default function GamePage() {
   const [scale, setScale] = useState(1);
   const [endGame, setEndGame] = useState(false);
 
-  const gameMode = GAME_MODE[(gameSetting as { game_mode?: keyof typeof GAME_MODE })?.game_mode as keyof typeof GAME_MODE] as GameMode;
+  // Pick a safe default game mode (first entry in GAME_MODE)
+  const defaultGameMode = useMemo(() => {
+    const firstKey = Object.keys(GAME_MODE)[0] as keyof typeof GAME_MODE | undefined;
+    return firstKey ? (GAME_MODE[firstKey] as GameMode) : (undefined as unknown as GameMode);
+  }, []);
 
-  useMemo(() => {
-    preloadBackground(gameMode.image);
-  }, [gameMode.image]);
+  const gameModeKey = (gameSetting as { game_mode?: unknown })?.game_mode;
+  const gameMode: GameMode = useMemo(() => {
+    if (isGameModeKey(gameModeKey)) return GAME_MODE[gameModeKey] as GameMode;
+    return defaultGameMode;
+  }, [gameModeKey, defaultGameMode]);
 
-	useEffect(() => {
-		document.body.classList.add("no-scroll");
-		document.documentElement.classList.add("no-scroll"); // html too (mobile/Safari)
-	
-		return () => {
-			document.body.classList.remove("no-scroll");
-			document.documentElement.classList.remove("no-scroll");
-		};
-	}, []);
-	
+  // ✅ side effect -> useEffect, and guard for undefined image
+  useEffect(() => {
+    const img = (gameMode as any)?.image as string | undefined;
+    if (!img) return;
+    preloadBackground(img);
+  }, [ gameMode]);
+
+  useEffect(() => {
+    document.body.classList.add("no-scroll");
+    document.documentElement.classList.add("no-scroll");
+    return () => {
+      document.body.classList.remove("no-scroll");
+      document.documentElement.classList.remove("no-scroll");
+    };
+  }, []);
 
   useEffect(() => {
     if (!user || !socket) return;
 
     if (!socket.connected) socket.connect();
-
 
     socket.emit("update-data", {
       username: user.username,
@@ -125,11 +140,12 @@ export default function GamePage() {
     if (!socket) return;
 
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "w" || e.key === "ArrowUp")
+      if (e.key === "w" || e.key === "ArrowUp") {
         socket.emit("paddle-move", { direction: "up" });
-
-      if (e.key === "s" || e.key === "ArrowDown")
+      }
+      if (e.key === "s" || e.key === "ArrowDown") {
         socket.emit("paddle-move", { direction: "down" });
+      }
     };
 
     window.addEventListener("keydown", handleKey);
@@ -137,11 +153,14 @@ export default function GamePage() {
   }, [socket]);
 
   useEffect(() => {
-    if (!game || !socket) return;
+    if (!game) return;
 
     if (game.state === "FINISHED") {
       setEndGame(true);
       return;
+    } else {
+      // if game continues (or new game starts), ensure overlay resets
+      if (endGame) setEndGame(false);
     }
 
     const canvas = canvasRef.current;
@@ -152,8 +171,7 @@ export default function GamePage() {
     canvas.width = GAME_WIDTH;
     canvas.height = GAME_HEIGHT;
 
-    let animationId : any;
-
+    let animationId = 0;
 
     const render = () => {
       drawFrame(ctx, game, gameMode);
@@ -162,7 +180,8 @@ export default function GamePage() {
 
     render();
     return () => cancelAnimationFrame(animationId);
-  }, [game, socket, gameMode]);
+    // gameMode is stable and safe now
+  }, [game, gameMode, endGame]);
 
   return (
     <div className="flex flex-col items-center w-full overflow-hidden">
@@ -178,6 +197,7 @@ export default function GamePage() {
           style={{ width: GAME_WIDTH * scale, height: GAME_HEIGHT * scale }}
           className="rounded-2xl border border-white/60"
         />
+
         {endGame && game && (
           <GameResult
             game={game}
@@ -187,9 +207,7 @@ export default function GamePage() {
         )}
       </div>
 
-      <p className="text-md opacity-60 mt-3 mb-12">
-        First to 10 points wins
-      </p>
+      <p className="text-md opacity-60 mt-3 mb-12">First to 10 points wins</p>
     </div>
   );
 }

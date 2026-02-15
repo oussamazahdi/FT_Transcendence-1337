@@ -28,8 +28,9 @@ const FriendsProfile = ({ userPage }:FriendProfileProp) => {
   const [isIncoming, setIsIncoming] = useState(false);
   const [showConfirmRemove, setShowconfirmRemove] = useState(false);
   const [showConfirmBlock, setShowconfirmBlock] = useState(false);
-  const rawLevel = 15.65
+  const rawLevel = userPage?.player_level || 0;
   const progressPercent = Math.round((rawLevel % 1) * 100);
+  const xp = userPage?.player_xp || 0
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -61,7 +62,7 @@ const FriendsProfile = ({ userPage }:FriendProfileProp) => {
 
   return (
     <div className="relative bg-[#0F0F0F]/75 rounded-[20px] flex flex-col overflow-hidden p-3 h-full min-h-0">
-      <div className="relative w-full h-24 md:h-52 overflow-hidden">
+      <div className="relative w-full aspect-4/2 overflow-hidden rounded-lg">
         <Image
           src={assets.coverPicture}
           alt="cover"
@@ -128,9 +129,6 @@ const FriendsProfile = ({ userPage }:FriendProfileProp) => {
             >
               <ChatBubbleOvalLeftIcon className="size-4 brightness-150" />
             </Link>}
-          <button className="flex justify-center items-center p-2 bg-[#414141]/60 hover:bg-[#414141] rounded-sm transition-colors cursor-pointer hover:scale-105">
-            <Gamepad2 strokeWidth={1.5} className="size-4 brightness-150" />
-          </button>
           <button onClick={() => setShowconfirmBlock(true)} className="flex justify-center items-center p-2 bg-[#583636]/40 hover:bg-[#583636] rounded-sm transition-colors cursor-pointer hover:scale-105">
             <NoSymbolIcon strokeWidth={1.5} className="size-4 brightness-150 text-[#D92F2F]" />
           </button>
@@ -139,7 +137,7 @@ const FriendsProfile = ({ userPage }:FriendProfileProp) => {
         <div className="w-full mt-auto px-1 pt-2">
           <div className="flex justify-between text-xs md:text-sm mb-1">
               <span className="font-bold ">Level: {rawLevel}</span>
-              <span >1950/3000</span>
+              <span >{xp}/{(Math.floor(rawLevel) + 1) * 3000}</span>
           </div>
           <div className="w-full bg-[#000000] rounded-full h-2.5">
               <div 

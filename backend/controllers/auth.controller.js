@@ -8,6 +8,7 @@ import { twoFactorModels } from "../models/twoFactor.model.js";
 import { generateFileNameByUser, generateToken, updateTokenFlags } from "../utils/authUtils.js";
 import { getEmailLetter } from "../templates/emailLetter.js";
 import { MatchController } from "./game.controller.js";
+import { passwordValidator, zErrorHandler } from "../utils/inputValidator.js"
 
 
 export class AuthController {
@@ -61,7 +62,8 @@ export class AuthController {
         const { firstname, lastname, username, email, password } = request.body;
         const db = request.server.db;
         try {
-            const user = await authModels.addNewUser(db, firstname, lastname, username, email, password);
+            const validPass  = passwordValidator.parse(password);
+            const user = await authModels.addNewUser(db, firstname, lastname, username, email, validPass);
 			MatchController.addNewGameSettings(request.server.db, user.id);
             const params = {
                 isVerified: !!user.isverified,
@@ -87,6 +89,9 @@ export class AuthController {
         }
         catch (error)
         {
+            const zError = zErrorHandler(error);
+            if (zError !== null)
+                return reply.code(zError.code).send({error: zError.error, fields: zError.fields});
             if (error.code)
                 return reply.code(error.code).send({error: error.message});
             else

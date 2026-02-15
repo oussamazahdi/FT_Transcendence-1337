@@ -77,7 +77,7 @@ function Card({
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           priority={false}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/20" />
       </div>
 
       {/* content */}
@@ -174,7 +174,7 @@ export default function LocalGame() {
           users={users}
           maxPlayers={4}
           // If your modal supports it, this is the ideal API:
-          onStart={handleTournamentStart as any}
+          onStart={handleTournamentStart}
         />
       </div>
     </div>

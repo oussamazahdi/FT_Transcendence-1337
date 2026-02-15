@@ -211,13 +211,13 @@ export class ChatModels
     }
 
 
-    createNewMessage(db, convId, senderId, type, content)
+    createNewMessage(db, convId, senderId, type, content, expired_at)
     {
         try {
             const result = db.prepare(`
                 INSERT INTO messages
-                (conversation_id, sender_id, type, content)
-                VALUES (?, ?, ?, ?)`).run(convId, senderId, type, content);
+                (conversation_id, sender_id, type, content, expired_at)
+                VALUES (?, ?, ?, ?, ?)`).run(convId, senderId, type, content, expired_at);
             return (result.lastInsertRowid);
 
         }
@@ -228,6 +228,53 @@ export class ChatModels
         }
     }
 
+    setInviteStatus(db, msgId, status)
+    {
+        try {
+					const result = db.prepare(`
+							UPDATE messages SET status = :status
+							WHERE id = :msgId`).run({msgId: msgId, status: status});
+					return result || null;
+        }
+        catch (error) 
+        {
+            const dbError = handleDatabaseError(error, 'setInviteStatus');
+            throw dbError; 
+        }
+    }
+    
+    // getMessageById(db, msgId)
+    // {
+    //     try {
+    //         const result = db.prepare(`
+    //             SELECT *
+    //             FROM messages
+    //             WHERE id = :msgId`).get(msgId);
+    //         return (result);
+
+    //     }
+    //     catch (error) 
+    //     {
+    //         const dbError = handleDatabaseError(error, 'getMessageById');
+    //         throw dbError; 
+    //     }
+    // }
+
+	getMessageById(db, msgId) {
+		try {
+				const result = db.prepare(`
+						SELECT *
+						FROM messages
+						WHERE id = ?
+				`).get(msgId);
+
+				return result || null;
+
+		} catch (error) {
+				const dbError = handleDatabaseError(error, 'getMessageById');
+				throw dbError;
+		}
+	}
 }
 
 
