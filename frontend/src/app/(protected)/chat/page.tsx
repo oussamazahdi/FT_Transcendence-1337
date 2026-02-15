@@ -103,6 +103,7 @@ export default function Chat() {
           receiverId: payload.receiverId,
           avatar: payload.avatar,
           type: payload.type,
+          status: payload.status,
           text: payload.content,
           timestamp: payload.sentAt,
           isMe: false,

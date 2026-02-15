@@ -248,11 +248,11 @@ export class AuthController {
             
             const user = authModels.getUserVerificationData(db, request.user.userId);
             if (user.isverified)
-                throw new Error("EMAIL_IS_ALREADY_VERIFIED");
+                return reply.code(409).send({error: "EMAIL_IS_ALREADY_VERIFIED"});
             if (today > user.otpexpiration)
-                throw new Error("EXPIRED_OTP");
+                return reply.code(409).send({error: "EXPIRED_OTP"});
             if (code !== user.otp)
-                throw new Error("INCORRECT");
+                return reply.code(409).send({error: "INCORRECT"});
             authModels.markEmailVerified(db, request.user.userId);
             const userflags = authModels.findUserById(db, request.user.userId);
             updateTokenFlags(userflags, reply);
@@ -260,6 +260,7 @@ export class AuthController {
         }
         catch(error)
         {
+            console.log(error);
             if (error.code)
                 return reply.code(error.code).send({error: error.message});
             else

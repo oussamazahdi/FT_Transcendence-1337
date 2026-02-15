@@ -5,16 +5,15 @@ import type { User } from "@/types";
 
 interface ProfileProps {
   user: User | null;
-  className?: string;
   aspect:string;
 }
-const Profile = ({ user, className, aspect }: ProfileProps) => {
+const Profile = ({ user, aspect }: ProfileProps) => {
   const rawLevel = user?.player_level || 0;
   const progressPercent = Math.round((rawLevel % 1) * 100);
   const xp = user?.player_xp || 0
 
   return (
-    <div className={`relative bg-[#0F0F0F]/75 rounded-[20px] flex flex-col pb-4 overflow-hidden p-3 shrink-0 ${className} `}>
+    <div className={`relative bg-[#0F0F0F]/75 rounded-[20px] flex flex-col pb-4 overflow-hidden p-3 shrink-0 h-full w-full `}>
       <div className={`relative w-full ${aspect} overflow-hidden rounded-lg`}>
         <Image
           src={assets.coverPicture}
