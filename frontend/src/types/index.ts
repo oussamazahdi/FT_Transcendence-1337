@@ -63,27 +63,26 @@ export interface Leaders{
 
 export const SignUpSchema = z
   .object({
-    username: z
-      .string()
+    username: z.string()
       .min(3, "Nickname must be at least 3 characters")
       .max(15, "Nickname must be at most 20 characters")
       .regex(/^[a-zA-Z0-9_-]+$/, "Nickname can only contain letters, numbers, _ or -"),
-    firstname: z
-      .string()
+    firstname: z.string()
       .min(3, "First name must be at least 3 characters")
       .max(15, "First name must be at most 50 characters")
       .regex(/^[a-zA-ZÀ-ÿ\s'-]+$/, "First name contains invalid characters"),
-    lastname: z
-      .string()
+    lastname: z.string()
       .min(3, "Last name must be at least 3 characters")
       .max(15, "Last name must be at most 50 characters")
       .regex(/^[a-zA-ZÀ-ÿ\s'-]+$/, "Last name contains invalid characters"),
     email: z.string().email("Email address is invalid"),
-    password: z
-      .string()
+    password: z.string()
       .min(8, "Password must be at least 8 characters")
+      .max(64, "Password must not exceed 64 characters")
       .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-      .regex(/[0-9]/, "Password must contain at least one number"),
+      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+      .regex(/[0-9]/, "Password must contain at least one number")
+      .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {

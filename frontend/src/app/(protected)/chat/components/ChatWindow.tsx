@@ -149,7 +149,7 @@ export default function ChatWindow({selectedFriend, updateLastMessage, liveMessa
 				type: "game_invite"
 				}
 			socket.emit("chat:game:accept", tmp, (res: InviteResponse): void => {
-				if (!res.ok) console.error("Invite failed:", res?.message);
+				if (!res.ok) triggerError("somthing wrong with the game invite, please send another one.");
         else updateMessageStatus("accepted")
 			});
 		}else{
@@ -158,7 +158,7 @@ export default function ChatWindow({selectedFriend, updateLastMessage, liveMessa
 				type: "game_invite"
 			}
 			socket.emit("chat:game:reject", tmp, (res: InviteResponse): void => {
-				if (!res.ok) console.error("Invite failed:", res.message);
+				if (!res.ok) triggerError("somthing wrong with the game invite, please send another one.");
         else updateMessageStatus("rejected");
 			});
 		}
