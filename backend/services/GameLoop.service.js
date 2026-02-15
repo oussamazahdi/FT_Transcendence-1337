@@ -1,9 +1,22 @@
 import { activeGames } from "../store/memory.store.js"
-import { GAME_HEIGHT, GAME_WIDTH, WIN_SCORE } from "../constants/game.constants.js"
+import { GAME_HEIGHT, GAME_WIDTH, PADDLE_SIZE, PADDLE_SPEED, WIN_SCORE } from "../constants/game.constants.js"
 import { GameUtils } from "../utils/GameUtils.js";
 import { MatchController } from "../controllers/game.controller.js";
 
 class gameLoop{
+	updatePaddles(game, deltaSec) {
+		const move = (player) => {
+			if (!player?.player) return;
+			const direction = Number(player.moveDirection) || 0;
+			if (direction === 0) return;
+
+			const nextY = player.player.y + direction * PADDLE_SPEED * deltaSec;
+			player.player.y = Math.max(0, Math.min(GAME_HEIGHT - PADDLE_SIZE, nextY));
+		};
+
+		move(game.player1);
+		move(game.player2);
+	}
 
 	resetBall(ball) {
 		ball.x = GAME_WIDTH / 2;
@@ -89,7 +102,13 @@ class gameLoop{
 	updateGame(io, roomId) {
 		const game = activeGames.get(roomId);
 		if (!game || game.state !== "PLAYING") return;
+
+		const now = Date.now();
+		const previous = game.lastUpdateAt || now;
+		const deltaSec = Math.min(Math.max((now - previous) / 1000, 0), 0.05);
+		game.lastUpdateAt = now;
 	
+		this.updatePaddles(game, deltaSec);
 		this.updateBall(game);
 		this.checkScore(game, io, roomId);
 	
