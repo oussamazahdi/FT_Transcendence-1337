@@ -50,13 +50,15 @@ const MatchHistory = ({ classname, id }:any) => {
         className={`flex justify-between items-center w-full h-16 ${iWon ? " bg-[#42A78A]/30" : "bg-[#B23B3B]/30 "} rounded-lg p-1 `}
       >
         <div className="flex items-center flex-1 gap-2 min-w-0 justify-start">
-          <Image
-            src={match.player1_avatar || assets.defaultProfile}
-            alt="avatar"
-            width={54}
-            height={54}
-            className="rounded-md shrink-0"
-          />
+        <div className="overflow-hidden w-13 h-14 rounded-sm">
+            <Image
+              src={match.player1_avatar || assets.defaultProfile}
+              alt="avatar"
+              width={54}
+              height={54}
+              className="shrink-0"
+            />
+          </div>
           <p className="text-xs font-bold truncate">{match.player1_username}</p>
         </div>
         <div className="flex flex-col justify-center items-center w-20 shrink-0">
@@ -70,13 +72,15 @@ const MatchHistory = ({ classname, id }:any) => {
         </div>
         <div className="flex items-center justify-end flex-1 gap-2 min-w-0">
           <p className="text-xs font-bold truncate">{match.player2_username}</p>
-          <Image
-            src={match.player2_avatar || assets.defaultProfile}
-            alt="avatar"
-            width={54}
-            height={54}
-            className="rounded-md shrink-0"
-          />
+          <div className="overflow-hidden w-13 h-14 rounded-sm">
+            <Image
+              src={match.player2_avatar || assets.defaultProfile}
+              alt="avatar"
+              width={54}
+              height={54}
+              className="shrink-0"
+              />
+          </div>
         </div>
       </div>)
 });

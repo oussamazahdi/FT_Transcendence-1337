@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/authContext.tsx";
 import { assets } from "@/assets/data";
 import type { ChatMessage } from "@/types";
 import { parseTime } from "@/lib/utils"
+import { messages } from "@/assets/mocData";
 
 interface MessageBubble{
   message: ChatMessage
@@ -13,43 +14,16 @@ interface MessageBubble{
 	handleGameInvite: (status:string, id: string | number) => void
 }
 
-/**
-id: "tmp-1770993648371"
-isMe: true
-senderId: 2003
-receiverId: 1002
-text: "1vs1 game invite"
-type: "game_invite"
-avatar: "http://localhost:3001/uploads/default/profile4.jpeg"
-timestamp: "2026-02-13T14:40:48.371Z"
- */
-
-// type GAMEINVITECHAT = {
-// 	id: number;
-// 	isMe: boolean;
-// 	senderId:number | string;
-// 	// receiverId:number | string;
-// 	text:string;
-// 	type:string;
-// 	avatar:string;
-// 	timestamp:string;
-// }
-
-
-
-
-
 const MessageBubble = (props:MessageBubble) => {
   const { user } = useAuth();
   const time = parseTime(props.message.timestamp)
   const isMe = props.message.isMe;
-	// const invit: GAMEINVITECHAT = props.message;
+  const now = new Date();
+  const messageTime = new Date(props.message.timestamp);
+  const expirationTime = new Date(messageTime.getTime() + (15 * 60 * 1000));
+  const isExpired = now > expirationTime;
+  let status = props.message.status;
 
-	// function acceptGameInvitation (){
-		
-	// }
-
-	// console.log("----------> message bubble:", props.message);
   return (
     <div className={`flex gap-1 w-full items-center ${props.isMe ? "flex-row-reverse" : "justify-start"}`}>
       <div className="size-9 overflow-hidden rounded-sm">
@@ -80,7 +54,7 @@ const MessageBubble = (props:MessageBubble) => {
         </div>
       ) : (
         <div
-          className={`flex flex-col gap-3 max-w-[70%] p-2 rounded-xl text-xs m-1 ${
+          className={`flex flex-col gap-2 max-w-[70%] p-2 rounded-xl text-xs ${
             props.isMe
               ? "bg-[#595959]/65 text-white"
               : "bg-[#0F0F0F]/65 text-white"
@@ -88,15 +62,17 @@ const MessageBubble = (props:MessageBubble) => {
         >
           <p className="font-medium">{"1 vs 1 ping pong game invitation"}</p>
           {!isMe && (
-            <div className="flex justify-center items-center gap-1">
+            status === "accepted" ? <p className="text-center text-[10px] text-gray-500">game invite <span className="text-[#5CD57E]/70">accepted</span></p> : 
+            (status === "rejected" ? <p className="text-center text-[10px] text-gray-500">game invite <span className="text-[#D55C5C]/70">rejected</span></p> : 
+            ( isExpired ? <p className="text-center text-[10px] text-gray-500">game invite <span className="text-gray-400">expired</span></p> :
+              <div className="flex justify-center items-center gap-1">
               <button onClick={() => props.handleGameInvite("reject", props.message.id)} className="bg-[#583F3F]/55 text-[8px] text-[#D55C5C] px-3 py-1 rounded-xs hover:bg-[#8D4646]/50 cursor-pointer">
                 Reject
               </button>
               <button onClick={() => props.handleGameInvite("accept", props.message.id)} className="bg-[#3F5846]/55 text-[8px] text-[#5CD57E] px-3 py-1 rounded-xs hover:bg-[#468C74]/50 cursor-pointer">
                 Accept
               </button>
-            </div>)}
-          
+            </div>)))}
         </div>
       )}
     </div>

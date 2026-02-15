@@ -14,7 +14,7 @@ export default function BlockedUsers() {
   }
 
   return (
-    <div className="h-full flex flex-col justify-start md:justify-center items-center gap-4 mx-1 pt-4 md:pt-0">
+    <div className="h-full flex flex-col justify-start md:justify-center items-center gap-4 mx-3 pt-4 md:pt-0">
       <div className="md:basis-2/10 flex flex-col md:justify-end-safe items-center">
         <NoSymbolIcon className="size-12" />
         <h1 className="text-white font-bold text-sm md:text-xsm">

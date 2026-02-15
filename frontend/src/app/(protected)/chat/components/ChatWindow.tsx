@@ -66,6 +66,7 @@ export default function ChatWindow({selectedFriend, updateLastMessage, liveMessa
           senderId: message.sender_id,
           avatar: message.avatar,
           type: message.type,
+          status: message.status,
           text: message.content,
           timestamp: message.creationdate,
           isMe: String(user?.id) === String(message.sender_id),
@@ -128,7 +129,17 @@ export default function ChatWindow({selectedFriend, updateLastMessage, liveMessa
     };
   }, [socket, triggerError, updateLastMessage]);
 
+  //handle game invite
 	const handleGameInvite = (status:string, id: string | number) => {
+    if (!socket)
+      return
+    const updateMessageStatus = (newStatus: "accepted" | "rejected") => {
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === id ? { ...msg, status: newStatus } : msg
+        )
+      );
+    };
 		if (status === "accept"){
 			const tmp = {
 				msgId: id,
@@ -137,24 +148,22 @@ export default function ChatWindow({selectedFriend, updateLastMessage, liveMessa
 				room_id: safeUUID(),
 				type: "game_invite"
 				}
-			if (!socket)
-				return
 			socket.emit("chat:game:accept", tmp, (res: InviteResponse): void => {
 				if (!res.ok) console.error("Invite failed:", res?.message);
+        else updateMessageStatus("accepted")
 			});
 		}else{
 			const tmp = {
 				msgId: id,
 				type: "game_invite"
 			}
-			if (!socket)
-				return
 			socket.emit("chat:game:reject", tmp, (res: InviteResponse): void => {
 				if (!res.ok) console.error("Invite failed:", res.message);
+        else updateMessageStatus("rejected");
 			});
 		}
 	}
-
+//handel send message
   const handleSend = (content: string, type: string) => {
     const now = new Date();
 
@@ -169,6 +178,7 @@ export default function ChatWindow({selectedFriend, updateLastMessage, liveMessa
       receiverId: selectedFriend.id,
       avatar: user?.avatar || null,
       type: type,
+      status: "",
       text: content,
       timestamp: now.toISOString(),
       isMe: true,

@@ -41,6 +41,7 @@ export type ChatMessage = {
   receiverId: number | string;
   avatar?: string | null;
   type: string;
+  status: string;
   text: string;
   timestamp: string;
   isMe: boolean;

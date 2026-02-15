@@ -189,6 +189,7 @@ export class ChatModels
                 m.id AS message_id,
                 m.sender_id,
                 m.type,
+                m.status,
                 u.avatar,
                 m.content,
                 m.creationdate
