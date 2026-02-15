@@ -1,3 +1,10 @@
+type GameModeConfig = {
+  label: string;
+  image: string;
+  ball: string;
+  paddle: string;
+};
+
 const GAME_WIDTH = 1024;
 const GAME_HEIGHT = 700;
 
@@ -43,9 +50,15 @@ const GAME_MODE = {
     ball: "#F8F9FA",
     paddle: "#5A189A",
   },
+} satisfies Record<string, GameModeConfig>;
+
+type MapEntry = {
+  id: keyof typeof GAME_MODE;
+  label: string;
+  image: string;
 };
 
-const MAPS = [
+const MAPS: MapEntry[] = [
   { id: "desert", label: "DESERT", image: "/GameMaps/desert.png" },
   { id: "hell", label: "HELL", image: "/GameMaps/hell.png" },
   { id: "ocean", label: "OCÉAN", image: "/GameMaps/water.png" },
@@ -54,4 +67,4 @@ const MAPS = [
   { id: "space", label: "SPACE", image: "/GameMaps/space.png" },
 ];
 
-export {GAME_MODE, MAPS, GAME_WIDTH, GAME_HEIGHT}
+export { GAME_MODE, MAPS, GAME_WIDTH, GAME_HEIGHT };

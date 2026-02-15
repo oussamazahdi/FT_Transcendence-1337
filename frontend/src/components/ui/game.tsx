@@ -370,7 +370,12 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
     return Number.isFinite(n) ? n : null;
   }, [searchParams]);
 
-  const { gameSetting } = useAuth() as { gameSetting?: GameSetting | null };
+  const { gameSetting: rawGameSetting } = useAuth();
+  const gameSetting = useMemo<GameSetting | null>(() => {
+    const value: unknown = rawGameSetting;
+    if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+    return value as GameSetting;
+  }, [rawGameSetting]);
 
   const mode = useMemo<GameMode>(() => {
     const gm = gameSetting?.game_mode;

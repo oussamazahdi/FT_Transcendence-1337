@@ -174,7 +174,7 @@ export default function LocalGame() {
           users={users}
           maxPlayers={4}
           // If your modal supports it, this is the ideal API:
-          onStart={handleTournamentStart as any}
+          onStart={handleTournamentStart}
         />
       </div>
     </div>

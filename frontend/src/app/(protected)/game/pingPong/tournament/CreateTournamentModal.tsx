@@ -32,6 +32,7 @@ export default function CreateTournamentModal({
   maxPlayers = 4,
   storageKey = "tournament:create",
   redirectTo = "/game/pingPong/tournament",
+  onStart,
 }: CreateTournamentModalProps) {
   const router = useRouter();
   const overlayRef = useRef<HTMLDivElement | null>(null);
@@ -233,10 +234,16 @@ export default function CreateTournamentModal({
 
     if (players.length !== maxPlayers) return setError(`You need exactly ${maxPlayers} players to start.`);
 
+    if (onStart) {
+      onStart({ name: trimmedName, players });
+      onClose();
+      return;
+    }
+
     localStorage.setItem(storageKey, JSON.stringify({ name: trimmedName, players }));
     onClose();
     router.push(redirectTo);
-  }, [lockedUserId, maxPlayers, name, onClose, players, redirectTo, router, storageKey]);
+  }, [lockedUserId, maxPlayers, name, onClose, onStart, players, redirectTo, router, storageKey]);
 
   const canStart = players.length === maxPlayers && name.trim().length > 0;
 

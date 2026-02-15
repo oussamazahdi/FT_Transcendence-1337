@@ -93,7 +93,7 @@ export default function GamePage() {
     const img = (gameMode as any)?.image as string | undefined;
     if (!img) return;
     preloadBackground(img);
-  }, [(gameMode as any)?.image]);
+  }, [ gameMode]);
 
   useEffect(() => {
     document.body.classList.add("no-scroll");
