@@ -52,7 +52,6 @@ const MatchesPlayed = ({id}:any) => {
         setLabels(formattedLabels);
         setTotal(totalData);
       }catch(error:any){
-        console.log("faild to fetch Statistics");
         return []
       }finally{
         setLoading(false);

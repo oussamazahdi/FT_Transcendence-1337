@@ -33,7 +33,6 @@ export default function TwoFaSetup({ setEnable, setView }:TwoFaSetupProps) {
 
         setImagePreview(data.qr);
       } catch (err:any) {
-        console.log(err.message);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -65,7 +64,6 @@ export default function TwoFaSetup({ setEnable, setView }:TwoFaSetupProps) {
       updateUser({status2fa:true})
       setView("status");
     } catch (err:any) {
-      console.log(err.message);
       setError(err.message);
     }
   };

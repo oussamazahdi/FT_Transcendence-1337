@@ -5,7 +5,6 @@ import { useAuth } from "@/contexts/authContext";
 
 export default function BlockedUsers() {
   const { blocked } = useAuth();
-  console.log("check blocked in blocked", blocked);
 
   const FriendComponent = () => {
     if (!blocked || blocked.length == 0)

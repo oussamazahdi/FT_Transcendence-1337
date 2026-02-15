@@ -25,7 +25,6 @@ const ChatInput = ({ onSend, friend }: ChatInputProps) => {
   };
 
   const handleGameInvite = () => {
-		console.log("hahhaah")
     const content = "1vs1 game invite"
     onSend(content, "game_invite")
   }

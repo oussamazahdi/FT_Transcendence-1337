@@ -11,6 +11,7 @@ import {
   UsersIcon,
 } from "@heroicons/react/24/outline";
 import type { User } from "@/types";
+import { useAuth } from "@/contexts/authContext";
 
 interface ProfileDropDownProps {
   user: User | null;
@@ -20,6 +21,7 @@ const ProfileDropDown = ({ user }: ProfileDropDownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
+  const { triggerError } = useAuth()
 
   const handleSignOut = async () => {
     try {
@@ -33,7 +35,7 @@ const ProfileDropDown = ({ user }: ProfileDropDownProps) => {
       if (response.ok) 
         router.push("/");
     } catch (error:any) {
-      console.log(error.error);
+      triggerError("An unexpected error occurred. Please try again.");
     }
   };
 

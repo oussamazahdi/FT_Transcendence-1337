@@ -51,8 +51,6 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
   const [notification, setNotification] = useState<any[]>(initialUser?.notification || []);
   const blockers = initialUser?.blockers
   const router = useRouter();
-  // console.log("hhhhhhhhhhhhhhhhh", blocked);
-  // console.log("jajajajjajajajaja", blockers);
 
   const refreshFriendReq = useCallback(async () => {
     try {
@@ -97,7 +95,7 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
       }
 
     } catch (err) {
-      console.log("Failed to refresh friend data", err);
+      triggerError("An unexpected error occurred. Please try again.");
     }
   },[]);
 
@@ -144,14 +142,10 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
       if (!response.ok)
         throw new Error(data.error)
 
-      console.log("Friend Request sent succefully")
-
       setPendingRequests((prev: any) => [...prev, user]);
     } catch (err: unknown) {
-      const msg =
-    err instanceof Error ? err.message : typeof err === "string" ? err : "default";
-
-    triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
+      const msg = err instanceof Error ? err.message : typeof err === "string" ? err : "default";
+      triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
     }
   }
 
@@ -166,15 +160,11 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
       if (!response.ok)
         throw new Error(data.error)
 
-      console.log("Friend request canceled succefully")
-
       setPendingRequests(pendingRequests.filter((items: any) => items.id !== user.id));
       setIncomingRequests(incomingRequest.filter((items: any) => items.id !== user.id))
     } catch (err: unknown) {
-      const msg =
-    err instanceof Error ? err.message : typeof err === "string" ? err : "default";
-
-  triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
+      const msg = err instanceof Error ? err.message : typeof err === "string" ? err : "default";
+      triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
     }
   }
 
@@ -189,15 +179,11 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
       if (!response.ok)
         throw new Error(data.error)
 
-      console.log("Friend request accepted successfully")
-
       setFriends((prev: any) => [...prev, user]);
       setIncomingRequests(incomingRequest.filter((items: any) => items.id !== user.id))
     } catch (err: unknown) {
-      const msg =
-    err instanceof Error ? err.message : typeof err === "string" ? err : "default";
-
-  triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
+      const msg = err instanceof Error ? err.message : typeof err === "string" ? err : "default";
+      triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
     }
   }
 
@@ -212,14 +198,10 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
       if (!response.ok)
         throw new Error(data.error)
 
-      console.log("Friend removed sent succefully")
-
       setFriends(friends.filter((items: any) => items.id !== user.id));
     } catch (err: unknown) {
-      const msg =
-    err instanceof Error ? err.message : typeof err === "string" ? err : "default";
-
-  triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
+      const msg = err instanceof Error ? err.message : typeof err === "string" ? err : "default";
+      triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
     }
   }
 
@@ -234,8 +216,6 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
 
       if (!response.ok)
         throw new Error(data.error)
-
-      console.log("user blocked succefully");
 
       setBlocked((prev: any) => [...prev, user]);
       setFriends(friends.filter((items: any) => items.id !== user.id));

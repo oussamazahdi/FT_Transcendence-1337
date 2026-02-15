@@ -29,7 +29,6 @@ const MatchStats = () => {
         const data = await response.json();
         setStatistics([data.data[0].wins, data.data[0].loses,data.data[0].win_forfaits,data.data[0].lose_forfaits]);
       }catch(error:any){
-        console.log("faild to fetch Statistics");
         return []
       }finally{
         setLoading(false);

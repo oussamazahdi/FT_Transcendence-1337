@@ -59,8 +59,6 @@ export default function ChatWindow({selectedFriend, updateLastMessage, liveMessa
         const newMessages = data.messages || [];
         if (newMessages.length < 30) 
           setHasMore(false);
-
-        console.log(newMessages);
         const formatedData: ChatMessage[] = newMessages.map((message: any) => ({
           id: message.message_id,
           senderId: message.sender_id,
@@ -81,7 +79,7 @@ export default function ChatWindow({selectedFriend, updateLastMessage, liveMessa
           return [...prev, ...unique];
         });
       } catch (err) {
-        console.log("Failed to fetch messages", err);
+        triggerError("An unexpected error occurred. Please try again.")
         setHasMore(false);
       } finally {
         setLoading(false);
@@ -89,7 +87,7 @@ export default function ChatWindow({selectedFriend, updateLastMessage, liveMessa
     };
 
     fetchMessages();
-  }, [page, Friend.id, hasMore, user?.id]);
+  }, [page, Friend.id, hasMore, user?.id, triggerError]);
 
   useEffect(() => {
     if (!liveMessages || liveMessages.length === 0) 
@@ -109,7 +107,6 @@ export default function ChatWindow({selectedFriend, updateLastMessage, liveMessa
       return;
 
     const onError = (err: any) => {
-			console.log(err);
       const message = typeof err === "string" ? err : err?.message;
       const now = new Date();
 

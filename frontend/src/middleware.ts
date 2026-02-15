@@ -34,7 +34,6 @@ const onboardingSteps = {
     try {
       const secret = new TextEncoder().encode(process.env.JWT_SECRET);
       const { payload } = await jwtVerify(accessToken, secret);
-      console.log(payload);
 
       userState.isValid = true;
       userState.isVerified = !!payload.isVerified;
@@ -65,11 +64,8 @@ const onboardingSteps = {
         if (setCookie) {
           response.headers.set("Set-Cookie", setCookie);
         }
-
-        console.log("Token refreshed successfully via Middleware");
         return response
       }else {
-        console.log("Refresh failed. Session expired. Redirecting to login.");
         const response = NextResponse.redirect(new URL("/sign-in", request.url));
         response.cookies.delete("accessToken");
         response.cookies.delete("refreshToken");

@@ -89,7 +89,6 @@ const SelectImage = () => {
 
     try {
       if (profileImage) {
-        console.log("request from image");
         const formData = new FormData();
         formData.append("image/", profileImage);
         const reply = await fetch(
@@ -110,9 +109,7 @@ const SelectImage = () => {
           throw new Error(errorMessage);
         }
 
-        console.log("Upload successful:", data);
       } else if (selectedAvatar) {
-        console.log("request from avatar");
         const reply = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/auth/uploadImage`,
           {
@@ -132,8 +129,6 @@ const SelectImage = () => {
             AUTH_ERRORS[data.error] || AUTH_ERRORS["default"];
           throw new Error(errorMessage);
         }
-
-        console.log("Avatar selection successful:", data);
       }
       login(data.userData);
       router.replace("/dashboard");

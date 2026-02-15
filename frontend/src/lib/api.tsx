@@ -10,8 +10,6 @@ export const autofetch = async(url:string, options:any) => {
       if (!refreshResponse.ok)
         throw new Error("Refresh failed")
 
-      console.log("Cookie Refreshed. Retrying original request...");
-
       return fetch(url, options);
     }catch(err){
       console.error("Session expired completely.");
