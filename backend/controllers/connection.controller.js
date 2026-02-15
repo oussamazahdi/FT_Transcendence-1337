@@ -1,4 +1,4 @@
-import { waitingPlayer, socketToUsername, usernameToSocket, activeGames, playerMove, onlineUsers } from "../store/memory.store.js";
+import { waitingPlayer, socketToUserId, userIdToSocket, activeGames, playerMove, onlineUsers } from "../store/memory.store.js";
 import { PADDLE_SPEED, GAME_HEIGHT, PADDLE_SIZE } from "../constants/game.constants.js"
 import { NotifServices, httpError } from "../services/Notification.service.js";
 import { GameAcceptService } from "../services/gameAccept.service.js";
@@ -9,45 +9,47 @@ import { DisconnectionService } from "../services/Disconnection.service.js";
 class ConnectionController 
 {
 	onJoinGame(socket, io, player) {
+		
+		console.log("*********************> join game:", player);
 		if (!player || !GameUtils.isValidPlayerData(player)) return;
 		
-		JoinGameServices.rebindSocket(player.username, socket.id);
+		JoinGameServices.rebindSocket(player.id, socket.id);
 		
-		if (GameUtils.getGameByUsername(player.username)) return;
-		if (socketToUsername.has(socket.id)) return;
+		if (GameUtils.getGameByUserId(player.id)) return;
+		if (socketToUserId.has(socket.id)) return;
 		
-		socketToUsername.set(socket.id, player.username);
-		usernameToSocket.set(player.username, socket.id);
+		socketToUserId.set(socket.id, player.id);
+		userIdToSocket.set(player.id, socket.id);
 		
 		if (!waitingPlayer.value) {
 			waitingPlayer.value = { socketId: socket.id, player };
 			// console.log("**********************> Waiting player:", waitingPlayer.value);
-		return;
+			return;
 		}
-
-		if (waitingPlayer.value.player.username === player.username) return;
-
+		
+		if (waitingPlayer.value.player.id === player.id) return;
+		
 		const game = JoinGameServices.createGame(waitingPlayer.value, socket, player);
 		waitingPlayer.value = null;
 		waitingPlayer.data = null;
-
+		
 		activeGames.set(game.roomId, game);
 		JoinGameServices.startMatch(io, game);
 	}
 	
 	onUpdateData(socket, io, player) {
-		if (!player || !GameUtils.isValidPlayerData(player) || !player?.username) return;
+		if (!player || !GameUtils.isValidPlayerData(player) || !player?.id) return;
 
-		const game = GameUtils.getGameByUsername(player.username);
+		const game = GameUtils.getGameByUserId(player.id);
 		if (!game) return;
 
-		const setPlayer = game.player1.username === player.username ? game.player1 : game.player2;
+		const setPlayer = game.player1.id === player.id ? game.player1 : game.player2;
 
-		if (setPlayer.socketId !== socket.id) socketToUsername.delete(setPlayer.socketId);
+		if (setPlayer.socketId !== socket.id) socketToUserId.delete(setPlayer.socketId);
 
 		setPlayer.socketId = socket.id;
-		socketToUsername.set(socket.id, player.username);
-		usernameToSocket.set(player.username, socket.id);
+		socketToUserId.set(socket.id, player.id);
+		userIdToSocket.set(player.id, socket.id);
 
 		if (game.state === "PLAYING") socket.join(game.roomId);
 
@@ -142,10 +144,10 @@ class ConnectionController
 			
 			const playersData = await GameAcceptService.loadPlayersData(db, senderId, receiverId, io);
 			if (!playersData?.ok)
-				{
-					// console.log(playersData)
-					throw new Error(playersData?.message);
-				} 
+			{
+				// console.log(playersData)
+				throw new Error(playersData?.message);
+			} 
 			const {player1, player2, p1SocketId, p2SocketId, p1Socket, p2Socket} = playersData
 			
 			bindInfo = { player1, player2, p1SocketId, p2SocketId };
@@ -166,6 +168,7 @@ class ConnectionController
 
 			io.to(current.roomId).emit("match-started:accept", current.roomId);
 			setTimeout(()=> GameUtils.startGameLoop(io, current.roomId), 3000);
+			// setTimeout(()=> io.to(current.roomId).emit("match-data", current), 1000);
 			io.to(current.roomId).emit("match-data", current);
 
 			ack?.({ ok: true, notification: notification, message: "Success" });

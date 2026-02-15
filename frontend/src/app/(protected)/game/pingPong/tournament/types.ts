@@ -23,6 +23,7 @@ export type CreateTournamentModalProps = {
   maxPlayers?: number;
   storageKey?: string;
   redirectTo?: string;
+  onStart?: (payload: { name: string; players: TournamentPlayer[] }) => void;
 };
 
 export const DEFAULT_AVATARS = [

@@ -16,7 +16,8 @@ export class AuthModels
     async loginUser(db, email, password)
     {
         try {
-            const user = db.prepare(`SELECT * FROM users WHERE email = ?`).get(email);
+            const mEmail = email.toLowerCase();
+            const user = db.prepare(`SELECT * FROM users WHERE email = ?`).get(mEmail);
             if (!user)
                 return ({message: "USER_NOT_FOUND"});
             const match = await bcrypt.compare(password, user.password);
@@ -32,9 +33,11 @@ export class AuthModels
     async addNewUser(db, firstname, lastname, username, email, password)
     {
         try {
+            const mUsername = username.toLowerCase();
+            const mEmail = email.toLowerCase();
             let cryptedPass = await bcrypt.hash(password, 12);
-            db.prepare(`INSERT INTO users (firstname, lastname, username, email, password) VALUES (?, ?, ?, ?, ?)`).run(firstname, lastname, username, email, cryptedPass);
-            const user = db.prepare(`SELECT id, firstname, lastname, username, email, avatar, isverified, status2fa FROM users WHERE email = ?`).get(email);
+            db.prepare(`INSERT INTO users (firstname, lastname, username, email, password) VALUES (?, ?, ?, ?, ?)`).run(firstname, lastname, mUsername, mEmail, cryptedPass);
+            const user = db.prepare(`SELECT id, firstname, lastname, username, email, avatar, isverified, status2fa FROM users WHERE email = ?`).get(mEmail);
             return (user);
         } 
         catch (error) {
@@ -45,8 +48,8 @@ export class AuthModels
     findUserById(db, userId)
     {
         try {
-            return db.prepare(`
-                SELECT  u.id AS id,
+            const result = db.prepare(`
+                SELECT  u.id,
                         u.username,
                         u.firstname,
                         u.lastname,
@@ -60,6 +63,8 @@ export class AuthModels
                 FROM users u
                 JOIN game_settings gs ON gs.player_id = u.id
                 WHERE u.id = ?`).get(userId);
+                console.log(userId, result);
+                return (result);
         } 
         catch (error) {
             const dbError = handleDatabaseError(error, 'findUserById');
@@ -70,8 +75,9 @@ export class AuthModels
     findUserByEmail(db, email, fields = ['firstname', 'lastname', 'username', 'email', 'avatar', 'isverified'])
     {
         try {
+            const mEmail = email.toLowerCase();
             const fieldList = fields.join(', ');
-            return db.prepare(`SELECT ${fieldList} FROM users WHERE email = ?`).get(email);
+            return db.prepare(`SELECT ${fieldList} FROM users WHERE email = ?`).get(mEmailmail);
         } 
         catch (error) {
             const dbError = handleDatabaseError(error, 'findUserByEmail');

@@ -10,7 +10,6 @@ import { getCurrentUser } from "@/lib/auth";
 
 async function getFriendProfile(id:string) {
   const cookieStore = await cookies();
-  console.log(cookieStore);
 
   try {
     const response = await fetch(`${process.env.SERVER_SIDE_API_URL}/api/users/${id}`, {
@@ -40,33 +39,36 @@ const FriendProfilePage = async ({ params }:any) => {
 
   const currentUser = currentUserData?.userData;
   const blockedList = currentUserData?.blocked || [];
+  const blockers = currentUserData?.blockers || []
 
   if (currentUser && currentUser.id == id) {
     redirect("/profile");
   }
 
   const isBlocked = blockedList.some((item:any) => item.id == id);
-  if (isBlocked) {
+  if (isBlocked) 
     return <UserNotFound />;
-  }
+  
+  const isBlocker = blockers.some((item:any) => item.id == id)
+  if (isBlocker)
+    return <UserNotFound />;
 
-  if (!friendProfile) {
+  if (!friendProfile) 
     return <UserNotFound />;
-  }
 
   return (
-    <div className="grid w-full max-w-7xl mx-3 grid-cols-1 gap-2 md:h-[86vh] md:grid-cols-12 md:grid-rows-2">
+    <div className="grid w-[90vw] mx-3 grid-cols-1 gap-2 md:h-[86vh] md:grid-cols-12 md:grid-rows-2">
       <div className="min-w-0 md:col-span-8 md:row-start-1">
-        <FriendsProfile userPage={friendProfile} />
+        <FriendsProfile userPage={friendProfile}  />
       </div>
 
       <div className="grid min-w-0 grid-cols-1 gap-2 md:col-span-8 md:row-start-2 md:grid-cols-2">
-        <MatchPlayed />
-        <WinRate />
+        <MatchPlayed id={id}/>
+        <WinRate id={id}/>
       </div>
 
       <div className="min-w-0 h-full md:col-span-4 md:col-start-9 md:row-span-2">
-        <MatchHistory classname="h-full min-h-0" />
+        <MatchHistory classname="h-full min-h-0" id={id}/>
       </div>
     </div>
   );

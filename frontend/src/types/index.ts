@@ -10,6 +10,8 @@ export interface User {
   avatar?: string | null;
   isverified?: boolean;
   status2fa?: boolean;
+  player_level: number;
+  player_xp: number
 }
 
 export interface otherUserData{
@@ -18,6 +20,8 @@ export interface otherUserData{
   username:string;
   id:string;
   avatar:StaticImageData | null | string;
+  player_level: number;
+  player_xp: number
 }
 
 export type Conversation = {
@@ -61,17 +65,17 @@ export const SignUpSchema = z
     username: z
       .string()
       .min(3, "Nickname must be at least 3 characters")
-      .max(20, "Nickname must be at most 20 characters")
+      .max(15, "Nickname must be at most 20 characters")
       .regex(/^[a-zA-Z0-9_-]+$/, "Nickname can only contain letters, numbers, _ or -"),
     firstname: z
       .string()
       .min(3, "First name must be at least 3 characters")
-      .max(50, "First name must be at most 50 characters")
+      .max(15, "First name must be at most 50 characters")
       .regex(/^[a-zA-ZÀ-ÿ\s'-]+$/, "First name contains invalid characters"),
     lastname: z
       .string()
       .min(3, "Last name must be at least 3 characters")
-      .max(50, "Last name must be at most 50 characters")
+      .max(15, "Last name must be at most 50 characters")
       .regex(/^[a-zA-ZÀ-ÿ\s'-]+$/, "Last name contains invalid characters"),
     email: z.string().email("Email address is invalid"),
     password: z
@@ -93,7 +97,6 @@ export interface Friend {
   id: string;
   username: string;
   avatar?: string;
-  status: 'online' | 'offline';
 }
 
 export interface GameSetting {
@@ -126,4 +129,5 @@ export interface fullUser{
   incomingRequests: any,
   gameSetting: any,
   notification: any,
+  blockers:any,
 }

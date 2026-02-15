@@ -4,11 +4,12 @@ import ChatHeader from "./ChatHeader";
 import ChatInput from "./ChatInput";
 import MessageList from "./MessageList";
 import { useAuth } from "@/contexts/authContext";
-import { useSocket } from "@/contexts/socketContext";
-import { autofetch } from "@/lib/api";
+import { autofetch } from "@/lib/api.tsx";
 import type { SelectedFriend } from "@/contexts/userContexts";
 import { CHAT_ERROR } from "@/lib/utils";
 import { ChatMessage } from "@/types";
+import { useSocket, InviteResponse } from "@/contexts/socketContext";
+import { safeUUID } from "../../profile/components/FriendCard";
 
 interface ChatWindowProps {
   selectedFriend: SelectedFriend;
@@ -16,6 +17,7 @@ interface ChatWindowProps {
   liveMessages: ChatMessage[];
   clearLiveMessages: () => void;
 }
+
 
 export default function ChatWindow({selectedFriend, updateLastMessage, liveMessages, clearLiveMessages}: ChatWindowProps) {
   const Friend = selectedFriend;
@@ -126,8 +128,40 @@ export default function ChatWindow({selectedFriend, updateLastMessage, liveMessa
     };
   }, [socket, triggerError, updateLastMessage]);
 
+	const handleGameInvite = (status:string, id: string | number) => {
+		if (status === "accept"){
+			const tmp = {
+				msgId: id,
+				sender_id: user?.id || "",
+				recever_id: selectedFriend.id,
+				room_id: safeUUID(),
+				type: "game_invite"
+				}
+			if (!socket)
+				return
+			socket.emit("chat:game:accept", tmp, (res: InviteResponse): void => {
+				if (!res.ok) console.error("Invite failed:", res?.message);
+			});
+		}else{
+			const tmp = {
+				msgId: id,
+				type: "game_invite"
+			}
+			if (!socket)
+				return
+			socket.emit("chat:game:reject", tmp, (res: InviteResponse): void => {
+				if (!res.ok) console.error("Invite failed:", res.message);
+			});
+		}
+	}
+
   const handleSend = (content: string, type: string) => {
     const now = new Date();
+
+    if(content.length > 500){
+      triggerError(CHAT_ERROR["MESSAGE_TOO_LONG"])
+      return
+    }
 
     const tmpMessage: ChatMessage = {
       id: `tmp-${now.getTime()}`,
@@ -151,6 +185,8 @@ export default function ChatWindow({selectedFriend, updateLastMessage, liveMessa
     });
   };
 
+
+
   return (
     <div className="w-full flex flex-col flex-1 gap-2 rounded-lg h-full">
       <ChatHeader user={Friend} />
@@ -161,6 +197,7 @@ export default function ChatWindow({selectedFriend, updateLastMessage, liveMessa
           onLoadMore={() => setPage((p) => p + 1)}
           loading={loading}
           hasMore={hasMore}
+					handleGameInvite={handleGameInvite}
         />
         <ChatInput onSend={handleSend} friend={Friend} />
       </div>

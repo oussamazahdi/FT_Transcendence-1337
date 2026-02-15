@@ -23,7 +23,7 @@ interface FriendCardProps {
   user: FriendCardUser;
 }
 
-function safeUUID(): string {
+export function safeUUID(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
@@ -49,7 +49,7 @@ const FriendCard = ({ user }: FriendCardProps) => {
 
     socket.emit("game:invite", payload, (res: InviteResponse): void => {
       if (!res.ok) console.error("Invite failed:", res.message);
-      else console.log("✅ Invite sent:", res.notification);
+      // else console.log("✅ Invite sent:", res.notification);
     });
   };
 

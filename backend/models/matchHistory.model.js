@@ -26,7 +26,8 @@ class matchHistory {
 								mh.winner_id,
 								mh.player1_score,
 								mh.player2_score,
-								mh.created_at
+								mh.created_at,
+								mh.id
 							FROM match_history mh
 							JOIN users u1 ON u1.id = mh.player1_id
 							JOIN users u2 ON u2.id = mh.player2_id

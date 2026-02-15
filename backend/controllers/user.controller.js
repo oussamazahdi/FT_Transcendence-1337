@@ -5,7 +5,7 @@ import fs from "fs"
 
 import { userModels } from "../models/user.model.js";
 import { generateFileNameByUser } from "../utils/authUtils.js";
-import { updateUserSchema, zErrorHandler } from "../utils/inputValidator.js"
+import { updateUserSchema, passwordValidator, zErrorHandler } from "../utils/inputValidator.js"
 
 /**
  * still neeed to apply erroring system
@@ -109,8 +109,8 @@ export class UserController
 			userData = {
 				firstname: validatedData.firstname || user.firstname,
 				lastname: validatedData.lastname || user.lastname,
-				username: validatedData.username || user.username,
-				email: validatedData.email || user.email,
+				username: (validatedData.username || user.username).toLowerCase(),
+				email: (validatedData.email || user.email).toLowerCase(),
 				avatar: validatedData.avatar || user.avatar
 			}
 			
@@ -120,7 +120,6 @@ export class UserController
 		}
 		catch (error) {
 			const zError = zErrorHandler(error);
-			console.log(zError.fields);
 			if (zError !== null)
 				return reply.code(zError.code).send({error: zError.error, fields: zError.fields});
 			if (error.code)
@@ -163,15 +162,18 @@ export class UserController
 				return reply.code(400).send({error: 'NEW_PASSWORDS_DO_NOT_MATCH'});
 			if (newPassword === oldPassword)
 				return reply.code(400).send({error: 'NEW_PASSWORD_MATCHS_OLD_PASSWORD'});
-
 			const userPassword = userModels.getPassword(db, request.user.userId);
 			const match = await bcrypt.compare(oldPassword, userPassword);
 			if (!match)
 				return reply.code(401).send({ error: 'CURRENT_PASSWORD_IS_INCORRECT' });
-			await userModels.setNewPassword(db, request.user.userId, newPassword);
+			const validPass  = passwordValidator.parse(newPassword);
+			await userModels.setNewPassword(db, request.user.userId, validPass);
 			return reply.code(200).send({message: "PASSWORD_CHANGED_SUCCESSFULLY"});
 		}
 		catch (error) {
+			const zError = zErrorHandler(error);
+			if (zError !== null)
+				return reply.code(zError.code).send({error: zError.error, fields: zError.fields});
 			if (error.code)
 				return reply.code(error.code).send({error: error.message});
 			else

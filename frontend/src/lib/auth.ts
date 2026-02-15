@@ -18,9 +18,10 @@ export async function getCurrentUser(): Promise<fullUser | null> {
     const pendingReqPromise = fetch(`${API}/api/friends/requests/sent`,{headers})
     const incomingReqPromise = fetch(`${API}/api/friends/requests`,{headers})
 		const playerSettingsPromise = fetch(`${API}/api/game/settings`,{headers});
-		const notificationsPoromise = fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notifications`,{headers});
+		const notificationsPoromise = fetch(`${API}/api/notifications`,{headers});
+    const blockersPromise = fetch(`${API}/api/friends/blockers`,{headers})
 
-    const [userRes, friendsRes, blockedRes, pendingReqRes, incomingReqRes, playerSettingsRes, notificationsRes] = await Promise.all([userPromise, friendsPromise, blockedPromise, pendingReqPromise, incomingReqPromise, playerSettingsPromise, notificationsPoromise])
+    const [userRes, friendsRes, blockedRes, pendingReqRes, incomingReqRes, playerSettingsRes, notificationsRes, blockersRes] = await Promise.all([userPromise, friendsPromise, blockedPromise, pendingReqPromise, incomingReqPromise, playerSettingsPromise, notificationsPoromise, blockersPromise])
 
     if (!userRes.ok) 
       return null;
@@ -64,6 +65,12 @@ export async function getCurrentUser(): Promise<fullUser | null> {
 			notificationsList = notifications?.userData || [];
 		}
 
+		let blockersList = [];
+		if (blockersRes.ok) {
+			const Blockers = await blockersRes.json();
+			blockersList = Blockers?.blockedUsers || [];
+		}
+
     return {
       userData: user.userData,
       friends: friendsList,
@@ -72,6 +79,7 @@ export async function getCurrentUser(): Promise<fullUser | null> {
       incomingRequests: incomingReqList,
 			gameSetting: playerSettingsList,
 			notification: notificationsList,
+      blockers: blockersList
     };
   } catch (error) {
     console.error("Failed to fetch user:", error);

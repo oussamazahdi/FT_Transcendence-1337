@@ -1,19 +1,20 @@
 import { activeGames } from "../store/memory.store.js";
 import { GameUtils } from "../utils/GameUtils.js";
-import { usernameToSocket, socketToUsername } from "../store/memory.store.js";
+import { userIdToSocket, socketToUserId } from "../store/memory.store.js";
 import { GameSession } from "../store/game.store.js";
 import { waitingPlayer } from "../store/memory.store.js";
 import { Paddle } from "../store/game.store.js";
 import { GAME_WIDTH, GAME_HEIGHT } from "../constants/game.constants.js";
 
 class joinGameServices{
-	rebindSocket(username, newSocketId) {
-		const oldSocketId = usernameToSocket.get(username);
+	//userIdToSocket
+	rebindSocket(id, newSocketId) {
+		const oldSocketId = userIdToSocket.get(id);
 		if (!oldSocketId || oldSocketId === newSocketId) return;
 
-		socketToUsername.delete(oldSocketId);
+		socketToUserId.delete(oldSocketId);
 
-		if (waitingPlayer.value?.player.username === username) {
+		if (waitingPlayer.value?.player.id === id) {
 			waitingPlayer.value.socketId = newSocketId;
 		}
 	}

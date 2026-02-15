@@ -1,5 +1,5 @@
 import soufiixPdp from "./soufiix.jpeg";
-import mohcinePdp from "./mohcine.jpeg";
+import OussamaPdp from "./Oussama.jpeg";
 import kamalPdp from "./kamal.jpeg";
 import loginImg from "./login_img.png";
 import icon42 from "./42.png";
@@ -9,33 +9,20 @@ import iconIn from "./linkdin.png";
 import SignUp_image from "./sign-up-image.jpg";
 import signIn_image from "./sign-in-img.jpg";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import noChatFound from "./no-chat.png";
 import defaultProfile from "./default-profil.jpg";
 import coverPicture from "./coverPicture.png";
-import chatIcon from "./chat.png";
-import dashboardIcon from "./dashboard.png";
-import pingPongIcon from "./ping-pong.png";
-import leaderboardIcon from "./winner.png";
-import searchIcon from "./SearchIcon.png";
 import pingPongL from "./pingPongL.png";
 import pingPongR from "./pingPongR.png";
 import ticTacToeL from "./ticTacToeL.png";
 import ticTacToeR from "./ticTacToeR.png";
-import noUserFound from "./noUserfound.png";
 
 export const assets = {
-  noUserFound,
   pingPongL,
   pingPongR,
   ticTacToeL,
   ticTacToeR,
-  searchIcon,
-  chatIcon,
-  dashboardIcon,
-  pingPongIcon,
-  leaderboardIcon,
   soufiixPdp,
-  mohcinePdp,
+  OussamaPdp,
   kamalPdp,
   loginImg,
   icon42,
@@ -45,7 +32,6 @@ export const assets = {
   SignUp_image,
   signIn_image,
   MagnifyingGlassIcon,
-  noChatFound,
   defaultProfile,
   coverPicture,
 };

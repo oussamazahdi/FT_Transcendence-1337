@@ -3,33 +3,14 @@ import Image, { StaticImageData } from "next/image";
 import { useAuth } from "@/contexts/authContext.tsx";
 import { assets } from "@/assets/data";
 import type { ChatMessage } from "@/types";
+import { parseTime } from "@/lib/utils"
 
 interface MessageBubble{
   message: ChatMessage
   isMe: boolean
   showAvatar: boolean
   friendAvatar : StaticImageData | string | null
-}
-function parseTime(timeString: string) {
-  const date = new Date(timeString);
-  const now = new Date();
-
-  if (isNaN(date.getTime())) 
-    return timeString;
-
-  const isToday = date.toDateString() === now.toDateString();
-
-  if (isToday) {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-  } else {
-    return date.toLocaleString('en-GB', {
-      day: 'numeric',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    });
-  }
+	handleGameInvite: (status:string, id: string | number) => void
 }
 
 /**
@@ -43,16 +24,16 @@ avatar: "http://localhost:3001/uploads/default/profile4.jpeg"
 timestamp: "2026-02-13T14:40:48.371Z"
  */
 
-type GAMEINVITECHAT = {
-	id: number;
-	isMe: boolean;
-	senderId:number | string;
-	// receiverId:number | string;
-	text:string;
-	type:string;
-	avatar:string;
-	timestamp:string;
-}
+// type GAMEINVITECHAT = {
+// 	id: number;
+// 	isMe: boolean;
+// 	senderId:number | string;
+// 	// receiverId:number | string;
+// 	text:string;
+// 	type:string;
+// 	avatar:string;
+// 	timestamp:string;
+// }
 
 
 
@@ -70,7 +51,7 @@ const MessageBubble = (props:MessageBubble) => {
 
 	// console.log("----------> message bubble:", props.message);
   return (
-    <div className={`flex gap-2 w-full items-center ${props.isMe ? "flex-row-reverse" : "justify-start"}`}>
+    <div className={`flex gap-1 w-full items-center ${props.isMe ? "flex-row-reverse" : "justify-start"}`}>
       <div className="size-9 overflow-hidden rounded-sm">
         {props.showAvatar ? (
           <Image
@@ -108,10 +89,10 @@ const MessageBubble = (props:MessageBubble) => {
           <p className="font-medium">{"1 vs 1 ping pong game invitation"}</p>
           {!isMe && (
             <div className="flex justify-center items-center gap-1">
-              <button className="bg-[#583F3F]/55 text-[8px] text-[#D55C5C] px-3 py-1 rounded-xs hover:bg-[#8D4646]/50 cursor-pointer">
+              <button onClick={() => props.handleGameInvite("reject", props.message.id)} className="bg-[#583F3F]/55 text-[8px] text-[#D55C5C] px-3 py-1 rounded-xs hover:bg-[#8D4646]/50 cursor-pointer">
                 Reject
               </button>
-              <button className="bg-[#3F5846]/55 text-[8px] text-[#5CD57E] px-3 py-1 rounded-xs hover:bg-[#468C74]/50 cursor-pointer">
+              <button onClick={() => props.handleGameInvite("accept", props.message.id)} className="bg-[#3F5846]/55 text-[8px] text-[#5CD57E] px-3 py-1 rounded-xs hover:bg-[#468C74]/50 cursor-pointer">
                 Accept
               </button>
             </div>)}
