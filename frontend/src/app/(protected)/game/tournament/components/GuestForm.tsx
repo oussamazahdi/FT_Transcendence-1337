@@ -1,28 +1,17 @@
 import { DEFAULT_AVATARS } from "../types";
+import Image from "next/image";
 
-export function GuestForm({
-  guestFirst,
-  guestLast,
-  guestNick,
-  guestAvatar,
-  setGuestFirst,
-  setGuestLast,
-  setGuestNick,
-  setGuestAvatar,
-  isFull,
-  onAdd,
-}: {
-  guestFirst: string;
-  guestLast: string;
-  guestNick: string;
-  guestAvatar: string | null;
-  setGuestFirst: (v: string) => void;
-  setGuestLast: (v: string) => void;
-  setGuestNick: (v: string) => void;
-  setGuestAvatar: (v: string | null) => void;
-  isFull: boolean;
-  onAdd: () => void;
-}) {
+export function GuestForm({ guestFirst, guestLast, guestNick, guestAvatar, setGuestFirst, setGuestLast, setGuestNick, setGuestAvatar, isFull, onAdd }: {
+guestFirst: string;
+guestLast: string;
+guestNick: string;
+guestAvatar: string | null;
+setGuestFirst: (v: string) => void;
+setGuestLast: (v: string) => void;
+setGuestNick: (v: string) => void;
+setGuestAvatar: (v: string | null) => void;
+isFull: boolean;
+onAdd: () => void; }) {
   return (
     <div className="mt-4 rounded-2xl bg-white/5 w-full p-4 ring-1 ring-white/10">
       <div className="flex items-center justify-between gap-3">
@@ -33,7 +22,9 @@ export function GuestForm({
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="flex flex-col w-full items-center justify-center gap-3 rounded-2xl bg-black/20 p-3 ring-1 ring-white/10">
           <div className="h-28 w-28 overflow-hidden rounded-2xl bg-white/10 ring-1 ring-white/10">
-            <img
+            <Image 
+							width={60}
+							height={60}
               alt="Guest avatar"
               src={guestAvatar ?? DEFAULT_AVATARS[0] ?? "/gameAvatars/profile1.jpeg"}
               className="h-full w-full object-cover"

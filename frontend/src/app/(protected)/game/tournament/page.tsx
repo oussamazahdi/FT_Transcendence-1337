@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSocket } from "@/contexts/socketContext";
+import Image from "next/image";
 
 export type TournamentPlayer = {
   id: string;
@@ -272,7 +273,7 @@ function PlayerAvatar({
 }) {
   return (
     <div className={`${sizeClassName} overflow-hidden ${wrapperClassName}`}>
-      <img src={src} alt={alt} className="h-full w-full object-cover" />
+      <Image width={60} height={60} src={src} alt={alt} className="h-full w-full object-cover" />
     </div>
   );
 }
