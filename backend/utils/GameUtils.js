@@ -1,9 +1,5 @@
 import { activeGames, loops, socketToUserId, userIdToSocket, waitingPlayer } from "../store/memory.store.js";
-import { GAME_WIDTH, FPS } from "../constants/game.constants.js";
-// import { updateGame } from "../services/GameLoop.service.js";
-import { GameSession, Paddle } from "../store/game.store.js";
-import { randomUUID } from "crypto";
-
+import { FPS } from "../constants/game.constants.js";
 import { GameLoop } from "../services/GameLoop.service.js";
 
 class gameUtils{
