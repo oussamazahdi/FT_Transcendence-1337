@@ -50,17 +50,16 @@ const MatchHistory = ({ classname, id }:any) => {
         className={`flex justify-between items-center w-full h-16 ${iWon ? " bg-[#42A78A]/30" : "bg-[#B23B3B]/30 "} rounded-lg p-1 `}
       >
         <div className="flex items-center flex-1 gap-2 min-w-0 justify-start">
-        <div className="overflow-hidden w-13 h-14 rounded-sm">
-            <Image
-              src={match.player1_avatar || assets.defaultProfile}
-              alt="avatar"
-              width={54}
-              height={54}
-              className="shrink-0"
-            />
+          <div className="relative overflow-hidden w-13 h-14 rounded-sm">
+              <Image
+                src={match.player1_avatar || assets.defaultProfile}
+                alt="avatar"
+                fill
+                className="shrink-0 object-cover"
+              />
+            </div>
+            <p className="text-xs font-bold truncate w-full">{match.player1_username}</p>
           </div>
-          <p className="text-xs font-bold truncate">{match.player1_username}</p>
-        </div>
         <div className="flex flex-col justify-center items-center w-20 shrink-0">
           <p className="text-sm font-bold">{iWon ? "Win" : "Lose"}</p>
           <p className="text-sm font-bold whitespace-nowrap">
@@ -71,14 +70,13 @@ const MatchHistory = ({ classname, id }:any) => {
           </p>
         </div>
         <div className="flex items-center justify-end flex-1 gap-2 min-w-0">
-          <p className="text-xs font-bold truncate">{match.player2_username}</p>
-          <div className="overflow-hidden w-13 h-14 rounded-sm">
+          <p className="text-xs text-right font-bold truncate w-full">{match.player2_username}</p>
+          <div className="relative overflow-hidden w-13 h-14 rounded-sm">
             <Image
               src={match.player2_avatar || assets.defaultProfile}
               alt="avatar"
-              width={54}
-              height={54}
-              className="shrink-0"
+              fill
+              className="shrink-0 object-cover"
               />
           </div>
         </div>
