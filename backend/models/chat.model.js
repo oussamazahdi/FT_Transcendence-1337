@@ -217,7 +217,7 @@ export class ChatModels
             const result = db.prepare(`
                 INSERT INTO messages
                 (conversation_id, sender_id, type, content, expired_at)
-                VALUES (?, ?, ?, ?)`).run(convId, senderId, type, content, expired_at);
+                VALUES (?, ?, ?, ?, ?)`).run(convId, senderId, type, content, expired_at);
             return (result.lastInsertRowid);
 
         }
@@ -231,11 +231,10 @@ export class ChatModels
     setInviteStatus(db, msgId, status)
     {
         try {
-            const result = db.prepare(`
-                UPDATE messages SET status = :status
-                WHERE id = :msgId`).run({msgId: msgId, status: status});
-            return (result);
-
+					const result = db.prepare(`
+							UPDATE messages SET status = :status
+							WHERE id = :msgId`).run({msgId: msgId, status: status});
+					return result || null;
         }
         catch (error) 
         {
@@ -244,22 +243,38 @@ export class ChatModels
         }
     }
     
-    getMessageById(db, msgId)
-    {
-        try {
-            const result = db.prepare(`
-                SELECT *
-                FROM messages
-                WHERE id = :msgId`).get(msgId);
-            return (result);
+    // getMessageById(db, msgId)
+    // {
+    //     try {
+    //         const result = db.prepare(`
+    //             SELECT *
+    //             FROM messages
+    //             WHERE id = :msgId`).get(msgId);
+    //         return (result);
 
-        }
-        catch (error) 
-        {
-            const dbError = handleDatabaseError(error, 'getMessageById');
-            throw dbError; 
-        }
-    }
+    //     }
+    //     catch (error) 
+    //     {
+    //         const dbError = handleDatabaseError(error, 'getMessageById');
+    //         throw dbError; 
+    //     }
+    // }
+
+	getMessageById(db, msgId) {
+		try {
+				const result = db.prepare(`
+						SELECT *
+						FROM messages
+						WHERE id = ?
+				`).get(msgId);
+
+				return result || null;
+
+		} catch (error) {
+				const dbError = handleDatabaseError(error, 'getMessageById');
+				throw dbError;
+		}
+	}
 }
 
 

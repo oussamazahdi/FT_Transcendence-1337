@@ -10,6 +10,7 @@ interface MessageBubble{
   isMe: boolean
   showAvatar: boolean
   friendAvatar : StaticImageData | string | null
+	handleGameInvite: (status:string, id: string | number) => void
 }
 
 /**
@@ -23,16 +24,16 @@ avatar: "http://localhost:3001/uploads/default/profile4.jpeg"
 timestamp: "2026-02-13T14:40:48.371Z"
  */
 
-type GAMEINVITECHAT = {
-	id: number;
-	isMe: boolean;
-	senderId:number | string;
-	// receiverId:number | string;
-	text:string;
-	type:string;
-	avatar:string;
-	timestamp:string;
-}
+// type GAMEINVITECHAT = {
+// 	id: number;
+// 	isMe: boolean;
+// 	senderId:number | string;
+// 	// receiverId:number | string;
+// 	text:string;
+// 	type:string;
+// 	avatar:string;
+// 	timestamp:string;
+// }
 
 
 
@@ -88,10 +89,10 @@ const MessageBubble = (props:MessageBubble) => {
           <p className="font-medium">{"1 vs 1 ping pong game invitation"}</p>
           {!isMe && (
             <div className="flex justify-center items-center gap-1">
-              <button className="bg-[#583F3F]/55 text-[8px] text-[#D55C5C] px-3 py-1 rounded-xs hover:bg-[#8D4646]/50 cursor-pointer">
+              <button onClick={() => props.handleGameInvite("reject", props.message.id)} className="bg-[#583F3F]/55 text-[8px] text-[#D55C5C] px-3 py-1 rounded-xs hover:bg-[#8D4646]/50 cursor-pointer">
                 Reject
               </button>
-              <button className="bg-[#3F5846]/55 text-[8px] text-[#5CD57E] px-3 py-1 rounded-xs hover:bg-[#468C74]/50 cursor-pointer">
+              <button onClick={() => props.handleGameInvite("accept", props.message.id)} className="bg-[#3F5846]/55 text-[8px] text-[#5CD57E] px-3 py-1 rounded-xs hover:bg-[#468C74]/50 cursor-pointer">
                 Accept
               </button>
             </div>)}

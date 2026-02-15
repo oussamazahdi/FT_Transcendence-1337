@@ -51,8 +51,8 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
   const [notification, setNotification] = useState<any[]>(initialUser?.notification || []);
   const blockers = initialUser?.blockers
   const router = useRouter();
-  console.log("hhhhhhhhhhhhhhhhh", blocked);
-  console.log("jajajajjajajajaja", blockers);
+  // console.log("hhhhhhhhhhhhhhhhh", blocked);
+  // console.log("jajajajjajajajaja", blockers);
 
   const refreshFriendReq = useCallback(async () => {
     try {

@@ -9,7 +9,8 @@ import { DisconnectionService } from "../services/Disconnection.service.js";
 class ConnectionController 
 {
 	onJoinGame(socket, io, player) {
-		console.log("*********************> join game:", socket.id);
+		
+		console.log("*********************> join game:", player);
 		if (!player || !GameUtils.isValidPlayerData(player)) return;
 		
 		JoinGameServices.rebindSocket(player.username, socket.id);
@@ -23,15 +24,15 @@ class ConnectionController
 		if (!waitingPlayer.value) {
 			waitingPlayer.value = { socketId: socket.id, player };
 			// console.log("**********************> Waiting player:", waitingPlayer.value);
-		return;
+			return;
 		}
-
+		
 		if (waitingPlayer.value.player.username === player.username) return;
-
+		
 		const game = JoinGameServices.createGame(waitingPlayer.value, socket, player);
 		waitingPlayer.value = null;
 		waitingPlayer.data = null;
-
+		
 		activeGames.set(game.roomId, game);
 		JoinGameServices.startMatch(io, game);
 	}

@@ -8,8 +8,9 @@ interface MessageListProps{
   onLoadMore: () => void
   loading: boolean
   hasMore: boolean
+	handleGameInvite: (status:string, id:string | number) => void
 }
-const MessageList = ({ messages, onLoadMore, loading, hasMore}:MessageListProps) => {
+const MessageList = ({ messages, onLoadMore, loading, hasMore, handleGameInvite}:MessageListProps) => {
   const { user } = useAuth();
 
   return (
@@ -23,6 +24,7 @@ const MessageList = ({ messages, onLoadMore, loading, hasMore}:MessageListProps)
             isMe={user?.id === msg.senderId}
             showAvatar={isLastInSequence}
             friendAvatar={msg.avatar || null}
+						handleGameInvite={handleGameInvite}
           />
         );
       })}

@@ -84,7 +84,7 @@ export class ChatController
             const convId = chatModels.getOrCreateConversationId(db, senderId, receiverId);
             if (data.type === "game_invite")
             {
-                expDate = new Date(Date.now() + (15 * 1000));
+                expDate = new Date(Date.now() + (15 * 60 * 1000)).toISOString();
                 msgId = chatModels.createNewMessage(db, convId, senderId, data.type, data.content, expDate);
             }
             else

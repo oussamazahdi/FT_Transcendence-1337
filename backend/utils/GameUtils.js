@@ -53,12 +53,11 @@ class gameUtils{
 
 	isValidPlayerData(data) {
 		return ( data && typeof data === "object" &&
-			typeof data.username === "string" &&
-			data.username.length > 0 &&
-			data.username.length <= 20 &&
-			typeof data.firstName === "string" &&
-			typeof data.lastName === "string" &&
-			typeof data.avatar === "string"
+			typeof data?.username === "string" &&
+			data?.username.length > 0 &&
+			typeof data?.firstName === "string" &&
+			typeof data?.lastName === "string" &&
+			typeof data?.avatar === "string"
 		);
 	}
 }

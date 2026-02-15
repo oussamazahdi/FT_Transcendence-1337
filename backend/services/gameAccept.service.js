@@ -64,7 +64,7 @@ class gameAcceptService {
 				return { ok: false, message: "Invalid player data" };
 	
 			if (GameUtils.getGameByUsername(player1.username) || GameUtils.getGameByUsername(player2.username))
-				return { ok: false, message: "One of the players is already in a game 1" };
+				return { ok: false, message: "One of the players is already in a game" };
 	
 			const p1SocketId = onlineUsers?.get?.(senderId);
 			const p2SocketId = onlineUsers?.get?.(receiverId);
