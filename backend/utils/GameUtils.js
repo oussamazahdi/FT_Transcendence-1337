@@ -1,4 +1,4 @@
-import { activeGames, loops, socketToUsername, usernameToSocket, waitingPlayer } from "../store/memory.store.js";
+import { activeGames, loops, socketToUserId, userIdToSocket, waitingPlayer } from "../store/memory.store.js";
 import { GAME_WIDTH, FPS } from "../constants/game.constants.js";
 // import { updateGame } from "../services/GameLoop.service.js";
 import { GameSession, Paddle } from "../store/game.store.js";
@@ -17,9 +17,9 @@ class gameUtils{
 		return null;
 	}
 
-	getGameByUsername(username) {
+	getGameByUserId(id) {
 		for (const game of activeGames.values()) {
-			if (game.player1.username === username || game.player2.username === username)
+			if (game.player1.id === id || game.player2.id === id)
 				return game;
 		}
 		return null;
@@ -41,10 +41,10 @@ class gameUtils{
 	}
 
 	cleanupPlayers(game) {
-		socketToUsername.delete(game.player1.socketId);
-		socketToUsername.delete(game.player2.socketId);
-		usernameToSocket.delete(game.player1.username);
-		usernameToSocket.delete(game.player2.username);
+		socketToUserId.delete(game.player1.socketId);
+		socketToUserId.delete(game.player2.socketId);
+		userIdToSocket.delete(game.player1.id);
+		userIdToSocket.delete(game.player2.id);
 	}
 
 	isValidDirection(direction) {

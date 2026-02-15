@@ -1,4 +1,4 @@
-import { onlineUsers, socketToUsername, usernameToSocket, activeGames } from "../store/memory.store.js";
+import { onlineUsers, socketToUserId, userIdToSocket, activeGames } from "../store/memory.store.js";
 import { NotifServices } from "../services/Notification.service.js";
 import { GameSession, Paddle } from "../store/game.store.js";
 import { GAME_WIDTH } from "../constants/game.constants.js";
@@ -12,7 +12,6 @@ class gameAcceptService {
 		return ( data && typeof data === "object" &&
 			typeof data.username === "string" &&
 			data.username.length > 0 &&
-			data.username.length <= 20 &&
 			typeof data.firstname === "string" &&
 			typeof data.lastname === "string" &&
 			typeof data.avatar === "string"
@@ -63,7 +62,7 @@ class gameAcceptService {
 			if (!this.playerIsValid(player1) || !this.playerIsValid(player2))
 				return { ok: false, message: "Invalid player data" };
 	
-			if (GameUtils.getGameByUsername(player1.username) || GameUtils.getGameByUsername(player2.username))
+			if (GameUtils.getGameByUserId(player1.id) || GameUtils.getGameByUserId(player2.id))
 				return { ok: false, message: "One of the players is already in a game" };
 	
 			const p1SocketId = onlineUsers?.get?.(senderId);
@@ -127,17 +126,17 @@ class gameAcceptService {
 	bindUserToSocket = ({ player1, player2, p1SocketId, p2SocketId })=>{
 		console.log("***********************************>",player1, player2)
 			if(!player1 || !player2) return;
-			usernameToSocket.set(player1.username, p1SocketId);
-			usernameToSocket.set(player2.username, p2SocketId);
-			socketToUsername.set(p1SocketId, player1.username);
-			socketToUsername.set(p2SocketId, player2.username);
+			userIdToSocket.set(player1.id, p1SocketId);
+			userIdToSocket.set(player2.id, p2SocketId);
+			socketToUserId.set(p1SocketId, player1.id);
+			socketToUserId.set(p2SocketId, player2.id);
 	}
 	
 	unbindUsernameSocketMaps = ({ player1, player2, p1SocketId, p2SocketId })=> {
-		if (player1?.username) usernameToSocket.delete(player1.username);
-		if (player2?.username) usernameToSocket.delete(player2.username);
-		if (p1SocketId) socketToUsername.delete(p1SocketId);
-		if (p2SocketId) socketToUsername.delete(p2SocketId);
+		if (player1?.id) userIdToSocket.delete(player1.id);
+		if (player2?.id) userIdToSocket.delete(player2.id);
+		if (p1SocketId) socketToUserId.delete(p1SocketId);
+		if (p2SocketId) socketToUserId.delete(p2SocketId);
 	}
 	
 	cleanupGame(game) {
