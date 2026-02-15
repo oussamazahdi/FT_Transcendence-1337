@@ -232,7 +232,6 @@ export default function NotificationDropDown() {
 
       socket.emit("game:accept", { notifId: Number(notif.id), roomId }, (ack) => {
         if (!ack?.ok) return;
-        // navigation handled elsewhere (match-started:accept), or add router push here if needed
       });
     },
     [loadNotificationById, postNotificationAction, connectSocketIfNeeded, socket]
@@ -308,7 +307,7 @@ export default function NotificationDropDown() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 max-h-[256px] bg-[#0F0F0F]/75 rounded-[10px] flex flex-col gap-1 p-2 overflow-y-auto z-50 custom-scrollbar min-w-[260px]">
+        <div className="absolute right-0 top-full mt-2 max-h-64 bg-[#0F0F0F]/75 rounded-[10px] flex flex-col gap-1 p-2 overflow-y-auto z-50 custom-scrollbar min-w-65">
           {loading ? (
             <p className="text-[10px] text-white/60 text-center py-4">Loading...</p>
           ) : notifications.length > 0 ? (

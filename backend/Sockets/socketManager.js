@@ -10,7 +10,7 @@ export function initSocketManager(io) {
 			socket.join(`user:${userId}`);
       socket.join(`chat:${userId}`);
     }
-		
+
 		onlineUsers.set(userId, socket.id);
 		
     io.emit("users:status", Array.from(onlineUsers.keys()));

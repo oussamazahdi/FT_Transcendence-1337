@@ -4,20 +4,6 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSocket } from "@/contexts/socketContext";
 
-/**
- * FULL FIX:
- * ✅ Do NOT call useSocket() inside a normal function (hooks rule)
- * ✅ Compute next match + label
- * ✅ Console log next round + players
- * ✅ Notify ONLY the 2 players in the next match
- * ✅ Avoid duplicate notifications (useRef)
- * ✅ Only notify when next match becomes "ready"
- */
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Types
-// ─────────────────────────────────────────────────────────────────────────────
-
 export type TournamentPlayer = {
   id: string;
   username: string;
@@ -53,10 +39,6 @@ type TournamentState = {
   createdAt: string;
   updatedAt: string;
 };
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Storage + helpers
-// ─────────────────────────────────────────────────────────────────────────────
 
 function safeParse<T>(value: string | null): T | null {
   if (!value) return null;
@@ -97,7 +79,6 @@ function makeMatchId() {
 }
 
 function buildBracket(players: TournamentPlayer[], name: string): TournamentState {
-  // Assumes exactly 4 players
   const semis: Match[] = [
     { id: makeMatchId(), round: 1, a: players[0], b: players[1], status: "ready" },
     { id: makeMatchId(), round: 1, a: players[2], b: players[3], status: "locked" },
@@ -106,8 +87,8 @@ function buildBracket(players: TournamentPlayer[], name: string): TournamentStat
   const final: Match = {
     id: makeMatchId(),
     round: 2,
-    a: semis[0].a, // temp
-    b: semis[1].a, // temp
+    a: semis[0].a,
+    b: semis[1].a,
     status: "locked",
   };
 
@@ -156,7 +137,6 @@ function advanceLocks(state: TournamentState): TournamentState {
   const semi1 = next.semis[0];
   const semi2 = next.semis[1];
 
-  // unlock semi2 after semi1 completes
   if (semi1.status === "completed" && semi2.status === "locked") {
     semi2.status = "ready";
   }
@@ -164,7 +144,6 @@ function advanceLocks(state: TournamentState): TournamentState {
   const w1 = getWinner(semi1);
   const w2 = getWinner(semi2);
 
-  // if both winners exist, set final players + unlock final
   if (w1 && w2) {
     next.final.a = w1;
     next.final.b = w2;
@@ -181,10 +160,6 @@ function computeChampion(finalMatch: Match | null): TournamentPlayer | null {
   return finalMatch.winnerId === finalMatch.a.id ? finalMatch.a : finalMatch.b;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Next round helpers (log + notify)
-// ─────────────────────────────────────────────────────────────────────────────
-
 function getNextMatchInfo(state: TournamentState): { match: Match; label: string } {
   const m1 = state.semis[0];
   const m2 = state.semis[1];
@@ -197,10 +172,6 @@ function getNextMatchInfo(state: TournamentState): { match: Match; label: string
 function buildNextRoundMessage(label: string, a: TournamentPlayer, b: TournamentPlayer) {
   return `🔥 ${label} is ready! ${a.displayName} vs ${b.displayName} — let’s see who advances 🏆`;
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Small UI Components (same UI)
-// ─────────────────────────────────────────────────────────────────────────────
 
 function PageShell({ children }: { children: React.ReactNode }) {
   return <div className="w-full max-w-7xl mx-auto px-4 py-8">{children}</div>;
@@ -301,7 +272,6 @@ function PlayerAvatar({
 }) {
   return (
     <div className={`${sizeClassName} overflow-hidden ${wrapperClassName}`}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={src} alt={alt} className="h-full w-full object-cover" />
     </div>
   );
@@ -578,10 +548,6 @@ function FooterActions({
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Page
-// ─────────────────────────────────────────────────────────────────────────────
-
 export default function TournamentPage() {
   const router = useRouter();
   const socket = useSocket();
@@ -589,10 +555,8 @@ export default function TournamentPage() {
   const [state, setState] = useState<TournamentState | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // prevents spamming notifications for the same match
   const lastNotifiedMatchIdRef = useRef<string | null>(null);
 
-  // init / hydrate
   useEffect(() => {
     const existing = loadStateSafe();
     if (existing) {
@@ -613,7 +577,6 @@ export default function TournamentPage() {
     setState(built);
   }, []);
 
-  // ✅ log + notify next round
   useEffect(() => {
     if (!state) return;
 
@@ -658,14 +621,13 @@ export default function TournamentPage() {
     setError(null);
     setState(rebuilt);
 
-    // allow notifications again after reset
     lastNotifiedMatchIdRef.current = null;
   };
 
   const clearAndBack = () => {
     localStorage.removeItem("tournament:create");
     localStorage.removeItem("tournament:state");
-    router.push("/game/pingPong");
+    router.push("/game");
   };
 
   const playMatch = (matchId: string) => {
@@ -674,18 +636,16 @@ export default function TournamentPage() {
     const m = findMatch(state, matchId);
     if (!m) return;
 
-    // Only current match is playable
     if (state.currentMatchId !== matchId) return;
     if (m.status !== "ready" && m.status !== "in_progress") return;
 
-    // Mark in progress and persist before leaving
     const next = structuredClone(state);
     const mm = findMatch(next, matchId);
     if (mm && mm.status === "ready") mm.status = "in_progress";
     next.updatedAt = new Date().toISOString();
     persist(next);
 
-    router.push(`/game/pingPong/local?mode=tournament&matchId=${matchId}`);
+    router.push(`/game/local?mode=tournament&matchId=${matchId}`);
   };
 
   if (error) {
@@ -693,7 +653,7 @@ export default function TournamentPage() {
       <ErrorState
         title="Tournament"
         message={error}
-        onBack={() => router.push("/game/pingPong")}
+        onBack={() => router.push("/game")}
         onClear={clearAndBack}
       />
     );
@@ -712,7 +672,7 @@ export default function TournamentPage() {
       <TournamentHeader
         name={payload.name}
         currentMatchLabel={currentMatchLabel}
-        onBack={() => router.push("/game/pingPong")}
+        onBack={() => router.push("/game")}
         onReset={resetTournament}
       />
 

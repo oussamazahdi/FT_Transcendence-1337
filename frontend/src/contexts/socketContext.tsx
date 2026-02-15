@@ -130,7 +130,6 @@ export function SocketProvider({ children }: SocketProviderProps) {
     });
 
     const handleMatchStarted = (data: MatchStartedPayload | MatchRoomId) => {
-			console.log("+++++> data:", data);
       const roomId = typeof data === "string" || typeof data === "number" ? data : data?.roomId;
       if (!roomId) return;
 
@@ -141,18 +140,10 @@ export function SocketProvider({ children }: SocketProviderProps) {
       });
 
 
-      router.push(`/game/pingPong/${roomId}`);
+      router.push(`/game/${roomId}`);
     };
-    
-    // function onNewNotification(notif){
-    //   console.log("**** notif:", notif);
-    //   setNotifications((prev)=> [notif, ...prev])
-    // }
-
-    // socketHolder.on("notification:new", onNewNotification);
     socketHolder.on("match-started:accept", handleMatchStarted);
 
-    //handle OnlineStatus
     const onUsersStatus = (data: OnlineStatusPayload) => {
       if (Array.isArray(data)) {
         const ids = data
@@ -166,13 +157,11 @@ export function SocketProvider({ children }: SocketProviderProps) {
     socketHolder.on("users:status", onUsersStatus);
     setSocket(socketHolder);
     return () => {
-      // socketHolder.off("notification:new", onNewNotification);
       socketHolder.off("match-started:accept", handleMatchStarted);
       socketHolder.off("users:status", onUsersStatus);
       socketHolder.disconnect();
       setSocket(null);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const notifValue = useMemo(

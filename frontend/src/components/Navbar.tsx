@@ -31,7 +31,6 @@ export default function Navbar() {
     { href: "/leaderboard", label: "Leaderboard", icon: ChartBarIcon },
   ];
 
-  // ✅ Hard reload navigation
   const hardNavigate = (href: string) => {
     if (pathname !== href) {
       window.location.href = href;
@@ -42,7 +41,6 @@ export default function Navbar() {
     <header className="relative pt-4 mx-4 md:mx-10">
       <div className="flex items-center justify-between ">
 
-        {/* Logo */}
         <button onClick={() => hardNavigate("/dashboard")}>
           <Image
             src="/logo.png"
@@ -53,7 +51,6 @@ export default function Navbar() {
           />
         </button>
 
-        {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-3">
           {navItems.map((item) => {
             const isActive = pathname.startsWith(item.href);
@@ -63,25 +60,19 @@ export default function Navbar() {
                 onClick={() => hardNavigate(item.href)}
                 className={`px-4 py-2 rounded-full border border-[#BEBEBE] text-sm
                   hover:bg-black/40 hover:text-white
-                  ${isActive ? "bg-black/40 shadow-2xl backdrop-blur-xl ring-1 ring-white/15 text-white" : "text-[#BEBEBE]"}`}
-                  // ${isActive ? "bg-black/60 text-white" : "text-[#BEBEBE]"}`}
-									//bg-white/10 p-6 shadow-2xl backdrop-blur-xl ring-1 ring-white/15
-              >
+                  ${isActive ? "bg-black/40 shadow-2xl backdrop-blur-xl ring-1 ring-white/15 text-white" : "text-[#BEBEBE]"}`}>
                 {item.label}
               </button>
             );
           })}
         </nav>
 
-        {/* Desktop Search */}
         <Search />
 
-        {/* Desktop User */}
         <div className="hidden md:block">
           <UserDropdown />
         </div>
 
-        {/* Mobile Burger */}
         <button
           onClick={() => setOpen(true)}
           className="md:hidden p-2 rounded-full hover:bg-black/20"
@@ -90,12 +81,10 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile Menu */}
       {open && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm">
           <div className="absolute top-0 right-0 w-72 h-full bg-[#0f0f0f] p-6 flex flex-col">
 
-            {/* Close */}
             <button
               onClick={() => setOpen(false)}
               className="self-end mb-6"
@@ -103,7 +92,6 @@ export default function Navbar() {
               <XMarkIcon className="w-7 h-7 text-white" />
             </button>
 
-            {/* Nav Links */}
             <div className="flex flex-col gap-4">
               {navItems.map((item) => (
                 <button
@@ -119,7 +107,6 @@ export default function Navbar() {
 
             <hr className="my-6 border-white/10" />
 
-            {/* User Actions (NO IMAGE) */}
             <div className="flex flex-col gap-4 mt-auto">
               <button
                 onClick={() => hardNavigate("/profile")}

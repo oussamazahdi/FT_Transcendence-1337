@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import Image from "next/image";
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
 import { assets } from '@/assets/data';
@@ -26,7 +26,7 @@ const BlockedCard = ({user}:blockedCardProp) => {
         </p>
         <p className="text-xs/3 md:text-xs text-[#909090]">{`[@${user.username}]`}</p>
       </div>
-      <button onClick={() => unblockUser(user)} className="ml-auto mr-1 md:mr-4 hover:scale-105 cursor-pointer transition-all duration-150 flex gap-1 rounded-full border-1 p-2">
+      <button onClick={() => unblockUser(user)} className="ml-auto mr-1 md:mr-4 hover:scale-105 cursor-pointer transition-all duration-150 flex gap-1 rounded-full border p-2">
         <CheckCircleIcon className="w-4 h-4" />
         <p className="text-xs">Unblock</p>
       </button>

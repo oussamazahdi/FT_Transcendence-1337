@@ -63,7 +63,6 @@ export class AuthModels
                 FROM users u
                 JOIN game_settings gs ON gs.player_id = u.id
                 WHERE u.id = ?`).get(userId);
-                console.log(userId, result);
                 return (result);
         } 
         catch (error) {

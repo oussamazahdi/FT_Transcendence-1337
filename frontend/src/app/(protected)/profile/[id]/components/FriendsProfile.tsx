@@ -136,7 +136,7 @@ const FriendsProfile = ({ userPage }:FriendProfileProp) => {
           )}
         <div className="w-full mt-auto px-1 pt-2">
           <div className="flex justify-between text-xs md:text-sm mb-1">
-              <span className="font-bold ">Level: {rawLevel}</span>
+              <span className="font-bold ">Level: {rawLevel.toFixed(2)}</span>
               <span >{xp}/{(Math.floor(rawLevel) + 1) * 3000}</span>
           </div>
           <div className="w-full bg-[#000000] rounded-full h-2.5">

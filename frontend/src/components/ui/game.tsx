@@ -7,12 +7,9 @@ import { GAME_MODE, GAME_WIDTH, GAME_HEIGHT } from "@/components/ui/GameMode";
 import { useAuth } from "@/contexts/authContext";
 import { GameUtiles } from "./utils";
 
-/**
- * Tournament redirect route
- */
-const TOURNAMENT_PAGE_ROUTE = "/game/pingPong/tournament";
 
-// ---------------- Types ----------------
+const TOURNAMENT_PAGE_ROUTE = "/game/tournament";
+
 type GameMode = (typeof GAME_MODE)[keyof typeof GAME_MODE] | null;
 
 type PlayerInput = {
@@ -91,7 +88,6 @@ type GameUtilesType = {
 
 const GameUtilesTyped = GameUtiles as GameUtilesType;
 
-// ---------------- Local game (GameData) ----------------
 type LocalGameData = {
   player1NickName?: string;
   player1Avatar?: string;
@@ -124,7 +120,6 @@ function readLocalGameData(): LocalGameData | null {
   return safeParse<LocalGameData>(localStorage.getItem("GameData"));
 }
 
-// ---------------- Tournament persistence types/helpers ----------------
 type TournamentPlayer = {
   id: string;
   username: string;
@@ -229,7 +224,6 @@ function setMatchResult(state: TournamentState, matchId: string, scoreA: number,
   return advanceLocks(next);
 }
 
-// ---------------- Background preload (module scope cache) ----------------
 let gameMapImg: HTMLImageElement | null = null;
 let bgReady = false;
 
@@ -256,7 +250,6 @@ function getBackgroundImage(): BackgroundImage {
   return { image: gameMapImg, ready: bgReady };
 }
 
-// ---------------- Helpers ----------------
 const DEFAULT_AVATAR = "/gameAvatars/Empty.jpeg";
 
 const toNumber = (v: unknown, fallback: number) => {
@@ -360,8 +353,8 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const urlMode = searchParams.get("mode"); // "tournament" | null
-  const matchId = searchParams.get("matchId"); // string | null
+  const urlMode = searchParams.get("mode");
+  const matchId = searchParams.get("matchId");
 
   const scoreLimitOverride = useMemo(() => {
     const raw = searchParams.get("scoreLimit");
@@ -390,7 +383,6 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
     return null;
   }, [gameSetting?.game_mode]);
 
-  // preload background when mode image changes
   useEffect(() => {
     preloadBackground(mode?.image ?? null);
   }, [mode?.image]);
@@ -406,7 +398,6 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
   const animationRef = useRef<number | null>(null);
   const storedResultRef = useRef(false);
 
-  // -------- Local GameData (normal local mode) --------
   const [localPlayers, setLocalPlayers] = useState<{ p1: PlayerInput | null; p2: PlayerInput | null }>({
     p1: null,
     p2: null,
@@ -444,7 +435,6 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
     });
   }, [urlMode]);
 
-  // -------- Tournament players (tournament mode only) --------
   function tournamentPlayerToInput(p: TournamentPlayer): PlayerInput {
     return {
       username: p.username,
@@ -482,13 +472,11 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
     });
   }, [urlMode, matchId]);
 
-  // -------- Derived effective players (tournament > localStorage > props) --------
   const effectiveP1 = urlMode === "tournament" ? tournamentPlayers.p1 : localPlayers.p1 ?? player1;
   const effectiveP2 = urlMode === "tournament" ? tournamentPlayers.p2 : localPlayers.p2 ?? player2;
 
   const mergedScoreLimitOverride = localOverrides?.scoreLimit ?? scoreLimitOverride;
 
-  // -------- Game state + players config --------
   const gameStateRef = useRef<GameState>(
     initGameState({ gameSetting, mode, scoreLimitOverride: mergedScoreLimitOverride, overrides: localOverrides })
   );
@@ -505,7 +493,6 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
     });
   }, []);
 
-  // Reset everything when inputs / mode changes
   useEffect(() => {
     gameStateRef.current = initGameState({
       gameSetting,
@@ -538,7 +525,6 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
 		effectiveP2
   ]);
 
-  // Winner logic
   useEffect(() => {
     const limit = gameStateRef.current.scoreLimit;
     if (score1 >= limit) {
@@ -550,7 +536,6 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
     }
   }, [score1, score2, players]);
 
-  // Main game loop + keyboard
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -594,7 +579,6 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
     };
   }, [players, gameOver, togglePause, gameSetting?.ball_speed, localOverrides?.ballSpeed]);
 
-  // Store tournament result & redirect
   useEffect(() => {
     if (!gameOver) return;
     if (urlMode !== "tournament") return;
@@ -645,35 +629,21 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
         </div>
 
         <div className="flex gap-1 flex-col items-center">
-          <NextImage
-            src={players.player2.avatar}
-            alt="player 2 avatar"
-            width={80}
-            height={80}
-            className="w-20 h-20 rounded-lg object-cover"
-          />
+          <NextImage src={players.player2.avatar} alt="player 2 avatar" width={80} height={80}
+            className="w-20 h-20 rounded-lg object-cover"/>
           <h3 className="text-2xl font-semibold">{players.player2.nickName}</h3>
           <p className="text-xs text-[#858585]">↑ (up) / ↓ (down)</p>
         </div>
       </div>
 
       <div className="mx-4 w-full flex justify-center">
-        <canvas
-          ref={canvasRef}
-          width={gameStateRef.current.board.width}
-          height={gameStateRef.current.board.height}
-          className="w-full max-w-240 rounded-2xl border border-white/20"
-        />
+        <canvas ref={canvasRef} width={gameStateRef.current.board.width} height={gameStateRef.current.board.height}
+          className="w-full max-w-240 rounded-2xl border border-white/20"/>
       </div>
 
       <div className="flex flex-row gap-6 mb-4">
-        <button
-          className="px-6 py-2 bg-[#8D8D8D]/25 rounded-lg hover:bg-white/25 transition"
-          onClick={togglePause}
-          disabled={gameOver}
-          title={gameOver ? "Game finished" : undefined}
-          type="button"
-        >
+        <button className="px-6 py-2 bg-[#8D8D8D]/25 rounded-lg hover:bg-white/25 transition"
+          onClick={togglePause} disabled={gameOver} title={gameOver ? "Game finished" : undefined} type="button">
           {isPause ? "Resume" : "Pause"}
         </button>
       </div>

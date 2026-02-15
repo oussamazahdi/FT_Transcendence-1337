@@ -21,6 +21,7 @@ export function UsersPicker({ usersCount, search, setSearch, filteredUsers, sele
       <div className="mt-3 flex flex-col gap-3">
         <input
           value={search}
+					maxLength={50}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search..."
           className="w-full rounded-2xl bg-white/10 px-4 py-2.5 text-sm text-white placeholder:text-white/35 outline-none ring-1 ring-white/10 focus:ring-2 focus:ring-white/25"

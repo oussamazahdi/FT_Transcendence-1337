@@ -45,7 +45,6 @@ export class AuthController {
                 path: '/',
                 maxAge: 15 * 60 * 1000
             });
-            console.log(result);
             return reply.code(200).send({message: "AUTHORIZED", userData: result});
         }
         catch (error) {

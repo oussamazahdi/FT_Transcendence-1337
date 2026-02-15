@@ -57,7 +57,7 @@ const clampNum = (v: unknown): number => {
 };
 
 async function fetchGameSetting(): Promise<GameSetting> {
-  const res = await fetch("http://localhost:3001/api/game/settings", {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/game/settings`, {
     credentials: "include",
   });
 
@@ -71,7 +71,7 @@ export default function GameSettings() {
 
   const [gameSetting, setGameSetting] = useState<GameSetting | null>(null);
 
-  const [selectedMap, setSelectedMap] = useState<string>(""); // keep string only
+  const [selectedMap, setSelectedMap] = useState<string>("");
   const [userData, setUserData] = useState<SettingsState>({
     ball_speed: 2,
     score_limit: 10,
@@ -80,7 +80,6 @@ export default function GameSettings() {
 
   const [hoveredMap, setHoveredMap] = useState<string | null>(null);
 
-  // ✅ fetch on mount
   useEffect(() => {
     let cancelled = false;
 
@@ -89,7 +88,7 @@ try {
 	const gameset = await fetchGameSetting();
 	if (cancelled) return;
 
-	setGameSetting(gameset.settings as GameSetting); // Cast to GameSetting
+	setGameSetting(gameset.settings as GameSetting);
 	setSelectedMap(gameset?.settings?.game_mode ?? "");
 	setUserData({
 		ball_speed: gameset?.settings?.ball_speed ?? 2,
@@ -150,7 +149,6 @@ try {
     };
   }, [gameSetting]);
 
-  // ✅ normalize before compare (prevents false "changed")
   const hasChanges = useMemo(() => {
     const normalizedUser = {
       ball_speed: userData.ball_speed === "" ? undefined : Number(userData.ball_speed),
@@ -193,9 +191,7 @@ const onSave = useCallback(() => {
 	};
 
 	updateGameSettings(payload);
-	console.log("Saving:", payload);
 
-	// ✅ update local baseline so button disables after save
 	setGameSetting(() => ({
 		settings: {
 			ball_speed: userData.ball_speed === "" ? undefined : Number(userData.ball_speed),

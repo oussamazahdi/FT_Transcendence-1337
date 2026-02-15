@@ -23,13 +23,8 @@ export function PlayerCard({ player }: { player: Player }) {
 
   return (
     <div className="flex flex-col items-center">
-      <Image
-        src={avatarSrc}
-				alt={"player avatar"}
-				width={200}
-				height={200}
-        className="w-14 h-14 rounded-lg object-cover"
-      />
+      <Image src={avatarSrc} alt={"player avatar"} width={200} height={200}
+        className="w-14 h-14 rounded-lg object-cover"/>
       <p className="font-semibold">
         {firstName}.{lastName?.[0]}
       </p>

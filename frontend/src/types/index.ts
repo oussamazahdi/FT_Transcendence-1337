@@ -115,7 +115,7 @@ export interface AuthResponse {
 export interface Notification {
   id: string;
   message: string;
-  type: 'info' | 'invite' | 'message';// to check later
+  type: 'info' | 'invite' | 'message';
   read: boolean;
   createdAt: string;
   [key: string]: any;

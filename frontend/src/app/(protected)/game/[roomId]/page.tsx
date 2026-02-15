@@ -81,7 +81,6 @@ export default function GamePage() {
   const [scale, setScale] = useState(1);
   const [endGame, setEndGame] = useState(false);
 
-  // Pick a safe default game mode (first entry in GAME_MODE)
   const defaultGameMode = useMemo(() => {
     const firstKey = Object.keys(GAME_MODE)[0] as keyof typeof GAME_MODE | undefined;
     return firstKey ? (GAME_MODE[firstKey] as GameMode) : (undefined as unknown as GameMode);
@@ -93,7 +92,6 @@ export default function GamePage() {
     return defaultGameMode;
   }, [gameModeKey, defaultGameMode]);
 
-  // ✅ side effect -> useEffect, and guard for undefined image
   useEffect(() => {
     const img = (gameMode as any)?.image as string | undefined;
     if (!img) return;
@@ -237,24 +235,9 @@ export default function GamePage() {
     <div className="flex flex-col items-center w-full overflow-hidden">
       {game && <ScoreBoard game={game} />}
 
-      <div
-        ref={wrapperRef}
-        className="w-full max-w-5xl flex justify-center relative"
-        style={{ height: GAME_HEIGHT * scale }}
-      >
-        <canvas
-          ref={canvasRef}
-          style={{ width: GAME_WIDTH * scale, height: GAME_HEIGHT * scale }}
-          className="rounded-2xl border border-white/60"
-        />
-
-        {endGame && game && (
-          <GameResult
-            game={game}
-            width={GAME_WIDTH * scale}
-            height={GAME_HEIGHT * scale}
-          />
-        )}
+      <div ref={wrapperRef} className="w-full max-w-5xl flex justify-center relative" style={{ height: GAME_HEIGHT * scale }}>
+        <canvas ref={canvasRef} style={{ width: GAME_WIDTH * scale, height: GAME_HEIGHT * scale }} className="rounded-2xl border border-white/60"/>
+        {endGame && game && (<GameResult game={game} width={GAME_WIDTH * scale} height={GAME_HEIGHT * scale}/>)}
       </div>
 
       <p className="text-md opacity-60 mt-3 mb-12">First to 10 points wins</p>

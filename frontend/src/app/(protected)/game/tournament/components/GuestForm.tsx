@@ -24,24 +24,23 @@ export function GuestForm({
   onAdd: () => void;
 }) {
   return (
-    <div className="mt-4 rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
+    <div className="mt-4 rounded-2xl bg-white/5 w-full p-4 ring-1 ring-white/10">
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs font-semibold uppercase tracking-wide text-white/60">Guest player</p>
         <span className="text-xs text-white/40">No account needed</span>
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-black/20 p-3 ring-1 ring-white/10">
+        <div className="flex flex-col w-full items-center justify-center gap-3 rounded-2xl bg-black/20 p-3 ring-1 ring-white/10">
           <div className="h-28 w-28 overflow-hidden rounded-2xl bg-white/10 ring-1 ring-white/10">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               alt="Guest avatar"
               src={guestAvatar ?? DEFAULT_AVATARS[0] ?? "/gameAvatars/profile1.jpeg"}
               className="h-full w-full object-cover"
             />
           </div>
-          <div className="min-w-0 text-center">
-            <p className="truncate text-sm font-semibold text-white">
+          <div className="min-w-0 w-full text-center">
+            <p className="w-full truncate text-sm font-semibold text-white">
               {guestFirst || guestLast ? `${guestFirst} ${guestLast}`.trim() : "Full Name"}
             </p>
             <p className="truncate text-xs text-white/55">@{guestNick || "nickname"}</p>
@@ -52,6 +51,7 @@ export function GuestForm({
           <div>
             <label className="text-xs text-white/60">First name</label>
             <input
+							maxLength={15}
               value={guestFirst}
               onChange={(e) => setGuestFirst(e.target.value)}
               className="mt-1 w-full rounded-2xl bg-white/10 px-4 py-2.5 text-sm text-white outline-none ring-1 ring-white/10 focus:ring-2 focus:ring-white/25"
@@ -61,6 +61,7 @@ export function GuestForm({
           <div>
             <label className="text-xs text-white/60">Last name</label>
             <input
+							maxLength={15}
               value={guestLast}
               onChange={(e) => setGuestLast(e.target.value)}
               className="mt-1 w-full rounded-2xl bg-white/10 px-4 py-2.5 text-sm text-white outline-none ring-1 ring-white/10 focus:ring-2 focus:ring-white/25"
@@ -70,6 +71,7 @@ export function GuestForm({
           <div>
             <label className="text-xs text-white/60">Nickname</label>
             <input
+							maxLength={50}
               value={guestNick}
               onChange={(e) => setGuestNick(e.target.value)}
               className="mt-1 w-full rounded-2xl bg-white/10 px-4 py-2.5 text-sm text-white outline-none ring-1 ring-white/10 focus:ring-2 focus:ring-white/25"
