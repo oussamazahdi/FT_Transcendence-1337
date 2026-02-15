@@ -74,7 +74,7 @@ const EmailVerification = () => {
     setError("");
     setIsVerifying(true);
     try {
-      const response = await fetch(
+      const response = await autofetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/emailVerification`,
         {
           method: "POST",

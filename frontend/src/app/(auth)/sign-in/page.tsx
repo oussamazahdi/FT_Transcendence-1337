@@ -24,14 +24,9 @@ const SignIn = () => {
     try {
       if (password.length < 8)
         throw new Error("Password must be at least 8 characters");
-      const reply = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
-        {
+      const reply = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,{
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
+          headers: {"Content-Type": "application/json",},
           body: JSON.stringify({
             email,
             password,

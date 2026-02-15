@@ -55,12 +55,12 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
   const refreshFriendReq = useCallback(async () => {
     try {
       const [incomreqRes, pendReqRes, friendsRes, blockedRes, playerSettingsRes, notificationsRes] = await Promise.all([
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests`, { credentials: "include" }),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/sent`, { credentials: "include" }),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/`, { credentials: "include" }),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks`, { credentials: "include" }),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/game/settings`, { credentials: "include" }),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notifications`, { credentials: "include" })
+        autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests`, { credentials: "include" }),
+        autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/sent`, { credentials: "include" }),
+        autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/`, { credentials: "include" }),
+        autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks`, { credentials: "include" }),
+        autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/game/settings`, { credentials: "include" }),
+        autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notifications`, { credentials: "include" })
 
       ]);
 
@@ -106,7 +106,7 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
 
   const logout = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
+      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
         method: "POST",
         credentials: "include",
       });
@@ -121,9 +121,8 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
         setIncomingRequests([]);
         setGameSetting([]);
       }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : typeof err === "string" ? err : "default";
-      triggerError(USER_ERROR[msg] ?? USER_ERROR.default);
+    } catch (err: any) {
+      router.refresh()
     }
   };
 

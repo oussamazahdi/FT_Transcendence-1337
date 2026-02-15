@@ -111,7 +111,7 @@ export default function GameSetup({ isVisible, onClose }: GameSetupProps) {
     "w-11 h-11 rounded-lg object-cover cursor-pointer transition-all hover:scale-110";
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+    <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50">
       <div className="relative bg-[#1A1A1A]/75 backdrop-blur-md p-6 rounded-3xl shadow-lg w-full max-w-4xl m-3">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
