@@ -48,7 +48,7 @@ class gameUtils{
 	}
 
 	isValidDirection(direction) {
-		return direction === "up" || direction === "down";
+		return direction === "up" || direction === "down" || direction === "stop";
 	}
 
 	isValidPlayerData(data) {
