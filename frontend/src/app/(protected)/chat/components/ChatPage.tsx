@@ -3,15 +3,16 @@
 import WelcomeScreen from "./WelcomeScreen";
 import ChatWindow from "./ChatWindow";
 import { useSelectedFriend, type SelectedFriend } from "@/contexts/userContexts";
-import { ChatMessage } from "@/types";
+import { ChatMessage, Conversation } from "@/types";
 
 interface ChatPageProps {
   updateLastMessage: (lastmessage: string, time: string, friend: SelectedFriend) => void;
   messagesByFriendId: Record<string, ChatMessage[]>;
   setMessagesByFriendId: React.Dispatch<React.SetStateAction<Record<string, ChatMessage[]>>>;
+  conversations: Conversation[]
 }
 
-export default function ChatPage({updateLastMessage, messagesByFriendId, setMessagesByFriendId,}: ChatPageProps) {
+export default function ChatPage({updateLastMessage, messagesByFriendId, setMessagesByFriendId,conversations}: ChatPageProps) {
   const { selectedFriend } = useSelectedFriend();
 
   if (!selectedFriend) {
@@ -39,6 +40,7 @@ export default function ChatPage({updateLastMessage, messagesByFriendId, setMess
         updateLastMessage={updateLastMessage}
         liveMessages={liveMessages}
         clearLiveMessages={clearLiveMessages}
+        conversations={conversations}
       />
     </div>
   );

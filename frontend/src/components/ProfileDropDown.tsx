@@ -11,7 +11,6 @@ import {
   UsersIcon,
 } from "@heroicons/react/24/outline";
 import type { User } from "@/types";
-import { useAuth } from "@/contexts/authContext";
 import { autofetch } from "@/lib/api";
 
 interface ProfileDropDownProps {

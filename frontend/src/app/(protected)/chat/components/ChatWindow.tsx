@@ -4,22 +4,23 @@ import ChatHeader from "./ChatHeader";
 import ChatInput from "./ChatInput";
 import MessageList from "./MessageList";
 import { useAuth } from "@/contexts/authContext";
-import { autofetch } from "@/lib/api.tsx";
 import type { SelectedFriend } from "@/contexts/userContexts";
 import { CHAT_ERROR } from "@/lib/utils";
-import { ChatMessage } from "@/types";
+import { ChatMessage, Conversation } from "@/types";
 import { useSocket, InviteResponse } from "@/contexts/socketContext";
 import { safeUUID } from "../../profile/components/FriendCard";
+import { autofetch } from "@/lib/api";
 
 interface ChatWindowProps {
   selectedFriend: SelectedFriend;
   updateLastMessage: (lastmessage: string, time: string, friend: SelectedFriend) => void;
   liveMessages: ChatMessage[];
   clearLiveMessages: () => void;
+  conversations: Conversation[]
 }
 
 
-export default function ChatWindow({selectedFriend, updateLastMessage, liveMessages, clearLiveMessages}: ChatWindowProps) {
+export default function ChatWindow({selectedFriend, updateLastMessage, liveMessages, clearLiveMessages, conversations}: ChatWindowProps) {
   const Friend = selectedFriend;
   const friendRef = useRef(Friend);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -79,15 +80,13 @@ export default function ChatWindow({selectedFriend, updateLastMessage, liveMessa
           return [...prev, ...unique];
         });
       } catch (err) {
-        triggerError("An unexpected error occurred. Please try again.")
         setHasMore(false);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchMessages();
-  }, [page, Friend.id, hasMore, user?.id, triggerError]);
+      fetchMessages();
+  }, [page, Friend.id, hasMore, user?.id]);
 
   useEffect(() => {
     if (!liveMessages || liveMessages.length === 0) 

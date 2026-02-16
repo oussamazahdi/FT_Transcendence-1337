@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/authContext";
 import { AUTH_ERRORS } from "@/lib/utils.ts";
 import { CloudArrowUpIcon } from "@heroicons/react/24/outline";
-import { autofetch } from "@/lib/api";
 
 const SelectImage = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -92,7 +91,7 @@ const SelectImage = () => {
       if (profileImage) {
         const formData = new FormData();
         formData.append("image/", profileImage);
-        const reply = await autofetch(
+        const reply = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/auth/uploadImage`,
           {
             method: "POST",
@@ -111,7 +110,7 @@ const SelectImage = () => {
         }
 
       } else if (selectedAvatar) {
-        const reply = await autofetch(
+        const reply = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/auth/uploadImage`,
           {
             method: "POST",

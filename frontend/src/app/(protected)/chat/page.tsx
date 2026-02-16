@@ -19,9 +19,11 @@ export default function Chat() {
   const id = searchParams.get("id");
 
   useEffect(() => {
-    if (!id) return;
+    if (!id) 
+      return;
     const index = friends.findIndex((u: SelectedFriend) => String(u.id) === id);
-    if (index !== -1) setSelectedFriend(friends[index]);
+    if (index !== -1) 
+      setSelectedFriend(friends[index]);
   }, [id, friends]);
 
   useEffect(() => {
@@ -56,7 +58,7 @@ export default function Chat() {
     };
 
     fetchConversation();
-  }, []);
+  }, [triggerError]);
 
   const updateLastMessage = (lastmessage: string, time: string, friend: SelectedFriend) => {
     setDisplayData((prev) => {
@@ -135,6 +137,7 @@ export default function Chat() {
             updateLastMessage={updateLastMessage}
             messagesByFriendId={messagesByFriendId}
             setMessagesByFriendId={setMessagesByFriendId}
+            conversations={displayData}
           />
         </div>
       </div>
