@@ -10,7 +10,8 @@ class ConnectionController
 {
 	onJoinGame(socket, io, player) {
 		
-		if (!player || !GameUtils.isValidPlayerData(player)) return;
+		const authUserId = Number(socket.user?.userId)
+		if (!player || !GameUtils.isValidPlayerData(player) || player.id !== authUserId) return;
 		
 		JoinGameServices.rebindSocket(player.id, socket.id);
 		
@@ -36,7 +37,8 @@ class ConnectionController
 	}
 	
 	onUpdateData(socket, io, player) {
-		if (!player || !GameUtils.isValidPlayerData(player) || !player?.id) return;
+		const authUserId = Number(socket.user?.userId)
+		if (!player || !GameUtils.isValidPlayerData(player) || !player?.id || player.id !== authUserId) return;
 
 		const game = GameUtils.getGameByUserId(player.id);
 		if (!game) return;

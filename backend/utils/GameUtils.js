@@ -49,6 +49,7 @@ class gameUtils{
 
 	isValidPlayerData(data) {
 		return ( data && typeof data === "object" &&
+			typeof data?.id === "number" &&
 			typeof data?.username === "string" &&
 			data?.username.length > 0 &&
 			typeof data?.firstName === "string" &&

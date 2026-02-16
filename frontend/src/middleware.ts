@@ -9,6 +9,8 @@ type payloadType = {
 	session2FA : boolean
 }
 
+const ROOM_CHECK_TIMEOUT_MS = 3000;
+
 function extractRoomId(pathname: string): string | null {
   const publicRoutes = [
     "/game/local",
@@ -150,21 +152,40 @@ export async function middleware(request:NextRequest) {
 		
 		const roomId = extractRoomId(pathname);
 		if(roomId){
+			const roomGuardRedirect = () => NextResponse.redirect(new URL('/game', request.url));
+			const controller = new AbortController();
+			const timeoutId = setTimeout(() => controller.abort(), ROOM_CHECK_TIMEOUT_MS);
 
 			try{
 				const RoomRes = await fetch(`${process.env.SERVER_SIDE_API_URL}/api/game/rooms/${roomId}/action`, {
 					method: "GET",
 					headers: {
 						Cookie: `refreshToken=${refreshToken}; accessToken=${accessToken || ""}`,
-					}, });
-					const Room = await RoomRes.json();
-					if (!Room?.Game || Room?.Game === undefined)
-						return NextResponse.redirect(new URL('/game', request.url));
-					if(userState.id !== Room.Game.player1.id && userState.id !== Room.Game.player2.id)
-						return NextResponse.redirect(new URL('/game', request.url));
-				}catch(error){
-					
+					},
+					signal: controller.signal,
+				});
+
+				if (!RoomRes.ok) return roomGuardRedirect();
+
+				let Room: unknown;
+				try {
+					Room = await RoomRes.json();
+				} catch {
+					return roomGuardRedirect();
 				}
+
+				const game = (Room as { Game?: { player1?: { id?: number | string }; player2?: { id?: number | string } } })?.Game;
+				if (!game) return roomGuardRedirect();
+
+				const player1Id = Number(game.player1?.id);
+				const player2Id = Number(game.player2?.id);
+				if (userState.id !== player1Id && userState.id !== player2Id)
+					return roomGuardRedirect();
+			}catch(error){
+				return roomGuardRedirect();
+			} finally {
+				clearTimeout(timeoutId);
+			}
 		}
 		
     return NextResponse.next();
