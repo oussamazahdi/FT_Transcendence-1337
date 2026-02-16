@@ -5,23 +5,17 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  /* overflow: hidden; */
 }
 
-/* Hide Scrollbar but Keep Scrolling Functionality */
 .custom-scrollbar {
-  /* Firefox */
   scrollbar-width: none;
-  /* IE and Edge */
   -ms-overflow-style: none;
 }
 
-/* Webkit browsers (Chrome, Safari, Edge) */
 .custom-scrollbar::-webkit-scrollbar {
   display: none;
 }
 
-/* Remove number input arrows (Chrome, Safari, Edge) */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -35,7 +29,6 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 
-/* Remove number input arrows (Firefox) */
 input[type="number"] {
 appearance: textfield;
 -moz-appearance: textfield;

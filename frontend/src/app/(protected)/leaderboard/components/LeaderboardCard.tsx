@@ -22,12 +22,12 @@ const LeaderboardCard = ({id, firstname, lastname, avatar, player_level, rank, p
           <p className="truncate">{lastname}</p> 
         </div>
       </Link>
-      <div className='text-center'>{player_level}</div>
-      <div className='text-center'>{player_xp}</div>
-      <div className='text-center hidden md:block'>{wins}</div>
-      <div className='text-center hidden md:block'>{loses}</div>
-      <div className='text-center hidden md:block'>{forfaits}</div>
-      <div className='text-center font-bold'>{rank}</div>
+<div className='text-center w-full truncate'>{player_level.toFixed(2)}</div>
+      <div className='text-center w-full truncate'>{player_xp}</div>
+      <div className='text-center w-full truncate hidden md:block'>{wins}</div>
+      <div className='text-center w-full truncate hidden md:block'>{loses}</div>
+      <div className='text-center w-full truncate hidden md:block'>{forfaits}</div>
+      <div className='text-center w-full truncate font-bold'>{rank}</div>
       </div>
       )
 }

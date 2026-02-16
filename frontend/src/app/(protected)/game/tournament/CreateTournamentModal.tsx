@@ -31,7 +31,7 @@ export default function CreateTournamentModal({
   initialPlayers = [],
   maxPlayers = 4,
   storageKey = "tournament:create",
-  redirectTo = "/game/pingPong/tournament",
+  redirectTo = "/game/tournament",
   onStart,
 }: CreateTournamentModalProps) {
   const router = useRouter();
@@ -91,7 +91,6 @@ export default function CreateTournamentModal({
 
   const isFull = players.length >= maxPlayers;
 
-  // Reset only when opens
   const resetForOpen = useCallback(() => {
     setError(null);
     setSearch("");
@@ -114,7 +113,6 @@ export default function CreateTournamentModal({
     }
   }, [open, resetForOpen]);
 
-  // Keep locked first (if loads later)
   useEffect(() => {
     if (!open) return;
     setPlayers((prev) => {
@@ -125,7 +123,6 @@ export default function CreateTournamentModal({
     });
   }, [open, lockedPlayer, maxPlayers]);
 
-  // ESC close
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (e: KeyboardEvent) => {
@@ -252,8 +249,8 @@ export default function CreateTournamentModal({
   return (
     <ModalShell overlayRef={overlayRef} onOverlayMouseDown={onOverlayMouseDown} onClose={onClose}>
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Left */}
-        <div className="rounded-2xl bg-black/25 p-5 ring-1 ring-white/10">
+        
+				<div className="rounded-2xl bg-black/25 p-5 ring-1 ring-white/10">
           <TournamentNameInput name={name} setName={setName} />
 
           <div className="mt-6">
@@ -270,7 +267,7 @@ export default function CreateTournamentModal({
           <ErrorAndStart error={error} canStart={canStart} onStart={startTournament} />
         </div>
 
-        {/* Right */}
+
         <div className="rounded-2xl bg-black/25 p-5 ring-1 ring-white/10">
           <div className="mb-3">
             <p className="text-sm font-medium text-white/80">Add Players :</p>

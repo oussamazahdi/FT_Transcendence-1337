@@ -2,6 +2,7 @@ import { notificationsSuccessResponse, errorResponse } from "../config/schemes.c
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { NotifController } from "../controllers/notif.controller.js";
 
+
 export async function notifRoutes(fastify, opts) {
 
   fastify.get("/", { preHandler: authMiddleware,

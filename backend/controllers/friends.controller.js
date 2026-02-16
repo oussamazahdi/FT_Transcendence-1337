@@ -48,7 +48,6 @@ export class FriendsController {
             return reply.code(200).send({message: "SUCCESS", page: pageNum, limit: limit, friends: result });
         }
         catch (error) {
-            console.log(error)
             if (error.code)
                 return reply.code(error.code).send({error: error.message});
             else
@@ -65,7 +64,6 @@ export class FriendsController {
                 return reply.code(401).send({ error: "CANT_FRIEND_OR_UNFRIEND_YOURSELF" });
             const hasFriendship = friendsModels.isFriendshipExists(db, request.user.userId, request.params.id);
             const isBlocked = friendsModels.isBlockedByUser(db, request.user.userId, request.params.id);
-						console.log("friendship status :", isBlocked);
             if (isBlocked && isBlocked.status === 'blocked')
                 return (reply.code(401).send({error: "USER_IS_BLOCKED"}));
             if (hasFriendship)

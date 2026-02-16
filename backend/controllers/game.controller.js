@@ -143,6 +143,15 @@ class matchController {
 			return res.code(status).send({message: err?.message || "INTERNAL_SERVER_ERROR",});
 		}
 	}
+
+	protectRouter = async (req, res) =>{
+		const roomId = req.params.roomId;
+
+		if(!roomId) return res.code(404).send({error: "INVALID_ROOM_ID"}) 
+		const game = activeGames.get(roomId);
+		if(!game) return res.code(404).send({error: "GAME_NOT_FOUND"})
+		else return res.code(200).send({Game: game});
+	}
 	
 }
 export const MatchController = new matchController();

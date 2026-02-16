@@ -16,7 +16,6 @@ type GameData = {
   player2NickName: string;
   player2Avatar: string;
 
-  // keep defaults so the game page won't break if it expects them
   paddleColor: string;
   ballColor: string;
   boardColor: string;
@@ -74,7 +73,6 @@ export default function GameSetup({ isVisible, onClose }: GameSetupProps) {
 
   const [gameData, setGameData] = useState<GameData>(DEFAULT_GAME_DATA);
 
-  // Persist whenever gameData changes
   useEffect(() => {
     localStorage.setItem("GameData", JSON.stringify(gameData));
   }, [gameData]);
@@ -102,7 +100,7 @@ export default function GameSetup({ isVisible, onClose }: GameSetupProps) {
   const handlePlay = useCallback(() => {
     if (!isReadyToPlay) return;
     localStorage.setItem("GameData", JSON.stringify(gameData));
-    router.push("/game/pingPong/local");
+    router.push("/game/local");
   }, [gameData, isReadyToPlay, router]);
 
   if (!isVisible) return null;
@@ -113,8 +111,8 @@ export default function GameSetup({ isVisible, onClose }: GameSetupProps) {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50">
       <div className="relative bg-[#1A1A1A]/75 backdrop-blur-md p-6 rounded-3xl shadow-lg w-full max-w-4xl m-3">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-6">
+        
+				<div className="flex justify-between items-center mb-6">
           <h1 className="text-white text-2xl font-semibold">Game Setup</h1>
           <button
             onClick={onClose}
@@ -125,9 +123,9 @@ export default function GameSetup({ isVisible, onClose }: GameSetupProps) {
           </button>
         </div>
 
-        {/* Players */}
+
         <div className="grid md:grid-cols-2 gap-6">
-          {/* Player 1 */}
+
           <div className="flex flex-col items-center border border-dashed border-gray-500/60 rounded-xl p-6">
             <h2 className="text-xl font-semibold text-white mb-4">Player 1</h2>
 
@@ -176,7 +174,7 @@ export default function GameSetup({ isVisible, onClose }: GameSetupProps) {
             />
           </div>
 
-          {/* Player 2 */}
+
           <div className="flex flex-col items-center border border-dashed border-gray-500/60 rounded-xl p-6">
             <h2 className="text-xl font-semibold text-white mb-4">Player 2</h2>
 

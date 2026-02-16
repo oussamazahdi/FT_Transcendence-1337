@@ -86,8 +86,6 @@ export default function Matchmaking() {
   const joinedRef = useRef(false);
   const navigatedRef = useRef(false);
 
-
-  // Keep player1 identity in sync with user (works on refresh too).
   useEffect(() => {
     if (!user) {
       setPlayer1(emptyPlayer);
@@ -127,10 +125,9 @@ export default function Matchmaking() {
     navigatedRef.current = true;
     socket.emit("leave-game");
 
-    // Optional: you can disconnect, but if you do, make sure you reconnect when coming back.
     socket.disconnect();
 
-    router.push("/game/pingPong");
+    router.push("/game");
   }, [socket, canExit, router]);
 
   const handleTryAgain = useCallback(() => {
@@ -140,7 +137,6 @@ export default function Matchmaking() {
   useEffect(() => {
     if (!user || !socket || navigatedRef.current) return;
 
-    // Ensure connected after refresh / after a previous disconnect.
     if (!socket.connected) socket.connect();
 
     const onConnect = () => {
@@ -149,7 +145,6 @@ export default function Matchmaking() {
     };
 
     const onDisconnect = () => {
-      // You can optionally show a status; keeps UX transparent.
       setStatus("Disconnected. Reconnecting...");
       joinedRef.current = false;
     };
@@ -170,7 +165,7 @@ export default function Matchmaking() {
 
     const handleMatchStarted = (roomId: string | number) => {
       navigatedRef.current = true;
-      router.push(`/game/pingPong/${roomId}`);
+      router.push(`/game/${roomId}`);
       router.refresh();
     };
 
@@ -180,7 +175,6 @@ export default function Matchmaking() {
     socket.on("match-canceled", handleMatchCanceled);
     socket.on("match-started", handleMatchStarted);
 
-    // If already connected when this effect runs, run connect logic immediately.
     if (socket.connected) onConnect();
 
     return () => {

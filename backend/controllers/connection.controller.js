@@ -4,12 +4,12 @@ import { GameAcceptService } from "../services/gameAccept.service.js";
 import { JoinGameServices } from "../services/JoinGame.service.js";
 import { GameUtils } from "../utils/GameUtils.js";
 import { DisconnectionService } from "../services/Disconnection.service.js";
+import { chatModels } from "../models/chat.model.js";
 
 class ConnectionController 
 {
 	onJoinGame(socket, io, player) {
 		
-		console.log("*********************> join game:", player);
 		if (!player || !GameUtils.isValidPlayerData(player)) return;
 		
 		JoinGameServices.rebindSocket(player.id, socket.id);
@@ -22,7 +22,6 @@ class ConnectionController
 		
 		if (!waitingPlayer.value) {
 			waitingPlayer.value = { socketId: socket.id, player };
-			// console.log("**********************> Waiting player:", waitingPlayer.value);
 			return;
 		}
 		
@@ -136,10 +135,15 @@ class ConnectionController
 			const playersData = await GameAcceptService.loadPlayersData(db, senderId, receiverId, io);
 			if (!playersData?.ok)
 			{
-				// console.log(playersData)
 				throw new Error(playersData?.message);
 			} 
 			const {player1, player2, p1SocketId, p2SocketId, p1Socket, p2Socket} = playersData
+
+			if(waitingPlayer?.value && (player1.id === waitingPlayer.value.player.id || player2.id === waitingPlayer.value.player.id)) {
+				const socketIdRev = player1.id === waitingPlayer.value.player.id ? p1SocketId : p2SocketId
+				DisconnectionService.cleanupSocket(socketIdRev);
+				DisconnectionService.handleWaitingPlayerDisconnect(socketIdRev)
+			}
 			
 			bindInfo = { player1, player2, p1SocketId, p2SocketId };
 			GameAcceptService.bindUserToSocket(bindInfo);
@@ -159,12 +163,103 @@ class ConnectionController
 
 			io.to(current.roomId).emit("match-started:accept", current.roomId);
 			setTimeout(()=> GameUtils.startGameLoop(io, current.roomId), 3000);
-			// setTimeout(()=> io.to(current.roomId).emit("match-data", current), 1000);
 			io.to(current.roomId).emit("match-data", current);
 
 			ack?.({ ok: true, notification: notification, message: "Success" });
 		} catch(err) {
 				ack?.({ ok: false, notification: null , message: err?.message });
+		}
+	}
+
+	async onChatGameAccept (io, data, ack){
+		const senderId = Number(data?.sender_id);
+			const receiverId = Number(data?.recever_id);
+			const roomId = data?.room_id;
+			const db = io.db;
+			const msgId = data?.msgId;
+			let bindInfo = null;
+			let gameInvite = null;
+
+			try{
+
+				if(waitingPlayer?.value && (senderId === waitingPlayer.value.player.id || receiverId === waitingPlayer.value.player.id)) {
+					const socketIdRev = senderId === waitingPlayer.value.player.id ? userIdToSocket.get(senderId) : userIdToSocket.get(receiverId)
+					DisconnectionService.cleanupSocket(socketIdRev);
+					DisconnectionService.handleWaitingPlayerDisconnect(socketIdRev)
+				}
+
+				gameInvite = await chatModels.getMessageById(db, msgId);
+				if (!gameInvite) throw new Error("Message not found");
+				
+				if (gameInvite.status && gameInvite.status !== "pending")
+					throw new Error("Invalide game invite");
+
+				if(!gameInvite?.expired_at || typeof gameInvite?.expired_at !== "string" )
+					ack?.({ok:false, message:"Invalide expiration date"});
+				
+				const expiration_date = new Date(gameInvite?.expired_at);
+				const now = new Date();
+				
+				if(now > expiration_date)
+					throw new Error("Game invite expired");
+				
+				if( !Number.isInteger(senderId) || !Number.isInteger(receiverId) || 
+				receiverId <= 0 || senderId <= 0 || receiverId === senderId)
+					throw new Error("Invalide sender or recever id");
+					
+				if (!data?.room_id || !data?.type || data?.type !== "game_invite")
+					throw new Error("Invalide roomId or type");
+				
+				const playersData = await GameAcceptService.loadPlayersData(db, senderId, receiverId, io);
+				if (!playersData?.ok)
+					throw new Error(playersData?.message);
+				
+				const {player1, player2, p1SocketId, p2SocketId, p1Socket, p2Socket} = playersData
+				
+				bindInfo = { player1, player2, p1SocketId, p2SocketId };
+				GameAcceptService.bindUserToSocket(bindInfo);
+				
+				const GameInfo = { roomId, senderId, receiverId, p1SocketId, p2SocketId, player1, player2 };
+				
+				const { result, current } = GameAcceptService.createGameSession(GameInfo);
+				if (!result.ok){
+					GameAcceptService.cleanupGame(current)
+					if (bindInfo) GameAcceptService.unbindUsernameSocketMaps(bindInfo);
+					throw new Error(result?.message);
+				}
+
+				current.state = "PLAYING";
+				p1Socket.join(current.roomId);
+				p2Socket.join(current.roomId);
+
+				chatModels.setInviteStatus(db, msgId, "accepted")
+				
+				io.to(current.roomId).emit("match-started:accept", current.roomId);
+				setTimeout(()=> GameUtils.startGameLoop(io, current.roomId), 3000);
+				io.to(current.roomId).emit("match-data", current);
+
+				ack?.({ok:true, data: data, message: "Success"});
+			}catch(err){
+				ack?.({ok:false, message: err?.message});
+			}
+	}
+
+	async onChatGameReject (io, data, ack) {
+		try{
+			const db = io.db;
+			const gameInvite = await chatModels.getMessageById(db, data?.msgId);
+			if (!gameInvite) throw new Error("Message not found");
+
+			if (gameInvite.status && gameInvite.status !== "pending")
+				throw new Error("Invalide game invite");
+			
+			if (!data?.type || data?.type !== "game_invite")
+				throw new Error("Invalide roomId or type");
+			
+			chatModels.setInviteStatus(db, data?.msgId, "rejected")
+			ack?.({ok:true, data: data, message: "Success"});
+		}catch(err){
+			ack?.({ok:false, message: err?.message});
 		}
 	}
 }
