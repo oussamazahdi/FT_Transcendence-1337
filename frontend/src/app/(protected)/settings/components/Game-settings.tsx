@@ -62,11 +62,13 @@ async function fetchGameSetting(): Promise<GameSetting> {
   });
 
   if (!res.ok) throw new Error("Failed to fetch game settings");
+  const setting = await res.json();
 
-  return res.json();
+  return setting;
 }
 
 export default function GameSettings() {
+  const { triggerError } = useAuth();
   const { updateGameSettings } = useAuth();
 
   const [gameSetting, setGameSetting] = useState<GameSetting | null>(null);
@@ -96,7 +98,7 @@ try {
 		paddle_size: gameset?.settings?.paddle_size ?? 1,
 	});
 } catch (error) {
-	console.error(error);
+  triggerError("An unexpected error occurred. Please try again.");
 }
     })();
 

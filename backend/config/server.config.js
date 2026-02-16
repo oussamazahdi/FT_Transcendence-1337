@@ -1,5 +1,4 @@
 export const serverConfig = {
-    // logger: false
     logger: {
         transport: {
             target: 'pino-pretty',

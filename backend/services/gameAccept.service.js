@@ -79,7 +79,6 @@ class gameAcceptService {
 	
 			return { ok: true, player1, player2, p1SocketId, p2SocketId, p1Socket, p2Socket, message: "Success" };
 		} catch (err) {
-			console.error("[loadPlayersData] real error:", err);
 			return { ok: false, message: err?.message ?? "Unexpected error while loading players data" };
 		}
 	};

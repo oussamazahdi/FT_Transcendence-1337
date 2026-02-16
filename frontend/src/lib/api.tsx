@@ -12,7 +12,6 @@ export const autofetch = async(url:string, options:any) => {
 
       return fetch(url, options);
     }catch(err){
-      console.error("Session expired completely.");
       window.location.href = "/";
     }
   }

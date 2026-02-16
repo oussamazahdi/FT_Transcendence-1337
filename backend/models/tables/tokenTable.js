@@ -18,7 +18,8 @@ function createTokenTable(db)
             )`);
     }
     catch (error) {
-        console.error("Database cannot be inited due to : " + error.message);
+        const dbError = handleDatabaseError(error, 'createTokenTable');
+        console.error(dbError);
         process.exit(1);
     }
 }

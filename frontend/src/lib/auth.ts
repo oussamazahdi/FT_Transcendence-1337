@@ -82,7 +82,6 @@ export async function getCurrentUser(): Promise<fullUser | null> {
       blockers: blockersList
     };
   } catch (error) {
-    console.error("Failed to fetch user:", error);
     return null;
   }
 }

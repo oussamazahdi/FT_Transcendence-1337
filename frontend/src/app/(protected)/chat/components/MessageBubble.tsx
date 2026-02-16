@@ -4,7 +4,6 @@ import { useAuth } from "@/contexts/authContext.tsx";
 import { assets } from "@/assets/data";
 import type { ChatMessage } from "@/types";
 import { parseTime } from "@/lib/utils"
-import { messages } from "@/assets/mocData";
 
 interface MessageBubble{
   message: ChatMessage

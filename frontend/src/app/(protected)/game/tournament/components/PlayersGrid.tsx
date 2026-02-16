@@ -39,7 +39,6 @@ function PlayerSlotCard({ idx, slot, lockedUserId, onRemove }: {
     <div className={cardClass}>
       <div className="h-12 w-12 shrink-0 aspect-square overflow-hidden rounded-xl bg-white/10 ring-1 ring-white/10">
         {slot.status === "filled" ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             alt={slot.player!.username}
             src={slot.player!.avatarUrl ?? DEFAULT_AVATARS[0] ?? "/gameAvatars/profile1.jpeg"}

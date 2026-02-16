@@ -44,10 +44,10 @@ const MatchStats = () => {
         label: "Match Outcomes",
         data: statistics,
         backgroundColor: [
-          "rgb(66, 167, 138, 0.5)", // Pastel Blue (Wins)
-          "rgb(178, 59, 59, 0.5)", // Pastel Red (Loses)
-          "rgb(17, 95, 72, 0.5)", // Pastel Green (Forfeit Wins)
-          "rgb(152, 10, 10, 0.5)", // Pastel Orange (Forfeit Loses)
+          "rgb(66, 167, 138, 0.5)",
+          "rgb(178, 59, 59, 0.5)", 
+          "rgb(17, 95, 72, 0.5)", 
+          "rgb(152, 10, 10, 0.5)", 
         ],
         borderColor: "rgba(15, 15, 15, 0)",
         borderWidth: 0,

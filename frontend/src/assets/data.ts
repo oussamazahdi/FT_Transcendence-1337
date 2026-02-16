@@ -11,16 +11,7 @@ import signIn_image from "./sign-in-img.jpg";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import defaultProfile from "./default-profil.jpg";
 import coverPicture from "./coverPicture.png";
-import pingPongL from "./pingPongL.png";
-import pingPongR from "./pingPongR.png";
-import ticTacToeL from "./ticTacToeL.png";
-import ticTacToeR from "./ticTacToeR.png";
-
 export const assets = {
-  pingPongL,
-  pingPongR,
-  ticTacToeL,
-  ticTacToeR,
   soufiixPdp,
   OussamaPdp,
   kamalPdp,

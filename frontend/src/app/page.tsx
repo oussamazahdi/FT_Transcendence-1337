@@ -23,7 +23,7 @@ export default function Home() {
       imageUrl: assets.kamalPdp,
       links: {
         school42: "https://profile.intra.42.fr/users/kael-ala",
-        linkedin: "...",
+        linkedin: "https://www.linkedin.com/in/KamalElAlami/",
         github: "https://github.com/KamalElAlami",
       },
       key: "1",

@@ -1,9 +1,4 @@
 export const rateLimitConfig = {
-    // keyGenerator: function (request) {
-    //     if (request.user.id && request.ip)
-    //         return request.user.userId;
-    //     return request.ip;
-    // },
     max: 500,
     timeWindow: '1 minute',
     errorResponseBuilder: () => ({

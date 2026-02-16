@@ -24,7 +24,6 @@ async function getFriendProfile(id:string) {
     const data = await response.json();
     return data.userData;
   } catch (error) {
-    console.error("Failed to fetch friend profile:", error);
     return null;
   }
 }

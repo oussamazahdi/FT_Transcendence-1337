@@ -33,7 +33,6 @@ export class ChatController
             return reply.code(200).send({message: "SUCCESS", conversations: conversations});
         }
         catch (error) {
-            console.error(error);
             if (error.code)
                 return reply.code(error.code).send({error: error.message});
             else

@@ -139,7 +139,6 @@ export class AuthController {
     {
         const db = request.server.db;
         const refreshToken = request.cookies.refreshToken;
-				console.log("refreshToken",refreshToken)
         try {
             if (!refreshToken)
                 return reply.code(401).send({error:"UNAUTHORIZED_NO_TOKEN"});
@@ -258,7 +257,6 @@ export class AuthController {
         }
         catch(error)
         {
-            console.log(error);
             if (error.code)
                 return reply.code(error.code).send({error: error.message});
             else

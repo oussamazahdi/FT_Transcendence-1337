@@ -218,7 +218,6 @@ export default function NotificationDropDown({
 
   const acceptGameInvite = useCallback(
     async (value: NotificationItem | NotificationItem["id"]) => {
-      // ✅ accept either notif object or id
       const notifId = typeof value === "object" && value !== null ? value.id : value;
 
       const notif = await loadNotificationById(notifId);

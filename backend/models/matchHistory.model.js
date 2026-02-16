@@ -35,7 +35,6 @@ class matchHistory {
 							ORDER BY 
 								mh.created_at DESC`).all({me: userId});
 			return (result)
-			// return (db.prepare(`SELECT * FROM match_history WHERE player1_id = ? OR player2_id = ? ORDER BY created_at DESC`).all(userId, userId));
 		} catch (error) {
 			throw handleDatabaseError(error);
 		}

@@ -108,7 +108,6 @@ export async function middleware(request:NextRequest) {
         return response;
       }
     } catch (error) {
-      console.error("Error during token refresh:", error);
       return NextResponse.redirect(new URL("/sign-in", request.url));
     }
   }

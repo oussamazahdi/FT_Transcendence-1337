@@ -71,7 +71,6 @@ class gameLoop{
 
 	checkScore = (game, io, roomId) => {
 		if (game.player1.score < 0 || game.player2.score < 0) {
-			console.error(`Invalid scores detected: ${game.player1.score} - ${game.player2.score}`);
 			game.player1.score = 0;
 			game.player2.score = 0;
 		}

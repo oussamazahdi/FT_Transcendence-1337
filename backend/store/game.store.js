@@ -42,7 +42,7 @@ export class Player {
 
 export class GameSession {
   constructor() {
-    this.state = "WAITING"; // WAITING | PLAYING | FINISHED
+    this.state = "WAITING";
     this.gameType = "PingPong";
     this.roomId = randomUUID();
     this.startPlayingAt = 0;

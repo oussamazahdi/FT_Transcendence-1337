@@ -137,7 +137,6 @@ export default function Chat() {
             updateLastMessage={updateLastMessage}
             messagesByFriendId={messagesByFriendId}
             setMessagesByFriendId={setMessagesByFriendId}
-            conversations={displayData}
           />
         </div>
       </div>
