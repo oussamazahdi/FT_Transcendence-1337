@@ -114,7 +114,17 @@ export async function fetchUnreadNotificationsCount() {
   return Number(data?.unreadCount ?? 0);
 }
 
-export default function NotificationDropDown() {
+type NotificationDropDownProps = {
+  containerClassName?: string;
+  buttonClassName?: string;
+  panelClassName?: string;
+};
+
+export default function NotificationDropDown({
+  containerClassName = "relative hidden md:block",
+  buttonClassName = "md:border border-[#9D9D9D]/40 rounded-[10px] md:p-3 hover:bg-[#000000]/40 cursor-pointer hover:scale-105 active:scale-95 transition relative",
+  panelClassName = "absolute right-0 top-full mt-2 max-h-64 bg-[#0F0F0F]/75 rounded-[10px] flex flex-col gap-1 p-2 overflow-y-auto z-50 custom-scrollbar min-w-65",
+}: NotificationDropDownProps = {}) {
   const socket = useSocket() as unknown as NotificationSocket | null;
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -291,12 +301,12 @@ export default function NotificationDropDown() {
   }, [socket, addIncomingNotification]);
 
   return (
-    <div ref={dropdownRef} className="relative hidden md:block">
+    <div ref={dropdownRef} className={containerClassName}>
       <button
         type="button"
         onClick={handleBellClick}
         aria-label="Open notifications"
-        className="md:border border-[#9D9D9D]/40 rounded-[10px] md:p-3 hover:bg-[#000000]/40 cursor-pointer hover:scale-105 active:scale-95 transition relative"
+        className={buttonClassName}
       >
         <BellAlertIcon className="h-5 w-5 text-white/60" />
         {unreadCount > 0 && (
@@ -307,7 +317,7 @@ export default function NotificationDropDown() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 max-h-64 bg-[#0F0F0F]/75 rounded-[10px] flex flex-col gap-1 p-2 overflow-y-auto z-50 custom-scrollbar min-w-65">
+        <div className={panelClassName}>
           {loading ? (
             <p className="text-[10px] text-white/60 text-center py-4">Loading...</p>
           ) : notifications.length > 0 ? (

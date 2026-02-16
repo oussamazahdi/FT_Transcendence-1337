@@ -18,6 +18,7 @@ import {
 import UserDropdown from "./UserDropdown";
 import { useAuth } from "@/contexts/authContext";
 import Search from "./Search";
+import NotificationDropDown from "./NotificationDropDown";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -73,12 +74,19 @@ export default function Navbar() {
           <UserDropdown />
         </div>
 
-        <button
-          onClick={() => setOpen(true)}
-          className="md:hidden p-2 rounded-full hover:bg-black/20"
-        >
-          <Bars3Icon className="w-8 h-8 text-white" />
-        </button>
+        <div className="md:hidden flex items-center gap-2">
+          <NotificationDropDown
+            containerClassName="relative md:hidden"
+            buttonClassName="border border-[#9D9D9D]/40 rounded-[10px] p-2.5 hover:bg-[#000000]/40 cursor-pointer hover:scale-105 active:scale-95 transition relative"
+            panelClassName="absolute right-0 top-full mt-2 max-h-64 w-64 bg-[#0F0F0F]/95 rounded-[10px] flex flex-col gap-1 p-2 overflow-y-auto z-50 custom-scrollbar"
+          />
+          <button
+            onClick={() => setOpen(true)}
+            className="p-2 rounded-full hover:bg-black/20"
+          >
+            <Bars3Icon className="w-8 h-8 text-white" />
+          </button>
+        </div>
       </div>
 
       {open && (
