@@ -162,7 +162,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
       socketHolder.disconnect();
       setSocket(null);
     };
-  }, [user, router, socket]);
+  }, [user]);
 
   const notifValue = useMemo(
     () => ({ notifications, setNotifications }),
