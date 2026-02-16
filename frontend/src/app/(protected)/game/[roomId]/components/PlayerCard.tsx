@@ -15,9 +15,18 @@ type Game = {
   player2: Player;
 };
 
+const shortenText = (value: string, max = 12) => {
+  const text = value.trim();
+  if (text.length <= max) return text;
+  return `${text.slice(0, Math.max(1, max - 1))}…`;
+};
+
 export function PlayerCard({ player }: { player: Player }) {
   const firstName = player.firstName ?? player.firstname ?? "";
   const lastName = player.lastName ?? player.lastname;
+  const displayNameRaw = [firstName, lastName?.[0]].filter(Boolean).join(".");
+  const displayName = shortenText(displayNameRaw || player.username, 14);
+  const username = shortenText(player.username, 14);
 
 	const avatarSrc = player?.avatar ?? "/game/gameAvatars/Empty.jpeg";
 
@@ -25,11 +34,11 @@ export function PlayerCard({ player }: { player: Player }) {
     <div className="flex flex-col items-center">
       <Image src={avatarSrc} alt={"player avatar"} width={200} height={200}
         className="w-14 h-14 rounded-lg object-cover"/>
-      <p className="font-semibold">
-        {firstName}.{lastName?.[0]}
+      <p className="max-w-[140px] truncate font-semibold text-center">
+        {displayName}
       </p>
-      <span className="text-sm text-gray-400">
-        [{player.username}]
+      <span className="max-w-[140px] truncate text-sm text-gray-400">
+        [{username}]
       </span>
     </div>
   );

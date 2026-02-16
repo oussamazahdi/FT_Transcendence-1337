@@ -171,7 +171,7 @@ function getNextMatchInfo(state: TournamentState): { match: Match; label: string
 }
 
 function buildNextRoundMessage(label: string, a: TournamentPlayer, b: TournamentPlayer) {
-  return `🔥 ${label} is ready! ${a.displayName} vs ${b.displayName} — let’s see who advances 🏆`;
+  return `🔥 ${label} is ready! @${a.username} vs @${b.username} — let’s see who advances 🏆`;
 }
 
 function PageShell({ children }: { children: React.ReactNode }) {
@@ -272,7 +272,7 @@ function PlayerAvatar({
   wrapperClassName: string;
 }) {
   return (
-    <div className={`${sizeClassName} overflow-hidden ${wrapperClassName}`}>
+    <div className={`${sizeClassName} shrink-0 aspect-square overflow-hidden ${wrapperClassName}`}>
       <Image width={60} height={60} src={src} alt={alt} className="h-full w-full object-cover" />
     </div>
   );
@@ -288,12 +288,12 @@ function PlayersSection({ players }: { players: TournamentPlayer[] }) {
           <div key={p.id} className="flex items-center gap-3 rounded-2xl bg-white/5 p-3 ring-1 ring-white/10">
             <PlayerAvatar
               src={p.avatarUrl ?? "/avatars/placeholder.png"}
-              alt={p.displayName}
+              alt={p.username}
               sizeClassName="h-12 w-12"
               wrapperClassName="rounded-xl bg-white/10 ring-1 ring-white/10"
             />
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-white">{p.displayName}</p>
+              <p className="truncate text-sm font-semibold text-white">{p.username}</p>
               <p className="truncate text-xs text-white/55">@{p.username}</p>
             </div>
           </div>
@@ -336,13 +336,13 @@ function PlayerRow({
     <div className={rowClass}>
       <PlayerAvatar
         src={player.avatarUrl ?? "/avatars/placeholder.png"}
-        alt={player.displayName}
+        alt={player.username}
         sizeClassName="h-12 w-12"
         wrapperClassName="rounded-xl bg-white/10 ring-1 ring-white/10"
       />
 
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-white">{player.displayName}</p>
+        <p className="truncate text-sm font-semibold text-white">{player.username}</p>
         <p className="truncate text-xs text-white/55">@{player.username}</p>
       </div>
 
@@ -387,7 +387,7 @@ function MatchCard({
 
       {winner ? (
         <div className="mt-3 rounded-2xl bg-white/5 p-3 text-sm text-white/70 ring-1 ring-white/10">
-          Winner: <span className="font-semibold text-white">{winner.displayName}</span>
+          Winner: <span className="font-semibold text-white">@{winner.username}</span>
         </div>
       ) : null}
 
@@ -440,13 +440,13 @@ function ChampionCard({ champion }: { champion: TournamentPlayer | null }) {
         <div className="mt-3 flex items-center gap-3 rounded-2xl bg-white/10 p-4 ring-1 ring-white/15">
           <PlayerAvatar
             src={champion.avatarUrl ?? "/avatars/placeholder.png"}
-            alt={champion.displayName}
+            alt={champion.username}
             sizeClassName="h-14 w-14"
             wrapperClassName="rounded-2xl bg-white/10 ring-1 ring-white/10"
           />
 
           <div className="min-w-0">
-            <p className="truncate text-base font-bold text-white">{champion.displayName}</p>
+            <p className="truncate text-base font-bold text-white">{champion.username}</p>
             <p className="truncate text-sm text-white/55">@{champion.username}</p>
           </div>
 
@@ -665,7 +665,7 @@ export default function TournamentPage() {
   const currentMatchLabel = (() => {
     const cm = findMatch(state, state.currentMatchId);
     if (!cm) return "—";
-    return `${cm.a.displayName} vs ${cm.b.displayName}`;
+    return `@${cm.a.username} vs @${cm.b.username}`;
   })();
 
   return (

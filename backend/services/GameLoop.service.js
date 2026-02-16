@@ -1,5 +1,13 @@
 import { activeGames } from "../store/memory.store.js"
-import { GAME_HEIGHT, GAME_WIDTH, PADDLE_SIZE, PADDLE_SPEED, WIN_SCORE } from "../constants/game.constants.js"
+import {
+	GAME_HEIGHT,
+	GAME_WIDTH,
+	PADDLE_SIZE,
+	PADDLE_SPEED,
+	WIN_SCORE,
+	BALL_BASE_SPEED,
+	BALL_HIT_SPEED_INCREMENT,
+} from "../constants/game.constants.js"
 import { GameUtils } from "../utils/GameUtils.js";
 import { MatchController } from "../controllers/game.controller.js";
 
@@ -22,7 +30,7 @@ class gameLoop{
 		ball.x = GAME_WIDTH / 2;
 		ball.y = GAME_HEIGHT / 2;
 		ball.velocityX *= -1;
-		ball.speed = 2.5;
+		ball.speed = BALL_BASE_SPEED;
 	}
 
 	handlePaddleCollision(ball, paddle, isLeft) {
@@ -32,7 +40,7 @@ class gameLoop{
 	
 		if (!hit) return;
 	
-		ball.speed += 0.3;
+		ball.speed += BALL_HIT_SPEED_INCREMENT;
 		ball.velocityX = isLeft ? Math.abs(ball.velocityX) : -Math.abs(ball.velocityX);
 	
 		ball.velocityY = ((ball.y - paddle.y) / paddle.height - 0.5) * 2;

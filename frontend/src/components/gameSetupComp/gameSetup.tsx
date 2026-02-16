@@ -20,7 +20,6 @@ type GameData = {
   ballColor: string;
   boardColor: string;
   scoreLimit: number;
-  ballSpeed: number;
   paddleSize: number;
 
   player1Score: number;
@@ -44,7 +43,6 @@ const DEFAULT_GAME_DATA: GameData = {
   ballColor: "#D9D9D9",
   boardColor: "#262626",
   scoreLimit: 5,
-  ballSpeed: 1,
   paddleSize: 1,
 
   player1Score: 0,

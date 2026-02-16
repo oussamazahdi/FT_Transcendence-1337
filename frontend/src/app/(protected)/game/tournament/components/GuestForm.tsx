@@ -21,9 +21,9 @@ onAdd: () => void; }) {
 
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="flex flex-col w-full items-center justify-center gap-3 rounded-2xl bg-black/20 p-3 ring-1 ring-white/10">
-          <div className="h-28 w-28 overflow-hidden rounded-2xl bg-white/10 ring-1 ring-white/10">
+          <div className="h-28 w-28 shrink-0 aspect-square overflow-hidden rounded-2xl bg-white/10 ring-1 ring-white/10">
             <Image 
-							width={60}
+								width={60}
 							height={60}
               alt="Guest avatar"
               src={guestAvatar ?? DEFAULT_AVATARS[0] ?? "/gameAvatars/profile1.jpeg"}

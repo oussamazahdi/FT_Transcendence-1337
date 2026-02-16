@@ -37,11 +37,11 @@ function PlayerSlotCard({ idx, slot, lockedUserId, onRemove }: {
 
   return (
     <div className={cardClass}>
-      <div className="h-12 w-12 overflow-hidden rounded-xl bg-white/10 ring-1 ring-white/10">
+      <div className="h-12 w-12 shrink-0 aspect-square overflow-hidden rounded-xl bg-white/10 ring-1 ring-white/10">
         {slot.status === "filled" ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            alt={slot.player!.displayName}
+            alt={slot.player!.username}
             src={slot.player!.avatarUrl ?? DEFAULT_AVATARS[0] ?? "/gameAvatars/profile1.jpeg"}
             className="h-full w-full object-cover"
           />
@@ -56,7 +56,7 @@ function PlayerSlotCard({ idx, slot, lockedUserId, onRemove }: {
         {slot.status === "filled" ? (
           <>
             <p className="truncate text-sm font-semibold text-white">
-              {slot.player!.displayName}{" "}
+              {slot.player!.username}{" "}
               {isLocked && (
                 <span className="ml-2 rounded-full bg-white/10 px-2 py-1 text-[11px] text-white/70 ring-1 ring-white/10">
                   You (Player 1)

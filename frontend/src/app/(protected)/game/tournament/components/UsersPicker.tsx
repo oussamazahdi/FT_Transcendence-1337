@@ -60,21 +60,21 @@ export function UsersPicker({ usersCount, search, setSearch, filteredUsers, sele
 												}}
 												className={rowClass}
 											>
-												<div className="h-9 w-9 overflow-hidden rounded-xl bg-white/10 ring-1 ring-white/10">
-													{/* eslint-disable-next-line @next/next/no-img-element */}
-													<img
-														alt={u.displayName ?? u.username}
-														src={u.avatarUrl ?? DEFAULT_AVATARS[0] ?? "/gameAvatars/profile1.jpeg"}
-														className="h-full w-full object-cover"
-													/>
+													<div className="h-9 w-9 shrink-0 aspect-square overflow-hidden rounded-xl bg-white/10 ring-1 ring-white/10">
+														{/* eslint-disable-next-line @next/next/no-img-element */}
+														<img
+															alt={u.username}
+															src={u.avatarUrl ?? DEFAULT_AVATARS[0] ?? "/gameAvatars/profile1.jpeg"}
+															className="h-full w-full object-cover"
+														/>
 												</div>
 									
-												<div className="min-w-0 flex-1">
-													<p className="truncate text-sm font-semibold text-white">
-														{u.displayName ?? u.username}{" "}
-														{isYou && (
-															<span className="ml-2 rounded-full bg-white/10 px-2 py-1 text-[11px] text-white/70 ring-1 ring-white/10">
-																You
+													<div className="min-w-0 flex-1">
+														<p className="truncate text-sm font-semibold text-white">
+															{u.username}{" "}
+															{isYou && (
+																<span className="ml-2 rounded-full bg-white/10 px-2 py-1 text-[11px] text-white/70 ring-1 ring-white/10">
+																	You
 															</span>
 														)}
 													</p>
