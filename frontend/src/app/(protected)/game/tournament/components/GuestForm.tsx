@@ -27,7 +27,7 @@ onAdd: () => void; }) {
 							height={60}
               alt="Guest avatar"
               src={guestAvatar ?? DEFAULT_AVATARS[0] ?? "/gameAvatars/profile1.jpeg"}
-              className="h-full w-full object-cover"
+              className="h-full  w-full object-cover"
             />
           </div>
           <div className="min-w-0 w-full text-center">
