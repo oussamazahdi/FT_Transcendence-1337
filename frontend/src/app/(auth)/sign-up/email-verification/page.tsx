@@ -5,6 +5,7 @@ import { assets } from "@/assets/data";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AUTH_ERRORS } from "@/lib/utils.ts";
 import { useAuth } from "@/contexts/authContext";
+import { autofetch } from "@/lib/api";
 
 const EmailVerification = () => {
   const [otp, setOtp] = useState<string[]>(new Array(6).fill(""));
@@ -26,7 +27,7 @@ const EmailVerification = () => {
 
   const sendVerificationCode = useCallback(async () => {
     try {
-      const response = await fetch(
+      const response = await autofetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/resendCode`,
         {
           method: "POST",
@@ -73,7 +74,7 @@ const EmailVerification = () => {
     setError("");
     setIsVerifying(true);
     try {
-      const response = await fetch(
+      const response = await autofetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/emailVerification`,
         {
           method: "POST",

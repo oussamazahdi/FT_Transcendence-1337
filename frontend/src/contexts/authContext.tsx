@@ -3,6 +3,7 @@ import { useState, useContext, createContext, ReactNode, useCallback } from "rea
 import { useRouter } from "next/navigation";
 import { USER_ERROR } from "@/lib/utils.ts";
 import { User, fullUser } from "@/types/index"
+import { autofetch } from "@/lib/api";
 
 
 interface UserCtxValue {
@@ -51,6 +52,14 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
   const blockers = initialUser?.blockers
   const router = useRouter();
 
+	const triggerError = useCallback((message: string) => {
+    setGlobalError(message);
+
+    setTimeout(() => {
+      setGlobalError(null);
+    }, 3000);
+  }, []);
+
   const refreshFriendReq = useCallback(async () => {
     try {
       const [incomreqRes, pendReqRes, friendsRes, blockedRes, playerSettingsRes, notificationsRes] = await Promise.all([
@@ -96,7 +105,7 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
     } catch (err) {
       triggerError("An unexpected error occurred. Please try again.");
     }
-  },[]);
+  },[triggerError]);
 
   const login = (userData: User) => {
     setUser(userData);
@@ -105,7 +114,7 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
 
   const logout = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
+      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
         method: "POST",
         credentials: "include",
       });
@@ -134,7 +143,7 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
 
   const sendFriendRequest = async (user: any) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/${user.id}`, {
+      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/${user.id}`, {
         method: "POST",
         credentials: "include",
       })
@@ -152,7 +161,7 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
 
   const cancelRequest = async (user: any) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/${user.id}`, {
+      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/${user.id}`, {
         method: "DELETE",
         credentials: "include",
       })
@@ -171,7 +180,7 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
 
   const acceptRequest = async (user: any) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/${user.id}/accept`, {
+      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/${user.id}/accept`, {
         method: "POST",
         credentials: "include",
       })
@@ -190,7 +199,7 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
 
   const removeFriend = async (user: any) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/${user.id}`, {
+      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/${user.id}`, {
         method: "DELETE",
         credentials: "include",
       })
@@ -208,7 +217,7 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
 
   const blockUser = async (user: any) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks/${user.id}`, {
+      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks/${user.id}`, {
         method: "POST",
         credentials: "include",
       })
@@ -228,7 +237,7 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
 
   const unblockUser = async (user: any) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks/${user.id}`, {
+      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/blocks/${user.id}`, {
         method: "DELETE",
         credentials: "include"
       })
@@ -266,7 +275,7 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
         return { ok: false, status: 400, error: "NO_FIELDS_TO_UPDATE" };
       }
 
-      const res = await fetch(
+      const res = await autofetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/game/update-settings`,
         {
           method: "PATCH",
@@ -291,15 +300,6 @@ export function UserProvider({ children, initialUser }: UserProviderProps) {
       return { ok: false, status: 0, error: err?.message || "NETWORK_ERROR" };
     }
   };
-
-
-  const triggerError = useCallback((message: string) => {
-    setGlobalError(message);
-
-    setTimeout(() => {
-      setGlobalError(null);
-    }, 3000);
-  }, []);
 
   return (
     <UserCtx.Provider

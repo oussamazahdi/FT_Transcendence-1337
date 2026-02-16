@@ -6,7 +6,7 @@ import MessageList from "./MessageList";
 import { useAuth } from "@/contexts/authContext";
 import type { SelectedFriend } from "@/contexts/userContexts";
 import { CHAT_ERROR } from "@/lib/utils";
-import { ChatMessage, Conversation } from "@/types";
+import { ChatMessage} from "@/types";
 import { useSocket, InviteResponse } from "@/contexts/socketContext";
 import { safeUUID } from "../../profile/components/FriendCard";
 import { autofetch } from "@/lib/api";
@@ -16,11 +16,10 @@ interface ChatWindowProps {
   updateLastMessage: (lastmessage: string, time: string, friend: SelectedFriend) => void;
   liveMessages: ChatMessage[];
   clearLiveMessages: () => void;
-  conversations: Conversation[]
 }
 
 
-export default function ChatWindow({selectedFriend, updateLastMessage, liveMessages, clearLiveMessages, conversations}: ChatWindowProps) {
+export default function ChatWindow({selectedFriend, updateLastMessage, liveMessages, clearLiveMessages}: ChatWindowProps) {
   const Friend = selectedFriend;
   const friendRef = useRef(Friend);
   const [messages, setMessages] = useState<ChatMessage[]>([]);

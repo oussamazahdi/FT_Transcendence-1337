@@ -37,13 +37,13 @@ export class AuthController {
                 httpOnly: true,
                 sameSite: 'lax',
                 path: '/',
-                maxAge: 7 * 24 * 60 * 60 * 1000
+                maxAge: 300
             });
             reply.setCookie('accessToken', accessToken, {
                 httpOnly: true,
                 sameSite: 'lax',
                 path: '/',
-                maxAge: 15 * 60 * 1000
+                maxAge: 30
             });
             return reply.code(200).send({message: "AUTHORIZED", userData: result});
         }
@@ -76,13 +76,13 @@ export class AuthController {
                 httpOnly: true,
                 sameSite: 'lax',
                 path: '/',
-                maxAge: 7 * 24 * 60 * 60 * 1000
+                maxAge: 300
             });
             reply.setCookie('accessToken', accessToken, {
                 httpOnly: true,
                 sameSite: 'lax',
                 path: '/',
-                maxAge: 15 * 60 * 1000
+                maxAge: 30
             });
             return reply.code(201).send({message: "USER_CREATED_SUCCESSFULLY"});
         }
@@ -139,18 +139,17 @@ export class AuthController {
     {
         const db = request.server.db;
         const refreshToken = request.cookies.refreshToken;
-        const accessToken = request.cookies.accessToken;
-    
+				console.log("refreshToken",refreshToken)
         try {
-            if (!refreshToken || !accessToken)
-                throw new Error("UNAUTHORIZED_NO_TOKEN");
+            if (!refreshToken)
+                return reply.code(401).send({error:"UNAUTHORIZED_NO_TOKEN"});
             const blacklisted = tokenModels.isTokenRevoked(db, refreshToken);
             if (blacklisted)
-                throw new Error("TOKEN_REVOKED");
+							return reply.code(402).send({error:"TOKEN_REVOKED"});
             const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
             const tokenDbResults = tokenModels.tokenExists(db, refreshToken);
             if (!tokenDbResults)
-                throw new Error("INVALID_TOKEN");
+							return reply.code(403).send({error: "INVALID_TOKEN"});
             const user = authModels.findUserById(db, decoded.userId);
             updateTokenFlags(user, reply);
             return reply.code(201).send({message: "TOKEN_REFRESHED_SUCCESSFULLY"});

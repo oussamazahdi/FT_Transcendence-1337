@@ -7,6 +7,7 @@ import { ComponentUtils } from "@/lib/utils";
 import { GameInvite } from "@/components/ui/GameInvite";
 import { FriendInvite } from "./ui/FriendInvite";
 import { MessageNotif } from "./ui/MessageNotif";
+import { autofetch } from "@/lib/api";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -92,7 +93,7 @@ type JsonResult<T> = {
 
 async function requestJson<T = unknown>(url: string, options?: RequestInit): Promise<JsonResult<T>> {
   try {
-    const res = await fetch(url, options);
+    const res = await autofetch(url, options);
     const data = (await res.json().catch(() => null)) as T | null;
     return { res, data, error: null };
   } catch (error) {

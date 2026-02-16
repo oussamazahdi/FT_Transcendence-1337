@@ -88,7 +88,7 @@ export async function middleware(request:NextRequest) {
       const refreshResponse = await fetch(`${process.env.SERVER_SIDE_API_URL}/api/auth/refresh`,{
           method: "POST",
           headers: {
-            Cookie: `refreshToken=${refreshToken}; accessToken=${accessToken || ""}`,
+            Cookie: `refreshToken=${refreshToken}; accessToken=${accessToken}`,
           },
         },
       );

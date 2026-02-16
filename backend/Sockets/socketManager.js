@@ -25,7 +25,6 @@ export function initSocketManager(io) {
     socket.on("game:accept", async (data, ack) => { connectionController.onGameAccept(socket, io, data, ack);});
 
     socket.on("chat:send", (data) => chatController.sendMessage(socket, io, data));
-    socket.on("chat:error", (error) => {console.error(error.message);});
 
 		socket.on("chat:game:accept", async (data, ack) => connectionController.onChatGameAccept(io, data, ack));
 		socket.on("chat:game:reject", async (data, ack) => connectionController.onChatGameReject(io, data, ack));

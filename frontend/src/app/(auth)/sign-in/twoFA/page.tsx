@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { AUTH_ERRORS } from "@/lib/utils.ts";
 import { useAuth } from "@/contexts/authContext";
+import { autofetch } from "@/lib/api";
 
 const TwoFA = () => {
   const [loading, setLoading] = useState(false);
@@ -21,7 +22,7 @@ const TwoFA = () => {
       const twofaToken = TwoFAcode.join("");
       if (!twofaToken) 
         throw new Error("enter the code firstly");
-      const response = await fetch(
+      const response = await autofetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/2fa/verify`,
         {
           method: "post",
