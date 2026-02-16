@@ -85,7 +85,6 @@ export class TwoFactorController
         }
         catch (error)
         {
-            console.log(error);
             if (error.code)
                 return reply.code(error.code).send({error: error.message});
             return reply.code(500).send(error.message);

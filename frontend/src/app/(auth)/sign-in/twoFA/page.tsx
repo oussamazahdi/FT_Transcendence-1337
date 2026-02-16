@@ -40,7 +40,6 @@ const TwoFA = () => {
       router.push("/dashboard");
     } catch (err:any) {
       setError(err.message);
-      console.log(err.message);
     } finally {
       setLoading(false);
     }

@@ -42,6 +42,7 @@ type GameState = {
 };
 
 type UpdateDataPayload = {
+  id: string | number;
   username: string;
   firstName: string;
   lastName: string;
@@ -52,7 +53,7 @@ type GameSocket = {
   connected: boolean;
   connect: () => void;
   emit(event: "update-data", payload: UpdateDataPayload): void;
-  emit(event: "paddle-move", payload: { direction: "up" | "down" }): void;
+  emit(event: "paddle-move", payload: { direction: "up" | "down" | "stop" }): void;
   on(event: "match-data" | "game-state", cb: (game: GameState) => void): void;
   off(event: "match-data" | "game-state", cb: (game: GameState) => void): void;
 };
@@ -71,12 +72,15 @@ export default function GamePage() {
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const gameRef = useRef<GameState | null>(null);
+  const upPressedRef = useRef(false);
+  const downPressedRef = useRef(false);
+  const lastDirectionRef = useRef<"up" | "down" | "stop">("stop");
 
   const [game, setGame] = useState<GameState | null>(null);
   const [scale, setScale] = useState(1);
   const [endGame, setEndGame] = useState(false);
 
-  // Pick a safe default game mode (first entry in GAME_MODE)
   const defaultGameMode = useMemo(() => {
     const firstKey = Object.keys(GAME_MODE)[0] as keyof typeof GAME_MODE | undefined;
     return firstKey ? (GAME_MODE[firstKey] as GameMode) : (undefined as unknown as GameMode);
@@ -88,7 +92,6 @@ export default function GamePage() {
     return defaultGameMode;
   }, [gameModeKey, defaultGameMode]);
 
-  // ✅ side effect -> useEffect, and guard for undefined image
   useEffect(() => {
     const img = (gameMode as any)?.image as string | undefined;
     if (!img) return;
@@ -110,6 +113,7 @@ export default function GamePage() {
     if (!socket.connected) socket.connect();
 
     socket.emit("update-data", {
+      id: user.id,
       username: user.username,
       firstName: user.firstname,
       lastName: user.lastname,
@@ -139,30 +143,73 @@ export default function GamePage() {
   useEffect(() => {
     if (!socket) return;
 
-    const handleKey = (e: KeyboardEvent) => {
+    const emitDirection = (direction: "up" | "down" | "stop") => {
+      if (lastDirectionRef.current === direction) return;
+      socket.emit("paddle-move", { direction });
+      lastDirectionRef.current = direction;
+    };
+
+    const syncDirection = () => {
+      if (upPressedRef.current && !downPressedRef.current) {
+        emitDirection("up");
+        return;
+      }
+      if (downPressedRef.current && !upPressedRef.current) {
+        emitDirection("down");
+        return;
+      }
+      emitDirection("stop");
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "w" || e.key === "ArrowUp") {
-        socket.emit("paddle-move", { direction: "up" });
+        e.preventDefault();
+        upPressedRef.current = true;
+        syncDirection();
       }
       if (e.key === "s" || e.key === "ArrowDown") {
-        socket.emit("paddle-move", { direction: "down" });
+        e.preventDefault();
+        downPressedRef.current = true;
+        syncDirection();
       }
     };
 
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === "w" || e.key === "ArrowUp") {
+        upPressedRef.current = false;
+        syncDirection();
+      }
+      if (e.key === "s" || e.key === "ArrowDown") {
+        downPressedRef.current = false;
+        syncDirection();
+      }
+    };
+
+    const handleBlur = () => {
+      upPressedRef.current = false;
+      downPressedRef.current = false;
+      syncDirection();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    window.addEventListener("blur", handleBlur);
+
+    return () => {
+      handleBlur();
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener("blur", handleBlur);
+    };
   }, [socket]);
 
   useEffect(() => {
+    gameRef.current = game;
     if (!game) return;
+    setEndGame(game.state === "FINISHED");
+  }, [game]);
 
-    if (game.state === "FINISHED") {
-      setEndGame(true);
-      return;
-    } else {
-      // if game continues (or new game starts), ensure overlay resets
-      if (endGame) setEndGame(false);
-    }
-
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -174,37 +221,23 @@ export default function GamePage() {
     let animationId = 0;
 
     const render = () => {
-      drawFrame(ctx, game, gameMode);
+      if (gameRef.current) {
+        drawFrame(ctx, gameRef.current, gameMode);
+      }
       animationId = requestAnimationFrame(render);
     };
 
     render();
     return () => cancelAnimationFrame(animationId);
-    // gameMode is stable and safe now
-  }, [game, gameMode, endGame]);
+  }, [gameMode]);
 
   return (
     <div className="flex flex-col items-center w-full overflow-hidden">
       {game && <ScoreBoard game={game} />}
 
-      <div
-        ref={wrapperRef}
-        className="w-full max-w-5xl flex justify-center relative"
-        style={{ height: GAME_HEIGHT * scale }}
-      >
-        <canvas
-          ref={canvasRef}
-          style={{ width: GAME_WIDTH * scale, height: GAME_HEIGHT * scale }}
-          className="rounded-2xl border border-white/60"
-        />
-
-        {endGame && game && (
-          <GameResult
-            game={game}
-            width={GAME_WIDTH * scale}
-            height={GAME_HEIGHT * scale}
-          />
-        )}
+      <div ref={wrapperRef} className="w-full max-w-5xl flex justify-center relative" style={{ height: GAME_HEIGHT * scale }}>
+        <canvas ref={canvasRef} style={{ width: GAME_WIDTH * scale, height: GAME_HEIGHT * scale }} className="rounded-2xl border border-white/60"/>
+        {endGame && game && (<GameResult game={game} width={GAME_WIDTH * scale} height={GAME_HEIGHT * scale}/>)}
       </div>
 
       <p className="text-md opacity-60 mt-3 mb-12">First to 10 points wins</p>

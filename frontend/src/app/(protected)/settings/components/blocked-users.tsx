@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { NoSymbolIcon } from "@heroicons/react/24/outline";
 import BlockedCard from "./BlockedCard.tsx";
 import { useAuth } from "@/contexts/authContext";

@@ -35,6 +35,7 @@ export class Player {
     this.score = 0;
     this.roomId = "";
     this.player = null;
+    this.moveDirection = 0;
     this.ready = false;
   }
 }
@@ -49,5 +50,6 @@ export class GameSession {
     this.player1 = new Player();
     this.player2 = new Player();
     this.ball = new Ball();
+    this.lastUpdateAt = Date.now();
   }
 }

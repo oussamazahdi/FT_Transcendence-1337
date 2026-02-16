@@ -20,5 +20,3 @@ export type MapCardProps = {
   onLeave: () => void;
   onSelect: () => void;
 };
-
-// export {MapDefinition, FieldProps, MapCardProps}

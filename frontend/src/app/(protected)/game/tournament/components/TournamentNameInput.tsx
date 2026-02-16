@@ -7,6 +7,7 @@ export function TournamentNameInput({ name, setName }: { name: string; setName: 
         Tournament name :
       </label>
       <input
+				maxLength={50}
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder="e.g. Friday Night Pong"
