@@ -121,7 +121,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
       return;
     }
 
-    const socketHolder: SocketType = io("http://localhost:3001", {
+    const socketHolder: SocketType = io(process.env.NEXT_PUBLIC_API_URL, {
       withCredentials: true,
       transports: ["websocket"],
       reconnection: true,
