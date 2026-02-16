@@ -41,6 +41,9 @@ type TournamentState = {
   updatedAt: string;
 };
 
+const TOURNAMENT_CREATE_STORAGE_KEY = "tournament:create";
+const TOURNAMENT_STATE_STORAGE_KEY = "tournament:state";
+
 function safeParse<T>(value: string | null): T | null {
   if (!value) return null;
   try {
@@ -66,13 +69,13 @@ function isValidTournamentState(x: unknown): x is TournamentState {
 }
 
 function loadStateSafe(): TournamentState | null {
-  const raw = safeParse<unknown>(localStorage.getItem("tournament:state"));
+  const raw = safeParse<unknown>(localStorage.getItem(TOURNAMENT_STATE_STORAGE_KEY));
   if (!isValidTournamentState(raw)) return null;
   return raw;
 }
 
 function saveState(state: TournamentState) {
-  localStorage.setItem("tournament:state", JSON.stringify(state));
+  localStorage.setItem(TOURNAMENT_STATE_STORAGE_KEY, JSON.stringify(state));
 }
 
 function makeMatchId() {
@@ -567,7 +570,7 @@ export default function TournamentPage() {
       return;
     }
 
-    const payload = safeParse<TournamentCreatePayload>(localStorage.getItem("tournament:create"));
+    const payload = safeParse<TournamentCreatePayload>(localStorage.getItem(TOURNAMENT_CREATE_STORAGE_KEY));
     if (!payload || !payload.name || !Array.isArray(payload.players) || payload.players.length !== 4) {
       setError("Tournament setup not found. Please create a tournament first.");
       return;
@@ -609,13 +612,19 @@ export default function TournamentPage() {
   const finalMatch = state?.final ?? null;
   const champion = useMemo(() => computeChampion(finalMatch), [finalMatch]);
 
+  useEffect(() => {
+    if (!state?.final?.winnerId) return;
+    localStorage.removeItem(TOURNAMENT_CREATE_STORAGE_KEY);
+    localStorage.removeItem(TOURNAMENT_STATE_STORAGE_KEY);
+  }, [state?.final?.winnerId]);
+
   const persist = (next: TournamentState) => {
     setState(next);
     saveState(next);
   };
 
   const resetTournament = () => {
-    const create = safeParse<TournamentCreatePayload>(localStorage.getItem("tournament:create"));
+    const create = safeParse<TournamentCreatePayload>(localStorage.getItem(TOURNAMENT_CREATE_STORAGE_KEY));
     if (!create || create.players.length !== 4) return;
     const rebuilt = buildBracket(create.players, create.name);
     saveState(rebuilt);
@@ -626,8 +635,8 @@ export default function TournamentPage() {
   };
 
   const clearAndBack = () => {
-    localStorage.removeItem("tournament:create");
-    localStorage.removeItem("tournament:state");
+    localStorage.removeItem(TOURNAMENT_CREATE_STORAGE_KEY);
+    localStorage.removeItem(TOURNAMENT_STATE_STORAGE_KEY);
     router.push("/game");
   };
 

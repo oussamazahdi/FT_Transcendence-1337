@@ -2,12 +2,13 @@
 
 import { GAME_MODE, GAME_WIDTH, GAME_HEIGHT } from "@/components/ui/GameMode";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useSocket } from "@/contexts/socketContext";
+import { useMatch, useSocket } from "@/contexts/socketContext";
 import { useAuth } from "@/contexts/authContext";
 import type { User } from "@/types/index";
 import { GameResult } from "./components/GameResult";
 import { ScoreBoard } from "./components/PlayerCard";
 import { drawFrame, preloadBackground } from "./lib/utils";
+import { useParams } from "next/navigation";
 
 type GameMode = (typeof GAME_MODE)[keyof typeof GAME_MODE];
 
@@ -64,6 +65,8 @@ function isGameModeKey(v: unknown): v is keyof typeof GAME_MODE {
 
 export default function GamePage() {
   const socket = useSocket() as GameSocket | null;
+  const { activeMatch } = useMatch();
+  const params = useParams<{ roomId?: string | string[] }>();
 
   const { user, gameSetting } = useAuth() as {
     user: User | null;
@@ -80,6 +83,13 @@ export default function GamePage() {
   const [game, setGame] = useState<GameState | null>(null);
   const [scale, setScale] = useState(1);
   const [endGame, setEndGame] = useState(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
+
+  const currentRoomId = useMemo(() => {
+    const raw = params?.roomId;
+    if (Array.isArray(raw)) return raw[0] ?? "";
+    return raw ?? "";
+  }, [params]);
 
   const defaultGameMode = useMemo(() => {
     const firstKey = Object.keys(GAME_MODE)[0] as keyof typeof GAME_MODE | undefined;
@@ -210,6 +220,34 @@ export default function GamePage() {
   }, [game]);
 
   useEffect(() => {
+    const activeRoomId = activeMatch?.roomId == null ? "" : String(activeMatch.roomId);
+    if (!activeRoomId || activeRoomId !== currentRoomId || !activeMatch?.ts) {
+      setCountdown(null);
+      return;
+    }
+
+    const durationMs = 3000;
+    const updateCountdown = () => {
+      const elapsed = Date.now() - activeMatch.ts;
+      const remaining = durationMs - elapsed;
+      if (remaining <= 0) {
+        setCountdown(null);
+        return false;
+      }
+      setCountdown(Math.ceil(remaining / 1000));
+      return true;
+    };
+
+    if (!updateCountdown()) return;
+
+    const timer = window.setInterval(() => {
+      if (!updateCountdown()) window.clearInterval(timer);
+    }, 100);
+
+    return () => window.clearInterval(timer);
+  }, [activeMatch, currentRoomId]);
+
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -237,6 +275,15 @@ export default function GamePage() {
 
       <div ref={wrapperRef} className="w-full max-w-5xl flex justify-center relative" style={{ height: GAME_HEIGHT * scale }}>
         <canvas ref={canvasRef} style={{ width: GAME_WIDTH * scale, height: GAME_HEIGHT * scale }} className="rounded-2xl border border-white/60"/>
+        {countdown ? (
+          <div
+            className="absolute top-0 left-0 rounded-2xl bg-black/55 flex flex-col items-center justify-center text-white"
+            style={{ width: GAME_WIDTH * scale, height: GAME_HEIGHT * scale }}
+          >
+            <p className="text-xs md:text-sm font-bold uppercase tracking-[0.3em] mb-4">Match Starts In</p>
+            <p className="text-6xl md:text-8xl font-black leading-none">{countdown}</p>
+          </div>
+        ) : null}
         {endGame && game && (<GameResult game={game} width={GAME_WIDTH * scale} height={GAME_HEIGHT * scale}/>)}
       </div>
 

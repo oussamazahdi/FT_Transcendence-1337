@@ -10,6 +10,8 @@ import { LocalGameResult } from "./LocalGameResult";
 
 
 const TOURNAMENT_PAGE_ROUTE = "/game/tournament";
+const LOCAL_GAME_STORAGE_KEY = "GameData";
+const TOURNAMENT_STATE_STORAGE_KEY = "tournament:state";
 
 type GameMode = (typeof GAME_MODE)[keyof typeof GAME_MODE] | null;
 
@@ -117,7 +119,7 @@ function safeParse<T>(value: string | null): T | null {
 
 function readLocalGameData(): LocalGameData | null {
   if (typeof window === "undefined") return null;
-  return safeParse<LocalGameData>(localStorage.getItem("GameData"));
+  return safeParse<LocalGameData>(localStorage.getItem(LOCAL_GAME_STORAGE_KEY));
 }
 
 type TournamentPlayer = {
@@ -153,7 +155,7 @@ type TournamentState = {
 };
 
 function saveTournamentState(state: TournamentState) {
-  localStorage.setItem("tournament:state", JSON.stringify(state));
+  localStorage.setItem(TOURNAMENT_STATE_STORAGE_KEY, JSON.stringify(state));
 }
 
 function findTournamentMatch(state: TournamentState, matchId: string): TournamentMatch | null {
@@ -601,7 +603,7 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
 
     storedResultRef.current = true;
 
-    const existing = safeParse<TournamentState>(localStorage.getItem("tournament:state"));
+    const existing = safeParse<TournamentState>(localStorage.getItem(TOURNAMENT_STATE_STORAGE_KEY));
     if (existing) {
       const next = setMatchResult(existing, matchId, score1, score2);
       saveTournamentState(next);
@@ -613,6 +615,12 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
 
     return () => window.clearTimeout(t);
   }, [gameOver, urlMode, matchId, score1, score2, router]);
+
+  useEffect(() => {
+    if (!gameOver) return;
+    if (urlMode === "tournament") return;
+    localStorage.removeItem(LOCAL_GAME_STORAGE_KEY);
+  }, [gameOver, urlMode]);
 
   return (
     <div className="relative inset-x-0 flex flex-col items-center text-white space-y-6">

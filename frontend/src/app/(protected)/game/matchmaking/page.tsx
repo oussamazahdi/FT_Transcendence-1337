@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/authContext";
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { DoorOpen, RotateCcw } from "lucide-react";
-import { useSocket } from "@/contexts/socketContext.tsx";
+import { useMatch, useSocket } from "@/contexts/socketContext.tsx";
 import { PlayerCard } from "./PlayerCard";
 import type { User } from "@/types/index";
 
@@ -74,6 +74,7 @@ const DEFAULT_AVATAR = "/game/gameAvatars/Empty.jpeg";
 export default function Matchmaking() {
   const { user } = useAuth() as { user: User | null };
   const socket = useSocket() as MatchSocket | null;
+  const { setActiveMatch } = useMatch();
   const router = useRouter();
 
   const emptyPlayer = useMemo(() => makeEmptyPlayer(), []);
@@ -164,6 +165,11 @@ export default function Matchmaking() {
     };
 
     const handleMatchStarted = (roomId: string | number) => {
+      setActiveMatch({
+        roomId,
+        payload: { roomId },
+        ts: Date.now(),
+      });
       navigatedRef.current = true;
       router.push(`/game/${roomId}`);
       router.refresh();
@@ -184,7 +190,7 @@ export default function Matchmaking() {
       socket.off("match-canceled", handleMatchCanceled);
       socket.off("match-started", handleMatchStarted);
     };
-  }, [user, socket, router, joinGame, emptyPlayer]);
+  }, [user, socket, router, joinGame, emptyPlayer, setActiveMatch]);
 
   return (
     <div className="w-full max-w-3xl rounded-3xl bg-[#0F0F0F]/65 p-6 sm:p-10 flex flex-col items-center gap-6 mx-8 my-2">
