@@ -14,7 +14,7 @@ interface SearchUserCardProps extends SearchUser {
 const SearchUserCard = (props: SearchUserCardProps) => {
   const { user } = useAuth();
   const selectHandler = () => {
-    props.setIsOpen(false); // no need
+    props.setIsOpen(false);
     props.setSearchQuery("");
   };
   return (

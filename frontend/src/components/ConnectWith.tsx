@@ -1,5 +1,5 @@
 import React from "react";
-import { assets } from "@/assets/data.js";
+import { assets } from "@/assets/data";
 import Image from "next/image";
 
 const ConnectWith = () => {

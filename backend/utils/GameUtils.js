@@ -1,9 +1,5 @@
 import { activeGames, loops, socketToUserId, userIdToSocket, waitingPlayer } from "../store/memory.store.js";
-import { GAME_WIDTH, FPS } from "../constants/game.constants.js";
-// import { updateGame } from "../services/GameLoop.service.js";
-import { GameSession, Paddle } from "../store/game.store.js";
-import { randomUUID } from "crypto";
-
+import { FPS } from "../constants/game.constants.js";
 import { GameLoop } from "../services/GameLoop.service.js";
 
 class gameUtils{
@@ -48,11 +44,12 @@ class gameUtils{
 	}
 
 	isValidDirection(direction) {
-		return direction === "up" || direction === "down";
+		return direction === "up" || direction === "down" || direction === "stop";
 	}
 
 	isValidPlayerData(data) {
 		return ( data && typeof data === "object" &&
+			typeof data?.id === "number" &&
 			typeof data?.username === "string" &&
 			data?.username.length > 0 &&
 			typeof data?.firstName === "string" &&

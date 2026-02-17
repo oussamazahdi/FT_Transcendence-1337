@@ -1,15 +1,36 @@
 import { activeGames } from "../store/memory.store.js"
-import { GAME_HEIGHT, GAME_WIDTH, WIN_SCORE } from "../constants/game.constants.js"
+import {
+	GAME_HEIGHT,
+	GAME_WIDTH,
+	PADDLE_SIZE,
+	PADDLE_SPEED,
+	WIN_SCORE,
+	BALL_BASE_SPEED,
+	BALL_HIT_SPEED_INCREMENT,
+} from "../constants/game.constants.js"
 import { GameUtils } from "../utils/GameUtils.js";
 import { MatchController } from "../controllers/game.controller.js";
 
 class gameLoop{
+	updatePaddles(game, deltaSec) {
+		const move = (player) => {
+			if (!player?.player) return;
+			const direction = Number(player.moveDirection) || 0;
+			if (direction === 0) return;
+
+			const nextY = player.player.y + direction * PADDLE_SPEED * deltaSec;
+			player.player.y = Math.max(0, Math.min(GAME_HEIGHT - PADDLE_SIZE, nextY));
+		};
+
+		move(game.player1);
+		move(game.player2);
+	}
 
 	resetBall(ball) {
 		ball.x = GAME_WIDTH / 2;
 		ball.y = GAME_HEIGHT / 2;
 		ball.velocityX *= -1;
-		ball.speed = 2.5;
+		ball.speed = BALL_BASE_SPEED;
 	}
 
 	handlePaddleCollision(ball, paddle, isLeft) {
@@ -19,7 +40,7 @@ class gameLoop{
 	
 		if (!hit) return;
 	
-		ball.speed += 0.3;
+		ball.speed += BALL_HIT_SPEED_INCREMENT;
 		ball.velocityX = isLeft ? Math.abs(ball.velocityX) : -Math.abs(ball.velocityX);
 	
 		ball.velocityY = ((ball.y - paddle.y) / paddle.height - 0.5) * 2;
@@ -50,7 +71,6 @@ class gameLoop{
 
 	checkScore = (game, io, roomId) => {
 		if (game.player1.score < 0 || game.player2.score < 0) {
-			console.error(`Invalid scores detected: ${game.player1.score} - ${game.player2.score}`);
 			game.player1.score = 0;
 			game.player2.score = 0;
 		}
@@ -89,7 +109,13 @@ class gameLoop{
 	updateGame(io, roomId) {
 		const game = activeGames.get(roomId);
 		if (!game || game.state !== "PLAYING") return;
+
+		const now = Date.now();
+		const previous = game.lastUpdateAt || now;
+		const deltaSec = Math.min(Math.max((now - previous) / 1000, 0), 0.05);
+		game.lastUpdateAt = now;
 	
+		this.updatePaddles(game, deltaSec);
 		this.updateBall(game);
 		this.checkScore(game, io, roomId);
 	

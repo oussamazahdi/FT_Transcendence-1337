@@ -11,6 +11,7 @@ import {
   UsersIcon,
 } from "@heroicons/react/24/outline";
 import type { User } from "@/types";
+import { autofetch } from "@/lib/api";
 
 interface ProfileDropDownProps {
   user: User | null;
@@ -23,17 +24,16 @@ const ProfileDropDown = ({ user }: ProfileDropDownProps) => {
 
   const handleSignOut = async () => {
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`,
-        {
+      const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`,{
           method: "POST",
           credentials: "include",
         },
       );
-      if (response.ok) 
-        router.push("/");
+      if (!response.ok) 
+        throw new Error("fail to logout")
+      router.push("/");
     } catch (error:any) {
-      console.log(error.error);
+      router.refresh();
     }
   };
 

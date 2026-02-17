@@ -1,6 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import { Poppins } from "next/font/google";
-import Background from "../components/Background"; // Adjusted path
+import Background from "../components/Background";
 import { UserProvider } from "@/contexts/authContext.tsx";
 import { getCurrentUser } from "@/lib/auth";
 

@@ -8,6 +8,7 @@ import { UserIcon } from "@heroicons/react/24/outline";
 import { Gamepad2 } from "lucide-react";
 import { assets } from "@/assets/data";
 import { useSocket, GameInvitePayload, InviteResponse } from "@/contexts/socketContext";
+import { useAuth } from "@/contexts/authContext";
 
 type FriendStatus = "Online" | "Offline";
 
@@ -35,6 +36,7 @@ function normalizeStatus(raw: FriendCardUser["status"]): FriendStatus {
 
 const FriendCard = ({ user }: FriendCardProps) => {
   const socket = useSocket();
+  const { triggerError } = useAuth();
 
   const status = normalizeStatus(user.status);
 
@@ -48,14 +50,14 @@ const FriendCard = ({ user }: FriendCardProps) => {
     };
 
     socket.emit("game:invite", payload, (res: InviteResponse): void => {
-      if (!res.ok) console.error("Invite failed:", res.message);
-      // else console.log("✅ Invite sent:", res.notification);
+      if (!res.ok) 
+        triggerError("An unexpected error occurred. Please try again.")
     });
   };
 
   return (
     <div className="flex items-center w-full bg-[#414141]/60 rounded-lg p-1 gap-1">
-      <div className="relative size-10 flex items-center overflow-hidden rounded-sm">
+      <div className="relative w-10 h-10 overflow-hidden rounded-sm shrink-0">
         <Image
           src={user?.avatar ?? assets.defaultProfile}
           alt="icon"
@@ -64,9 +66,8 @@ const FriendCard = ({ user }: FriendCardProps) => {
           className="object-cover"
         />
       </div>
-
       <div className="flex-1 min-w-0 flex flex-col justify-center">
-        <p className="text-xs font-bold truncate">
+        <p className="text-xs font-bold truncate w-full">
           {user.firstname} {user.lastname}
         </p>
 

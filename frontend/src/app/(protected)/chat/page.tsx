@@ -9,7 +9,7 @@ import { useSocket } from "@/contexts/socketContext";
 import type { Conversation, ChatMessage } from "@/types";
 
 export default function Chat() {
-  const { friends } = useAuth();
+  const { friends, triggerError } = useAuth();
   const socket = useSocket();
   const [selectedFriend, setSelectedFriend] = useState<SelectedFriend | null>(null);
   const [displayData, setDisplayData] = useState<Conversation[]>([]);
@@ -19,9 +19,11 @@ export default function Chat() {
   const id = searchParams.get("id");
 
   useEffect(() => {
-    if (!id) return;
+    if (!id) 
+      return;
     const index = friends.findIndex((u: SelectedFriend) => String(u.id) === id);
-    if (index !== -1) setSelectedFriend(friends[index]);
+    if (index !== -1) 
+      setSelectedFriend(friends[index]);
   }, [id, friends]);
 
   useEffect(() => {
@@ -35,7 +37,6 @@ export default function Chat() {
 
         const data = await response.json();
         if (!response.ok) throw new Error(data.error);
-        console.log("hhhhhhhhh",data.conversations);
 
         const formatedData: Conversation[] = (data.conversations || []).map((conversation: any) => ({
           id: conversation.userid,
@@ -50,14 +51,14 @@ export default function Chat() {
 
         setDisplayData(formatedData);
       } catch (err) {
-        console.log("Failed to fetch conversations", err);
+        triggerError("An unexpected error occurred. Please try again.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchConversation();
-  }, []);
+  }, [triggerError]);
 
   const updateLastMessage = (lastmessage: string, time: string, friend: SelectedFriend) => {
     setDisplayData((prev) => {
@@ -103,6 +104,7 @@ export default function Chat() {
           receiverId: payload.receiverId,
           avatar: payload.avatar,
           type: payload.type,
+          status: payload.status,
           text: payload.content,
           timestamp: payload.sentAt,
           isMe: false,

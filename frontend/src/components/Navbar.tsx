@@ -18,6 +18,7 @@ import {
 import UserDropdown from "./UserDropdown";
 import { useAuth } from "@/contexts/authContext";
 import Search from "./Search";
+import NotificationDropDown from "./NotificationDropDown";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -31,7 +32,6 @@ export default function Navbar() {
     { href: "/leaderboard", label: "Leaderboard", icon: ChartBarIcon },
   ];
 
-  // ✅ Hard reload navigation
   const hardNavigate = (href: string) => {
     if (pathname !== href) {
       window.location.href = href;
@@ -42,7 +42,6 @@ export default function Navbar() {
     <header className="relative pt-4 mx-4 md:mx-10">
       <div className="flex items-center justify-between ">
 
-        {/* Logo */}
         <button onClick={() => hardNavigate("/dashboard")}>
           <Image
             src="/logo.png"
@@ -53,7 +52,6 @@ export default function Navbar() {
           />
         </button>
 
-        {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-3">
           {navItems.map((item) => {
             const isActive = pathname.startsWith(item.href);
@@ -63,39 +61,38 @@ export default function Navbar() {
                 onClick={() => hardNavigate(item.href)}
                 className={`px-4 py-2 rounded-full border border-[#BEBEBE] text-sm
                   hover:bg-black/40 hover:text-white
-                  ${isActive ? "bg-black/40 shadow-2xl backdrop-blur-xl ring-1 ring-white/15 text-white" : "text-[#BEBEBE]"}`}
-                  // ${isActive ? "bg-black/60 text-white" : "text-[#BEBEBE]"}`}
-									//bg-white/10 p-6 shadow-2xl backdrop-blur-xl ring-1 ring-white/15
-              >
+                  ${isActive ? "bg-black/40 shadow-2xl backdrop-blur-xl ring-1 ring-white/15 text-white" : "text-[#BEBEBE]"}`}>
                 {item.label}
               </button>
             );
           })}
         </nav>
 
-        {/* Desktop Search */}
         <Search />
 
-        {/* Desktop User */}
         <div className="hidden md:block">
           <UserDropdown />
         </div>
 
-        {/* Mobile Burger */}
-        <button
-          onClick={() => setOpen(true)}
-          className="md:hidden p-2 rounded-full hover:bg-black/20"
-        >
-          <Bars3Icon className="w-8 h-8 text-white" />
-        </button>
+        <div className="md:hidden flex items-center gap-2">
+          <NotificationDropDown
+            containerClassName="relative md:hidden"
+            buttonClassName="border border-[#9D9D9D]/40 rounded-[10px] p-2.5 hover:bg-[#000000]/40 cursor-pointer hover:scale-105 active:scale-95 transition relative"
+            panelClassName="absolute right-0 top-full mt-2 max-h-64 w-64 bg-[#0F0F0F]/95 rounded-[10px] flex flex-col gap-1 p-2 overflow-y-auto z-50 custom-scrollbar"
+          />
+          <button
+            onClick={() => setOpen(true)}
+            className="p-2 rounded-full hover:bg-black/20"
+          >
+            <Bars3Icon className="w-8 h-8 text-white" />
+          </button>
+        </div>
       </div>
 
-      {/* Mobile Menu */}
       {open && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm">
           <div className="absolute top-0 right-0 w-72 h-full bg-[#0f0f0f] p-6 flex flex-col">
 
-            {/* Close */}
             <button
               onClick={() => setOpen(false)}
               className="self-end mb-6"
@@ -103,7 +100,6 @@ export default function Navbar() {
               <XMarkIcon className="w-7 h-7 text-white" />
             </button>
 
-            {/* Nav Links */}
             <div className="flex flex-col gap-4">
               {navItems.map((item) => (
                 <button
@@ -119,7 +115,6 @@ export default function Navbar() {
 
             <hr className="my-6 border-white/10" />
 
-            {/* User Actions (NO IMAGE) */}
             <div className="flex flex-col gap-4 mt-auto">
               <button
                 onClick={() => hardNavigate("/profile")}

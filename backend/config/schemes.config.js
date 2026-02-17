@@ -203,6 +203,7 @@ export const messageSchema = {
         message_id: { type: 'integer' },
         sender_id: { type: 'integer' },
         type: {type: 'string'},
+        status: {type: 'string'},
         avatar: { type: ['string', 'null'] },
         content: { type: 'string' },
         creationdate: { type: 'string' }

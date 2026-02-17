@@ -49,34 +49,36 @@ const MatchHistory = ({ classname, id }:any) => {
         key={match.id}
         className={`flex justify-between items-center w-full h-16 ${iWon ? " bg-[#42A78A]/30" : "bg-[#B23B3B]/30 "} rounded-lg p-1 `}
       >
-        <div className="flex items-center flex-1 gap-2 min-w-0 justify-start">
-          <Image
-            src={match.player1_avatar || assets.defaultProfile}
-            alt="avatar"
-            width={54}
-            height={54}
-            className="rounded-md shrink-0"
-          />
-          <p className="text-xs font-bold truncate">{match.player1_username}</p>
-        </div>
+        <div className="w-full flex items-center flex-1 gap-2 min-w-0 justify-start">
+          <div className="relative overflow-hidden w-14 h-14 rounded-sm shrink-0">
+              <Image
+                src={match.player1_avatar || assets.defaultProfile}
+                alt="avatar"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <p className="text-xs font-bold truncate w-full">{match.player1_username}</p>
+          </div>
         <div className="flex flex-col justify-center items-center w-20 shrink-0">
           <p className="text-sm font-bold">{iWon ? "Win" : "Lose"}</p>
           <p className="text-sm font-bold whitespace-nowrap">
             {match.player1_score} - {match.player2_score}
           </p>
-          <p className="text-[10px] text-gray-400 whitespace-nowra">
+          <p className="text-[10px] text-gray-400">
             {parseTime(match.created_at)}
           </p>
         </div>
-        <div className="flex items-center justify-end flex-1 gap-2 min-w-0">
-          <p className="text-xs font-bold truncate">{match.player2_username}</p>
-          <Image
-            src={match.player2_avatar || assets.defaultProfile}
-            alt="avatar"
-            width={54}
-            height={54}
-            className="rounded-md shrink-0"
-          />
+        <div className="w-full flex items-center justify-end flex-1 gap-2 min-w-0">
+          <p className="text-xs text-right font-bold truncate w-full">{match.player2_username}</p>
+          <div className="relative overflow-hidden w-14 h-14 rounded-sm shrink-0">
+            <Image
+              src={match.player2_avatar || assets.defaultProfile}
+              alt="avatar"
+              fill
+              className="object-cover"
+              />
+          </div>
         </div>
       </div>)
 });

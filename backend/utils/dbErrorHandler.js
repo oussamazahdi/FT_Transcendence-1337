@@ -1,5 +1,4 @@
 export function handleDatabaseError(error, context = '') {
-		console.error(`[DB ERROR in ${context}]:`, error.message);
 
     if (error.message.includes('UNIQUE constraint failed'))
     {
@@ -9,7 +8,6 @@ export function handleDatabaseError(error, context = '') {
         if (error.message.includes('users.username'))
             return { code: 409, message: 'USERNAME_ALREADY_TAKEN' };
 
-        // ✅ (optional but useful) friendships duplicate mapping
         if (error.message.includes('friendships.requester_id') || error.message.includes('friendships.addressee_id'))
             return { code: 409, message: 'FRIENDSHIP_ALREADY_EXISTS' };
 
@@ -38,7 +36,6 @@ export function handleDatabaseError(error, context = '') {
 
     if (error.message.includes('no such table') || error.message.includes('no such column')) 
     {
-        console.error('CRITICAL: Database schema error!');
         return { code: 500, message: 'INTERNAL_SERVER_ERROR' };
     }
 

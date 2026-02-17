@@ -1,10 +1,10 @@
 import { randomUUID } from "crypto";
-import { GAME_WIDTH, GAME_HEIGHT } from "../constants/game.constants.js"
+import { GAME_WIDTH, GAME_HEIGHT, BALL_BASE_SPEED } from "../constants/game.constants.js"
 
 export class Ball {
   constructor() {
     const angle = Math.random() * Math.PI / 2 - Math.PI / 4;
-    const speed = 2.5;
+    const speed = BALL_BASE_SPEED;
 
     this.x = GAME_WIDTH / 2;
     this.y = GAME_HEIGHT / 2;
@@ -35,13 +35,14 @@ export class Player {
     this.score = 0;
     this.roomId = "";
     this.player = null;
+    this.moveDirection = 0;
     this.ready = false;
   }
 }
 
 export class GameSession {
   constructor() {
-    this.state = "WAITING"; // WAITING | PLAYING | FINISHED
+    this.state = "WAITING";
     this.gameType = "PingPong";
     this.roomId = randomUUID();
     this.startPlayingAt = 0;
@@ -49,5 +50,6 @@ export class GameSession {
     this.player1 = new Player();
     this.player2 = new Player();
     this.ball = new Ball();
+    this.lastUpdateAt = Date.now();
   }
 }

@@ -4,12 +4,12 @@ import ChatHeader from "./ChatHeader";
 import ChatInput from "./ChatInput";
 import MessageList from "./MessageList";
 import { useAuth } from "@/contexts/authContext";
-import { autofetch } from "@/lib/api.tsx";
 import type { SelectedFriend } from "@/contexts/userContexts";
 import { CHAT_ERROR } from "@/lib/utils";
-import { ChatMessage } from "@/types";
+import { ChatMessage} from "@/types";
 import { useSocket, InviteResponse } from "@/contexts/socketContext";
 import { safeUUID } from "../../profile/components/FriendCard";
+import { autofetch } from "@/lib/api";
 
 interface ChatWindowProps {
   selectedFriend: SelectedFriend;
@@ -59,13 +59,12 @@ export default function ChatWindow({selectedFriend, updateLastMessage, liveMessa
         const newMessages = data.messages || [];
         if (newMessages.length < 30) 
           setHasMore(false);
-
-        console.log(newMessages);
         const formatedData: ChatMessage[] = newMessages.map((message: any) => ({
           id: message.message_id,
           senderId: message.sender_id,
           avatar: message.avatar,
           type: message.type,
+          status: message.status,
           text: message.content,
           timestamp: message.creationdate,
           isMe: String(user?.id) === String(message.sender_id),
@@ -80,14 +79,12 @@ export default function ChatWindow({selectedFriend, updateLastMessage, liveMessa
           return [...prev, ...unique];
         });
       } catch (err) {
-        console.log("Failed to fetch messages", err);
         setHasMore(false);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchMessages();
+      fetchMessages();
   }, [page, Friend.id, hasMore, user?.id]);
 
   useEffect(() => {
@@ -108,7 +105,6 @@ export default function ChatWindow({selectedFriend, updateLastMessage, liveMessa
       return;
 
     const onError = (err: any) => {
-			console.log(err);
       const message = typeof err === "string" ? err : err?.message;
       const now = new Date();
 
@@ -128,7 +124,17 @@ export default function ChatWindow({selectedFriend, updateLastMessage, liveMessa
     };
   }, [socket, triggerError, updateLastMessage]);
 
+  //handle game invite
 	const handleGameInvite = (status:string, id: string | number) => {
+    if (!socket)
+      return
+    const updateMessageStatus = (newStatus: "accepted" | "rejected") => {
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === id ? { ...msg, status: newStatus } : msg
+        )
+      );
+    };
 		if (status === "accept"){
 			const tmp = {
 				msgId: id,
@@ -137,24 +143,22 @@ export default function ChatWindow({selectedFriend, updateLastMessage, liveMessa
 				room_id: safeUUID(),
 				type: "game_invite"
 				}
-			if (!socket)
-				return
 			socket.emit("chat:game:accept", tmp, (res: InviteResponse): void => {
-				if (!res.ok) console.error("Invite failed:", res?.message);
+				if (!res.ok) triggerError("somthing wrong with the game invite, please send another one.");
+        else updateMessageStatus("accepted")
 			});
 		}else{
 			const tmp = {
 				msgId: id,
 				type: "game_invite"
 			}
-			if (!socket)
-				return
 			socket.emit("chat:game:reject", tmp, (res: InviteResponse): void => {
-				if (!res.ok) console.error("Invite failed:", res.message);
+				if (!res.ok) triggerError("somthing wrong with the game invite, please send another one.");
+        else updateMessageStatus("rejected");
 			});
 		}
 	}
-
+//handel send message
   const handleSend = (content: string, type: string) => {
     const now = new Date();
 
@@ -169,6 +173,7 @@ export default function ChatWindow({selectedFriend, updateLastMessage, liveMessa
       receiverId: selectedFriend.id,
       avatar: user?.avatar || null,
       type: type,
+      status: "",
       text: content,
       timestamp: now.toISOString(),
       isMe: true,

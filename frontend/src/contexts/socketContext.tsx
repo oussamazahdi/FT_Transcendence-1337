@@ -9,6 +9,7 @@ import {
   type Dispatch,
   type ReactNode,
   type SetStateAction,
+	useRef,
 } from "react";
 import { useRouter } from "next/navigation";
 import { io, type Socket } from "socket.io-client";
@@ -110,70 +111,70 @@ export function SocketProvider({ children }: SocketProviderProps) {
   const [activeMatch, setActiveMatch] = useState<ActiveMatch | null>(null);
 
   const [onlineIds, setOnlineIds] = useState<string[]>([]);
-  
-  useEffect(() => {
-    if (!user) {
-      if (socket) socket.disconnect();
-      setSocket(null);
-      setNotifications([]);
-      setActiveMatch(null);
-      setOnlineIds([]);
-      return;
-    }
+	const socketRef = useRef<SocketType | null>(null);
 
-    const socketHolder: SocketType = io(process.env.NEXT_PUBLIC_API_URL, {
-      withCredentials: true,
-      transports: ["websocket"],
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
+useEffect(() => {
+  if (!user) {
+    socketRef.current?.disconnect();
+    socketRef.current = null;
+
+    setSocket(null);
+    setNotifications([]);
+    setActiveMatch(null);
+    setOnlineIds([]);
+    return;
+  }
+  if (socketRef.current) return;
+	const socketHolder: SocketType = io(process.env.NEXT_PUBLIC_API_URL!, {
+    withCredentials: true,
+    transports: ["websocket"],
+    reconnection: true,
+    reconnectionAttempts: 5,
+    reconnectionDelay: 1000,
+  });
+
+  socketRef.current = socketHolder;
+  setSocket(socketHolder);
+
+  const handleMatchStarted = (data: MatchStartedPayload | MatchRoomId) => {
+    const roomId =
+      typeof data === "string" || typeof data === "number" ? data : data?.roomId;
+
+    if (!roomId) return;
+
+    setActiveMatch({
+      roomId,
+      payload: typeof data === "object" ? data : null,
+      ts: Date.now(),
     });
 
-    const handleMatchStarted = (data: MatchStartedPayload | MatchRoomId) => {
-			console.log("+++++> data:", data);
-      const roomId = typeof data === "string" || typeof data === "number" ? data : data?.roomId;
-      if (!roomId) return;
+    router.push(`/game/${roomId}`);
+  };
 
-      setActiveMatch({
-        roomId,
-        payload: typeof data === "object" ? data : null,
-        ts: Date.now(),
-      });
+  const onUsersStatus = (data: OnlineStatusPayload) => {
+    if (Array.isArray(data)) {
+      setOnlineIds(
+        data
+          .filter((id): id is string | number => typeof id === "string" || typeof id === "number")
+          .map(String)
+      );
+    } else {
+      setOnlineIds([]);
+    }
+  };
 
+  socketHolder.on("match-started:accept", handleMatchStarted);
+  socketHolder.on("users:status", onUsersStatus);
 
-      router.push(`/game/pingPong/${roomId}`);
-    };
-    
-    // function onNewNotification(notif){
-    //   console.log("**** notif:", notif);
-    //   setNotifications((prev)=> [notif, ...prev])
-    // }
+  return () => {
+    socketHolder.off("match-started:accept", handleMatchStarted);
+    socketHolder.off("users:status", onUsersStatus);
+    socketHolder.disconnect();
+    socketRef.current = null;
+    setSocket(null);
+  };
+}, [user, router]);
 
-    // socketHolder.on("notification:new", onNewNotification);
-    socketHolder.on("match-started:accept", handleMatchStarted);
-
-    //handle OnlineStatus
-    const onUsersStatus = (data: OnlineStatusPayload) => {
-      if (Array.isArray(data)) {
-        const ids = data
-          .filter((id) => typeof id === "string" || typeof id === "number")
-          .map((id) => String(id));
-        setOnlineIds(ids);
-      } else {
-        setOnlineIds([]);
-      }
-    };
-    socketHolder.on("users:status", onUsersStatus);
-    setSocket(socketHolder);
-    return () => {
-      // socketHolder.off("notification:new", onNewNotification);
-      socketHolder.off("match-started:accept", handleMatchStarted);
-      socketHolder.off("users:status", onUsersStatus);
-      socketHolder.disconnect();
-      setSocket(null);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
 
   const notifValue = useMemo(
     () => ({ notifications, setNotifications }),

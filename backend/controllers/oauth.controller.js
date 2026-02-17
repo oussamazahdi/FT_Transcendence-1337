@@ -13,7 +13,6 @@ export class OAuthController
             hasAvatar: true
         }
         const goTo = `${process.env.FRONTEND_URL}/dashboard`;
-        console.log(goTo);
         try {
             const { token } = await request.server.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(request);
             

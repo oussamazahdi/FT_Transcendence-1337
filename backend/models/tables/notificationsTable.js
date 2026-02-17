@@ -22,7 +22,8 @@ export function createNotificationsTable(db) {
       );
     `);
   } catch (error) {
-    console.error("Database cannot be inited due to : " + error.message);
+    const dbError = handleDatabaseError(error, 'createNotificationsTable');
+    console.error(dbError);
     process.exit(1);
   }
 }

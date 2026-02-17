@@ -1,5 +1,6 @@
 import { MatchHistory } from "../models/matchHistory.model.js";
 import { GameSetting } from "../models/gameSetting.model.js";
+import { activeGames } from "../store/memory.store.js";
 
 
 export function httpError(code, message) {
@@ -142,6 +143,25 @@ class matchController {
 			const status = err?.code && Number.isInteger(err.code) ? err.code : 500;
 			return res.code(status).send({message: err?.message || "INTERNAL_SERVER_ERROR",});
 		}
+	}
+
+	protectRouter = async (req, res) =>{
+		const roomId = req.params.roomId;
+		const authUserId = Number(req.user?.userId);
+
+		if(!roomId) return res.code(404).send({error: "INVALID_ROOM_ID"});
+		if (!Number.isInteger(authUserId) || authUserId <= 0)
+			return res.code(401).send({ error: "UNAUTHORIZED" });
+
+		const game = activeGames.get(roomId);
+		if(!game) return res.code(404).send({error: "GAME_NOT_FOUND"});
+
+		const player1Id = Number(game?.player1?.id);
+		const player2Id = Number(game?.player2?.id);
+		if (authUserId !== player1Id && authUserId !== player2Id)
+			return res.code(403).send({ error: "FORBIDDEN_ROOM_ACCESS" });
+
+		return res.code(200).send({Game: game});
 	}
 	
 }

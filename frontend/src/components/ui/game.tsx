@@ -6,13 +6,13 @@ import NextImage from "next/image";
 import { GAME_MODE, GAME_WIDTH, GAME_HEIGHT } from "@/components/ui/GameMode";
 import { useAuth } from "@/contexts/authContext";
 import { GameUtiles } from "./utils";
+import { LocalGameResult } from "./LocalGameResult";
 
-/**
- * Tournament redirect route
- */
-const TOURNAMENT_PAGE_ROUTE = "/game/pingPong/tournament";
 
-// ---------------- Types ----------------
+const TOURNAMENT_PAGE_ROUTE = "/game/tournament";
+const LOCAL_GAME_STORAGE_KEY = "GameData";
+const TOURNAMENT_STATE_STORAGE_KEY = "tournament:state";
+
 type GameMode = (typeof GAME_MODE)[keyof typeof GAME_MODE] | null;
 
 type PlayerInput = {
@@ -91,7 +91,6 @@ type GameUtilesType = {
 
 const GameUtilesTyped = GameUtiles as GameUtilesType;
 
-// ---------------- Local game (GameData) ----------------
 type LocalGameData = {
   player1NickName?: string;
   player1Avatar?: string;
@@ -103,7 +102,6 @@ type LocalGameData = {
   boardColor?: string;
 
   scoreLimit?: number;
-  ballSpeed?: number;
   paddleSize?: number;
 
   player1Score?: number;
@@ -121,10 +119,9 @@ function safeParse<T>(value: string | null): T | null {
 
 function readLocalGameData(): LocalGameData | null {
   if (typeof window === "undefined") return null;
-  return safeParse<LocalGameData>(localStorage.getItem("GameData"));
+  return safeParse<LocalGameData>(localStorage.getItem(LOCAL_GAME_STORAGE_KEY));
 }
 
-// ---------------- Tournament persistence types/helpers ----------------
 type TournamentPlayer = {
   id: string;
   username: string;
@@ -158,7 +155,7 @@ type TournamentState = {
 };
 
 function saveTournamentState(state: TournamentState) {
-  localStorage.setItem("tournament:state", JSON.stringify(state));
+  localStorage.setItem(TOURNAMENT_STATE_STORAGE_KEY, JSON.stringify(state));
 }
 
 function findTournamentMatch(state: TournamentState, matchId: string): TournamentMatch | null {
@@ -229,7 +226,6 @@ function setMatchResult(state: TournamentState, matchId: string, scoreA: number,
   return advanceLocks(next);
 }
 
-// ---------------- Background preload (module scope cache) ----------------
 let gameMapImg: HTMLImageElement | null = null;
 let bgReady = false;
 
@@ -256,7 +252,6 @@ function getBackgroundImage(): BackgroundImage {
   return { image: gameMapImg, ready: bgReady };
 }
 
-// ---------------- Helpers ----------------
 const DEFAULT_AVATAR = "/gameAvatars/Empty.jpeg";
 
 const toNumber = (v: unknown, fallback: number) => {
@@ -264,12 +259,26 @@ const toNumber = (v: unknown, fallback: number) => {
   return Number.isFinite(n) ? n : fallback;
 };
 
+const toConfiguredBallSpeed = (v: unknown, fallback: number) => {
+  const n = Math.round(toNumber(v, fallback));
+  return Math.min(3, Math.max(1, n));
+};
+
+const BALL_SPEED_SCALE = 2;
+
+const toRuntimeBallSpeed = (configuredBallSpeed: number) => configuredBallSpeed * BALL_SPEED_SCALE;
+
+const shortenName = (value: string, max = 12) => {
+  const text = value.trim();
+  if (text.length <= max) return text;
+  return `${text.slice(0, Math.max(1, max - 1))}…`;
+};
+
 type LocalOverrides = {
   paddleColor?: string;
   ballColor?: string;
   boardColor?: string;
   scoreLimit?: number;
-  ballSpeed?: number;
   paddleSize?: number;
 };
 
@@ -325,7 +334,8 @@ const initGameState = ({
   const paddleSize = toNumber(overrides?.paddleSize ?? gameSetting?.paddle_size, 1);
   const paddleHeight = 90 + 15 * paddleSize;
 
-  const ballSpeed = toNumber(overrides?.ballSpeed ?? gameSetting?.ball_speed, 3);
+  const configuredBallSpeed = toConfiguredBallSpeed(gameSetting?.ball_speed, 2);
+  const runtimeBallSpeed = toRuntimeBallSpeed(configuredBallSpeed);
 
   const scoreLimit =
     typeof scoreLimitOverride === "number" && Number.isFinite(scoreLimitOverride)
@@ -342,9 +352,9 @@ const initGameState = ({
     ball: {
       x: width / 2,
       y: height / 2,
-      velocityX: Math.cos(angle) * ballSpeed * direction,
-      velocityY: Math.sin(angle) * ballSpeed,
-      speed: ballSpeed > 2 ? 0.6 * ballSpeed : 0.5 * ballSpeed,
+      velocityX: Math.cos(angle) * direction,
+      velocityY: Math.sin(angle),
+      speed: runtimeBallSpeed,
       radius: 10,
     },
     player1: { x: 40, y: height / 2 - paddleHeight / 2, width: 15, height: paddleHeight },
@@ -360,8 +370,8 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const urlMode = searchParams.get("mode"); // "tournament" | null
-  const matchId = searchParams.get("matchId"); // string | null
+  const urlMode = searchParams.get("mode");
+  const matchId = searchParams.get("matchId");
 
   const scoreLimitOverride = useMemo(() => {
     const raw = searchParams.get("scoreLimit");
@@ -390,7 +400,6 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
     return null;
   }, [gameSetting?.game_mode]);
 
-  // preload background when mode image changes
   useEffect(() => {
     preloadBackground(mode?.image ?? null);
   }, [mode?.image]);
@@ -406,7 +415,6 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
   const animationRef = useRef<number | null>(null);
   const storedResultRef = useRef(false);
 
-  // -------- Local GameData (normal local mode) --------
   const [localPlayers, setLocalPlayers] = useState<{ p1: PlayerInput | null; p2: PlayerInput | null }>({
     p1: null,
     p2: null,
@@ -439,16 +447,14 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
       ballColor: data.ballColor,
       boardColor: data.boardColor,
       scoreLimit: typeof data.scoreLimit === "number" ? data.scoreLimit : undefined,
-      ballSpeed: typeof data.ballSpeed === "number" ? data.ballSpeed : undefined,
       paddleSize: typeof data.paddleSize === "number" ? data.paddleSize : undefined,
     });
   }, [urlMode]);
 
-  // -------- Tournament players (tournament mode only) --------
   function tournamentPlayerToInput(p: TournamentPlayer): PlayerInput {
     return {
       username: p.username,
-      nickName: p.displayName || p.username,
+      nickName: p.username || p.displayName,
       avatar: p.avatarUrl ?? undefined,
     };
   }
@@ -482,13 +488,11 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
     });
   }, [urlMode, matchId]);
 
-  // -------- Derived effective players (tournament > localStorage > props) --------
   const effectiveP1 = urlMode === "tournament" ? tournamentPlayers.p1 : localPlayers.p1 ?? player1;
   const effectiveP2 = urlMode === "tournament" ? tournamentPlayers.p2 : localPlayers.p2 ?? player2;
 
   const mergedScoreLimitOverride = localOverrides?.scoreLimit ?? scoreLimitOverride;
 
-  // -------- Game state + players config --------
   const gameStateRef = useRef<GameState>(
     initGameState({ gameSetting, mode, scoreLimitOverride: mergedScoreLimitOverride, overrides: localOverrides })
   );
@@ -505,7 +509,6 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
     });
   }, []);
 
-  // Reset everything when inputs / mode changes
   useEffect(() => {
     gameStateRef.current = initGameState({
       gameSetting,
@@ -538,7 +541,6 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
 		effectiveP2
   ]);
 
-  // Winner logic
   useEffect(() => {
     const limit = gameStateRef.current.scoreLimit;
     if (score1 >= limit) {
@@ -550,7 +552,6 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
     }
   }, [score1, score2, players]);
 
-  // Main game loop + keyboard
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -566,7 +567,7 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
 
-    const baseBallSpeed = toNumber(localOverrides?.ballSpeed ?? gameSetting?.ball_speed, 2);
+    const baseBallSpeed = toRuntimeBallSpeed(toConfiguredBallSpeed(gameSetting?.ball_speed, 2));
 
     const gameLoop = () => {
       const state = gameStateRef.current;
@@ -592,9 +593,8 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
       window.removeEventListener("keyup", onKeyUp);
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
-  }, [players, gameOver, togglePause, gameSetting?.ball_speed, localOverrides?.ballSpeed]);
+  }, [players, gameOver, togglePause, gameSetting?.ball_speed]);
 
-  // Store tournament result & redirect
   useEffect(() => {
     if (!gameOver) return;
     if (urlMode !== "tournament") return;
@@ -603,7 +603,7 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
 
     storedResultRef.current = true;
 
-    const existing = safeParse<TournamentState>(localStorage.getItem("tournament:state"));
+    const existing = safeParse<TournamentState>(localStorage.getItem(TOURNAMENT_STATE_STORAGE_KEY));
     if (existing) {
       const next = setMatchResult(existing, matchId, score1, score2);
       saveTournamentState(next);
@@ -616,6 +616,12 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
     return () => window.clearTimeout(t);
   }, [gameOver, urlMode, matchId, score1, score2, router]);
 
+  useEffect(() => {
+    if (!gameOver) return;
+    if (urlMode === "tournament") return;
+    localStorage.removeItem(LOCAL_GAME_STORAGE_KEY);
+  }, [gameOver, urlMode]);
+
   return (
     <div className="relative inset-x-0 flex flex-col items-center text-white space-y-6">
       <div className="flex flex-row items-center justify-between w-full lg:max-w-5xl px-5">
@@ -627,53 +633,48 @@ export default function PongGame({ player1, player2 }: PongGameProps) {
             height={80}
             className="w-20 h-20 rounded-lg object-cover"
           />
-          <h3 className="text-2xl font-semibold">{players.player1.nickName}</h3>
+          <h3 className="text-2xl font-semibold">{shortenName(players.player1.nickName)}</h3>
           <p className="text-xs text-[#858585]">w (up) / s (down)</p>
         </div>
 
         <div className="flex flex-col items-center">
           <p className="text-5xl font-bold">{`${score1} - ${score2}`}</p>
-
-          {gameOver ? (
-            <div className="mt-2 flex flex-col items-center gap-1">
-              <p className="text-sm text-[#BDBDBD]">{winner ? `${winner} wins` : "Game over"}</p>
-              {urlMode === "tournament" ? (
-                <p className="text-xs text-white/60">Returning to tournament in 3 seconds…</p>
-              ) : null}
-            </div>
-          ) : null}
         </div>
 
         <div className="flex gap-1 flex-col items-center">
-          <NextImage
-            src={players.player2.avatar}
-            alt="player 2 avatar"
-            width={80}
-            height={80}
-            className="w-20 h-20 rounded-lg object-cover"
-          />
-          <h3 className="text-2xl font-semibold">{players.player2.nickName}</h3>
+          <NextImage src={players.player2.avatar} alt="player 2 avatar" width={80} height={80}
+            className="w-20 h-20 rounded-lg object-cover"/>
+          <h3 className="text-2xl font-semibold">{shortenName(players.player2.nickName)}</h3>
           <p className="text-xs text-[#858585]">↑ (up) / ↓ (down)</p>
         </div>
       </div>
 
       <div className="mx-4 w-full flex justify-center">
-        <canvas
-          ref={canvasRef}
-          width={gameStateRef.current.board.width}
-          height={gameStateRef.current.board.height}
-          className="w-full max-w-240 rounded-2xl border border-white/20"
-        />
+        <div className="relative w-full max-w-240">
+          <canvas
+            ref={canvasRef}
+            width={gameStateRef.current.board.width}
+            height={gameStateRef.current.board.height}
+            className="w-full rounded-2xl border border-white/20"
+          />
+          <div className="pointer-events-none absolute inset-0 rounded-2xl bg-black/25" />
+          {gameOver ? (
+            <LocalGameResult
+              winnerName={shortenName(
+                winner || (score1 > score2 ? players.player1.nickName : players.player2.nickName),
+                16
+              )}
+              score1={score1}
+              score2={score2}
+              isTournament={urlMode === "tournament"}
+            />
+          ) : null}
+        </div>
       </div>
 
       <div className="flex flex-row gap-6 mb-4">
-        <button
-          className="px-6 py-2 bg-[#8D8D8D]/25 rounded-lg hover:bg-white/25 transition"
-          onClick={togglePause}
-          disabled={gameOver}
-          title={gameOver ? "Game finished" : undefined}
-          type="button"
-        >
+        <button className="px-6 py-2 bg-[#8D8D8D]/25 rounded-lg hover:bg-white/25 transition"
+          onClick={togglePause} disabled={gameOver} title={gameOver ? "Game finished" : undefined} type="button">
           {isPause ? "Resume" : "Pause"}
         </button>
       </div>

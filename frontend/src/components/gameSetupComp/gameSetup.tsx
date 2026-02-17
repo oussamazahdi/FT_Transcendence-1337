@@ -6,7 +6,6 @@ import Image from "next/image";
 
 type AvatarOption = {
   color: string;
-  black: string;
   alt: string;
 };
 
@@ -16,12 +15,10 @@ type GameData = {
   player2NickName: string;
   player2Avatar: string;
 
-  // keep defaults so the game page won't break if it expects them
   paddleColor: string;
   ballColor: string;
   boardColor: string;
   scoreLimit: number;
-  ballSpeed: number;
   paddleSize: number;
 
   player1Score: number;
@@ -45,7 +42,6 @@ const DEFAULT_GAME_DATA: GameData = {
   ballColor: "#D9D9D9",
   boardColor: "#262626",
   scoreLimit: 5,
-  ballSpeed: 1,
   paddleSize: 1,
 
   player1Score: 0,
@@ -53,12 +49,12 @@ const DEFAULT_GAME_DATA: GameData = {
 };
 
 const AVATARS: AvatarOption[] = [
-  { color: "/gameAvatars/profile1.jpeg", black: "/gameAvatars/blackAvatar/avatar1.png", alt: "avatar 1" },
-  { color: "/gameAvatars/profile2.jpeg", black: "/gameAvatars/blackAvatar/avatar2.png", alt: "avatar 2" },
-  { color: "/gameAvatars/profile3.jpeg", black: "/gameAvatars/blackAvatar/avatar3.png", alt: "avatar 3" },
-  { color: "/gameAvatars/profile4.jpeg", black: "/gameAvatars/blackAvatar/avatar4.png", alt: "avatar 4" },
-  { color: "/gameAvatars/profile5.jpeg", black: "/gameAvatars/blackAvatar/avatar5.png", alt: "avatar 5" },
-  { color: "/gameAvatars/profile6.jpeg", black: "/gameAvatars/blackAvatar/avatar6.png", alt: "avatar 6" },
+  { color: "/gameAvatars/profile1.jpeg", alt: "avatar 1" },
+  { color: "/gameAvatars/profile2.jpeg", alt: "avatar 2" },
+  { color: "/gameAvatars/profile3.jpeg", alt: "avatar 3" },
+  { color: "/gameAvatars/profile4.jpeg", alt: "avatar 4" },
+  { color: "/gameAvatars/profile5.jpeg", alt: "avatar 5" },
+  { color: "/gameAvatars/profile6.jpeg", alt: "avatar 6" },
 ];
 
 function normalizeNickname(raw: string) {
@@ -74,7 +70,6 @@ export default function GameSetup({ isVisible, onClose }: GameSetupProps) {
 
   const [gameData, setGameData] = useState<GameData>(DEFAULT_GAME_DATA);
 
-  // Persist whenever gameData changes
   useEffect(() => {
     localStorage.setItem("GameData", JSON.stringify(gameData));
   }, [gameData]);
@@ -102,19 +97,19 @@ export default function GameSetup({ isVisible, onClose }: GameSetupProps) {
   const handlePlay = useCallback(() => {
     if (!isReadyToPlay) return;
     localStorage.setItem("GameData", JSON.stringify(gameData));
-    router.push("/game/pingPong/local");
+    router.push("/game/local");
   }, [gameData, isReadyToPlay, router]);
 
   if (!isVisible) return null;
 
-  const avatarThumbClass =
-    "w-11 h-11 rounded-lg object-cover cursor-pointer transition-all hover:scale-110";
+  const avatarThumbButtonClass =
+    "group relative h-11 w-11 overflow-hidden rounded-lg transition-transform hover:scale-110 focus:outline-none";
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+    <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50">
       <div className="relative bg-[#1A1A1A]/75 backdrop-blur-md p-6 rounded-3xl shadow-lg w-full max-w-4xl m-3">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-6">
+        
+				<div className="flex justify-between items-center mb-6">
           <h1 className="text-white text-2xl font-semibold">Game Setup</h1>
           <button
             onClick={onClose}
@@ -125,9 +120,9 @@ export default function GameSetup({ isVisible, onClose }: GameSetupProps) {
           </button>
         </div>
 
-        {/* Players */}
+
         <div className="grid md:grid-cols-2 gap-6">
-          {/* Player 1 */}
+
           <div className="flex flex-col items-center border border-dashed border-gray-500/60 rounded-xl p-6">
             <h2 className="text-xl font-semibold text-white mb-4">Player 1</h2>
 
@@ -148,15 +143,28 @@ export default function GameSetup({ isVisible, onClose }: GameSetupProps) {
               {AVATARS.map((a) => {
                 const isSelected = gameData.player1Avatar === a.color;
                 return (
-                  <Image
+                  <button
+                    key={a.color}
+                    type="button"
+                    onClick={() => setPlayerAvatar(1, a.color)}
+                    className={avatarThumbButtonClass}
+                    aria-label={`Select ${a.alt} for player 1`}
+                  >
+                    <Image
 										width={200}
 										height={200}
-                    key={a.color}
-                    src={isSelected ? a.color : a.black}
-                    alt={a.alt}
-                    className={avatarThumbClass}
-                    onClick={() => setPlayerAvatar(1, a.color)}
-                  />
+                      src={a.color}
+                      alt={a.alt}
+                      className={
+                        isSelected
+                          ? "h-full w-full rounded-lg object-cover transition-all"
+                          : "h-full w-full rounded-lg object-cover grayscale transition-all duration-200 group-hover:grayscale-0"
+                      }
+                    />
+                    {!isSelected ? (
+                      <span className="pointer-events-none absolute inset-0 bg-black/45 transition-opacity duration-200 group-hover:opacity-0" />
+                    ) : null}
+                  </button>
                 );
               })}
             </div>
@@ -176,7 +184,7 @@ export default function GameSetup({ isVisible, onClose }: GameSetupProps) {
             />
           </div>
 
-          {/* Player 2 */}
+
           <div className="flex flex-col items-center border border-dashed border-gray-500/60 rounded-xl p-6">
             <h2 className="text-xl font-semibold text-white mb-4">Player 2</h2>
 
@@ -197,15 +205,28 @@ export default function GameSetup({ isVisible, onClose }: GameSetupProps) {
               {AVATARS.map((a) => {
                 const isSelected = gameData.player2Avatar === a.color;
                 return (
-                  <Image
+                  <button
+                    key={a.color}
+                    type="button"
+                    onClick={() => setPlayerAvatar(2, a.color)}
+                    className={avatarThumbButtonClass}
+                    aria-label={`Select ${a.alt} for player 2`}
+                  >
+                    <Image
 										width={200}
 										height={200}
-                    key={a.color}
-                    src={isSelected ? a.color : a.black}
-                    alt={a.alt}
-                    className={avatarThumbClass}
-                    onClick={() => setPlayerAvatar(2, a.color)}
-                  />
+                      src={a.color}
+                      alt={a.alt}
+                      className={
+                        isSelected
+                          ? "h-full w-full rounded-lg object-cover transition-all"
+                          : "h-full w-full rounded-lg object-cover grayscale transition-all duration-200 group-hover:grayscale-0"
+                      }
+                    />
+                    {!isSelected ? (
+                      <span className="pointer-events-none absolute inset-0 bg-black/45 transition-opacity duration-200 group-hover:opacity-0" />
+                    ) : null}
+                  </button>
                 );
               })}
             </div>

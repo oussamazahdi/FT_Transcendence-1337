@@ -88,18 +88,15 @@ class gameUtiles {
       if (state.ball.x <= 0) setScore2((s) => s + 1);
       state.ball.x = state.board.width / 2;
       state.ball.y = state.board.height / 2;
-			// console.log("1 ===========> ball speed :", state.ball.speed, "\n1 ===========> base ball speed:", baseBallSpeed)
 			state.ball.speed = baseBallSpeed;
-			// console.log("2 ===========> ball speed :", state.ball.speed, "\n2 ===========> base ball speed:", baseBallSpeed)
     }
   };
 
 	ballCollisions = (state: GameState) => {
 		const ball = state.ball;
-		const p1 = state.player1; // left paddle
-		const p2 = state.player2; // right paddle
+		const p1 = state.player1;
+		const p2 = state.player2;
 	
-		// wall collision (top/bottom)
 		if (ball.y - ball.radius <= 0 || ball.y + ball.radius >= state.board.height) {
 			ball.velocityY *= -1;
 		}
@@ -118,13 +115,10 @@ class gameUtiles {
 	
 			ball.speed += 0.3;
 	
-			// bounce X direction
 			ball.velocityX = isLeft ? Math.abs(ball.velocityX) : -Math.abs(ball.velocityX);
 	
-			// bounce Y direction (normalized to [-1, 1])
 			ball.velocityY = ((ball.y - paddle.y) / paddle.height - 0.5) * 2;
 	
-			// optional safety: nudge ball outside paddle to avoid multi-hit in same frame
 			if (isLeft) ball.x = paddle.x + paddle.width + ball.radius;
 			else ball.x = paddle.x - ball.radius;
 		};

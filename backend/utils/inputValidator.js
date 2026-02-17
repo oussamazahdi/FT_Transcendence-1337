@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 export const updateUserSchema = z.object({
-  username: z.string().min(3).max(20).regex(/^[a-zA-Z0-9_-]+$/).optional(),
-  firstname: z.string().min(2).max(50).regex(/^[a-zA-ZÀ-ÿ\s'-]+$/).optional(),
-  lastname: z.string().min(2).max(50).regex(/^[a-zA-ZÀ-ÿ\s'-]+$/).optional(),
+  username: z.string().min(3).max(15).regex(/^[a-zA-Z0-9_-]+$/).optional(),
+  firstname: z.string().min(3).max(15).regex(/^[a-zA-ZÀ-ÿ\s'-]+$/).optional(),
+  lastname: z.string().min(3).max(15).regex(/^[a-zA-ZÀ-ÿ\s'-]+$/).optional(),
   email: z.string().email().optional(),
   avatar: z.string().url().optional()
 }).refine(

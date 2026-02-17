@@ -62,7 +62,6 @@ const WinRate = ({id}:any) => {
           setWins(winsData);
           setLoses(losesData);
         }catch(error:any){
-          console.log("faild to fetch Statistics");
           return []
         }finally{
           setLoading(false);

@@ -33,7 +33,7 @@ export function initializeSocketes(app) {
       if (!accessToken) return next(new Error("Unauthorized"));
 
       if (refreshToken) {
-        const revoked = await tokenModels.isTokenRevoked(socket.db, refreshToken);
+        const revoked = tokenModels.isTokenRevoked(socket.db, refreshToken);
         if (revoked) return next(new Error("TOKEN_REVOKED"));
       }
 

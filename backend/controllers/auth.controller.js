@@ -37,15 +37,14 @@ export class AuthController {
                 httpOnly: true,
                 sameSite: 'lax',
                 path: '/',
-                maxAge: 7 * 24 * 60 * 60 * 1000
+                maxAge: 300
             });
             reply.setCookie('accessToken', accessToken, {
                 httpOnly: true,
                 sameSite: 'lax',
                 path: '/',
-                maxAge: 15 * 60 * 1000
+                maxAge: 30
             });
-            console.log(result);
             return reply.code(200).send({message: "AUTHORIZED", userData: result});
         }
         catch (error) {
@@ -77,13 +76,13 @@ export class AuthController {
                 httpOnly: true,
                 sameSite: 'lax',
                 path: '/',
-                maxAge: 7 * 24 * 60 * 60 * 1000
+                maxAge: 300
             });
             reply.setCookie('accessToken', accessToken, {
                 httpOnly: true,
                 sameSite: 'lax',
                 path: '/',
-                maxAge: 15 * 60 * 1000
+                maxAge: 30
             });
             return reply.code(201).send({message: "USER_CREATED_SUCCESSFULLY"});
         }
@@ -140,18 +139,16 @@ export class AuthController {
     {
         const db = request.server.db;
         const refreshToken = request.cookies.refreshToken;
-        const accessToken = request.cookies.accessToken;
-    
         try {
-            if (!refreshToken || !accessToken)
-                throw new Error("UNAUTHORIZED_NO_TOKEN");
+            if (!refreshToken)
+                return reply.code(401).send({error:"UNAUTHORIZED_NO_TOKEN"});
             const blacklisted = tokenModels.isTokenRevoked(db, refreshToken);
             if (blacklisted)
-                throw new Error("TOKEN_REVOKED");
+							return reply.code(402).send({error:"TOKEN_REVOKED"});
             const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
             const tokenDbResults = tokenModels.tokenExists(db, refreshToken);
             if (!tokenDbResults)
-                throw new Error("INVALID_TOKEN");
+							return reply.code(403).send({error: "INVALID_TOKEN"});
             const user = authModels.findUserById(db, decoded.userId);
             updateTokenFlags(user, reply);
             return reply.code(201).send({message: "TOKEN_REFRESHED_SUCCESSFULLY"});
@@ -248,11 +245,11 @@ export class AuthController {
             
             const user = authModels.getUserVerificationData(db, request.user.userId);
             if (user.isverified)
-                throw new Error("EMAIL_IS_ALREADY_VERIFIED");
+                return reply.code(409).send({error: "EMAIL_IS_ALREADY_VERIFIED"});
             if (today > user.otpexpiration)
-                throw new Error("EXPIRED_OTP");
+                return reply.code(409).send({error: "EXPIRED_OTP"});
             if (code !== user.otp)
-                throw new Error("INCORRECT");
+                return reply.code(409).send({error: "INCORRECT"});
             authModels.markEmailVerified(db, request.user.userId);
             const userflags = authModels.findUserById(db, request.user.userId);
             updateTokenFlags(userflags, reply);

@@ -12,13 +12,13 @@ setup:
 	fi
 
 up: setup
-	@$(DOCKER_COMPOSE) up --build -d
+	@$(DOCKER_COMPOSE) up --build 
 
 frontend: setup
-	@$(DOCKER_COMPOSE) up frontend --build -d
+	@$(DOCKER_COMPOSE) up frontend --build
 
 backend: setup
-	@$(DOCKER_COMPOSE) up backend --build -d
+	@$(DOCKER_COMPOSE) up backend --build
 
 down:
 	@$(DOCKER_COMPOSE) down

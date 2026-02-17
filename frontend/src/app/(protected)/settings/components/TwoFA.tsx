@@ -28,12 +28,10 @@ export default function TwoFA({ isEnable, setView, setIsEnable }:TwoFaProps) {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
 
-      console.log("TwoFA disabled successfuly");
       setIsEnable(false);
       updateUser({status2fa:false})
       setShowconfirm(false);
     } catch (err:any) {
-      console.log(err.message);
       setError(err.message);
     }
   };

@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { NoSymbolIcon } from "@heroicons/react/24/outline";
 import BlockedCard from "./BlockedCard.tsx";
 import { useAuth } from "@/contexts/authContext";
 
 export default function BlockedUsers() {
   const { blocked } = useAuth();
-  console.log("check blocked in blocked", blocked);
 
   const FriendComponent = () => {
     if (!blocked || blocked.length == 0)
@@ -14,7 +13,7 @@ export default function BlockedUsers() {
   }
 
   return (
-    <div className="h-full flex flex-col justify-start md:justify-center items-center gap-4 mx-1 pt-4 md:pt-0">
+    <div className="h-full flex flex-col justify-start md:justify-center items-center gap-4 mx-3 pt-4 md:pt-0">
       <div className="md:basis-2/10 flex flex-col md:justify-end-safe items-center">
         <NoSymbolIcon className="size-12" />
         <h1 className="text-white font-bold text-sm md:text-xsm">

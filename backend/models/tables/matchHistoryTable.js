@@ -23,7 +23,8 @@ export function createMatchHistoryTable(db) {
 		);
 		`);
 	} catch (error) {
-		console.error("Database cannot be inited due to : " + error.message);
-		process.exit(1);
+        const dbError = handleDatabaseError(error, 'createMatchHistoryTable');
+        console.error(dbError);
+        process.exit(1);
 	}
 }

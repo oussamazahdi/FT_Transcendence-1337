@@ -7,6 +7,7 @@ import { ComponentUtils } from "@/lib/utils";
 import { GameInvite } from "@/components/ui/GameInvite";
 import { FriendInvite } from "./ui/FriendInvite";
 import { MessageNotif } from "./ui/MessageNotif";
+import { autofetch } from "@/lib/api";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -92,7 +93,7 @@ type JsonResult<T> = {
 
 async function requestJson<T = unknown>(url: string, options?: RequestInit): Promise<JsonResult<T>> {
   try {
-    const res = await fetch(url, options);
+    const res = await autofetch(url, options);
     const data = (await res.json().catch(() => null)) as T | null;
     return { res, data, error: null };
   } catch (error) {
@@ -114,7 +115,17 @@ export async function fetchUnreadNotificationsCount() {
   return Number(data?.unreadCount ?? 0);
 }
 
-export default function NotificationDropDown() {
+type NotificationDropDownProps = {
+  containerClassName?: string;
+  buttonClassName?: string;
+  panelClassName?: string;
+};
+
+export default function NotificationDropDown({
+  containerClassName = "relative hidden md:block",
+  buttonClassName = "md:border border-[#9D9D9D]/40 rounded-[10px] md:p-3 hover:bg-[#000000]/40 cursor-pointer hover:scale-105 active:scale-95 transition relative",
+  panelClassName = "absolute right-0 top-full mt-2 max-h-64 bg-[#0F0F0F]/75 rounded-[10px] flex flex-col gap-1 p-2 overflow-y-auto z-50 custom-scrollbar min-w-65",
+}: NotificationDropDownProps = {}) {
   const socket = useSocket() as unknown as NotificationSocket | null;
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -207,7 +218,6 @@ export default function NotificationDropDown() {
 
   const acceptGameInvite = useCallback(
     async (value: NotificationItem | NotificationItem["id"]) => {
-      // ✅ accept either notif object or id
       const notifId = typeof value === "object" && value !== null ? value.id : value;
 
       const notif = await loadNotificationById(notifId);
@@ -232,7 +242,6 @@ export default function NotificationDropDown() {
 
       socket.emit("game:accept", { notifId: Number(notif.id), roomId }, (ack) => {
         if (!ack?.ok) return;
-        // navigation handled elsewhere (match-started:accept), or add router push here if needed
       });
     },
     [loadNotificationById, postNotificationAction, connectSocketIfNeeded, socket]
@@ -292,12 +301,12 @@ export default function NotificationDropDown() {
   }, [socket, addIncomingNotification]);
 
   return (
-    <div ref={dropdownRef} className="relative hidden md:block">
+    <div ref={dropdownRef} className={containerClassName}>
       <button
         type="button"
         onClick={handleBellClick}
         aria-label="Open notifications"
-        className="md:border border-[#9D9D9D]/40 rounded-[10px] md:p-3 hover:bg-[#000000]/40 cursor-pointer hover:scale-105 active:scale-95 transition relative"
+        className={buttonClassName}
       >
         <BellAlertIcon className="h-5 w-5 text-white/60" />
         {unreadCount > 0 && (
@@ -308,7 +317,7 @@ export default function NotificationDropDown() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 max-h-[256px] bg-[#0F0F0F]/75 rounded-[10px] flex flex-col gap-1 p-2 overflow-y-auto z-50 custom-scrollbar min-w-[260px]">
+        <div className={panelClassName}>
           {loading ? (
             <p className="text-[10px] text-white/60 text-center py-4">Loading...</p>
           ) : notifications.length > 0 ? (

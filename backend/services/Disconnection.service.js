@@ -1,4 +1,4 @@
-import { socketToUserId, userIdToSocket, playerMove, waitingPlayer } from "../store/memory.store.js"
+import { socketToUserId, userIdToSocket, waitingPlayer } from "../store/memory.store.js"
 import { GameUtils } from "../utils/GameUtils.js";
 import { WIN_SCORE } from "../constants/game.constants.js";
 import { MatchController } from "../controllers/game.controller.js";
@@ -61,7 +61,6 @@ class disconnectionService{
     
     socketToUserId.delete(socketId);
     userIdToSocket.delete(id);
-    playerMove.delete(socketId);
     
     return id;
   }

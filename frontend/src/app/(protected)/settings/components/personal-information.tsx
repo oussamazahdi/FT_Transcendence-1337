@@ -117,15 +117,12 @@ export default function Personal_information() {
       if (!response.ok) {
         if (data.error === "INVALID_INPUT")
           throw new Error(`invalid ${data.fields}`);
-        console.log(data);
         throw new Error(AUTH_ERRORS[data.error] || AUTH_ERRORS["default"]);
       }
 
       const newUser = data.user;
       login({ ...user, ...newUser });
-      console.log("user update successfully :)");
     } catch (err:any) {
-      console.log("failed to update user :( ", err.message);
       setRootError(err.message)
     }
   }

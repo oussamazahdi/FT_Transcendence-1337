@@ -25,7 +25,6 @@ export class FriendsModels
     searchFriends(db, userId, query, limit, offset)
     {
         try {
-            console.log(query)
             const result = db.prepare(`
                 SELECT u.id, u.username, u.avatar, u.firstname, u.lastname
                     FROM friends f

@@ -13,7 +13,6 @@ import { updateUserSchema, passwordValidator, zErrorHandler } from "../utils/inp
 
 async function fileUpload(user, file)
 {
-	try {
 		const oldAvatar = user?.avatar;
 
 		const uploadDir = path.join(process.cwd(), 'uploads');
@@ -33,11 +32,6 @@ async function fileUpload(user, file)
             }
         }
 		return (fileLink);
-	}
-	catch (error)
-	{
-		console.log(error);
-	}
 }
 
 export class UserController 
@@ -194,7 +188,6 @@ export class UserController
 			if (!query || query.length < 2 || query.length > 20)
 				return reply.code(400).send({ error: 'INVALID_QUERY' });
 			const results = userModels.searchUsers(db, q, limit, offset);
-			console.log(results);
 			return reply.code(200).send({message: "SUCCESS", page: pageNum, limit: limit, users: results});
 		}
 		catch (error) {

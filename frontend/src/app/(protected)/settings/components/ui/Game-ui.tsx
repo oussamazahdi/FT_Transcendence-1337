@@ -9,7 +9,7 @@ export function Field({ label, rangeText, value, onChange, error }: FieldProps) 
         <span className="text-white/40 text-xs">{rangeText}</span>
       </div>
 
-      <input type="number" value={value === "" ? "" : Number(value)} onChange={onChange}
+      <input type="number" value={value === "" ? "" : Number(value)} onChange={onChange} maxLength={2}
         className={`h-12 px-4 rounded-xl bg-white/10 backdrop-blur-md text-white text-sm placeholder:text-white/25 focus:outline-none ring-1 transition
           ${ error ? "ring-red-500/80 focus:ring-red-500/90" : "ring-white/10 focus:ring-white/30"}`}/>
 
