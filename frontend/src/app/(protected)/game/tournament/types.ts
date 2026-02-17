@@ -76,12 +76,12 @@ class tournamentUtiles {
 		return `guest_${Math.random().toString(16).slice(2)}_${Date.now()}`;
 	}
 
-	toPlayer(u: UserLite): TournamentPlayer {
+	toPlayer(user: UserLite): TournamentPlayer {
 		return {
-			id: u.id,
-			username: u.username,
-			displayName: u.displayName ?? u.username,
-			avatarUrl: u.avatarUrl ?? null,
+			id: user.id,
+			username: user.username,
+			displayName: user.displayName ?? user.username,
+			avatarUrl: user.avatarUrl ?? null,
 			isGuest: false,
 		};
 	}

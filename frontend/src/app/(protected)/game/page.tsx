@@ -133,20 +133,12 @@ export default function LocalGame() {
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {items.map((it) => (
-            <Card
-              key={it.title}
-              title={it.title}
-              cover={it.cover}
-              alt={it.alt}
-              description={it.description}
-              button={it.button}
-              onClick={it.onClick}
-            />
+            <Card key={it.title} title={it.title} cover={it.cover} alt={it.alt} description={it.description} button={it.button} onClick={it.onClick}/>
           ))}
         </div>
 
         <GameSetup isVisible={isLocalSetupOpen} onClose={() => setIsLocalSetupOpen(false)} />
-        <CreateTournamentModal open={isTournamentOpen} onClose={() => setIsTournamentOpen(false)} users={users} maxPlayers={4} onStart={handleTournamentStart}/>
+        <CreateTournamentModal open={isTournamentOpen} onClose={() => setIsTournamentOpen(false)} users={users} onStart={handleTournamentStart}/>
       </div>
     </div>
   );
