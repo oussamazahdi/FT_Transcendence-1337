@@ -4,42 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSocket } from "@/contexts/socketContext";
 import Image from "next/image";
-
-export type TournamentPlayer = {
-  id: string;
-  username: string;
-  displayName: string;
-  avatarUrl?: string | null;
-  isGuest?: boolean;
-};
-
-type TournamentCreatePayload = {
-  name: string;
-  players: TournamentPlayer[];
-};
-
-type MatchStatus = "locked" | "ready" | "in_progress" | "completed";
-
-export type Match = {
-  id: string;
-  round: 1 | 2;
-  a: TournamentPlayer;
-  b: TournamentPlayer;
-  status: MatchStatus;
-  scoreA?: number;
-  scoreB?: number;
-  winnerId?: string;
-};
-
-type TournamentState = {
-  name: string;
-  players: TournamentPlayer[];
-  semis: Match[];
-  final: Match;
-  currentMatchId: string;
-  createdAt: string;
-  updatedAt: string;
-};
+import { TournamentPlayer, TournamentCreatePayload, MatchStatus, TournamentState, Match } from "./types";
 
 const TOURNAMENT_CREATE_STORAGE_KEY = "tournament:create";
 const TOURNAMENT_STATE_STORAGE_KEY = "tournament:state";
@@ -501,13 +466,7 @@ function FinalAndChampionSection({
   );
 }
 
-function BracketLayout({
-  semis,
-  finalMatch,
-  currentMatchId,
-  champion,
-  onPlayMatch,
-}: {
+function BracketLayout({ semis, finalMatch, currentMatchId, champion, onPlayMatch,}: {
   semis: Match[];
   finalMatch: Match;
   currentMatchId: string;
@@ -527,13 +486,7 @@ function BracketLayout({
   );
 }
 
-function FooterActions({
-  isComplete,
-  onEndTournament,
-}: {
-  isComplete: boolean;
-  onEndTournament: () => void;
-}) {
+function FooterActions({ isComplete, onEndTournament,}: { isComplete: boolean; onEndTournament: () => void; }) {
   return (
     <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div className="text-sm text-white/60">

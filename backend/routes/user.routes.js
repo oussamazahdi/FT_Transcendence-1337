@@ -53,6 +53,7 @@ function userRoutes(fastify)
                 required: ['id']
             },
             consumes: ['multipart/form-data'],
+            consumes: ['multipart/form-data'],
             response: {
                 200: emptySuccessResponse,
                 400: {
@@ -122,6 +123,7 @@ function userRoutes(fastify)
             }
         }
     }, userController.changePassword);
+
 
     fastify.get("/search", {
         preHandler: authMiddleware,

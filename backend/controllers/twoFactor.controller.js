@@ -1,6 +1,7 @@
 import { twoFactorModels } from "../models/twoFactor.model.js";
 import { authModels } from "../models/auth.model.js";
 import { generateToken, updateTokenFlags } from "../utils/authUtils.js";
+import { generateToken, updateTokenFlags } from "../utils/authUtils.js";
 
 export class TwoFactorController
 {
@@ -9,6 +10,9 @@ export class TwoFactorController
         const db = request.server.db;
 
         try {
+            if (request.user.status2fa)
+                reply.code(401).send({error: "2FA_ALREADY_ENABLED"});
+
             if (request.user.status2fa)
                 reply.code(401).send({error: "2FA_ALREADY_ENABLED"});
 
@@ -96,6 +100,8 @@ export class TwoFactorController
         const db = request.server.db;
 
         try {
+            if (!request.user.status2fa)
+                reply.code(401).send({error: "2FA_ALREADY_DISABLED"});
             if (!request.user.status2fa)
                 reply.code(401).send({error: "2FA_ALREADY_DISABLED"});
             twoFactorModels.update2FAStatus(db, 0, request.user.userId);

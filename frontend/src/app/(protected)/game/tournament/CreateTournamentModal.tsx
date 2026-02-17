@@ -18,24 +18,13 @@ const REDIRECTTO:string =  "/game/tournament";
 const MAXPLAYERS:number = 4
 
 export default function CreateTournamentModal({ open, onClose, users = [], initialPlayers = [], onStart,}: CreateTournamentModalProps) {
-  
-	// ─────────────────────────────────────────────────────────────
-  // SECTION 1: External hooks / refs
-  // - router: redirect after starting if no `onStart` callback
-  // - overlayRef: used to close modal when clicking outside content
-  // - wasOpenRef: detects "just opened" to reset state once per open
-  // ─────────────────────────────────────────────────────────────
+	// Comment: for external hooks or reactions
 	const router = useRouter();
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const wasOpenRef = useRef(false);
 
-	// ─────────────────────────────────────────────────────────────
-  // SECTION 2: UI state (inputs + selection + errors)
-  // - search/selectedUserId: pick an existing user
-  // - guest* fields: create a guest player
-  // - error: validation / user feedback message
-  // ─────────────────────────────────────────────────────────────
-	const [search, setSearch] = useState("");
+	// Comment: Ui states to easy update the UI
+ 	const [search, setSearch] = useState("");
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [guestFirst, setGuestFirst] = useState("");
   const [guestLast, setGuestLast] = useState("");
@@ -43,20 +32,10 @@ export default function CreateTournamentModal({ open, onClose, users = [], initi
   const [guestAvatar, setGuestAvatar] = useState<string | null>(DEFAULT_AVATARS[0] ?? null);
 	const [error, setError] = useState<string | null>(null);
 
-	// ─────────────────────────────────────────────────────────────
-  // SECTION 3: Context data
-  // - socket: passed to UsersPicker (ex: online status, etc.)
-  // - user: logged-in user data
-  // ─────────────────────────────────────────────────────────────
   const socket = useSocket();
   const { user } = useAuth() as UseAuthResult;
 
-	// ─────────────────────────────────────────────────────────────
-  // SECTION 4: Locked Player 1 (logged-in user)
-  // - lockedUserId: normalized user id as string
-  // - lockedPlayer: tournament player object representing "You"
-  //   (kept at index 0 by normalizePlayersWithLockedFirst)
-  // ─────────────────────────────────────────────────────────────
+	// Comment: Normalize loged user obj
   const lockedUserId: LockedUserId = user?.id != null ? String(user.id) : null;
 
   const lockedPlayer: TournamentPlayer | null = useMemo(
@@ -64,27 +43,16 @@ export default function CreateTournamentModal({ open, onClose, users = [], initi
     [lockedUserId, users, user]
   );
 
-	// ─────────────────────────────────────────────────────────────
-  // SECTION 5: Tournament state (name + players list)
-  // - name: tournament name input
-  // - players: current list of players (normalized to keep Player 1 locked)
-  // ─────────────────────────────────────────────────────────────
+	// Comment: initialize name of tournament, players array
   const [name, setName] = useState("");
   const [players, setPlayers] = useState<TournamentPlayer[]>(() =>
     TournamentUtiles.normalizePlayersWithLockedFirst(lockedPlayer, initialPlayers, MAXPLAYERS)
   );
 
-	// ─────────────────────────────────────────────────────────────
-  // SECTION 6: Derived flags
-  // - isFull: prevents adding beyond maxPlayers
-  // ─────────────────────────────────────────────────────────────
+	// Comment: check if tounament is full (cant add other players)
   const isFull = players.length >= MAXPLAYERS;
 
-	// ─────────────────────────────────────────────────────────────
-  // SECTION 7: Reset state when opening modal
-  // - clears inputs/errors
-  // - resets players back to normalized initial state
-  // ─────────────────────────────────────────────────────────────
+	// Comment: Clean all UI when open the modle
   const resetForOpen = useCallback(() => {
     setError(null);
     setSearch("");
@@ -98,12 +66,8 @@ export default function CreateTournamentModal({ open, onClose, users = [], initi
     );
   }, [initialPlayers, lockedPlayer, MAXPLAYERS]);
 
-	// ─────────────────────────────────────────────────────────────
-  // SECTION 8: Effects (lifecycle behaviors)
-  // A) Reset only when modal transitions CLOSED -> OPEN (once per open)
-  // B) Keep locked player always at index 0 while modal is open
-  // C) Close modal on Escape key
-  // ─────────────────────────────────────────────────────────────
+
+	// Comment: reset when model go from close to open, keep the locked player at the first box, 
   useEffect(() => {
     if (open && !wasOpenRef.current) {
       resetForOpen();
@@ -116,15 +80,14 @@ export default function CreateTournamentModal({ open, onClose, users = [], initi
 
   useEffect(() => {
     if (!open) return;
-		// If auth user changes while open, re-normalize players
     setPlayers((prev) => {
       const next = TournamentUtiles.normalizePlayersWithLockedFirst(lockedPlayer, prev, MAXPLAYERS);
-			// Avoid state update if nothing actually changed
       const same = next.length === prev.length && next.every((p, i) => p.id === prev[i]?.id);
       return same ? prev : next;
     });
   }, [open, lockedPlayer]);
 
+	// Comment: Close modle on ESC, click outside of modle
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (e: KeyboardEvent) => {
@@ -134,10 +97,6 @@ export default function CreateTournamentModal({ open, onClose, users = [], initi
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [open, onClose]);
 
-	// ─────────────────────────────────────────────────────────────
-  // SECTION 9: Overlay click handler
-  // - closes modal only when clicking on the overlay (not inside modal content)
-  // ─────────────────────────────────────────────────────────────
   const onOverlayMouseDown = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       if (e.target === overlayRef.current) onClose();
@@ -145,30 +104,23 @@ export default function CreateTournamentModal({ open, onClose, users = [], initi
     [onClose]
   );
 
-	// ─────────────────────────────────────────────────────────────
-  // SECTION 10: Derived data for UI (search + selected user + slots)
-  // - filteredUsers: users list filtered by search query
-  // - selectedUser: the currently picked user (from filtered list)
-  // - slots: array describing UI slots (filled/waiting/empty) for PlayersGrid
-  // ─────────────────────────────────────────────────────────────
+	// Comment: filter users by search input (query), pic user, array describing UI slots (filled/waiting/empty)
   const filteredUsers = useMemo(() => TournamentUtiles.filterUsers(users, search), [users, search]);
   const selectedUser = useMemo(() => TournamentUtiles.findSelectedUser(users, selectedUserId), [users, selectedUserId]);
   const slots = useMemo(() => TournamentUtiles.buildSlots(players, MAXPLAYERS), [players, MAXPLAYERS]);
 
-	// ─────────────────────────────────────────────────────────────
-  // SECTION 11: Actions (mutations)
+  // Comment:
   // A) addUserPlayer: add an existing registered user to tournament
   // B) addGuestPlayer: create and add a guest player
   // C) removePlayer: remove a player (except locked Player 1)
-  // D) startTournament: validate and then start tournament (callback or storage+redirect)
-  // ─────────────────────────────────────────────────────────────
+  // D) startTournament: validate and then start tournament
   const addUserPlayer = useCallback(() => {
     setError(null);
 
     if (isFull) return setError(`You can only add ${MAXPLAYERS} players.`);
     if (!selectedUser) return setError("Select a player to add.");
     if (lockedUserId && selectedUser.id === lockedUserId) return setError("You are already Player 1.");
-    if (players.some((p) => p.id === selectedUser.id))
+    if (players.some((ply) => ply.id === selectedUser.id))
       return setError("This player is already in the tournament.");
 
     setPlayers((prev) =>
@@ -259,22 +211,12 @@ export default function CreateTournamentModal({ open, onClose, users = [], initi
     router.push(REDIRECTTO);
   }, [lockedUserId, MAXPLAYERS, name, onClose, onStart, players, REDIRECTTO, router, STORAGEKEY]);
 
-	 // ─────────────────────────────────────────────────────────────
-  // SECTION 12: Final derived UI state
-  // - canStart: used to enable/disable start button
-  // ─────────────────────────────────────────────────────────────
+	// Comment: check if tournament can start
   const canStart = players.length === MAXPLAYERS && name.trim().length > 0;
 
-	// ─────────────────────────────────────────────────────────────
-  // SECTION 13: Conditional render (modal closed)
-  // ─────────────────────────────────────────────────────────────
+	// Comment: modle closed
   if (!open) return null;
 
-	// ─────────────────────────────────────────────────────────────
-  // SECTION 14: Render
-  // Left panel: name + player slots + start/errors
-  // Right panel: add players (users picker + guest form)
-  // ─────────────────────────────────────────────────────────────
   return (
     <ModalShell overlayRef={overlayRef} onOverlayMouseDown={onOverlayMouseDown} onClose={onClose}>
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">

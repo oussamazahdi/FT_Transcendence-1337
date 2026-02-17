@@ -3,7 +3,6 @@
 import React, { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-
 import GameSetup from "@/components/gameSetupComp/gameSetup";
 import CreateTournamentModal from "./tournament/CreateTournamentModal";
 import { useAuth } from "@/contexts/authContext";

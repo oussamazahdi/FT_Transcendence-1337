@@ -5,8 +5,12 @@ import { pipeline } from 'stream/promises';
 import { authModels } from "../models/auth.model.js";
 import { tokenModels } from "../models/token.model.js";
 import { twoFactorModels } from "../models/twoFactor.model.js";
+import { tokenModels } from "../models/token.model.js";
+import { twoFactorModels } from "../models/twoFactor.model.js";
 import { generateFileNameByUser, generateToken, updateTokenFlags } from "../utils/authUtils.js";
 import { getEmailLetter } from "../templates/emailLetter.js";
+import { MatchController } from "./game.controller.js";
+import { passwordValidator, zErrorHandler } from "../utils/inputValidator.js"
 import { MatchController } from "./game.controller.js";
 import { passwordValidator, zErrorHandler } from "../utils/inputValidator.js"
 
@@ -24,11 +28,15 @@ export class AuthController {
                 hasAvatar: !!result.avatar,
                 status2fa: !!result.status2fa,
                 session2FA: !!result.status2fa
+                hasAvatar: !!result.avatar,
+                status2fa: !!result.status2fa,
+                session2FA: !!result.status2fa
             }
             if (result.message && result.message.includes("USER_NOT_FOUND"))
                 return reply.code(404).send({error: "USER_NOT_FOUND"});
             if (result.message && result.message.includes("INVALID_PASSWORD"))
                 return reply.code(403).send({error: "INVALID_PASSWORD"});
+            twoFactorModels.update2FASessionStatus(db, result.status2fa, result.id);
             twoFactorModels.update2FASessionStatus(db, result.status2fa, result.id);
             const accessToken = generateToken(result.id, result.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION, params, "access");
             const refreshToken = generateToken(result.id, result.username, process.env.JWT_REFRESH_SECRET, process.env.JWT_REFRESH_EXPIRATION, null, "refresh");
@@ -36,11 +44,13 @@ export class AuthController {
             reply.setCookie('refreshToken', refreshToken, {
                 httpOnly: true,
                 sameSite: 'lax',
+                sameSite: 'lax',
                 path: '/',
                 maxAge: 60 * 60 * 24 * 7
             });
             reply.setCookie('accessToken', accessToken, {
                 httpOnly: true,
+                sameSite: 'lax',
                 sameSite: 'lax',
                 path: '/',
                 maxAge: 60 * 60
@@ -64,6 +74,9 @@ export class AuthController {
             const validPass  = passwordValidator.parse(password);
             const user = await authModels.addNewUser(db, firstname, lastname, username, email, validPass);
 			MatchController.addNewGameSettings(request.server.db, user.id);
+            const validPass  = passwordValidator.parse(password);
+            const user = await authModels.addNewUser(db, firstname, lastname, username, email, validPass);
+			MatchController.addNewGameSettings(request.server.db, user.id);
             const params = {
                 isVerified: !!user.isverified,
                 hasAvatar: !!user.avatar,
@@ -75,11 +88,13 @@ export class AuthController {
             reply.setCookie('refreshToken', refreshToken, {
                 httpOnly: true,
                 sameSite: 'lax',
+                sameSite: 'lax',
                 path: '/',
                 maxAge: 60 * 60 * 24 * 7
             });
             reply.setCookie('accessToken', accessToken, {
                 httpOnly: true,
+                sameSite: 'lax',
                 sameSite: 'lax',
                 path: '/',
                 maxAge: 60 * 60
@@ -88,6 +103,9 @@ export class AuthController {
         }
         catch (error)
         {
+            const zError = zErrorHandler(error);
+            if (zError !== null)
+                return reply.code(zError.code).send({error: zError.error, fields: zError.fields});
             const zError = zErrorHandler(error);
             if (zError !== null)
                 return reply.code(zError.code).send({error: zError.error, fields: zError.fields});
@@ -142,12 +160,17 @@ export class AuthController {
         try {
             if (!refreshToken)
                 return reply.code(401).send({error:"UNAUTHORIZED_NO_TOKEN"});
+            if (!refreshToken)
+                return reply.code(401).send({error:"UNAUTHORIZED_NO_TOKEN"});
             const blacklisted = tokenModels.isTokenRevoked(db, refreshToken);
             if (blacklisted)
 							return reply.code(402).send({error:"TOKEN_REVOKED"});
+							return reply.code(402).send({error:"TOKEN_REVOKED"});
             const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
             const tokenDbResults = tokenModels.tokenExists(db, refreshToken);
+            const tokenDbResults = tokenModels.tokenExists(db, refreshToken);
             if (!tokenDbResults)
+							return reply.code(403).send({error: "INVALID_TOKEN"});
 							return reply.code(403).send({error: "INVALID_TOKEN"});
             const user = authModels.findUserById(db, decoded.userId);
             updateTokenFlags(user, reply);
@@ -180,6 +203,8 @@ export class AuthController {
     {
         const db = request.server.db;
 		const io = request.server.io;
+        const db = request.server.db;
+		const io = request.server.io;
         try {
             const refreshToken = request.cookies.refreshToken;
             if (!refreshToken)
@@ -191,10 +216,12 @@ export class AuthController {
             reply.clearCookie('accessToken', {
                 httpOnly: true,
                 sameSite: 'lax',
+                sameSite: 'lax',
                 path: '/',
             });
             reply.clearCookie('refreshToken', {
                 httpOnly: true,
+                sameSite: 'lax',
                 sameSite: 'lax',
                 path: '/',
             });
@@ -246,9 +273,12 @@ export class AuthController {
             const user = authModels.getUserVerificationData(db, request.user.userId);
             if (user.isverified)
                 return reply.code(409).send({error: "EMAIL_IS_ALREADY_VERIFIED"});
+                return reply.code(409).send({error: "EMAIL_IS_ALREADY_VERIFIED"});
             if (today > user.otpexpiration)
                 return reply.code(409).send({error: "EXPIRED_OTP"});
+                return reply.code(409).send({error: "EXPIRED_OTP"});
             if (code !== user.otp)
+                return reply.code(409).send({error: "INCORRECT"});
                 return reply.code(409).send({error: "INCORRECT"});
             authModels.markEmailVerified(db, request.user.userId);
             const userflags = authModels.findUserById(db, request.user.userId);
