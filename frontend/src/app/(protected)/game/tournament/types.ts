@@ -66,6 +66,36 @@ export type FindSelectedUser = (users: UserLite[], selectedUserId: string | null
 export type BuildSlots = (players: TournamentPlayer[], maxPlayers: number) => PlayersSlots;
 
 
+export type TournamentCreatePayload = {
+  name: string;
+  players: TournamentPlayer[];
+};
+
+export type MatchStatus = "locked" | "ready" | "in_progress" | "completed";
+
+export type Match = {
+  id: string;
+  round: 1 | 2;
+  a: TournamentPlayer;
+  b: TournamentPlayer;
+  status: MatchStatus;
+  scoreA?: number;
+  scoreB?: number;
+  winnerId?: string;
+};
+
+export type TournamentState = {
+  name: string;
+  players: TournamentPlayer[];
+  semis: Match[];
+  final: Match;
+  currentMatchId: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+
+
 
 class tournamentUtiles {
 	clamp(n: number, min: number, max: number) {
@@ -87,8 +117,8 @@ class tournamentUtiles {
 	}
 
 	normalizePlayersWithLockedFirst( locked: TournamentPlayer | null, list: TournamentPlayer[], maxPlayers: number) {
-		const withoutLocked = list.filter((p) => (locked ? p.id !== locked.id : true));
-		const dedup = withoutLocked.filter((p, idx, arr) => arr.findIndex((x) => x.id === p.id) === idx);
+		const withoutLocked = list.filter((ply) => (locked ? ply.id !== locked.id : true));
+		const dedup = withoutLocked.filter((ply, idx, arr) => arr.findIndex((x) => x.id === ply.id) === idx);
 	
 		const keep = dedup.slice(0, Math.max(0, maxPlayers - (locked ? 1 : 0)));
 	
