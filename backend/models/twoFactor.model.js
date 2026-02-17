@@ -7,7 +7,6 @@ export class TwoFactorModels
     setUser2FASecret(db, secret, userId)
     {
         try{
-            console.log("=========================>", secret, "id = ", userId);
             db.prepare(`UPDATE users SET secret2fa = ? WHERE id = ?`).run(secret, userId);
         }
         catch (error) {
@@ -21,6 +20,17 @@ export class TwoFactorModels
     {
         try{
             db.prepare(`UPDATE users SET status2fa = ? WHERE id = ?`).run(status, userId);
+        }
+        catch (error) {
+            const dbError = handleDatabaseError(error, 'update2FAStatus');
+            throw dbError;
+        }
+    }
+
+    update2FASessionStatus(db, status,userId)
+    {
+        try{
+            db.prepare(`UPDATE users SET session2fa = ? WHERE id = ?`).run(status, userId);
         }
         catch (error) {
             const dbError = handleDatabaseError(error, 'update2FAStatus');

@@ -16,7 +16,7 @@
 
 # testing
 /coverage
-/backend/uploads
+# /backend/uploads
 # next.js
 /frontend/.next/
 /out/

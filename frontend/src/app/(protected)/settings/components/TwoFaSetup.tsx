@@ -1,0 +1,154 @@
+"use client";
+import react, { useRef, useState, useEffect } from "react";
+import Image from "next/image";
+import { useAuth } from "@/contexts/authContext";
+import { autofetch } from "@/lib/api.tsx";
+
+interface TwoFaSetupProps{
+  setView: React.Dispatch<React.SetStateAction<string>>
+  setEnable: React.Dispatch<React.SetStateAction<boolean>>
+}
+export default function TwoFaSetup({ setEnable, setView }:TwoFaSetupProps) {
+  const [TwoFAcode, setTwoFAcode] = useState<string[]>(new Array(6).fill(""));
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [imagePreview, setImagePreview] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const { updateUser } = useAuth()
+
+  useEffect(() => {
+    setError("");
+    const getQrCode = async () => {
+      try {
+        const response = await autofetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/2fa/setup`,
+          {
+            method: "post",
+            credentials: "include",
+          },
+        );
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error);
+
+        setImagePreview(data.qr);
+      } catch (err:any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    getQrCode();
+  }, []);
+
+  const VerifyQrCode = async () => {
+    setError("");
+    try {
+      const tokenString = TwoFAcode.join("");
+      const response = await autofetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/2fa/enable`,
+        {
+          method: "post",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token: tokenString }),
+        },
+      );
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+
+      setEnable(true);
+      updateUser({status2fa:true})
+      setView("status");
+    } catch (err:any) {
+      setError(err.message);
+    }
+  };
+
+  const handleChange = (element:HTMLInputElement, index:number) => {
+    if (Number.isNaN(Number(element.value))) 
+      return;
+    const newTwoFAcode = [...TwoFAcode];
+    newTwoFAcode[index] = element.value;
+    setTwoFAcode(newTwoFAcode);
+
+    if (element.value && index < 5 && inputRefs.current[index + 1]) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (e:React.KeyboardEvent<HTMLInputElement>, index:number) => {
+    if (
+      e.key === "Backspace" &&
+      !TwoFAcode[index] &&
+      index > 0 &&
+      inputRefs.current[index - 1]
+    ) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handlePast = (e:React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const data = e.clipboardData.getData("text");
+
+    if (!/^\d{6}$/.test(data)) return;
+
+    const splitCode = data.split("");
+    setTwoFAcode(splitCode);
+
+    inputRefs.current[5]?.focus();
+  };
+  return (
+    <div className="flex flex-col justify-start items-center gap-2">
+      <p className="text-white font-bold text-sm md:text-xsm">
+        Two-Factor Authentication
+      </p>
+      <p className="text-[#ABABAB] text-xs md:text-sm text-center">
+        Scan the QR code with your authentication app or manually enter the code
+        below.
+      </p>
+      <div className="border border-dashed w-24 h-24 p-0.5 rounded-[9px]">
+        {!loading ? (
+          <Image
+            src={imagePreview}
+            alt="icon"
+            width={90}
+            height={90}
+            className="rounded-md"
+          />
+        ) : (
+          <p>Loading...</p>
+        )}
+      </div>
+      <p className="text-xs text-gray-500">Enter your 2FA code here</p>
+      <div className="flex gap-2">
+        {TwoFAcode.map((data, index) => (
+          <input
+            key={index}
+            type="text"
+            maxLength={1}
+            ref={(el) => {inputRefs.current[index] = el}}
+            value={data}
+            onChange={(e) => handleChange(e.target, index)}
+            onKeyDown={(e) => handleKeyDown(e, index)}
+            onPaste={handlePast}
+            className="w-8 bg-[#4D4D4D]/40 border border-transparent rounded-lg text-center text-white text-xl font-meduim focus:outline-none focus:border-[#0F2C34] focus:ring-1 focus:ring-[#0F2C34] transition-all"
+          />
+        ))}
+      </div>
+      {/* add error andling here */}
+      {error && <p>{error}</p>}
+      <button
+        type="submit"
+        onClick={() => VerifyQrCode()}
+        className="w-full max-w-60 h-8 text-xs rounded-sm mt-4 hover:bg-[#0F2C34]/40 border-[#414141]/60 border bg-[#070707] text-white hover:text-white cursor-pointer"
+      >
+        Enable
+      </button>
+    </div>
+  );
+}

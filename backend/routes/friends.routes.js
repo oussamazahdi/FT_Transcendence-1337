@@ -1,13 +1,15 @@
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { friendsController } from "../controllers/friends.controller.js"
-import fastify from "fastify";
-import { errorResponse,
+import { 
+    errorResponse,
     emptySuccessResponse,
     friendsListResponse,
     friendRequestsResponse,
     sentFriendRequestsResponse,
     blockedUsersResponse,
-    idParamSchema
+    friendsSearchResponse,
+    idParamSchema,
+    searchQuerySchema
 } from "../config/schemes.config.js";
 
 function friendsRoutes(fastify)
@@ -24,6 +26,20 @@ function friendsRoutes(fastify)
             }
         }
     }, friendsController.getAllFriends);
+
+    fastify.get("/search", {
+        preHandler: authMiddleware,
+        schema: {
+            description: "Search friends by name/username with pagination",
+            tags: ['Friends'],
+            querystring: searchQuerySchema,
+            response: {
+                200: friendsSearchResponse,
+                401: errorResponse,
+                500: errorResponse
+            }
+        }
+    }, friendsController.searchFriends);
     
     fastify.get("/requests", {
         preHandler: authMiddleware,
@@ -40,15 +56,15 @@ function friendsRoutes(fastify)
     
     fastify.get("/requests/sent", {
         preHandler: authMiddleware,
-        // schema: {
-        //     description: "Get outgoing friend requests",
-        //     tags: ['Friends'],
-        //     response: {
-        //         200: sentFriendRequestsResponse,
-        //         401: errorResponse,
-        //         500: errorResponse
-        //     }
-        // }
+        schema: {
+            description: "Get outgoing friend requests",
+            tags: ['Friends'],
+            response: {
+                200: sentFriendRequestsResponse,
+                401: errorResponse,
+                500: errorResponse
+            }
+        }
     }, friendsController.getSentRequests);
 
     fastify.post("/requests/:id", {
@@ -94,6 +110,19 @@ function friendsRoutes(fastify)
         }
     }, friendsController.getAllBlocked);
     
+    fastify.get("/blockers", {
+        preHandler: authMiddleware,
+        schema: {
+            description: "Get users who blocked you",
+            tags: ['Friends'],
+            response: {
+                200: blockedUsersResponse,
+                401: errorResponse,
+                500: errorResponse
+            }
+        }
+    }, friendsController.getAllBlockers);
+
     fastify.post("/blocks/:id", {
         preHandler: authMiddleware,
         schema: {

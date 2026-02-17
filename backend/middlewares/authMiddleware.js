@@ -7,8 +7,8 @@ async function authMiddleware(request, reply)
     const accessToken = request.cookies.accessToken;
     const refreshToken = request.cookies.refreshToken;
     try {
-        if (!accessToken)
-            throw new Error("UNAUTHORIZED_NO_ACCESS_TOKEN");
+        if (!refreshToken || !accessToken)
+            throw new Error("UNAUTHORIZED_NO_TOKENS");
         if (refreshToken)
         {
             const blacklisted = tokenModels.isTokenRevoked(db, refreshToken);
@@ -16,7 +16,6 @@ async function authMiddleware(request, reply)
                 throw new Error("TOKEN_REVOKED");
         }
         const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
-        console.log(decoded);
         request.user = decoded;
     }
     catch (error) {

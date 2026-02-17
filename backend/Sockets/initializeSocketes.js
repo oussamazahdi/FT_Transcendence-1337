@@ -7,7 +7,7 @@ import { tokenModels } from "../models/token.model.js";
 export function initializeSocketes(app) {
   const io = new Server(app.server, {
     cors: {
-      origin: "http://localhost:3000",
+      origin: [process.env.FRONTEND_URL,`http://localhost:${process.env.FRONTEND_PORT}`],
       methods: ["GET", "POST"],
       credentials: true,
     },
@@ -29,18 +29,15 @@ export function initializeSocketes(app) {
       const cookies = cookie.parse(rawCookie);
       const accessToken = cookies.accessToken;
       const refreshToken = cookies.refreshToken;
-			console.log("accessToken:", accessToken);
-			console.log("refreshToken:", refreshToken);
 
       if (!accessToken) return next(new Error("Unauthorized"));
 
       if (refreshToken) {
-        const revoked = await tokenModels.isTokenRevoked(socket.db, refreshToken);
+        const revoked = tokenModels.isTokenRevoked(socket.db, refreshToken);
         if (revoked) return next(new Error("TOKEN_REVOKED"));
       }
 
       const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
-			console.log("--- decoded:", decoded);
 
       socket.user = decoded;
 

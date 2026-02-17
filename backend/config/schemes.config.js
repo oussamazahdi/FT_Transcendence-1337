@@ -1,3 +1,6 @@
+// User Auth
+
+// Full user - for /auth/me, own profile
 export const userSchema = {
     type: 'object',
     properties: {
@@ -7,10 +10,39 @@ export const userSchema = {
         firstname: { type: 'string' },
         lastname: { type: 'string' },
         avatar: { type: ['string', 'null'] },
-        isverified: { type: 'integer'},
-        status2fa: { type: 'integer'}
+        isverified: { type: 'integer' },
+        status2fa: { type: 'integer' },
+        player_level: { type: 'number' },
+        player_xp: { type: 'integer' }
     }
 };
+
+// Public user 
+export const publicUserSchema = {
+    type: 'object',
+    properties: {
+        id: { type: 'integer' },
+        username: { type: 'string' },
+        firstname: { type: 'string' },
+        lastname: { type: 'string' },
+        avatar: { type: ['string', 'null'] },
+    }
+};
+
+// Minimal user 
+export const minimalUserSchema = {
+    type: 'object',
+    properties: {
+        id: { type: 'integer' },
+        username: { type: 'string' },
+        firstname: { type: 'string' },
+        lastname: { type: 'string' },
+        avatar: { type: ['string', 'null'] },
+    }
+};
+
+// response success and error
+
 export const errorResponse = {
     type: 'object',
     properties: {
@@ -31,7 +63,7 @@ export const objectSuccessResponse = {
         message: { type: 'string' },
         userData: userSchema
     }
-}
+};
 
 export const nestedObjectSuccessResponse = {
     type: 'object',
@@ -39,13 +71,38 @@ export const nestedObjectSuccessResponse = {
         message: { type: 'string' },
         userData: {
             type: 'array',
-            items: userSchema
+            items: publicUserSchema
         }
     }
-    
-}
+};
+
+// Params & queries
+
+export const idParamSchema = {
+    type: 'object',
+    required: ['id'],
+    properties: {
+        id: { type: 'integer', minimum: 1 }
+    }
+};
+
+export const paginationQuerySchema = {
+    type: 'object',
+    properties: {
+        page: { type: 'integer', minimum: 1, default: 1 }
+    }
+};
+
+export const searchQuerySchema = {
+    type: 'object',
+    properties: {
+        q: { type: 'string', default: '' },
+        page: { type: 'integer', minimum: 1, default: 1 }
+    }
+};
 
 // 2FA
+
 export const twoFaSetupResponse = {
     type: 'object',
     properties: {
@@ -62,17 +119,18 @@ export const twoFaTokenBody = {
     }
 };
 
-// Friends
-export const userArraySchema = {
+// friends
+
+export const minimalUserArraySchema = {
     type: 'array',
-    items: userSchema
+    items: minimalUserSchema
 };
 
 export const friendsListResponse = {
     type: 'object',
     properties: {
         message: { type: 'string' },
-        friendList: userArraySchema
+        friendList: minimalUserArraySchema
     }
 };
 
@@ -80,7 +138,7 @@ export const friendRequestsResponse = {
     type: 'object',
     properties: {
         message: { type: 'string' },
-        requestsList: userArraySchema
+        requestsList: minimalUserArraySchema
     }
 };
 
@@ -88,24 +146,178 @@ export const sentFriendRequestsResponse = {
     type: 'object',
     properties: {
         message: { type: 'string' },
-        Requests: userArraySchema
+        Requests: minimalUserArraySchema
     }
 };
+
 export const blockedUsersResponse = {
     type: 'object',
     properties: {
         message: { type: 'string' },
-        blockedUsers: userArraySchema
+        blockedUsers: minimalUserArraySchema
     }
 };
 
-export const idParamSchema = {
+export const friendsSearchResponse = {
     type: 'object',
-    required: ['id'],
     properties: {
-        id: { type: 'integer', minimum: 1 }
+        message: { type: 'string' },
+        page: { type: 'integer' },
+        limit: { type: 'integer' },
+        friends: minimalUserArraySchema
     }
 };
+
+// chat
+
+export const  conversationSchema = {
+    type: 'object',
+    properties: {
+        userid: { type: 'integer' },
+        convid: { type: 'integer' },
+        firstname: { type: 'string' },
+        lastname: { type: 'string' },
+        avatar: { type: ['string', 'null'] },
+        last_message: { type: ['string', 'null'] },
+        updatedate: { type: ['string', 'null'] }
+    }
+};
+
+export const conversationSearchSchema = {
+    type: 'object',
+    properties: {
+        friend_id: { type: 'integer' },
+        firstname: { type: 'string' },
+        lastname: { type: 'string' },
+        username: { type: 'string' },
+        avatar: { type: ['string', 'null'] },
+        conversation_id: { type: 'integer' },
+        last_message: { type: ['string', 'null'] },
+        updatedate: { type: ['string', 'null'] }
+    }
+};
+
+export const messageSchema = {
+    type: 'object',
+    properties: {
+        message_id: { type: 'integer' },
+        sender_id: { type: 'integer' },
+        type: {type: 'string'},
+        status: {type: 'string'},
+        avatar: { type: ['string', 'null'] },
+        content: { type: 'string' },
+        creationdate: { type: 'string' }
+    }
+};
+
+export const allConversationsResponse = {
+    type: 'object',
+    properties: {
+        message: { type: 'string' },
+        conversations: {
+            type: 'array',
+            items: conversationSchema
+        }
+    }
+};
+
+export const searchConversationsResponse = {
+    type: 'object',
+    properties: {
+        message: { type: 'string' },
+        page: { type: 'integer' },
+        limit: { type: 'integer' },
+        conversations: {
+            type: 'array',
+            items: conversationSearchSchema
+        }
+    }
+};
+
+export const messagesQuerySchema = {
+    type: 'object',
+    required: ['friendId'],
+    properties: {
+        friendId: { type: 'integer' },
+        page: { type: 'integer', minimum: 1, default: 1 }
+    }
+};
+
+export const allMessagesResponse = {
+    type: 'object',
+    properties: {
+        message: { type: 'string' },
+        page: { type: 'integer' },
+        limit: { type: 'integer' },
+        messages: {
+            type: 'array',
+            items: messageSchema
+        }
+    }
+};
+
+// game
+
+export const gameSettingsSchema = {
+    type: 'object',
+    properties: {
+        player_id: { type: 'integer' },
+        player_xp: { type: 'integer' },
+        player_level: { type: 'integer' },
+        game_mode: { type: 'string' },
+        ball_speed: { type: 'integer' },
+        score_limit: { type: 'integer' },
+        paddle_size: { type: 'integer' },
+        updated_at: { type: 'string' }
+    }
+};
+
+export const gameSettingsResponse = {
+    type: 'object',
+    properties: {
+        message: { type: 'string' },
+        settings: gameSettingsSchema
+    }
+};
+
+export const updateGameSettingsBody = {
+    type: 'object',
+    properties: {
+        player_xp: { type: 'integer' },
+        player_level: { type: 'integer' },
+        game_mode: { type: 'string' },
+        ball_speed: { type: 'integer', minimum: 1, maximum: 3 },
+        score_limit: { type: 'integer', minimum: 5, maximum: 20 },
+        paddle_size: { type: 'integer', minimum: 1, maximum: 3 }
+    }
+};
+
+export const matchHistorySchema = {
+    type: 'object',
+    properties: {
+        id: { type: 'integer' },
+        player1_id: { type: 'integer' },
+        player2_id: { type: 'integer' },
+        player1_score: { type: 'integer' },
+        player2_score: { type: 'integer' },
+        winner_id: { type: ['integer', 'null'] },
+        status: { type: 'string' },
+        created_at: { type: 'string' }
+    }
+};
+
+export const matchHistoryResponse = {
+    type: 'object',
+    properties: {
+        message: { type: 'string' },
+        data: {
+            type: 'array',
+            items: matchHistorySchema
+        }
+    }
+};
+
+// notifs
 
 export const notificationSchema = {
 	type: "object",
@@ -120,7 +332,10 @@ export const notificationSchema = {
 		status: { type: "string" },
 		is_read: { type: "integer" },
 		expires_at: { type: ["string", "null"] },
-		created_at: { type: "string" }
+		created_at: { type: "string" },
+		is_expired: { type: "integer", enum: [0, 1] },
+		sender_username: { type: ["string", "null"] },
+    sender_avatar: { type: ["string", "null"], format: "uri" }
 	}
 };
 
@@ -128,10 +343,47 @@ export const notificationsSuccessResponse = {
   type: "object",
   properties: {
     message: { type: "string" },
-    userData: {
+    notifications: {
       type: "array",
       items: notificationSchema
     }
   }
 };
 
+export const unreadCountResponse = {
+    type: 'object',
+    properties: {
+        message: { type: 'string' },
+        unreadCount: { type: 'integer' }
+    }
+};
+
+export const leaderboardSchema = {
+    type: 'object',
+    properties: {
+        id: { type: 'integer' },
+        username: { type: 'string' },
+        avatar: { type: ['string', 'null'] },
+        firstname: { type: 'string' },
+        lastname: { type: 'string' },
+        player_xp: { type: ['integer'] },
+        player_level: { type: ['number'] },
+        wins: { type: ['integer'] },
+        loses: { type: ['integer'] },
+        forfaits: { type: ['integer'] }
+    }
+};
+
+export const usersRanking = {
+    type: 'object',
+    properties: {
+        message: { type: 'string' },
+        totalUsers: { type: 'integer'},
+        result: {
+            type: 'array',
+            items: leaderboardSchema
+        }
+    }
+};
+
+export const userArraySchema = minimalUserArraySchema;

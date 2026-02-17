@@ -1,67 +1,32 @@
-import {onJoinGame, onDisconnect, onUpdateData, onPaddleMove, onUserOnline,
-} from "../controllers/connection.controller.js";
-
-import { httpError } from "../services/Notification.service.js";
-import { NotifServices } from "../services/Notification.service.js";
-
-const service = new NotifServices();
-
-export async function onGameInvite(socket, io, data, ack) {
-  try {
-		const { user, roomId, gameType } = data ?? {};
-		
-    if (!user || !roomId || !gameType) {
-			throw httpError(400, "user, roomId, gameType are required");
-    }
-		
-    const userId = socket.user?.userId;
-		console.log("receve game invite :", data);
-    if (!userId) {
-			throw httpError(401, "Unauthorized");
-    }
-		
-    if (user === userId) {
-			throw httpError(400, "You cannot invite yourself");
-    }
-		
-    const notif = await service.create(socket.db, {
-			senderId: userId,
-      receiverId: user,
-      type: "game_invite",
-      title: "Game invite",
-      message: "You received a game invite",
-      payload: { roomId, gameType },
-    });
-		
-    io.to(`user:${user}`).emit("notification:new", notif);
-		
-		console.log("***********> user: ", user)
-    ack?.({ ok: true, notification: notif });
-  } catch (error) {
-		ack?.({
-			ok: false,
-      statusCode: error?.statusCode ?? 500,
-      message: error?.message ?? "Internal server error",
-    });
-  }
-}
+import { connectionController } from "../controllers/connection.controller.js";
+import { chatController } from "../controllers/chat.controller.js";
+import { onlineUsers } from "../store/memory.store.js";
 
 export function initSocketManager(io) {
   io.on("connection", (socket) => {
-    console.log("✅ Socket connected:", socket.id);
+		
+		const userId = socket.user?.userId;
+    if (userId) {
+			socket.join(`user:${userId}`);
+      socket.join(`chat:${userId}`);
+    }
 
-    const userId = socket.user?.userId;
-    if (userId) socket.join(`user:${userId}`);
+		onlineUsers.set(userId, socket.id);
+		
+    io.emit("users:status", Array.from(onlineUsers.keys()));
+    socket.on("join-game", (data) => connectionController.onJoinGame(socket, io, data));
+    socket.on("update-data", (data) => connectionController.onUpdateData(socket, io, data));
+    socket.on("paddle-move", (data) => connectionController.onPaddleMove(socket, io, data));
+    
+    socket.on("disconnect", () => { connectionController.onDisconnect(socket, io);});
+    socket.on("leave-game", () => connectionController.onDisconnect(socket, io));
+    
+    socket.on("game:invite", (data, ack) => connectionController.onGameInvite(socket, io, data, ack));
+    socket.on("game:accept", async (data, ack) => { connectionController.onGameAccept(socket, io, data, ack);});
 
-    socket.on("join-game", (data) => onJoinGame(socket, io, data));
-    socket.on("update-data", (data) => onUpdateData(socket, io, data));
-    socket.on("paddle-move", (data) => onPaddleMove(socket, io, data));
+    socket.on("chat:send", (data) => chatController.sendMessage(socket, io, data));
 
-    socket.on("disconnect", () => onDisconnect(socket, io));
-    socket.on("leave-game", () => onDisconnect(socket, io));
-
-    socket.on("user:online", (data) => onUserOnline(socket, data));
-
-    socket.on("game:invite", (data, ack) => onGameInvite(socket, io, data, ack));
-  });
+		socket.on("chat:game:accept", async (data, ack) => connectionController.onChatGameAccept(io, data, ack));
+		socket.on("chat:game:reject", async (data, ack) => connectionController.onChatGameReject(io, data, ack));
+	});
 }

@@ -5,7 +5,7 @@ import fs from "fs"
 
 import { userModels } from "../models/user.model.js";
 import { generateFileNameByUser } from "../utils/authUtils.js";
-import { updateUserSchema, zErrorHandler } from "../utils/inputValidator.js"
+import { updateUserSchema, passwordValidator, zErrorHandler } from "../utils/inputValidator.js"
 
 /**
  * still neeed to apply erroring system
@@ -13,16 +13,25 @@ import { updateUserSchema, zErrorHandler } from "../utils/inputValidator.js"
 
 async function fileUpload(user, file)
 {
-	const uploadDir = path.join(process.cwd(), 'uploads');
-	const image = file.fileStream;
-	const filename = generateFileNameByUser(user.username, file.filename, file.mimetype);
-	const filePath = path.join(uploadDir, filename);
-	console.log("MDR");
-	await pipeline(image, fs.createWriteStream(filePath));
-	console.log("LOL");
-	const fileLink = `${process.env.API_URL}/uploads/${filename}`;
-	console.log(fileLink);
-	return (fileLink);
+		const oldAvatar = user?.avatar;
+
+		const uploadDir = path.join(process.cwd(), 'uploads');
+		const image = file.fileStream;
+		const filename = generateFileNameByUser(user.username, file.filename, file.mimetype);
+		const filePath = path.join(uploadDir, filename);
+		await pipeline(image, fs.createWriteStream(filePath));
+		const fileLink = `${process.env.API_URL}/uploads/${filename}`;
+		if (oldAvatar && !oldAvatar.includes('/uploads/default/')) 
+		{
+            const oldFilename = oldAvatar.split('/uploads/')[1];
+            if (oldFilename)
+			{
+                const oldPath = path.join(process.cwd(), 'uploads', oldFilename);
+                if (fs.existsSync(oldPath))
+					fs.unlinkSync(oldPath);
+            }
+        }
+		return (fileLink);
 }
 
 export class UserController 
@@ -70,6 +79,10 @@ export class UserController
 
 			if (request.user.userId !== parseInt(request.params.id))
 				return reply.code(403).send({error: "FORBIDDEN"});
+
+			const user = userModels.getUserById(db, request.params.id);
+			if (!user)
+				return reply.code(404).send({error: "USER_NOT_FOUND"});
 			for await (const part of request.parts())
 			{
 				if (part.type === "field")
@@ -82,19 +95,16 @@ export class UserController
 						mimetype: part.mimetype,
 						fileStream: part.file
 					}
-					userData["avatar"] = await fileUpload(request.user, fileInfo);
+					userData["avatar"] = await fileUpload(user, fileInfo);
 				}
 			}
 			const validatedData = updateUserSchema.parse(userData);
-			const user = userModels.getUserById(db, request.params.id);
-			if (!user)
-				return reply.code(404).send({error: "USER_NOT_FOUND"});
 
 			userData = {
 				firstname: validatedData.firstname || user.firstname,
 				lastname: validatedData.lastname || user.lastname,
-				username: validatedData.username || user.username,
-				email: validatedData.email || user.email,
+				username: (validatedData.username || user.username).toLowerCase(),
+				email: (validatedData.email || user.email).toLowerCase(),
 				avatar: validatedData.avatar || user.avatar
 			}
 			
@@ -104,7 +114,6 @@ export class UserController
 		}
 		catch (error) {
 			const zError = zErrorHandler(error);
-			console.log(zError.fields);
 			if (zError !== null)
 				return reply.code(zError.code).send({error: zError.error, fields: zError.fields});
 			if (error.code)
@@ -147,84 +156,39 @@ export class UserController
 				return reply.code(400).send({error: 'NEW_PASSWORDS_DO_NOT_MATCH'});
 			if (newPassword === oldPassword)
 				return reply.code(400).send({error: 'NEW_PASSWORD_MATCHS_OLD_PASSWORD'});
-
 			const userPassword = userModels.getPassword(db, request.user.userId);
 			const match = await bcrypt.compare(oldPassword, userPassword);
 			if (!match)
 				return reply.code(401).send({ error: 'CURRENT_PASSWORD_IS_INCORRECT' });
-			await userModels.setNewPassword(db, request.user.userId, newPassword);
+			const validPass  = passwordValidator.parse(newPassword);
+			await userModels.setNewPassword(db, request.user.userId, validPass);
 			return reply.code(200).send({message: "PASSWORD_CHANGED_SUCCESSFULLY"});
 		}
 		catch (error) {
+			const zError = zErrorHandler(error);
+			if (zError !== null)
+				return reply.code(zError.code).send({error: zError.error, fields: zError.fields});
 			if (error.code)
 				return reply.code(error.code).send({error: error.message});
 			else
 				return reply.code(500).send({error: error.message});
         }
 	}
-	searchUsers(request, reply){
-		try{
-			const db = request.server.db;
-			const { query } = request.query;
-	
-			console.log(query);
-			if (!query || typeof query !== 'string'){
-				return reply.code(400).json({ error: 'QUERY_PARAMETER_REQUERED' });
-			}
-	
-			const searchUser = query.trim();
-	
-			if (trimmedQuery.length < 2) {
-				return reply.code(400).json({ error: 'QUERY_TOO_SHORT' });
-			}
-	
-			if (trimmedQuery.length > 20) {
-		  return reply.code(400).json({ error: 'QUERY_TOO_LONG' });
-		}
-	
-			const searchPattern = `%${searchUser}%`;
-			const startsWithPattern = `${searchUser}%`;
-	
-			// add AND id != the userId later 
-			const statement = db.prepare(`
-	
-				SELECT id, firstname, lastname, username, email, avatar
-				FROM users
-				WHERE (
-					firstname LIKE ? OR
-					lastname LIKE ? OR
-					username LIKE ?
-				)
-				ORDER BY
-					CASE
-					WHEN firstname LIKE ? THEN 1
-					WHEN lastname LIKE ? THEN 2
-					WHEN username LIKE ? THEN 3
-					ELSE 4
-					END,
-					firstname ASC
-				LIMIT ?
-			`);
-	
-			const results = statement.all(
-			searchPattern,
-			searchPattern,
-			searchPattern,
-			startsWithPattern,
-			startsWithPattern,
-			startsWithPattern,
-			5
-			);
-			const formattedResults = results.map(user => ({
-			id: user.id,
-			firstname: user.firstname,
-			lastname: user.lastname,
-			username: user.username,
-			avatar: user.avatar,
-			fullName: `${user.firstname} ${user.lastname}`
-			}));
-	
-			return reply.code(200).send(formattedResults);
+
+	searchUsers(request, reply)
+	{
+		const db = request.server.db;
+		try
+		{
+			const { q, page } = request.query;
+			const pageNum = Math.max(1, Number(page));
+        	const limit = 10;
+			const offset = (pageNum - 1) * limit;
+			const query = q.trim();
+			if (!query || query.length < 2 || query.length > 20)
+				return reply.code(400).send({ error: 'INVALID_QUERY' });
+			const results = userModels.searchUsers(db, q, limit, offset);
+			return reply.code(200).send({message: "SUCCESS", page: pageNum, limit: limit, users: results});
 		}
 		catch (error) {
 			if (error.code)

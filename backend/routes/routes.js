@@ -5,6 +5,9 @@ import { twoFactorAuthRoutes } from "./twoFactor.routes.js"
 import { friendsRoutes } from "./friends.routes.js";
 import { notifRoutes } from "./notif.routes.js";
 import { gameRoutes } from "./game.routes.js";
+import { chatRoutes } from "./chat.routes.js";
+import { leaderboardRoutes } from "./leaderboard.routes.js";
+import { dashboardRoutes } from "./dashboard.routes.js";
 
 function initializeRoutes(fastify)
 {
@@ -13,8 +16,11 @@ function initializeRoutes(fastify)
     fastify.register(oauthRoutes, { prefix: '/api/oauth' });
     fastify.register(twoFactorAuthRoutes, {prefix: '/api/2fa/'});
     fastify.register(friendsRoutes, {prefix: '/api/friends'});
-    fastify.register(notifRoutes, {prefix: "/api/notifications"})
-    fastify.register(gameRoutes, {prefix: "/api/game"})
+    fastify.register(notifRoutes, {prefix: "/api/notifications"});
+    fastify.register(gameRoutes, {prefix: "/api/game"});
+    fastify.register(chatRoutes, {prefix: "/api/chat"});
+    fastify.register(leaderboardRoutes, {prefix: "/api/leaderboard"});
+    fastify.register(dashboardRoutes, {prefix: "/api/statistics"});
 }
 
 export { initializeRoutes };

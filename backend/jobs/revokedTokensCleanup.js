@@ -16,8 +16,6 @@ function setupTokenCleanup(db) {
         `).run(now);
         
     });
-    
-    console.log(' Token cleanup done');
 }
 
 export { setupTokenCleanup };

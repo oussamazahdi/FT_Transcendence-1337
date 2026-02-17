@@ -1,0 +1,112 @@
+import { chatModels } from "../models/chat.model.js";
+import { friendsModels } from "../models/friends.model.js";
+
+export class ChatController 
+{
+    async searchConversations(request, reply)
+    {
+        const db = request.server.db;
+        const { q = "", page = 1 } = request.query;
+        const pageNum = Math.max(1, Number(page));
+        const limit = 10;
+        const offset = (pageNum - 1) * limit;
+        const query = q.trim();
+
+        try {
+            const conversations = chatModels.searchConversationsByPairs(db, request.user.userId, query, limit, offset);
+            return reply.code(200).send({message: "SUCCESS", page: pageNum, limit: limit, conversations: conversations});
+        }
+        catch (error) {
+            if (error.code)
+                return reply.code(error.code).send({error: error.message});
+            else
+                return reply.code(500).send({error: error.message});
+        }
+    }
+
+    async getAllConversations(request, reply)
+    {
+        const db = request.server.db;
+
+        try {
+            const conversations = chatModels.getAllConversations(db, request.user.userId);
+            return reply.code(200).send({message: "SUCCESS", conversations: conversations});
+        }
+        catch (error) {
+            if (error.code)
+                return reply.code(error.code).send({error: error.message});
+            else
+                return reply.code(500).send({error: error.message});
+        }
+    }
+
+    async getAllMessages(request, reply)
+    {
+        const db = request.server.db;
+        const { page = 1, friendId } = request.query;
+        const pageNum = Math.max(1, Number(page));
+        const limit = 30;
+        const offset = (pageNum - 1) * limit;
+
+        try {
+            if (!friendId)
+                return reply.code(400).send({error: "FRIEND_ID_IS_REQUIRED"});
+            const conv = chatModels.getConversation(db, request.user.userId, friendId);
+            const messages = chatModels.getAllMessages(db, conv.id, request.user.userId, limit, offset);
+            return reply.code(200).send({message: "SUCCESS", page: pageNum, limit: limit, messages: messages});
+        }
+        catch (error) {
+            if (error.code)
+                return reply.code(error.code).send({error: error.message});
+            else
+                return reply.code(500).send({error: error.message});
+        }
+    }
+
+    sendMessage(socket, server, data)
+    {
+        const senderId = socket.user.userId;
+        const db = server.db;
+        let msgId;
+        let expDate = null;
+        try {
+            if (!data.receiverId)
+                return (socket.emit("chat:error", {message: "NO_RECEIVER_PROVIDED"}));
+            if (data.content.length > 500 || !data.content)
+                return (socket.emit("chat:error", {message: "SOMETHING_WRONG_WITH_MESSAGE"}));
+            const receiverId = data.receiverId;
+            const friendshipStatus = friendsModels.isFriend(db, senderId, receiverId);
+            const blocked = friendsModels.isBlockedByUser(db, senderId, receiverId);
+            if (!friendshipStatus || blocked.status)
+                return socket.emit("chat:error", {message: "NOT_ALLOWED_TO_CONTACT_USER"});
+            if (senderId === receiverId)
+                return socket.emit("chat:error", {message: "NOT_ALLOWED_TO_CONTACT_YOURSELF"});
+            const convId = chatModels.getOrCreateConversationId(db, senderId, receiverId);
+            if (data.type === "game_invite")
+            {
+                expDate = new Date(Date.now() + (15 * 60 * 1000)).toISOString();
+                msgId = chatModels.createNewMessage(db, convId, senderId, data.type, data.content, expDate);
+            }
+            else
+                msgId = chatModels.createNewMessage(db, convId, senderId, data.type, data.content, expDate);
+            chatModels.UpdateLastMessage(db, senderId, receiverId);
+            const conversation = chatModels.getConversationById(db, senderId, convId);
+            const payload = {
+                msgId: msgId,
+                senderId: senderId,
+                receiverId: receiverId,
+                avatar: conversation.avatar,
+                type: data.type,
+                content: conversation.last_message,
+                expired_at: expDate,
+                sentAt: conversation.updatedate
+            }
+            socket.to(`chat:${receiverId}`).emit("chat:receiver", payload);
+        }
+        catch(error) {
+                socket.emit("chat:error", { message: error.message || "Internal Server Error" });
+        } 
+    }
+}
+
+export const chatController = new ChatController();

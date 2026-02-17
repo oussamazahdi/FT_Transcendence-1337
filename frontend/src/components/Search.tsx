@@ -1,0 +1,126 @@
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { useEffect, useState } from "react";
+import SearchUserCard from "./SearchUserCard";
+import { autofetch } from "@/lib/api.tsx";
+import type { User } from "@/types";
+import { SEARCH_USERS_ERROR } from "@/lib/utils";
+import { useAuth } from "@/contexts/authContext";
+
+type SearchUser = Pick<User, "id" | "avatar" | "firstname" | "lastname" | "username">;
+
+const Search = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchData, setSearchData] = useState<SearchUser[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const { triggerError } = useAuth();
+  useEffect(() => {
+    if (!searchQuery.trim() || searchQuery.trim().length < 2) {
+      setIsOpen(false);
+      setSearchData([]);
+      return;
+    }
+
+    const delayDebounceFn = setTimeout(async () => {
+      setLoading(true);
+      setIsOpen(true);
+      try {
+        const response = await autofetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/search?q=${searchQuery}&page=${page}`,{
+            method: "GET",
+            credentials: "include",
+          },
+        );
+        const data = await response.json();
+        if (!response.ok) 
+          throw new Error(SEARCH_USERS_ERROR[data.error] || SEARCH_USERS_ERROR.default);
+
+        const searchResult: SearchUser[] = data.users ?? [];
+
+        setSearchData((prev) => {
+          if (page === 1) return searchResult;
+          return [...prev, ...searchResult];
+        });
+        setHasMore(searchResult.length === 10);
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : SEARCH_USERS_ERROR.default;
+        triggerError(message);
+      } finally {
+        setLoading(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery, page, triggerError]);
+
+  const renderlist = () => {
+    if (!searchData || searchData.length === 0) {
+      if (loading)
+        return (
+          <div className="text-sm text-center text-white/60">Loading...</div>
+        );
+      return (
+        <div className="text-sm text-center text-white/60">
+          No users found
+        </div>
+      );
+    }
+    return (
+      <div className="flex flex-col h-full">
+        {searchData.map((user) => (
+          <SearchUserCard
+            key={user.id}
+            id={user.id}
+            avatar={user.avatar}
+            firstname={user.firstname}
+            lastname={user.lastname}
+            username={user.username}
+            setIsOpen={setIsOpen}
+            setSearchQuery={setSearchQuery}
+          />
+        ))}
+        {loading && (
+          <div className="text-xs text-center text-white/60 py-2">
+            Loading...
+          </div>
+        )}
+        {!loading && hasMore && searchData.length > 0 && (
+          <div className="w-full flex justify-center py-2 shrink-0">
+            <button
+              onClick={() => setPage((p) => p + 1)}
+              className="text-xs border border-gray-400 rounded-sm px-3 py-1 text-gray-300 hover:bg-gray-700 hover:text-white transition"
+            >
+              Load more users
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="relative hidden md:flex items-center border border-[#9D9D9D]/60 rounded-full px-4 py-2">
+      <div className="flex items-center">
+        <input
+          value={searchQuery}
+          maxLength={30}
+          onChange={(e) => {
+            setSearchQuery(e.currentTarget.value);
+            setPage(1);
+          }}
+          placeholder="Search"
+          className="bg-transparent outline-none text-white placeholder-white/40"
+        />
+        <MagnifyingGlassIcon className="w-5 h-5 ml-2 text-white/60" />
+      </div>
+      {isOpen && (
+        <div className="absolute right-0 top-full mt-2 max-h-64 bg-[#000000] rounded-[10px] flex flex-col gap-1 p-2 overflow-y-auto z-50 custom-scrollbar min-w-65">
+          {renderlist()}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Search;

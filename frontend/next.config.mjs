@@ -2,28 +2,28 @@
 const nextConfig = {
 
   images: {
+    domains: ["lh3.googleusercontent.com"],
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'http',
         hostname: 'localhost',
-        port: '3001', // ⚠️ Crucial: Matches the port in your error URL
-        pathname: '/uploads/**', // Allows images from the uploads folder
+        pathname: '/uploads/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'backend',
+        port: '3001',
+        pathname: '/uploads/**',
       },
       {
         protocol: 'https',
-        hostname: 'lh3.googleusercontent.com',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.googleusercontent.com',
+        hostname: '**.googleusercontent.com/**',
         port: '',
         pathname: '/**',
       },
     ],
   },
-  /* config options here */
 };
 
 export default nextConfig;

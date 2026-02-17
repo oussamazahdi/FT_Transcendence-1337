@@ -10,6 +10,6 @@ export const oauth2Config = {
         auth: googleOAuth2.GOOGLE_CONFIGURATION
     },
     startRedirectPath: '/api/oauth/google',
-    callbackUri: "http://localhost:3001/api/oauth/google/callback",
+    callbackUri: `${process.env.API_URL}/api/oauth/google/callback`,
     scope: ['profile', 'email'],
 };

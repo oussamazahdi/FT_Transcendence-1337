@@ -3,9 +3,12 @@ import fs from "fs"
 import path from "path";
 import { pipeline } from 'stream/promises';
 import { authModels } from "../models/auth.model.js";
-import { generateFileNameByUser, generateToken, updateTokenFlags } from "../utils/authUtils.js";
 import { tokenModels } from "../models/token.model.js";
+import { twoFactorModels } from "../models/twoFactor.model.js";
+import { generateFileNameByUser, generateToken, updateTokenFlags } from "../utils/authUtils.js";
 import { getEmailLetter } from "../templates/emailLetter.js";
+import { MatchController } from "./game.controller.js";
+import { passwordValidator, zErrorHandler } from "../utils/inputValidator.js"
 
 
 export class AuthController {
@@ -18,31 +21,33 @@ export class AuthController {
             const result = await authModels.loginUser(db, email, password);
             const params = {
                 isVerified: !!result.isverified,
-                status2fa: !!result.status2fa
+                hasAvatar: !!result.avatar,
+                status2fa: !!result.status2fa,
+                session2FA: !!result.status2fa
             }
             if (result.message && result.message.includes("USER_NOT_FOUND"))
                 return reply.code(404).send({error: "USER_NOT_FOUND"});
             if (result.message && result.message.includes("INVALID_PASSWORD"))
                 return reply.code(403).send({error: "INVALID_PASSWORD"});
+            twoFactorModels.update2FASessionStatus(db, result.status2fa, result.id);
             const accessToken = generateToken(result.id, result.username, process.env.JWT_SECRET, process.env.JWT_EXPIRATION, params, "access");
             const refreshToken = generateToken(result.id, result.username, process.env.JWT_REFRESH_SECRET, process.env.JWT_REFRESH_EXPIRATION, null, "refresh");
             authModels.addNewToken(db, result.id, refreshToken);
             reply.setCookie('refreshToken', refreshToken, {
                 httpOnly: true,
-                sameSite: 'strict',
+                sameSite: 'lax',
                 path: '/',
-                maxAge: 7 * 24 * 60 * 60 * 1000
+                maxAge: 300
             });
             reply.setCookie('accessToken', accessToken, {
                 httpOnly: true,
-                sameSite: 'strict',
+                sameSite: 'lax',
                 path: '/',
-                maxAge: 7 * 24 * 60 * 60 * 1000
+                maxAge: 30
             });
             return reply.code(200).send({message: "AUTHORIZED", userData: result});
         }
         catch (error) {
-            // console.log(error);
                 if (error.code)
                     return reply.code(error.code).send({error: error.message});
                 else
@@ -56,7 +61,9 @@ export class AuthController {
         const { firstname, lastname, username, email, password } = request.body;
         const db = request.server.db;
         try {
-            const user = await authModels.addNewUser(db, firstname, lastname, username, email, password);
+            const validPass  = passwordValidator.parse(password);
+            const user = await authModels.addNewUser(db, firstname, lastname, username, email, validPass);
+			MatchController.addNewGameSettings(request.server.db, user.id);
             const params = {
                 isVerified: !!user.isverified,
                 hasAvatar: !!user.avatar,
@@ -67,21 +74,23 @@ export class AuthController {
             authModels.addNewToken(db, user.id, refreshToken);
             reply.setCookie('refreshToken', refreshToken, {
                 httpOnly: true,
-                sameSite: 'strict',
+                sameSite: 'lax',
                 path: '/',
-                maxAge: 7 * 24 * 60 * 60 * 1000
+                maxAge: 300
             });
             reply.setCookie('accessToken', accessToken, {
                 httpOnly: true,
-                sameSite: 'strict',
+                sameSite: 'lax',
                 path: '/',
-                maxAge: 7 * 24 * 60 * 60 * 1000
+                maxAge: 30
             });
             return reply.code(201).send({message: "USER_CREATED_SUCCESSFULLY"});
         }
         catch (error)
         {
-            // console.log(error);
+            const zError = zErrorHandler(error);
+            if (zError !== null)
+                return reply.code(zError.code).send({error: zError.error, fields: zError.fields});
             if (error.code)
                 return reply.code(error.code).send({error: error.message});
             else
@@ -130,19 +139,16 @@ export class AuthController {
     {
         const db = request.server.db;
         const refreshToken = request.cookies.refreshToken;
-        const accessToken = request.cookies.accessToken;
-    
         try {
-            if (!refreshToken || !accessToken)
-                throw new Error("UNAUTHORIZED_NO_TOKEN");
+            if (!refreshToken)
+                return reply.code(401).send({error:"UNAUTHORIZED_NO_TOKEN"});
             const blacklisted = tokenModels.isTokenRevoked(db, refreshToken);
             if (blacklisted)
-                throw new Error("TOKEN_REVOKED");
+							return reply.code(402).send({error:"TOKEN_REVOKED"});
             const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-            //query the status of isVerfied from the database to get fresh data in case refeesh token have old data
-            const tokenDbResults = tokenModels.tokenExists(db, refreshToken); // check if token exists
+            const tokenDbResults = tokenModels.tokenExists(db, refreshToken);
             if (!tokenDbResults)
-                throw new Error("INVALID_TOKEN");
+							return reply.code(403).send({error: "INVALID_TOKEN"});
             const user = authModels.findUserById(db, decoded.userId);
             updateTokenFlags(user, reply);
             return reply.code(201).send({message: "TOKEN_REFRESHED_SUCCESSFULLY"});
@@ -160,11 +166,9 @@ export class AuthController {
         const db = request.server.db;
         try {
             const user = authModels.findUserById(db, request.user.userId);
-            // console.log(user)
             return reply.code(200).send({message: "SUCCESS", userData: user});
         }
         catch (error) {
-            // console.log(error);
             if (error.code)
                 return reply.code(error.code).send({error: error.message});
             else
@@ -174,7 +178,8 @@ export class AuthController {
     
     async   logout(request, reply)
     {
-        const db = request.server.db
+        const db = request.server.db;
+		const io = request.server.io;
         try {
             const refreshToken = request.cookies.refreshToken;
             if (!refreshToken)
@@ -185,12 +190,12 @@ export class AuthController {
             tokenModels.revokeToken(db, refreshToken, expiration);
             reply.clearCookie('accessToken', {
                 httpOnly: true,
-                sameSite: 'strict',
+                sameSite: 'lax',
                 path: '/',
             });
             reply.clearCookie('refreshToken', {
                 httpOnly: true,
-                sameSite: 'strict',
+                sameSite: 'lax',
                 path: '/',
             });
             return reply.code(200).send({message: "LOGGED_OUT"});
@@ -240,11 +245,11 @@ export class AuthController {
             
             const user = authModels.getUserVerificationData(db, request.user.userId);
             if (user.isverified)
-                throw new Error("EMAIL_IS_ALREADY_VERIFIED");
+                return reply.code(409).send({error: "EMAIL_IS_ALREADY_VERIFIED"});
             if (today > user.otpexpiration)
-                throw new Error("EXPIRED_OTP");
+                return reply.code(409).send({error: "EXPIRED_OTP"});
             if (code !== user.otp)
-                throw new Error("INCORRECT");
+                return reply.code(409).send({error: "INCORRECT"});
             authModels.markEmailVerified(db, request.user.userId);
             const userflags = authModels.findUserById(db, request.user.userId);
             updateTokenFlags(userflags, reply);

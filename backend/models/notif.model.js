@@ -1,9 +1,14 @@
 import { NOTIFICATION_TYPES } from "../rules/notifications.rules.js";
 
-export class NotifModel {
+class notifModel {
+	getNotifSelectQuery() {
+		return `SELECT notif.*, u.username AS sender_username, u.avatar AS sender_avatar
+			FROM notifications notif
+			LEFT JOIN users u ON u.id = notif.sender_id`;
+	}
+
   async create(db, { senderId, receiverId, type, title, message, payload = null, expiresAt = null }) {
     if (!Object.values(NOTIFICATION_TYPES).includes(type)) return null;
-    console.log("all types: ",typeof senderId, typeof receiverId, typeof type, typeof title, typeof message, typeof payload, typeof expiresAt)
     const safeExpiresAt = expiresAt instanceof Date ? expiresAt.toISOString() : expiresAt ?? null;
 
     const res = db.prepare(
@@ -15,7 +20,7 @@ export class NotifModel {
   }
 
   async getById(db, id) {
-    return db.prepare(`SELECT * FROM notifications WHERE id = ?`).get(id);
+    return db.prepare(`${this.getNotifSelectQuery()} WHERE notif.id = ?`).get(id);
   }
 
   async updateStatus(db, id, status) {
@@ -31,6 +36,25 @@ export class NotifModel {
   }
 
   async getForUser(db, userId) {
-    return db.prepare(`SELECT * FROM notifications WHERE receiver_id = ? ORDER BY created_at DESC`).all(userId);
+    return db.prepare(`${this.getNotifSelectQuery()} WHERE notif.receiver_id = ?
+  	ORDER BY notif.created_at DESC`).all(userId);
+
   }
+
+	updateNotificationStatus(db, { notifId, status, isRead = 1 }) {
+		const prepared = db.prepare(`UPDATE notifications SET status = ?, is_read = ? WHERE id = ?`);
+		return prepared.run(status, isRead, notifId);
+	}
+
+	getNotificationById(db, notifId) {
+		return db.prepare(`${this.getNotifSelectQuery()} WHERE notif.id = ?`).get(notifId);
+	}
+
+	getUnreadCount(db, userId){
+		return db.prepare(`SELECT COUNT(*) AS unreadCount FROM notifications WHERE receiver_id = ?
+			AND is_read = 0 AND (is_expired = 0 OR is_expired IS NULL)`).get(userId);
+	}
 }
+
+
+export const NotifModel = new notifModel();

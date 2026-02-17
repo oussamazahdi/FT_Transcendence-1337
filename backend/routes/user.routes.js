@@ -52,34 +52,7 @@ function userRoutes(fastify)
                 },
                 required: ['id']
             },
-            // body: {
-            //     type: 'object',
-            //     properties: {
-            //             firstname: {
-            //                 type: 'string',
-            //                 minLength: 3,
-            //                 maxLength: 15,
-            //             },
-            //             lastname: {
-            //                 type: 'string',
-            //                 minLength: 3,
-            //                 maxLength: 15,
-            //             },
-            //             username: {
-            //                 type: 'string',
-            //                 minLength: 3,
-            //                 maxLength: 15,
-            //             },
-            //             email: {
-            //                 type: 'string',
-            //                 format: 'email'
-            //             },
-            //             password: {
-            //                 type: 'string',
-            //                 minLength: 8,
-            //             },
-            //     },
-            // },
+            consumes: ['multipart/form-data'],
             response: {
                 200: emptySuccessResponse,
                 400: {
@@ -149,18 +122,18 @@ function userRoutes(fastify)
             }
         }
     }, userController.changePassword);
-    // TODO: Refactor search later - needs querystring
+
     fastify.get("/search", {
         preHandler: authMiddleware,
         schema: {
             description: 'search route is under construction',
             tags: ['Users'],
-            response: {
-                200: emptySuccessResponse,
-                400: errorResponse,
-                401: errorResponse,
-                500: errorResponse
-            }
+            // response: {
+            //     200: emptySuccessResponse,
+            //     400: errorResponse,
+            //     401: errorResponse,
+            //     500: errorResponse
+            // }
         }
     }, userController.searchUsers);
 }
