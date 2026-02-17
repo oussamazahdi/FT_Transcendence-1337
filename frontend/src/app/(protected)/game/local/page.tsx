@@ -1,36 +1,31 @@
 "use client";
 
 import PongGame from "@/components/ui/game";
-import { useAuth } from "@/contexts/authContext";
-import type { User } from "@/types/index";
+import { assets } from "@/assets/data";
 
 type PlayerInput = {
 	firstname?: string;
 	lastname?: string;
   nickName?: string;
   username?: string;
-  avatar?: string;
+  avatar?: any;
 };
 
 export default function LocalGame() {
-  const { user } = useAuth() as {
-    user: User | null;
-  };
 
 	const player1: PlayerInput = {
-		firstname: "oussama",
-		lastname: "zahdi",
-		nickName: "ozahdi",
-		username: "ozahdi",
-		avatar: user?.avatar || undefined,
+		firstname: "Default",
+		lastname: "Player1",
+		nickName: "Default",
+		username: "Default",
+		avatar: assets.defaultProfile,
 	};
-
 	const player2: PlayerInput = {
-		firstname: "kamal",
-		lastname: "el alami",
-		nickName: "kael-ala",
-		username: "kael-ala",
-		avatar: user?.avatar || undefined,
+		firstname: "Default",
+		lastname: "Player2",
+		nickName: "Default",
+		username: "Default",
+		avatar: assets.defaultProfile,
 	};
 
 	return (

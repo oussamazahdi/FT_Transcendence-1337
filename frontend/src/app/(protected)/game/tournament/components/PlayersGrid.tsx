@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import { TournamentPlayer, PlayerSlotStatus, DEFAULT_AVATARS } from "../types";
 
 export function PlayersGrid({ slots, lockedUserId, onRemove,}: {
@@ -39,7 +40,9 @@ function PlayerSlotCard({ idx, slot, lockedUserId, onRemove }: {
     <div className={cardClass}>
       <div className="h-12 w-12 shrink-0 aspect-square overflow-hidden rounded-xl bg-white/10 ring-1 ring-white/10">
         {slot.status === "filled" ? (
-          <img
+          <Image
+						width={500}
+						height={500}
             alt={slot.player!.username}
             src={slot.player!.avatarUrl ?? DEFAULT_AVATARS[0] ?? "/gameAvatars/profile1.jpeg"}
             className="h-full w-full object-cover"
