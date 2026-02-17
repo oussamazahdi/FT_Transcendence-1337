@@ -1,7 +1,7 @@
 
 import { userController } from "../controllers/user.controller.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
-import { errorResponse, emptySuccessResponse, objectSuccessResponse, nestedObjectSuccessResponse } from "../config/schemes.config.js";
+import { minimalUserSchema, errorResponse, emptySuccessResponse, objectSuccessResponse, nestedObjectSuccessResponse } from "../config/schemes.config.js";
 
 function userRoutes(fastify)
 {
@@ -126,14 +126,14 @@ function userRoutes(fastify)
     fastify.get("/search", {
         preHandler: authMiddleware,
         schema: {
-            description: 'search route is under construction',
+            description: 'search users across database',
             tags: ['Users'],
-            // response: {
-            //     200: emptySuccessResponse,
-            //     400: errorResponse,
-            //     401: errorResponse,
-            //     500: errorResponse
-            // }
+            response: {
+                200: minimalUserSchema,
+                400: errorResponse,
+                401: errorResponse,
+                500: errorResponse
+            }
         }
     }, userController.searchUsers);
 }

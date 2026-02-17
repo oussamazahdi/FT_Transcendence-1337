@@ -1,6 +1,5 @@
 import path from "path";
 import jwt from "jsonwebtoken"
-import { Session } from "inspector";
 
 function randomPasswordGenerator(length)
 {
@@ -63,7 +62,7 @@ function updateTokenFlags(user, reply)
         httpOnly: true,
         sameSite: 'strict',
         path: '/',
-        maxAge: 15 * 60 * 1000
+        maxAge: 60 * 60
     });
 }
 

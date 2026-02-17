@@ -78,7 +78,7 @@ export class TwoFactorController
                 httpOnly: true,
                 sameSite: 'lax',
                 path: '/',
-                maxAge: 7 * 24 * 60 * 60 * 1000
+                maxAge: 60 * 60
             });
             twoFactorModels.update2FASessionStatus(db, 0, request.user.userId);
             return reply.code(200).send({message: "2FA_VERIFIED_SUCCESSFULLY"});

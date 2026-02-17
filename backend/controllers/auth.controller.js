@@ -37,13 +37,13 @@ export class AuthController {
                 httpOnly: true,
                 sameSite: 'lax',
                 path: '/',
-                maxAge: 300
+                maxAge: 60 * 60 * 24 * 7
             });
             reply.setCookie('accessToken', accessToken, {
                 httpOnly: true,
                 sameSite: 'lax',
                 path: '/',
-                maxAge: 30
+                maxAge: 60 * 60
             });
             return reply.code(200).send({message: "AUTHORIZED", userData: result});
         }
@@ -76,13 +76,13 @@ export class AuthController {
                 httpOnly: true,
                 sameSite: 'lax',
                 path: '/',
-                maxAge: 300
+                maxAge: 60 * 60 * 24 * 7
             });
             reply.setCookie('accessToken', accessToken, {
                 httpOnly: true,
                 sameSite: 'lax',
                 path: '/',
-                maxAge: 30
+                maxAge: 60 * 60
             });
             return reply.code(201).send({message: "USER_CREATED_SUCCESSFULLY"});
         }

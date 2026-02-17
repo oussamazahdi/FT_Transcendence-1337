@@ -26,7 +26,7 @@ export class AuthModels
             return (user);
         }
         catch (error) {
-            const dbError = handleDatabaseError(error, 'addNewUser');
+            const dbError = handleDatabaseError(error, 'loginUser');
             throw dbError;
         }
     }
